@@ -46,10 +46,11 @@ if __name__ == '__main__':
     #####################
     # Part 3:
     # Use the initial conditions and propagation matrix for prediction
+    #####################
+
     # A = ?
     # a = ?
     # s = ?
-    #####################
 
     # Initial conditions for s0
     # Compute the rest of sk using Eq (1)
@@ -60,12 +61,13 @@ if __name__ == '__main__':
     #####################
     # Part 4:
     # Use the Kalman filter for prediction
+    #####################
+
     # B = ?
     # C = ?
-    #
+
     # Initial conditions for s0 and Sigma0
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
-    #####################
 
     # ax.plot(x_coords, y_coords, z_coords,
     #         '-r', label='Filtered trajectory')
