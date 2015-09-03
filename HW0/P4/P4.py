@@ -1,7 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-
+import pandas as pd
+import seaborn as sns
+sns.set_context('poster', font_scale=1.25)
 
 if __name__ == '__main__':
     # Model parameters
@@ -30,9 +32,13 @@ if __name__ == '__main__':
     # Load true trajectory and plot it
     # Normally, this data wouldn't be available in the real world
     #####################
+    s_true = pd.read_csv('./P4_trajectory.txt', header=None)
+    x_coords = s_true.loc[:, 0]
+    y_coords = s_true.loc[:, 1]
+    z_coords= s_true.loc[:, 2]
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '--b', label='True trajectory')
+    ax.plot(x_coords, y_coords, z_coords,
+             '--b', label='True trajectory')
 
     #####################
     # Part 2:
