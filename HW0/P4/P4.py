@@ -104,15 +104,26 @@ if __name__ == '__main__':
     # Use the Kalman filter for prediction
     #####################
 
+    def predictS(s, A=A, a=a):
+        """s must be oriented in the correct direction, i.e. column form."""
+        return np.dot(A, s) + a
+
+    def predictSig(s_propagated):
+        print 'in the works'
+
+
+    s_propagated = predictS(s)
+    print s_propagated
+
     # B = ?
     # C = ?
 
     # Initial conditions for s0 and Sigma0
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
 
-    # ax.plot(x_coords, y_coords, z_coords,
+    #ax.plot(x_coords, y_coords, z_coords,
     #         '-r', label='Filtered trajectory')
 
     # Show the plot
-    ax.legend()
-    plt.show()
+    #ax.legend()
+    #plt.show()
