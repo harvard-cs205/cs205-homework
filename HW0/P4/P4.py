@@ -82,19 +82,18 @@ if __name__ == '__main__':
     # Compute the rest of sk using Eq (1)
     s = np.array([[0, 0, 2, 15, 3.5, 4.0]]).T
 
-    K = 20
+    K = 130
     positions = np.zeros((6, K), dtype = np.double)
     positions[:, 0] = s[:, 0]
-    print positions
     for i in range(1, K):
         cur_position = positions[:, i-1]
         cur_position = np.array([cur_position]).T
         update_position = np.dot(A, cur_position) + a
         positions[:, i] = update_position[:, 0]
 
-    x_predicted = positions[:, 0]
-    y_predicted = positions[:, 1]
-    z_predicted = positions[:, 2]
+    x_predicted = positions[0, :]
+    y_predicted = positions[1, :]
+    z_predicted = positions[2, :]
 
 
     ax.plot(x_predicted, y_predicted, z_predicted,
