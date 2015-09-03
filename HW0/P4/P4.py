@@ -48,9 +48,20 @@ if __name__ == '__main__':
     #
     # Read the observation array and plot it (Part 2)
     #####################
+    measurements = pd.read_csv('./P4_measurements.txt', header=None)
+    # We now have to rescale x, y, and z appropriately. Luckily, the matrix
+    # is diagonal so we can just decouple everything.
+    rescaled_measurements = measurements.values
+    rescaled_measurements[:, 0] *= 1./rx
+    rescaled_measurements[:, 1] *= 1./ry
+    rescaled_measurements[:, 2] *= 1./rz
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '.g', label='Observed trajectory')
+    rescaled_x = rescaled_measurements[:, 0]
+    rescaled_y = rescaled_measurements[:, 1]
+    rescaled_z = rescaled_measurements[:, 2]
+
+    ax.plot(rescaled_x, rescaled_y, rescaled_z,
+             '.g', label='Observed trajectory')
 
     #####################
     # Part 3:
