@@ -1,1 +1,6 @@
-# Your answers here.
+1. 255 seconds
+2. 248/8 + 3 = 34 seconds
+3. 8 seconds
+4. ceil(log(N))
+5. Assuming infinite employees, 8 + 7 = 15
+6. For 1 bag: 256 + 8 = 264? For 2 bags: 128 + 7 = 135
