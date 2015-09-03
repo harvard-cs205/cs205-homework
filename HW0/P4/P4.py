@@ -104,6 +104,21 @@ if __name__ == '__main__':
     # Use the Kalman filter for prediction
     #####################
 
+    B = np.array([
+        [bx, 0, 0, 0, 0, 0],
+        [0, by, 0, 0, 0, 0],
+        [0, 0, bz, 0, 0, 0],
+        [0, 0, 0, bvx, 0, 0],
+        [0, 0, 0, 0, bvy, 0],
+        [0, 0, 0, 0, 0, bvz]
+    ])
+    C = np.array([
+        [rx, 0, 0, 0, 0, 0],
+        [0, ry, 0, 0, 0, 0],
+        [0, 0, rz, 0, 0, 0]
+    ])
+
+
     def predictS(s, A=A, a=a):
         """s must be oriented in the correct direction, i.e. column form."""
         return np.dot(A, s) + a
@@ -115,8 +130,6 @@ if __name__ == '__main__':
     s_propagated = predictS(s)
     print s_propagated
 
-    # B = ?
-    # C = ?
 
     # Initial conditions for s0 and Sigma0
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
