@@ -80,11 +80,11 @@ if __name__ == '__main__':
 
     # Initial conditions for s0
     # Compute the rest of sk using Eq (1)
-    s = np.array([[0, 0, 2, 15, 3.5, 4.0]]).T
+    s0 = np.array([[0, 0, 2, 15, 3.5, 4.0]]).T
 
     K = 130
     positions = np.zeros((6, K), dtype = np.double)
-    positions[:, 0] = s[:, 0]
+    positions[:, 0] = s0[:, 0]
     for i in range(1, K):
         cur_position = positions[:, i-1]
         cur_position = np.array([cur_position]).T
@@ -118,21 +118,40 @@ if __name__ == '__main__':
         [0, 0, rz, 0, 0, 0]
     ])
 
-
-    def predictS(s, A=A, a=a):
-        """s must be oriented in the correct direction, i.e. column form."""
-        return np.dot(A, s) + a
-
-    def predictSig(s_propagated):
-        print 'in the works'
-
-
-    s_propagated = predictS(s)
-    print s_propagated
-
-
     # Initial conditions for s0 and Sigma0
+    # s0 is defined above
+    sigma0 = 0.01 * np.identity(6)
+
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
+    def predictS(cur_s):
+        """cur_s must be oriented in the correct direction, i.e. column form."""
+        return np.dot(A, cur_s) + a
+
+    def predictSig(cur_s, sigma_k):
+        first_term = A.dot(sigma_k).dot(A.T)
+        second_term = B.dot(B.T)
+        return np.linalg.inv(first_term + second_term)
+
+    def updateSig(cur_sigma):
+        inner = cur_sigma + C.T.dot(C)
+        return np.linalg.inv(inner)
+
+    def updateS(cur_s, cur_sigma, sigma_k_plus_1, m_k_plus_1):
+        inner = cur_sigma.dot(cur_s) + C.T.dot(m_k_plus_1)
+        return sigma_k_plus_1.dot(inner)
+
+    positions = np.zeros((6, K), dtype = np.double)
+    positions[:, 0] = s0[:, 0]
+    for i in range(1, K):
+        cur_position = positions[:, i-1]
+        predicted_s = predictS(cur_position)
+        cur_position = np.array([cur_position]).T
+        update_position = np.dot(A, cur_position) + a
+        positions[:, i] = update_position[:, 0]
+
+    s_propagated = predictS(s0)
+    sig_predict = predictSig(s_propagated, sigma0)
+
 
     #ax.plot(x_coords, y_coords, z_coords,
     #         '-r', label='Filtered trajectory')
