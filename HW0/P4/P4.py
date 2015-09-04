@@ -41,8 +41,13 @@ if __name__ == '__main__':
     # Read the observation array and plot it (Part 2)
     #####################
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '.g', label='Observed trajectory')
+    s_measured = np.loadtxt('P4_measurements.txt', delimiter=',')
+
+    # adjust for dimensional stretching
+    s_measured = np.multiply(s_measured, np.array([1. / rx, 1. / ry, 1. / rz]))
+
+    x_coords, y_coords, z_coords = s_measured.T
+    ax.plot(x_coords, y_coords, z_coords, '.g', label='Observed trajectory')
 
     #####################
     # Part 3:
