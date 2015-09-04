@@ -31,8 +31,9 @@ if __name__ == '__main__':
     # Normally, this data wouldn't be available in the real world
     #####################
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '--b', label='True trajectory')
+    s_true = np.loadtxt('P4_trajectory.txt', delimiter=',')
+    x_coords, y_coords, z_coords, x_velocity, y_velocity, z_velocity = s_true.T
+    ax.plot(x_coords, y_coords, z_coords, '--b', label='True trajectory')
 
     #####################
     # Part 2:
