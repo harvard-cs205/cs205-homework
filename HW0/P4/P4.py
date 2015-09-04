@@ -31,8 +31,13 @@ if __name__ == '__main__':
     # Normally, this data wouldn't be available in the real world
     #####################
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '--b', label='True trajectory')
+    s_true = np.loadtxt('P4_trajectory.txt', delimiter=',')
+    x_coords = s_true[:,0]
+    y_coords = s_true[:,1]
+    z_coords = s_true[:,2]
+
+    ax.plot(x_coords, y_coords, z_coords,
+            '--b', label='True trajectory')
 
     #####################
     # Part 2:
@@ -40,8 +45,19 @@ if __name__ == '__main__':
     # Read the observation array and plot it (Part 2)
     #####################
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '.g', label='Observed trajectory')
+    # References: http://stackoverflow.com/questions/4151128/what-are-the-differences-between-numpy-arrays-and-matrices-which-one-should-i-u
+    s_measured = np.loadtxt('P4_measurements.txt', delimiter=',')
+
+    C = np.zeros((3,3))
+    C[np.diag_indices(3)] = [1./rx, 1./ry, 1./rz]
+    m = np.dot(C,np.transpose(s_measured))
+
+    x_coords = m[0,:]
+    y_coords = m[1,:]
+    z_coords = m[2,:]
+
+    ax.plot(x_coords, y_coords, z_coords,
+            '.g', label='Observed trajectory')
 
     #####################
     # Part 3:
