@@ -64,15 +64,34 @@ if __name__ == '__main__':
     # Use the initial conditions and propagation matrix for prediction
     #####################
 
-    # A = ?
-    # a = ?
-    # s = ?
+    # Propagation matrix
+    A = np.zeros((6,6))
+    A0, A1 = 1., 1 - c*dt
+    A[np.diag_indices(6)] = [1., 1., 1., A1, A1, A1]
+    A[0,3], A[1,4], A[2,5] = dt, dt, dt
+
+    # 'a' vector
+    a = np.zeros(6)
+    a[-1] = g*dt
+    a = np.transpose(a)
 
     # Initial conditions for s0
-    # Compute the rest of sk using Eq (1)
+    s0 = np.transpose( np.array( ([0, 0, 2, 15, 3.5, 4.0]) ) )
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '-k', label='Blind trajectory')
+    # 's' matrix
+    s = np.zeros( (6,K) )
+    s[:,0] = s0
+
+    # Compute the rest of sk using Eq (1)
+    for cur_k in xrange(1, K):
+        s[:,cur_k] = np.dot(A,s[:,cur_k-1]) + a
+
+    x_coords = s[0,:]
+    y_coords = s[1,:]
+    z_coords = s[2,:]
+
+    ax.plot(x_coords, y_coords, z_coords,
+            '-k', label='Blind trajectory')
 
     #####################
     # Part 4:
