@@ -1,1 +1,17 @@
 # Your answers here.
+
+1. 255 seconds
+
+2. Yes. They could each take 32 bags and find their individual totals in 31 seconds. Then 4 of them could each take 2 sums and add those in 1 second, 2 of them could take 2 sums again and those in 1 second, and finally one could add the last two remaining sums in an additional second for a total of 34 seconds.
+
+All logs below are base 2.
+
+3. With infinite employees, they could reduce the number of sums needed by a factor of 2 each second, so it would take them a total of ceil(log(256)) = 8 seconds.
+
+4. ceil(log(N)) seconds with infinite employees, N-1 seconds with one employee. 
+
+5. They would have to communicate after each sum, so it would take 15 seconds instead of 8.
+
+6. 1 bag - It would take 256 seconds just to hand out the bags. However, the cashiers could start handing over bags, computing sums, and transferring sums while you continued to hand them out. It would take an extra four seconds after you finished handing all of them out in order to hand over and sum the last few bags for a total of 260 seconds.
+2 bags - Same as above, but only 128 seconds to hand out the bags for a total of 132 seconds. 
+Better strategy - The added overhead of handing out the bags means it is faster to hand out more bags to each cashier so they can work when you are handing out the rest of the bags. It would thereore be faster to hand out 16 bags to each cashier. 

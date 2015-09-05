@@ -68,7 +68,6 @@ if __name__ == '__main__':
 
     def get_next_step(s_k):
         s_k = np.matrix(s_k)
-        # got mixed up between column and row vectors
         return (A * s_k.transpose() + a).transpose()
 
     s = s_true[0]
@@ -132,9 +131,6 @@ if __name__ == '__main__':
         kalman_predictions[k] = s.transpose()
 
     x_coords, y_coords, z_coords = get_cols(kalman_predictions)[:3]
-
-
-
 
     # Initial conditions for s0 and Sigma0
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
