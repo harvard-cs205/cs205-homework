@@ -1,1 +1,26 @@
-# Your answers here
+## Explanation
+
+Unlike in a single-threaded, single-process program, there are no guarantees about what order commands are executed in. In this case, with multiple processes, instructions will be scheduled for execution based on the scheduling algorithm. This algorithm can be setup in different ways to optimise certain characteristics depending on the nature of program. It is not necessarily going to be done on a first-come-first-served basis. 
+
+In such circumstances, there will often be frequent context switches which explains the interleaving of commands from different processes. For example, other processes run commands between the “Hi Job” and “Bye Job” commands for a particular process. In addition, on multiple cores, the commands may be executed on different cores leading to further interleaving of commands. 
+
+## How this affects how we program
+
+As commands can be executed in a seemingly random fashion, additional tools such as mutexes and semaphores need to be used if particular guarantees are required. We also need to be mindful of strange effects that can occur due to race conditions. These might only occur once in a while, making debugging particularly difficult.
+
+## Scenarios where this is important
+
+Whenever we have multiple threads/processes potentially reading and modifying shared memory, this becomes critical. Suppose we are trying to execute a particular function `doTenTimes()` 10 times in parallel. The logical thing is to try and keep a counter of how many times the function has executed; let this be stored in some variable `counter`. Each thread/process checks the counter variable with something like 
+
+```python
+while True:
+	if counter < 10:
+		doTenTimes()
+		counter += 1
+	else:
+		break
+```
+
+The problem is that the function `doTenTimes()` might be executed more than 10 times. The interleaving of commands from different threads or processes means that a check of `counter < 10` could happen right after the 10th execution of doTenTimes(), but before `counter` could actually be updated to equal 10. The simple solution here is to use a lock with the shared variable `counter` when reading or writing to it.
+
+
