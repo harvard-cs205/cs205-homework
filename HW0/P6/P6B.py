@@ -1,3 +1,5 @@
+import matplotlib as mpl
+mpl.use('Qt4Agg')
 import multiprocessing as mp
 import time
 import matplotlib.pyplot as plt
