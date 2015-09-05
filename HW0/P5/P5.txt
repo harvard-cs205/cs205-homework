@@ -1,1 +1,32 @@
 # Your answers here.
+
+1) Need to do 255 summations - 255 seconds
+
+2) Yes, the 8 of them can split the bags evenly and find the sum of their respective 32 bags which would take 31 seconds. 4 of them then take the sums of the other 4 people and sum their numbers together (1 second), then 2 take the sum of the other 2 (1 second), then 1 person takes the final sum (1 second). So in total 34 seconds + whatever time it takes to communicate the sums between employees.
+
+3) Using the same process of adding numbers, then taking half the employees to add the remaining numbers...
+	128 employees sum 2 numbers - 1 second
+	64 employees sum 2 numbers - 1 second
+	...
+	1 employee sums 2 numbers
+
+	For a total of 8 seconds
+
+4) log_2(N) seconds.
+
+5) Add a second every time there's a sum between two numbers except in the first case - 15 seconds
+
+6) Add 256 seconds, 1 second for every cashier coming to get 1 bag from you - 271 seconds
+   Add 128 seconds, 1 second for every cashier coming to get 2 bags from you - 143 seconds
+
+   Try to parallelize the distribution of bags as much as possible:
+
+   Give 256 bags to Emp1 - 1 second
+   Emp1 gives 128 bags to Emp2 - 1 second
+   Emp1-2 give 64 bags simultaneously to Emp3/Emp4 - 1 second
+   Emp1-4 give 32 bags simultaneously to Emp5-8 - 1 second
+   ...
+   Emp1-64 give 2 bags simultaneously to Emp65-128 - 1 second
+   Give your 2 bags to Emp65 - 1 second
+
+   Altogether distribution is 9 seconds + 15 seconds of calculation = 24 seconds
