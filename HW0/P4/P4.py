@@ -32,7 +32,7 @@ if __name__ == '__main__':
     #####################
     s_true=np.loadtxt('P4_trajectory.txt',delimiter=',')
     #Get transpose
-    s_true=zip(*s_true)
+    s_true=s_true.transpose()
     ax.plot(s_true[0], s_true[1], s_true[2],'--b', label='True trajectory')
 
     #####################
@@ -88,7 +88,7 @@ if __name__ == '__main__':
     B[0][0]=bx;B[1][1]=by;B[2][2]=bz
     B[3][3]=bvx;B[4][4]=bvy;B[5][5]=bvz
     
-    C=np.identity(3)
+    C=np.zeros([3,6])
     C[0][0]=rx
     C[1][1]=ry
     C[2][2]=rz
@@ -96,15 +96,31 @@ if __name__ == '__main__':
     # Initial conditions for s0 and Sigma0
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
     # predictS
-    def predictS(x,A,a):
-      return np.dot(A,x)+a
+    def predictS(s,A,a):
+      return np.dot(A,s)+a
     #predictSig
     def predictSig(A,Sig,B):
-      return np.    
-
-
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '-r', label='Filtered trajectory')
+      return np.linalg.inv(A.dot(np.dot(Sig,A.transpose()))+np.dot(B,B.transpose()))
+    #updateSig
+    def updateSig(Sig_w,C):
+      return np.linalg.inv(Sig_w+np.dot(C.transpose(),C))
+    #updateS
+    def updateS(Sig,s,C,m):
+      return np.dot(np.linalg.inv(Sig+np.dot(C.transpose(),C)),(np.dot(Sig,s)+np.dot(C.transpose(),m)))
+    #Init and Compute
+    m=np.loadtxt('P4_measurements.txt',delimiter=',')
+    S=np.zeros([6,K+1])
+    s=S[:,0]=[0,0,2,15,3.5,4.0]
+    Sig=0.01*np.identity(6)
+    k=0
+    while k<K:
+     #s=predictS(s,A,a)
+     s=updateS(predictSig(A,Sig,B),predictS(s,A,a),C,m[k,:])
+     Sig=updateSig(predictSig(A,Sig,B),C)
+     S[:,k+1]=s
+     k=k+1
+    ax.plot(S[0], S[1], S[2],
+             '-r', label='Filtered trajectory')
 
     # Show the plot
     ax.legend()
