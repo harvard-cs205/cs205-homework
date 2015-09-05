@@ -20,6 +20,8 @@ if __name__ == '__main__':
     rx = 1.0
     ry = 5.0
     rz = 5.0
+    
+    C = np.diag([rx,ry,rz])
 
     # Create 3D axes for plotting
     ax = Axes3D(plt.figure())
@@ -30,47 +32,112 @@ if __name__ == '__main__':
     # Load true trajectory and plot it
     # Normally, this data wouldn't be available in the real world
     #####################
+    
+    TruTraj = np.loadtxt("P4_trajectory.txt",dtype='float',delimiter=',')
+    xTru_coords, yTru_coords, zTru_coords = TruTraj[:,0], TruTraj[:,1], TruTraj[:,2]
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '--b', label='True trajectory')
+    #Plotting the true position
+    ax.plot(xTru_coords, yTru_coords, zTru_coords, '--b', label='True trajectory')
 
     #####################
     # Part 2:
     #
     # Read the observation array and plot it (Part 2)
     #####################
-
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '.g', label='Observed trajectory')
+    
+    ObsTraj = np.loadtxt("P4_measurements.txt",dtype='float',delimiter=',')
+    xObs_coords, yObs_coords, zObs_coords = ObsTraj[:,0], ObsTraj[:,1], ObsTraj[:,2]
+    
+    #Plotting the measured position
+    ax.plot(xObs_coords, yObs_coords, zObs_coords,'.g', label='Observed trajectory')
+    
+    xtld = ObsTraj.dot(np.diag([1/rx, 1/ry, 1/rz])) # I decided to try and streamline this...
+                                           #  which may be a sign that I'm getting comfy
+    #Plotting the approximate position
+    ax.plot(xtld[:,0],xtld[:,1],xtld[:,2],'.r', label='Approximate Position')                                        
+    
+    
 
     #####################
     # Part 3:
     # Use the initial conditions and propagation matrix for prediction
     #####################
 
-    # A = ?
-    # a = ?
+	#Propagation Matrix
+    A = np.diag([1, 1, 1, 1-c*dt, 1-c*dt, 1-c*dt]) + np.diag([dt, dt, dt],3)
+    
+    #Accounting for gravity in update
+    a = np.zeros(A.shape[0]) 
+    a[-1] = g*dt
     # s = ?
 
     # Initial conditions for s0
+    s0 = np.matrix(TruTraj[0,:]).T
+    
     # Compute the rest of sk using Eq (1)
-
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '-k', label='Blind trajectory')
+    sK = np.matrix(np.zeros((6,np.amax(TruTraj.shape)))) #Initializing array for state predictions
+    sK[:,0] = s0                              #Placing initial measurement as first column
+    
+    for i in range(1,np.amax(TruTraj.shape)):
+         sK[:,i] = A * sK[:,i-1] + np.matrix(a).T
+    
+    sK = np.asarray(sK) # Converting state prediction matrix to an array (for plotting??)
+    
+    #Plotting the predicted positions
+    ax.plot(sK[0,:], sK[1,:], sK[2,:], '-k', label='Blind trajectory')
 
     #####################
     # Part 4:
     # Use the Kalman filter for prediction
     #####################
 
-    # B = ?
-    # C = ?
-
+    B = np.diag([bx, by, bz, bvx, bvy, bvz])
+    C = np.concatenate( ( np.diag([rx, ry, rz]), np.zeros((3,3)) ), axis=1 )
+    
     # Initial conditions for s0 and Sigma0
+    s0_kalman, Sigma0 = np.matrix(TruTraj[0,:]).T, np.identity(A.shape[0]) * 0.01
+    
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
+    
+    def predictS(priorState): # Eq(2)
+         #Will fill out code structure here based on state update from part 3
+         predS = A * priorState + np.matrix(a).T
+         return predS
+         
+    def predictSig(priorSig): # Eq(3)
+         #Will fill out code structure here to predict SigmaK update
+         predSig = np.linalg.inv(A * priorSig * A.T + B * B.T)
+         return predSig
+         
+    def updateSig(predSig): # Eq(4)
+         #Will fill out structure here to update SigmaK
+         sigUpdate = np.linalg.inv(predSig + C.T.dot(C))
+         return sigUpdate
+         
+    def updateS(predS,sigmaUpdate,predSig,curMeas): # Eq (5)
+         #Will fill out structure here to update state estimate
+         stateUpdate = sigmaUpdate * (predSig * predS + C.T * curMeas)
+         return stateUpdate
+         
+    # Set up state estimation data structure and convert measurements array to a matrix
+    sK_kalman = np.matrix(np.zeros((6,np.amax(TruTraj.shape))))
+    sK_kalman[:,0] = s0_kalman
+    Measurements = np.matrix(ObsTraj)
+    
+         
+    # Run Kalman filter to determine estimate of trajectory     
+    for ii in range(1,np.amax(TruTraj.shape)):
+         if ii == 1:
+              sigUpdate = Sigma0
+              
+         sPred = predictS(sK_kalman[:,ii-1])
+         sigPred = predictSig(sigUpdate)
+         sigUpdate = updateSig(sigPred)
+         sK_kalman[:,ii] = updateS(sPred,sigUpdate,sigPred,Measurements[ii,:].T)
+    
+    sK_kalman = np.asarray(sK_kalman) # Converting state prediction matrix to an array (for plotting??)
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '-r', label='Filtered trajectory')
+    ax.plot(sK_kalman[0,:], sK_kalman[1,:], sK_kalman[2,:],'-r', label='Filtered trajectory')
 
     # Show the plot
     ax.legend()
