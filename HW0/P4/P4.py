@@ -127,7 +127,7 @@ if __name__ == '__main__':
         """cur_s must be oriented in the correct direction, i.e. column form."""
         return np.dot(A, cur_s) + a
 
-    def predictSig(cur_s, sigma_k):
+    def predictSig(sigma_k):
         first_term = A.dot(sigma_k).dot(A.T)
         second_term = B.dot(B.T)
         return np.linalg.inv(first_term + second_term)
@@ -142,20 +142,30 @@ if __name__ == '__main__':
 
     positions = np.zeros((6, K), dtype = np.double)
     positions[:, 0] = s0[:, 0]
+    cur_sigma = sigma0
     for i in range(1, K):
-        cur_position = positions[:, i-1]
-        predicted_s = predictS(cur_position)
-        cur_position = np.array([cur_position]).T
-        update_position = np.dot(A, cur_position) + a
-        positions[:, i] = update_position[:, 0]
+        s_k = positions[:, i-1]
+        s_tilde = predictS(s_k)
+        sig_tilde = predictSig(cur_sigma)
 
-    s_propagated = predictS(s0)
-    sig_predict = predictSig(s_propagated, sigma0)
+        sigma_k_plus_1 = updateSig(sig_tilde)
 
+        m_k_plus_1 = measurements.values[i, :]
 
-    #ax.plot(x_coords, y_coords, z_coords,
-    #         '-r', label='Filtered trajectory')
+        s_k_plus_1 = updateS(s_tilde, cur_sigma, sigma_k_plus_1,
+                             m_k_plus_1)
+
+        print s_k_plus_1.shape
+
+        positions[:, i] = s_k_plus_1
+
+    x_filtered = positions[0, :]
+    y_filtered = positions[1, :]
+    z_filtered = positions[2, :]
+
+    ax.plot(x_coords, y_coords, z_coords,
+             '-r', label='Filtered trajectory')
 
     # Show the plot
-    #ax.legend()
-    #plt.show()
+    ax.legend()
+    plt.show()
