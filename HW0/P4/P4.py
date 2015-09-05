@@ -31,8 +31,9 @@ if __name__ == '__main__':
     # Normally, this data wouldn't be available in the real world
     #####################
 
-    x_coords, y_coords, z_coords, v_x, v_y, v_z = s_true = np.loadtxt('P4_trajectory.txt', delimiter = ',', unpack = True)
-    ax.plot(x_coords, y_coords, z_coords,
+    s_true = np.loadtxt('P4_trajectory.txt', 
+             delimiter = ',', unpack = True)
+    ax.plot(s_true[0], s_true[1], s_true[2],
              '--b', label='True trajectory')
 
     #####################
@@ -40,9 +41,13 @@ if __name__ == '__main__':
     #
     # Read the observation array and plot it (Part 2)
     #####################
+    #C = np.matrix([1.0/rx,0,0],[0,1.0/ry,0],[0,0,1.0/rz])
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '.g', label='Observed trajectory')
+    s_measured = np.loadtxt('P4_measurements.txt', 
+             delimiter = ',', unpack = True)
+
+    ax.plot(s_measured[0] * 1.0/rx, s_measured[1] * 1.0/ry, s_measured[2] * 1.0/rz,
+             '.g', label='Observed trajectory')
 
     #####################
     # Part 3:
