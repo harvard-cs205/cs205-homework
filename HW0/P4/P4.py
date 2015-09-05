@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-
+from StringIO import StringIO
 
 if __name__ == '__main__':
     # Model parameters
@@ -31,8 +31,9 @@ if __name__ == '__main__':
     # Normally, this data wouldn't be available in the real world
     #####################
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '--b', label='True trajectory')
+    x_coords, y_coords, z_coords, v_x, v_y, v_z = s_true = np.loadtxt('P4_trajectory.txt', delimiter = ',', unpack = True)
+    ax.plot(x_coords, y_coords, z_coords,
+             '--b', label='True trajectory')
 
     #####################
     # Part 2:
