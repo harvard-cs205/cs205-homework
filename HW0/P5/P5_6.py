@@ -7,7 +7,7 @@ handing out x bags per second
 import copy
 
 # set True for second by second updates
-debug = True
+debug = False
 
 #Assume x divides N for simplicity
 def calculateTime(N, x):
@@ -78,4 +78,5 @@ def printStep(employees):
             
 
 if __name__ == '__main__':
+    calculateTime(256,1)
     calculateTime(256,2)
