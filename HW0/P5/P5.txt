@@ -22,7 +22,7 @@
    **Attached script for calculating
 
    1 bag to each employee - 258 seconds
-   2 bags to each employee - 133 seconds
+   2 bags to each employee - 132 seconds
 
    Try to parallelize the distribution of bags as much as possible:
 

@@ -6,6 +6,7 @@ handing out x bags per second
 """
 import copy
 
+# set True for second by second updates
 debug = True
 
 #Assume x divides N for simplicity
@@ -38,12 +39,12 @@ def processStep(employees, i, seconds):
                 print "Employee " + str(j+1) + " sums\n"
         elif temp[j] == 1:
             index = 0
-            min_index = i if i < len(employees) else len(employees)-1
-            while (index < i):
-                if index != j and temp[min_index] > temp[index] and temp[index] > 0:
+            min_index = j
+            while (index <= (i if i < len(employees) else len(employees) - 1)):
+                if index != j and (temp[min_index] >= temp[index] or min_index == j) and temp[index] > 0:
                     min_index = index        
                 index = index + 1
-            if min_index != j and min_index <= i and temp[min_index] > 0:
+            if min_index != j and temp[min_index] >= employees[min_index] and employees[min_index] > 0:
                 communicateBag(employees, j, min_index)
     if debug:
         printStep(employees)
