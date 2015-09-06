@@ -19,7 +19,7 @@
 6) (hand 1 bag of 256 each second)
    If only handing out x bags to each person, at the minimum it would take N/x seconds before handing out all the bags. There shouldn't be too many seconds after that to complete the summation though because as you're handing out bags the employees with bags already can start doing the computation.
 
-   **Attached script for calculating
+   **Attached script for calculating in submission folder
 
    1 bag to each employee - 258 seconds
    2 bags to each employee - 132 seconds
