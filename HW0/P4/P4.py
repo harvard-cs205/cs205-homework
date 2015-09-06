@@ -125,10 +125,10 @@ if __name__ == '__main__':
 
     for i in range(1,K):
         # compute sk+1
-        s_pred = predictS(sk) # wrong shape by 2nd iteration
+        s_pred = predictS(sk)
         sig_pred = predictSig(sig)
         sig = updateSig(sig_pred)
-        sk = updateS(sig, sig_pred, s_pred, mk) # wrong shape
+        sk = updateS(sig, sig_pred, s_pred, mk)
         # append sk+1 onto sk_list
         for j,row in enumerate(sk_list):
             row.append(sk[j][0])
