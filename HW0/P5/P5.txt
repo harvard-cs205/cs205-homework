@@ -26,7 +26,7 @@ the sums between employees.
    summation though because as you're handing out bags the employees with bags already can 
    start doing the computation.
 
-   **Attached script for calculating in submission folder
+   **Attached script for calculating in submission folder P5_6.py
 
    1 bag to each employee - 258 seconds
    2 bags to each employee - 132 seconds
