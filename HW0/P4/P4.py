@@ -165,7 +165,7 @@ if __name__ == '__main__':
     y_filtered = positions[1, :]
     z_filtered = positions[2, :]
 
-    ax.plot(x_coords, y_coords, z_coords,
+    ax.plot(x_filtered, y_filtered, z_filtered,
              '-r', label='Filtered trajectory')
 
     # Show the plot
