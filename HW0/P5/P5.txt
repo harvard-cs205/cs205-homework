@@ -1,1 +1,15 @@
 # Your answers here.
+
+1. There are 255 additions to be done by the single cashier… So 255 seconds
+
+2. Together the 8 of them are much faster. In total it takes 34 seconds 
+
+3. The fastest a store with infinite employees could add up the sum of pennies is 8 seconds.
+
+4. It will take the infinite employees log(N,2) rounded up to the nearest integer of seconds to count the N bags. [Plot submitted as demonstration]
+
+5. By adding overhead into the sum, it will now take 15 seconds. 
+
+6. If each employee only takes one bag and then by including overhead for employees to communicate, it will take 260 seconds at the fastest. If each employee gets two bags from you, the fastest they can sum up the coins is 134 seconds.
+
+With the current time constraints there are better strategies. If you give each employee 16 bags, it will take the 16 employees 35 seconds to calculate the sum.
