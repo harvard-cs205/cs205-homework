@@ -1,3 +1,4 @@
+#####################################################################
 A) We do see some behavior that I would naively expect. We initiate
 a pool of four processes and naively expect that the jobs
 1-10 should complete in order. Instead what we see is something like:
@@ -28,3 +29,13 @@ One scenario where this would be important is trying to have multiple
 data-analyzing threads reading from a set of data that another thread is producing(
 a data producing thread). If timing is not carefully controlled, the data-analyzing
 threads may try to read a dataset that does not yet exist, causing problems.
+
+#####################################
+B) Naively, we expect that the serial time divided by the parallel time
+should always be greater than one. Instead, at times less than roughly
+$10^{-4}$, serial execution is *faster* than parallel execution! This is
+likely because the overhead associated with setting up parallel pools and
+keeping track of threads is greater than the time of running the burnTime program in this regime.
+Evidently, it does not pay to run code in parallel if each job executes extremely quickly,
+as the overhead associated with running a parallel program can ultimately result in a longer
+execution time!
