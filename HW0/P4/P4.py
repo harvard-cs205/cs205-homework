@@ -123,22 +123,22 @@ if __name__ == '__main__':
     sigma0 = 0.01 * np.identity(6)
 
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
-    def predictS(s_k):
+    def predictS(_s_k):
         """cur_s must be oriented in the correct direction, i.e. column form."""
-        return A.dot(s_k) + a
+        return A.dot(_s_k) + a
 
-    def predictSig(sigma_k):
-        first_term = A.dot(sigma_k).dot(A.T)
+    def predictSig(_sigma_k):
+        first_term = A.dot(_sigma_k).dot(A.T)
         second_term = B.dot(B.T)
         return np.linalg.inv(first_term + second_term)
 
-    def updateSig(sig_tilde):
-        inner = sig_tilde + C.T.dot(C)
+    def updateSig(_sig_tilde):
+        inner = _sig_tilde + C.T.dot(C)
         return np.linalg.inv(inner)
 
-    def updateS(s_tilde, sig_tilde, sigma_k_plus_1, m_k_plus_1):
-        inner = sig_tilde.dot(s_tilde) + C.T.dot(m_k_plus_1)
-        return sigma_k_plus_1.dot(inner)
+    def updateS(_s_tilde, _sig_tilde, _sigma_k_plus_1, _m_k_plus_1):
+        inner = _sig_tilde.dot(_s_tilde) + C.T.dot(_m_k_plus_1)
+        return _sigma_k_plus_1.dot(inner)
 
     K = measurements.values.shape[0]
     positions = np.zeros((6, K), dtype = np.double)
