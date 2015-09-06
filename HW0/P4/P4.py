@@ -111,12 +111,12 @@ if __name__ == '__main__':
         [0, 0, 0, bvx, 0, 0],
         [0, 0, 0, 0, bvy, 0],
         [0, 0, 0, 0, 0, bvz]
-    ])
+    ], dtype=np.double)
     C = np.array([
         [rx, 0, 0, 0, 0, 0],
         [0, ry, 0, 0, 0, 0],
         [0, 0, rz, 0, 0, 0]
-    ])
+    ], dtype=np.double)
 
     # Initial conditions for s0 and Sigma0
     # s0 is defined above
