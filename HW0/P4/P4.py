@@ -48,10 +48,10 @@ if __name__ == '__main__':
     #
     # Read the observation array and plot it (Part 2)
     #####################
-    measurements = pd.read_csv('./P4_measurements.txt', header=None)
+    measurements = pd.read_csv('./P4_measurements.txt', header=None).values # Keep it as a ndarray
     # We now have to rescale x, y, and z appropriately. Luckily, the matrix
     # is diagonal so we can just decouple everything.
-    rescaled_measurements = measurements.values
+    rescaled_measurements = measurements.copy() #Copy...we don't want to overwrite the original measurements
     rescaled_measurements[:, 0] *= 1./rx
     rescaled_measurements[:, 1] *= 1./ry
     rescaled_measurements[:, 2] *= 1./rz
@@ -155,7 +155,7 @@ if __name__ == '__main__':
         sig_tilde = predictSig(sigma_k)
         sigma_k_plus_1 = updateSig(sig_tilde)
 
-        m_k_plus_1 = measurements.values[[i], :].T
+        m_k_plus_1 = measurements[[i], :].T
         s_k_plus_1 = updateS(s_tilde, sig_tilde, sigma_k_plus_1, m_k_plus_1)
 
         s_history[:, i] = s_k_plus_1[:, 0]
