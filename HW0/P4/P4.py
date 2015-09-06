@@ -72,11 +72,11 @@ if __name__ == '__main__':
         [1, 0, 0, dt, 0, 0],
         [0, 1, 0, 0, dt, 0],
         [0, 0, 1, 0, 0, dt],
-        [0, 0, 0, 1- c*dt, 0, 0],
-        [0, 0, 0, 0, 1 - c*dt, 0],
+        [0, 0, 0, 1-c*dt, 0, 0],
+        [0, 0, 0, 0, 1-c*dt, 0],
         [0, 0, 0, 0, 0, 1-c*dt]
-    ])
-    a = np.array([[0, 0, 0, 0, 0, g*dt]]).T
+    ], dtype=np.double)
+    a = np.array([[0, 0, 0, 0, 0, g*dt]], dtype=np.double).T
 
     # Initial conditions for s0
     # Compute the rest of sk using Eq (1)
@@ -118,32 +118,24 @@ if __name__ == '__main__':
         [0, 0, rz, 0, 0, 0]
     ], dtype=np.double)
 
-    # Initial conditions for s0 and Sigma0
-    # s0 is defined above
-    sigma0 = 0.01 * np.identity(6)
-
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
     def predictS(_s_k):
         """cur_s must be oriented in the correct direction, i.e. column form."""
         return A.dot(_s_k) + a
 
     def predictSig(_sigma_k):
-        first_term = A.dot(_sigma_k).dot(A.T)
-        second_term = B.dot(B.T)
-        return np.linalg.inv(first_term + second_term)
+        return np.linalg.inv(A.dot(_sigma_k).dot(A.T) + B.dot(B.T))
 
     def updateSig(_sig_tilde):
-        inner = _sig_tilde + C.T.dot(C)
-        return np.linalg.inv(inner)
+        return np.linalg.inv(_sig_tilde + C.T.dot(C))
 
     def updateS(_s_tilde, _sig_tilde, _sigma_k_plus_1, _m_k_plus_1):
-        inner = _sig_tilde.dot(_s_tilde) + C.T.dot(_m_k_plus_1)
-        return _sigma_k_plus_1.dot(inner)
+        return _sigma_k_plus_1.dot(_sig_tilde.dot(_s_tilde) + C.T.dot(_m_k_plus_1))
 
     K = measurements.values.shape[0]
     positions = np.zeros((6, K), dtype = np.double)
     positions[:, 0] = s0[:, 0]
-    sigma_k = sigma0
+    sigma_k = 0.01 * np.identity(6)
     for i in range(1, K):
         s_k = positions[:, i-1]
         s_k = np.array([s_k]).T # Make it a column vector
