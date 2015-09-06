@@ -153,15 +153,13 @@ if __name__ == '__main__':
         s_k = s_history[:, [i-1]] # keep dimensionality
         s_tilde = predictS(s_k)
         sig_tilde = predictSig(sigma_k)
-
         sigma_k_plus_1 = updateSig(sig_tilde)
 
         m_k_plus_1 = measurements.values[[i], :].T
-
-        s_k_plus_1 = updateS(s_tilde, sig_tilde, sigma_k_plus_1,
-                             m_k_plus_1)
+        s_k_plus_1 = updateS(s_tilde, sig_tilde, sigma_k_plus_1, m_k_plus_1)
 
         s_history[:, i] = s_k_plus_1[:, 0]
+
         sigma_k = sigma_k_plus_1
 
     x_filtered = s_history[0]
