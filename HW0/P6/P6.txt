@@ -1,1 +1,8 @@
 # Your answers here
+One strange phenomenon observed was that before Job 0 was finished, Job 1,2,3 began
+executing. This is because the processes are executing in parallel.
+
+Also, even though Job 0 began first, 'Bye Job 1' indicates that Job 1 actually ended
+first. Even though Job 0 started first, Job 1 may have been given more time by the scheduler to execute its job than the time given to Job 0. 
+
+This affects the way we program because many problems will occur if our processes share a resource. For example, if a two processes want to add 1 to a shared variable x only if x==0. Process A checks and sees that x==0, but is interrupted by Process B. B checks x==0 is true and adds one to x. A continues to execute without realizing that B already changed the value of x and thus adds another 1 to x. Now x's value is 2. This could have serious consequences if not noticed.
