@@ -29,11 +29,10 @@ If we keep splitting the bags so that each cashier only needs to add 2 numbers d
 
 5.
 Considering overhead associated with people communicating, 
-each split and count would need 1 second of adding and 1 second of communication overhead except for the initial count and the final count.
-So total time needed = log2(256)*2-2 = 14
+each split and count would need 1 second of adding and 1 second of communication overhead except for the final count.
+So total time needed = log2(256)*2-1 = 15
 
 6.
-[TO DO]
 If each cashier comes to me and takes 1 bag, then it will take 256 seconds to distribute the bags.
 Then, it takes 2 seconds to halve the number of bags.
 So total time needed = 256 + log2(256)*2 = 272
@@ -43,6 +42,6 @@ Then, it takes 2 seconds to halve the number of bags.
 So total time needed = 128 + 1 + log2(128)*2 = 143
 
 Finally, the optimal strategy is to distribute the bags to 2 cashiers at first and then recursively split evenly by 2. Each split requires 2 seconds of counting and communicating.
-Similar to Q5, total time needed for computation = 14
+Similar to Q5, total time needed for computation = 15
 Time needed to distribute the bags = 2
-Total time needed = 14+2 = 16
+Total time needed = 15+2 = 17
