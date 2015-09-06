@@ -101,7 +101,9 @@ if __name__ == '__main__':
     # Use the Kalman filter for prediction
     #####################
 
-    # Redefine constants for sanity
+    # Redefine constants and data for sanity
+
+    measurements = pd.read_csv('./P4_measurements.txt', header=None).values # Keep it as a ndarray
 
     A = np.array([
         [1, 0, 0, dt, 0, 0],
