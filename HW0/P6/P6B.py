@@ -55,6 +55,6 @@ if __name__ == '__main__':
     plt.xlabel('Wait Time (sec)')
     plt.ylabel('Serial Time (sec) / Parallel Time (sec)')
     plt.title('Speedup versus function time')
+    plt.savefig('P6.png', dpi=200, bbox_inches='tight')
     plt.show()
 
-    plt.savefig('P6.png', dpi=200, bbox_inches='tight')
