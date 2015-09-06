@@ -123,43 +123,44 @@ if __name__ == '__main__':
     sigma0 = 0.01 * np.identity(6)
 
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
-    def predictS(cur_s):
+    def predictS(s_k):
         """cur_s must be oriented in the correct direction, i.e. column form."""
-        return np.dot(A, cur_s) + a
+        return A.dot(s_k) + a
 
     def predictSig(sigma_k):
         first_term = A.dot(sigma_k).dot(A.T)
         second_term = B.dot(B.T)
         return np.linalg.inv(first_term + second_term)
 
-    def updateSig(cur_sigma):
-        inner = cur_sigma + C.T.dot(C)
+    def updateSig(sig_tilde):
+        inner = sig_tilde + C.T.dot(C)
         return np.linalg.inv(inner)
 
-    def updateS(cur_s, cur_sigma, sigma_k_plus_1, m_k_plus_1):
-        inner = cur_sigma.dot(cur_s) + C.T.dot(m_k_plus_1)
+    def updateS(s_tilde, sig_tilde, sigma_k_plus_1, m_k_plus_1):
+        inner = sig_tilde.dot(s_tilde) + C.T.dot(m_k_plus_1)
         return sigma_k_plus_1.dot(inner)
 
     K = measurements.values.shape[0]
     positions = np.zeros((6, K), dtype = np.double)
     positions[:, 0] = s0[:, 0]
-    cur_sigma = sigma0
+    sigma_k = sigma0
     for i in range(1, K):
-        s_k = positions[:, i-1].T
+        s_k = positions[:, i-1]
         s_k = np.array([s_k]).T # Make it a column vector
         s_tilde = predictS(s_k)
 
-        sig_tilde = predictSig(cur_sigma)
+        sig_tilde = predictSig(sigma_k)
 
         sigma_k_plus_1 = updateSig(sig_tilde)
 
         m_k_plus_1 = measurements.values[i, :]
         m_k_plus_1 = np.array([m_k_plus_1]).T
 
-        s_k_plus_1 = updateS(s_tilde, cur_sigma, sigma_k_plus_1,
+        s_k_plus_1 = updateS(s_tilde, sig_tilde, sigma_k_plus_1,
                              m_k_plus_1)
 
         positions[:, i] = s_k_plus_1[:, 0]
+        sigma_k = sigma_k_plus_1
 
     x_filtered = positions[0, :]
     y_filtered = positions[1, :]
