@@ -2,7 +2,11 @@
 
 1) Need to do 255 summations - 255 seconds
 
-2) Yes, the 8 of them can split the bags evenly and find the sum of their respective 32 bags which would take 31 seconds. 4 of them then take the sums of the other 4 people and sum their numbers together (1 second), then 2 take the sum of the other 2 (1 second), then 1 person takes the final sum (1 second). So in total 34 seconds + whatever time it takes to communicate the sums between employees.
+2) Yes, the 8 of them can split the bags evenly and find the sum of their respective 32 bags
+which would take 31 seconds. 4 of them then take the sums of the other 4 people and sum their
+numbers together (1 second), then 2 take the sum of the other 2 (1 second), then 1 person 
+takes the final sum (1 second). So in total 34 seconds + whatever time it takes to communicate
+the sums between employees.
 
 3) Using the same process of adding numbers, then taking half the employees to add the remaining numbers...
 	128 employees sum 2 numbers - 1 second
@@ -17,7 +21,10 @@
 5) Add a second every time there's a sum between two numbers except in the first case - 15 seconds
 
 6) (hand 1 bag of 256 each second)
-   If only handing out x bags to each person, at the minimum it would take N/x seconds before handing out all the bags. There shouldn't be too many seconds after that to complete the summation though because as you're handing out bags the employees with bags already can start doing the computation.
+   If only handing out x bags to each person, at the minimum it would take N/x seconds before 
+   handing out all the bags. There shouldn't be too many seconds after that to complete the 
+   summation though because as you're handing out bags the employees with bags already can 
+   start doing the computation.
 
    **Attached script for calculating in submission folder
 
@@ -38,4 +45,5 @@
    ... summation process ...
 
 
-   Altogether distribution is 8 seconds + 16 seconds of calculation (1 more from the extra step it took for you to distribute the last 2) = 24 seconds
+   Altogether distribution is 8 seconds + 16 seconds of calculation (1 more from the extra step 
+   it took for you to distribute the last 2) = 24 seconds
