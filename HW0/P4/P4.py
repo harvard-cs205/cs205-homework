@@ -30,16 +30,33 @@ if __name__ == '__main__':
     # Load true trajectory and plot it
     # Normally, this data wouldn't be available in the real world
     #####################
+    fd = open('P4_trajectory.txt')
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '--b', label='True trajectory')
-
+    
+    s_true = []
+    for line in fd:
+        s_true.append(line[:-1].split(','))
+    s_true = np.array(s_true)
+    #print s_true[:,0]
+    #print s_true[:10]
+    ax.plot([float(x) for x in s_true[:,0]], [float(y) for y in s_true[:,1]],
+     [float(z) for z in s_true[:,2]],'--b', label='True trajectory')
+    #plt.show()
     #####################
     # Part 2:
     #
     # Read the observation array and plot it (Part 2)
     #####################
-
+    fd2 = open('P4_measurements.txt')
+    s_true2 = []
+    #print fd2.readline().split(',')
+    for line in fd2:
+        s_true2.append(line[:-1].split(','))
+    #print s_true2
+    s_true2 = np.array(s_true2)
+    ax.plot([float(x) for x in s_true2[:,0]],[float(y) for y in s_true2[:,1]],
+        [float(z) for z in s_true2[:,2]],'.g',label='Observed trajectory')
+    plt.show()
     # ax.plot(x_coords, y_coords, z_coords,
     #         '.g', label='Observed trajectory')
 
@@ -73,5 +90,5 @@ if __name__ == '__main__':
     #         '-r', label='Filtered trajectory')
 
     # Show the plot
-    ax.legend()
-    plt.show()
+    #ax.legend()
+    #plt.show()
