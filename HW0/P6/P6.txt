@@ -1,1 +1,4 @@
 # Your answers here
+1. The general observation is that the order of computation of jobs varies. It might be so that job 5 may get completed before job 4. A problem where this might actually matter is where the parallel processing job is trying to modify shared data. A fitting example would be high-frequency trading where there are multiple transactions ordered at the same instant of time. And incase a job where assets might be sold to recoup money to buy in assets be slower to process than the later job, this might cause insufficient balances.
+
+2. The job in question seems to be too small for a parallel processing problem. In such cases the serial execution is much faster than parallel execution. Parallel jobs have an overhead in terms of code as well as scheduling of jobs. Only if the problem has the necessary size, parallel processing will be more beneficial.
