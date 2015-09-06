@@ -1,7 +1,23 @@
 # Your answers here
 
 Count To Ten:
-The Bye Job print statements are out of order. If the called function is completely independent then there shouldn't be an issue - but suppose the function called on an outside process that was used in the calculation of the function and then was updated for the next time the function was called (similar to the kalman filter problem), the ordering then would have an effect on the outcome.  If we want to do things in parallel in this situation we'd have to implement locks to do the completely independent calculations in parallel but make sure the updating procedures are done sequentially.
+The Bye Job print statements are out of order. 
+If the called function is completely independent then there shouldn't be an issue - 
+but suppose the function called on an outside process that was used in the calculation
+of the function and then was updated for the next time the function was called (similar
+to the kalman filter problem), the ordering then would have an effect on the outcome.  
+If we want to do things in parallel in this situation we'd have to implement locks to 
+do the completely independent calculations in parallel but make sure the updating 
+procedures are done sequentially.
 
 How Much Faster?:
-In very small wait times, the serial execution is actually faster than the parallel one - the time it takes for the pool to check all processes are finished and return outweighs the benefit of parallelization as the wait times are so miniscule. The ratio increases concavely as wait times increase until it plateaus at approximately 4, the maximum speedup possible given 4 processes. The miniscule wait times is one case in which parallel execution is slower than serial because the communication time between processes makes up for the parallelization. Another case would be where you may have imbalanced distribution of work between the processes in which case one process may hang the whole operation, compounded with the communication between the processes and you see little to no speedup.
+In very small wait times, the serial execution is actually faster than the parallel one 
+- the time it takes for the pool to check all processes are finished and return outweighs
+the benefit of parallelization as the wait times are so miniscule. The ratio increases 
+concavely as wait times increase until it plateaus at approximately 4, the maximum speedup
+possible given 4 processes. The miniscule wait times is one case in which parallel 
+execution is slower than serial because the communication time between processes 
+makes up for the parallelization. Another case would be where you may have imbalanced
+distribution of work between the processes in which case one process may hang the 
+whole operation, compounded with the communication between the processes and you see 
+little to no speedup.
