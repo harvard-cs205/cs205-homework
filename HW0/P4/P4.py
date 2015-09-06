@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-
+import pdb
 
 if __name__ == '__main__':
     # Model parameters
@@ -56,7 +56,7 @@ if __name__ == '__main__':
     s_true2 = np.array(s_true2)
     ax.plot([float(x) for x in s_true2[:,0]],[float(y) for y in s_true2[:,1]],
         [float(z) for z in s_true2[:,2]],'.g',label='Observed trajectory')
-    plt.show()
+    #plt.show()
     # ax.plot(x_coords, y_coords, z_coords,
     #         '.g', label='Observed trajectory')
 
@@ -68,13 +68,30 @@ if __name__ == '__main__':
     # A = ?
     # a = ?
     # s = ?
+    cdt = 1-c*dt
+    A = np.matrix([[1,0,0,dt,0,0],[0,1,0,0,dt,0],[0,0,1,0,0,dt],
+        [0,0,0,cdt,0,0],[0,0,0,0,cdt,0],[0,0,0,0,0,cdt]])
+    
+    s = np.zeros((6,K))
 
+
+    a = np.array([0,0,0,0,0,g*dt])
+
+    s0 = np.array([0.0,0.0,2.0,15.0,3.5,4.0])
+    s[:,0] = s0
+    # print s
+    #pdb.set_trace()
+    for k in range(1,121):
+        lhs = np.dot(A,s[:,k-1])
+        result = np.array(lhs.T)[:,0]+a
+        s[:,k] = result
+    
     # Initial conditions for s0
     # Compute the rest of sk using Eq (1)
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '-k', label='Blind trajectory')
-
+    ax.plot(s[0], s[1], s[2],
+            'k', label='Blind trajectory')
+    plt.show()
     #####################
     # Part 4:
     # Use the Kalman filter for prediction
