@@ -12,21 +12,30 @@
 
 	For a total of 8 seconds
 
-4) log_2(N) seconds.
+4) ceil(log_2(N)) seconds.
 
 5) Add a second every time there's a sum between two numbers except in the first case - 15 seconds
 
-6) Add 256 seconds, 1 second for every cashier coming to get 1 bag from you - 271 seconds
-   Add 128 seconds, 1 second for every cashier coming to get 2 bags from you - 143 seconds
+6) (hand 1 bag of 256 each second)
+   If only handing out x bags to each person, at the minimum it would take N/x seconds before handing out all the bags. There shouldn't be too many seconds after that to complete the summation though because as you're handing out bags the employees with bags already can start doing the computation.
+
+   **Attached script for calculating
+
+   1 bag to each employee - 258 seconds
+   2 bags to each employee - 133 seconds
 
    Try to parallelize the distribution of bags as much as possible:
 
-   Give 256 bags to Emp1 - 1 second
+   For simplicity of writeup let's say you're Emp1
    Emp1 gives 128 bags to Emp2 - 1 second
-   Emp1-2 give 64 bags simultaneously to Emp3/Emp4 - 1 second
-   Emp1-4 give 32 bags simultaneously to Emp5-8 - 1 second
+   Emp1-2 gives 64 bags to Emp3-4 - 1 second
+   Emp1-4 gives 32 bags to Emp5-8 - 1 second
    ...
-   Emp1-64 give 2 bags simultaneously to Emp65-128 - 1 second
-   Give your 2 bags to Emp65 - 1 second
+   Emp1-64 gives 2 bags to Emp65-128 - 1 second
+   Emp2-128 calculates sum emp1(you) gives bag to emp129 - 1 second
+   Emp2-64 communicate numbers to emp66-128 and emp129 sums - 1 second
+   Emp66-128 sum and emp129 communicates to emp65 - 1 second
+   ... summation process ...
 
-   Altogether distribution is 9 seconds + 15 seconds of calculation = 24 seconds
+
+   Altogether distribution is 8 seconds + 16 seconds of calculation (1 more from the extra step it took for you to distribute the last 2) = 24 seconds
