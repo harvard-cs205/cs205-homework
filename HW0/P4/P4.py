@@ -82,19 +82,16 @@ if __name__ == '__main__':
     # Compute the rest of sk using Eq (1)
     s0 = np.array([[0, 0, 2, 15, 3.5, 4.0]]).T
 
-    K = 130
-    positions = np.zeros((6, K), dtype = np.double)
-    positions[:, 0] = s0[:, 0]
+    s_history = np.zeros((6, K), dtype = np.double)
+    s_history[:, 0] = s0[:, 0]
     for i in range(1, K):
-        cur_position = positions[:, i-1]
-        cur_position = np.array([cur_position]).T
-        update_position = np.dot(A, cur_position) + a
-        positions[:, i] = update_position[:, 0]
+        cur_s = s_history[:, [i-1]] # Keep the dimensionality
+        update_position = np.dot(A, cur_s) + a
+        s_history[:, i] = update_position[:, 0]
 
-    x_predicted = positions[0, :]
-    y_predicted = positions[1, :]
-    z_predicted = positions[2, :]
-
+    x_predicted = s_history[0, :]
+    y_predicted = s_history[1, :]
+    z_predicted = s_history[2, :]
 
     ax.plot(x_predicted, y_predicted, z_predicted,
              '-k', label='Blind trajectory')
@@ -104,6 +101,19 @@ if __name__ == '__main__':
     # Use the Kalman filter for prediction
     #####################
 
+    # Redefine constants for sanity
+
+    A = np.array([
+        [1, 0, 0, dt, 0, 0],
+        [0, 1, 0, 0, dt, 0],
+        [0, 0, 1, 0, 0, dt],
+        [0, 0, 0, 1-c*dt, 0, 0],
+        [0, 0, 0, 0, 1-c*dt, 0],
+        [0, 0, 0, 0, 0, 1-c*dt]
+    ], dtype=np.double)
+
+    a = np.array([[0, 0, 0, 0, 0, g*dt]], dtype=np.double).T
+
     B = np.array([
         [bx, 0, 0, 0, 0, 0],
         [0, by, 0, 0, 0, 0],
@@ -112,6 +122,7 @@ if __name__ == '__main__':
         [0, 0, 0, 0, bvy, 0],
         [0, 0, 0, 0, 0, bvz]
     ], dtype=np.double)
+
     C = np.array([
         [rx, 0, 0, 0, 0, 0],
         [0, ry, 0, 0, 0, 0],
@@ -132,31 +143,30 @@ if __name__ == '__main__':
     def updateS(_s_tilde, _sig_tilde, _sigma_k_plus_1, _m_k_plus_1):
         return _sigma_k_plus_1.dot(_sig_tilde.dot(_s_tilde) + C.T.dot(_m_k_plus_1))
 
-    K = measurements.values.shape[0]
-    positions = np.zeros((6, K), dtype = np.double)
-    positions[:, 0] = s0[:, 0]
+    s0 = np.array([[0, 0, 2, 15, 3.5, 4.0]]).T
     sigma_k = 0.01 * np.identity(6)
-    for i in range(1, K):
-        s_k = positions[:, i-1]
-        s_k = np.array([s_k]).T # Make it a column vector
-        s_tilde = predictS(s_k)
 
+    s_history = np.zeros((6, K), dtype = np.double)
+    s_history[:, 0] = s0[:, 0]
+
+    for i in range(1, K):
+        s_k = s_history[:, [i-1]] # keep dimensionality
+        s_tilde = predictS(s_k)
         sig_tilde = predictSig(sigma_k)
 
         sigma_k_plus_1 = updateSig(sig_tilde)
 
-        m_k_plus_1 = measurements.values[i, :]
-        m_k_plus_1 = np.array([m_k_plus_1]).T
+        m_k_plus_1 = measurements.values[[i], :].T
 
         s_k_plus_1 = updateS(s_tilde, sig_tilde, sigma_k_plus_1,
                              m_k_plus_1)
 
-        positions[:, i] = s_k_plus_1[:, 0]
+        s_history[:, i] = s_k_plus_1[:, 0]
         sigma_k = sigma_k_plus_1
 
-    x_filtered = positions[0, :]
-    y_filtered = positions[1, :]
-    z_filtered = positions[2, :]
+    x_filtered = s_history[0]
+    y_filtered = s_history[1]
+    z_filtered = s_history[2]
 
     ax.plot(x_filtered, y_filtered, z_filtered,
              '-r', label='Filtered trajectory')
