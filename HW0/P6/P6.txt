@@ -1,8 +1,32 @@
+## Sample output
+
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 0
+Bye Job 1
+Bye Job 2
+Hi Job 4
+Hi Job 5
+Bye Job 3
+Hi Job 6
+Hi Job 7
+Bye Job 7
+Bye Job 5
+Bye Job 4
+Bye Job 6
+Hi Job 8
+Hi Job 9
+Bye Job 9
+Bye Job 8
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
 ## Explanation
 
 Unlike in a single-threaded, single-process program, there are no guarantees about what order commands are executed in. In this case, with multiple processes, instructions will be scheduled for execution based on the scheduling algorithm. This algorithm can be setup in different ways to optimise certain characteristics depending on the nature of program. It is not necessarily going to be done on a first-come-first-served basis. 
 
-In such circumstances, there will often be frequent context switches which explains the interleaving of commands from different processes. For example, other processes run commands between the “Hi Job” and “Bye Job” commands for a particular process. In addition, on multiple cores, the commands may be executed on different cores leading to further interleaving of commands. 
+In such circumstances, there will often be frequent context switches which explains the interleaving of commands from different processes. For example, other processes run commands between the “Hi Job” and “Bye Job” commands for a particular process since it sleeps for 0.25 seconds. In addition, with multiple cores, the commands may be executed on different cores leading to further interleaving of commands. 
 
 ## How this affects how we program
 
