@@ -1,1 +1,20 @@
-# Your answers here
+A) We do see some behavior that I would naively expect. We initiate
+a pool of four processes and naively expect that the jobs
+1-10 should complete in order. Instead what we see is something like:
+
+Hi Job 0
+Hi Job 2
+Hi Job 3
+Hi Job 1
+Bye Job 0
+Hi Job 4
+Bye Job 3
+Bye Job 2
+
+Somehow, Job 2 is launched before job 3 *and* job 1! Then, even though
+job 2 was launched before job 3, it finishes after job 3; I would not
+expect this. Evidently it is not possible to control precisely when
+each thread executes and finishes!
+
+The inability to control exactly when threads execute and finish has
+large implications for parallel computing.
