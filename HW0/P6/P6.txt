@@ -1,6 +1,30 @@
 # Your answers here
 
 Count To Ten:
+
+Example output:
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 1
+Bye Job 0
+Bye Job 2
+Hi Job 4
+Hi Job 5
+Bye Job 3
+Hi Job 6
+Hi Job 7
+Bye Job 4
+Hi Job 8
+Bye Job 6
+Bye Job 7
+Bye Job 5
+Hi Job 9
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
 The Bye Job print statements are out of order. 
 If the called function is completely independent then there shouldn't be an issue - 
 but suppose the function called on an outside process that was used in the calculation
