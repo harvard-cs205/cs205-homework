@@ -1,1 +1,172 @@
 # Your answers here
+
+Part A (Answers):
+
+From the order of output of P6.py (see Appendix), it looks like the jobs are 
+completed in orders different from those in which they are initiated. For example, 
+in Output 1, the first four jobs where initiated in the order: 0, 1, 2, 3 but were 
+completed in the order: 1, 2, 0, 3. So one might expect that the results are 
+returned to pool.map() as 1, 2, 0, 3 (in the order that the return statements were 
+probably executed). Instead, the returned values of the various processes (result) 
+are always ordered. 
+
+Still, it might be possible that the jobs are in fact completing in order (and that 
+the values are also returned to pool.map in order), but that the printed strings are 
+getting scrambled in the output stream. To test this, one can modify burnTime to 
+sleep for a random rather than a constant period of time. Experiments like these
+(see Output 4 in Appendix) seem to confirm that although the processes are finishing
+out of order, pool.map keeps returned values in order.
+
+One consequence of this is that pool.map has to wait until all the jobs are completed
+before returning the result. So, at worst, the compute time can be as bad as the sum
+of the longest compute times for jobs in the batch. This doesn't matter so much if
+we're only computing one batch. If, however, computation needs to continue for 
+additional batches then we might be waiting for one process to terminate while the
+rest are idle. This doesn't seem efficient. 
+
+
+Part B (Answers):
+
+The graph of the "Serial Time/Parallel Time vs Wait Time" in P6.png can be
+summarized as follows:
+
+1. when the wait time is between 10e-10 to approximately 10e-4 second, the 
+time for serial computation is less than that of parallel computation
+(the ratio of serial/parallel on this interval is < 1). 
+
+2. when the wait time is between 10e-4 and 10e-2, the time for serial computation
+is greater than that of parallel computation and that this difference between 
+speed ratios grows sublinearly (i.e. parallel is not just faster but that the 
+speed up factor increases as wait time increases).
+
+3. when the wait time is greater than 10e-2, the ratio of serial/parallel plateaus.
+That is, parallel is still faster for these wait times (about 4 times faster); but
+the time saved, as a proportion of the total serial compute time, won't be greater
+for a more time consuming task than for a less time consuming one.
+
+In particular, these trends suggest that it is possible for parallel programs to 
+run slower than serial versions. In our case, this happens when the compute time
+for each individual tasks is very small (between 10e-10 to approximately 10e-4 
+second). One possible reason for this might be that there is an initial cost 
+attached to dividing up the tasks and data for parallel computation (recall the
+example from P5, where it takes 1 second for each employee to just grab some bags 
+from the distributor). So, when the individual tasks have very small compute times 
+in comparison to the set up cost for parallel computation, it very well can be faster 
+to execute the tasks in serial. For example, if it takes 1 second to set up parallel
+computing for 10 tasks that takes less than 0.1 second to compute, it's faster to
+complete them in serial regardless of the time saved for the total group of tasks by 
+parallel computation. 
+
+Appendix: 
+
+***********************************
+***********************************
+****       Output 1     ***********
+***********************************
+***********************************
+
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 1
+Bye Job 2
+Bye Job 0
+Bye Job 3
+Hi Job 4
+Hi Job 5
+Hi Job 6
+Hi Job 7
+Bye Job 5
+Bye Job 4
+Bye Job 7
+Bye Job 6
+Hi Job 8
+Hi Job 9
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+***********************************
+***********************************
+****       Output 2     ***********
+***********************************
+***********************************
+
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 1
+Bye Job 2
+Bye Job 0
+Hi Job 4
+Hi Job 5
+Hi Job 6
+Bye Job 3
+Hi Job 7
+Bye Job 4
+Bye Job 5
+Hi Job 8
+Bye Job 6
+Hi Job 9
+Bye Job 7
+Bye Job 9
+Bye Job 8
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+***********************************
+***********************************
+****       Output 3     ***********
+***********************************
+***********************************
+
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 1
+Bye Job 0
+Hi Job 4
+Bye Job 2
+Hi Job 5
+Hi Job 6
+Bye Job 3
+Hi Job 7
+Bye Job 4
+Hi Job 8
+Bye Job 5
+Bye Job 6
+Hi Job 9
+Bye Job 7
+Bye Job 9
+Bye Job 8
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+***********************************
+***********************************
+****       Output 4     ***********
+***********************************
+***********************************
+
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 3
+Hi Job 4
+Bye Job 2
+Hi Job 5
+Bye Job 1
+Hi Job 6
+Bye Job 6
+Hi Job 7
+Bye Job 5
+Hi Job 8
+Bye Job 4
+Hi Job 9
+Bye Job 0
+Bye Job 7
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]

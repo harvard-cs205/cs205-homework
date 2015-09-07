@@ -1,1 +1,108 @@
 # Your answers here.
+
+Part 1. (Answer)
+Suppose we have N bags. 
+It takes 1 second to add up the first two bags (so there are N-2 bags left);
+thereafter it takes 1 second to add one more bag to the running sum. 
+So it takes N-1 seconds for one person to add up all the bags.
+
+*********************************
+In this case, it takes 255 seconds for 256 bags.
+*********************************
+
+Part 2. (Answer)
+Assuming one person can only add two numbers per second. 
+Assume that for any given sum, computation of the two summands are independent
+tasks (that is, knowing one summand of the sum doesn't speed up the computation
+of the other and that computing one summand doesn't require the knowledge of the 
+other).
+
+The person who computed the total, at time t_f, could have added up only two 
+subtotals; so, given our assumption, the best case scenario is that both subtotals 
+were produced optimally and simultaneously (so t_f - 1 is the min of the optimal 
+compute times of both subtotals).
+
+For M number of subtotal computed at time t > 0, the same rationale applies, that is, 
+we want to have optimally and simultaneously computed the 2M summands by time t-1. Thus, 
+at time 1 we want to calculate floor(N/2) number of subtotals; at time t we want to 
+calculate floor(N/2^t) number of subtotals.
+
+If we had an employee ready to perform a calculation whenever one was needed, 
+the fastest we can compute the total is ceiling(log_2(N)).
+
+In our case, at best, we can compute the total for 256 bags in 8 seconds.
+
+Note that at each time t, we need floor(N/2^t) number of employees to do simultaneous
+calculations. Since the number of calculations (hence employees) is monotone decreasing
+with respect to time, the bottle neck is the number of employees needed at time t = 1.
+So, if the number of employees, M, is less than floor(N/2). Then at each time t, we can 
+reduce the number of subtotals that remain to be summed by at most M. Let x be the least 
+natural number such that M - xN >= 2M. Then the fastest we can compute the total will be 
+x + ceiling(log_2(M-xN)).
+
+*********************************
+In our case, we can compute the total for 256 bags in (30 + 4) seconds with 8 employees.
+*********************************
+
+Part 3. (Answer)
+[See answer to Part 2]
+
+Part 4. (Answer)
+[See answer to Part 2]
+
+Part 5. (Answer)
+Assume there's no time cost to distributing the initial pile of bags to the employees 
+(i.e. grabbing a bag doesn't count as communication). Assume it takes 1 second to communicate 
+a number between two employees and that an employee cannot simultaneously communicate with
+two people. Then, at time t, each of the subtotals being simultaneously computed will take 
+three seconds (one for receiving each summand and one for adding). Thus, the computation 
+time for our scheme (in Part 2) will take 3*ceiling(log_2(N))-2 seconds with an infinite
+number of employees. This is still faster than computing the total with one employee (linear
+time). 
+
+*********************************
+In our case, it takes 22 seconds to total 256 bags. 
+*********************************
+
+Part 6. (Answer)
+
+(One Bag Case) Assume, initially, that each employee can only grab one bag, that this transaction 
+takes one second and that I can only interact with one person at a time. Then it will take 256
+seconds to distribute the bags from me to 256 employees. Thereafter, taking into account
+the overhead for communication, it will take 2 additional seconds for the 256 employees 
+to communicate the labels on the bags to the 128 employees who will add them up. That is,
+it takes 258 seconds to set up the problem (before any adding has been done).
+
+*********************************
+In this case, naively implementing our scheme takes longer than computing the total with one 
+employee. 
+*********************************
+
+(Two Bags Case) If each employee can grab two bags, then it takes 128 seconds to distribute the 
+bags and two more to communicate the labels to the next set of 128 employees who will start 
+adding them up. In this case it will take ceiling(N/2) + 3*ceiling(log_2(N)) number of seconds
+to total N number of bags. This is still faster than computing the total with one employee, for 
+large enough N. 
+
+*********************************
+In this case, it takes 152 seconds to total 256 bags using our scheme.
+*********************************
+
+(Multiple Bags Case) Assume that I can hand out multiple bags in each interaction and that 
+employees can distribute bags to other employees (under the same set of restrictions for each 
+interaction). Reversing the scheme we described for computing the total gives us a scheme for
+distributing the bags. That is, at time t=0, I distribute ceiling(N/2) and N - ceiling(N/2)
+number of bags respectively to two employees (this costs 2 seconds). At time t, each of the 
+K number of employees will distribute their bags respectively to the next 2K number of 
+bagless employees. Thus, the time it takes to distribute all the bags (so that each bag is
+held by a different employee) is 2*ceiling(log_2(N)). Then total time for summing up the
+bags, taking into account both the overhead for distribution/communication and calculation, 
+is 2*ceiling(log_2(N)) + 3*ceiling(log_2(N)). This is faster than computing the total 
+with one employee as well as for the case where I distribute two bags at a time, for large 
+enough N.
+
+*********************************
+In this case, it takes 40 seconds to total 256 bags using the above scheme.
+*********************************
+
+
