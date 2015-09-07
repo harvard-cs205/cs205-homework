@@ -1,1 +1,10 @@
 # Your answers here.
+
+Problem 5
+   1. 128+64+32+16+8+4+2+1 = 255s
+   2. of course it will be faster
+      --> 32+4+1 = 37s ==> 6.89x faster
+   3. 8s ==> 31.875x faster
+   4. P5.py 
+   5. 
+
