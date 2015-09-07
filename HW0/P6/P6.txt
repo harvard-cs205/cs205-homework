@@ -1,1 +1,6 @@
 # Your answers here
+Problem 6
+   1. Sometimes, next job is finished before previous job is not done. 
+      if the two jobs have sequential dependencies, the result would be wrong.
+      So, a next job needs to be wait for a previous jobs which has a sequential      dependency to be done. 
+   2. 
