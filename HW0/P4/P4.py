@@ -79,15 +79,38 @@ if __name__ == '__main__':
     # Use the initial conditions and propagation matrix for prediction
     #####################
 
-    # A = ?
-    # a = ?
-    # s = ?
-
+    # Propagation Matrix
+    A = np.matrix([[1, 0, 0,         dt,          0,          0],
+                   [0, 1, 0,          0,         dt,          0],
+                   [0, 0, 1,          0,          0,         dt],
+                   [0, 0, 0, (1 - c*dt),          0,          0],
+                   [0, 0, 0,          0, (1 - c*dt),          0],
+                   [0, 0, 0,          0,          0, (1 - c*dt)]])
+    
+    # Matrix a is the component of the motion that is changed by gravity in 
+    #    the time interval delta-t
+    a = np.transpose(np.matrix([0, 0, 0, 0, 0, g*dt]))
+    
     # Initial conditions for s0
-    # Compute the rest of sk using Eq (1)
+    s = np.transpose(np.matrix([0, 0, 2, 15, 3.5, 4.0]))
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '-k', label='Blind trajectory')
+    # Empty matrix to be filled with predicted values
+    s_pred = np.matrix(np.empty(shape=(6, (K-1))))
+
+    # Insert inistial conditions into the first row
+    s_pred[:, 0] = s
+    
+    # Compute the rest of sk using Eq (1), one column at a time
+    for i in range(1, K-1):
+        s_pred[:, i] = A * s_pred[:, i-1] + a
+
+    # Extract coordinate values from the top three rows
+    x_coords = np.array(s_pred)[0, :]  # extract x coordinates
+    y_coords = np.array(s_pred)[1, :]  # extract y coordinates
+    z_coords = np.array(s_pred)[2, :]  # extract z coordinates
+
+    ax.plot(x_coords, y_coords, z_coords,
+            '-k', label='Blind trajectory')
 
     #####################
     # Part 4:
