@@ -31,11 +31,16 @@ if __name__ == '__main__':
     # Normally, this data wouldn't be available in the real world
     #####################
 
-    trajectory = np.loadtxt(P4_trajectory.txt, delimeter = ",") 
+    s_true = np.loadtxt('P4_trajectory.txt', delimiter = ",") 
         #Load the trajectory text file into an array
-    print(trajectory)
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '--b', label='True trajectory')
+    print(s_true)  # make sure that it loaded correctly
+
+    x_coords = s_true[:, 0]
+    y_coords = s_true[:, 1]
+    z_coords = s_true[:, 2]
+
+    ax.plot(x_coords, y_coords, z_coords,
+             '--b', label='True trajectory')
 
     #####################
     # Part 2:
