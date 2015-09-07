@@ -41,8 +41,6 @@ if __name__ == '__main__':
     #
     # Read the observation array and plot it (Part 2)
     #####################
-    #C = np.matrix([1.0/rx,0,0],[0,1.0/ry,0],[0,0,1.0/rz])
-
     s_measured = np.loadtxt('P4_measurements.txt', 
              delimiter = ',', unpack = True)
 
@@ -74,7 +72,7 @@ if __name__ == '__main__':
     #print a
 
     # Initial conditions for s0
-    s_column = np.matrix([
+    s_0 = np.matrix([
                     [s_true[0][0]],
                     [s_true[1][0]], 
                     [s_true[2][0]], 
@@ -88,17 +86,14 @@ if __name__ == '__main__':
     s = np.asmatrix(s)
 
     # construct s using Eq (1)
+    s_column = s_0
     s[:,0] = s_column
     for k in range(1,K):
         s[:,k] = A*s_column + a
         s_column = s[:,k]
 
     s = np.array(s)
-    x_coords = s[0]
-    y_coords = s[1]
-    z_coords = s[2]
-
-    ax.plot(x_coords, y_coords, z_coords,
+    ax.plot(s[0], s[1], s[2],
              '-k', label='Blind trajectory')
 
     #####################
@@ -106,14 +101,56 @@ if __name__ == '__main__':
     # Use the Kalman filter for prediction
     #####################
 
-    # B = ?
-    # C = ?
+    B = np.matrix([
+                    [bx,0,0,0,0,0],
+                    [0,by,0,0,0,0],
+                    [0,0,bz,0,0,0],
+                    [0,0,0,bvx,0,0],
+                    [0,0,0,0,bvy,0],
+                    [0,0,0,0,0,bvz]
+                 ])
+    C = np.matrix([
+                    [rx,0,0,0,0,0],
+                    [0,ry,0,0,0,0],
+                    [0,0,rz,0,0,0],
+                 ])
 
+    def predictS (A,s_k,a):
+        return A*s_k + a
+
+    def predictSig(A,sig_k,B):
+        return np.linalg.inv(A*sig_k*A.transpose() + B*B.transpose())
+
+    def updateSig(sig_tilda, C):
+        return np.linalg.inv(sig_tilda + C.transpose()*C)
+
+    def updateS(sig_k1, sig_tilda, s_tilda, C, m_k1):
+        return sig_k1 * (sig_tilda*s_tilda + C.transpose()*m_k1)
+    
     # Initial conditions for s0 and Sigma0
-    # Compute the rest of sk using Eqs (2), (3), (4), and (5)
+    sig_0 = 0.01 * np.identity(6)
+    m = np.matrix(s_measured)
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '-r', label='Filtered trajectory')
+    s = np.zeros([6,K])
+    s = np.asmatrix(s)
+
+    # construct s using Eq (1)
+    s_k = s_0
+    sig_k = sig_0
+    
+    s[:,0] = s_k
+    for k in range(1,K):
+        s_tilda = predictS(A,s_k,a)
+        sig_tilda = predictSig(A, sig_k, B)
+        sig_k1 = updateSig(sig_tilda, C)
+        s[:,k] = updateS(sig_k1, sig_tilda, s_tilda, C, m[:,k])
+
+        s_k = s[:,k]
+        sig_k = sig_k1
+
+    s = np.array(s)
+    ax.plot(s[0], s[1], s[2],
+             '-r', label='Filtered trajectory')
 
     # Show the plot
     ax.legend()
