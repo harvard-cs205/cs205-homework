@@ -10,6 +10,8 @@
 # comments to document my process and observations for my
 # own reference. These would be unnecessary if writing 
 # for an audience that already understands the language.
+# Commands used for debugging will be removed for 
+# submission but can be found in earlier commits.
 
 ###############################
 
@@ -59,9 +61,9 @@ if __name__ == '__main__':
     ## print s_true.shape, s_true.dtype 
 
     # extract first three columns to obtain series of positions
-    x_coords = s_true[:,0]
-    y_coords = s_true[:,1]
-    z_coords = s_true[:,2]
+    x_coords = s_true[:, 0]
+    y_coords = s_true[:, 1]
+    z_coords = s_true[:, 2]
     ## print x_coords.shape, y_coords.shape, z_coords.shape
 
     ax.plot(x_coords, y_coords, z_coords,
@@ -92,6 +94,8 @@ if __name__ == '__main__':
     m_obs = mT_obs.T  
     r_values = [rx, ry, rz]
     r_array = np.diag(np.array(r_values))
+
+    # take inverse of diagonal matrix to get 1/rx, 1/ry, 1/rz
     x_est = np.dot(inv(r_array), m_obs)
     ## print m_obs.shape, r_array.shape, x_est.shape
     
@@ -105,9 +109,9 @@ if __name__ == '__main__':
             '.g', label='Observed trajectory')
 
     ## debug check
-    ## x_coords2 = mT_obs[:,0]/float(rx)
-    ## y_coords2 = mT_obs[:,1]/float(ry)
-    ## z_coords2 = mT_obs[:,2]/float(rz)
+    ## x_coords2 = mT_obs[:, 0]/float(rx)
+    ## y_coords2 = mT_obs[:, 1]/float(ry)
+    ## z_coords2 = mT_obs[:, 2]/float(rz)
     ## ax.plot(x_coords2, y_coords2, z_coords2,
     ##        '.r', label='test Observed trajectory')
 
@@ -116,15 +120,38 @@ if __name__ == '__main__':
     # Use the initial conditions and propagation matrix for prediction
     #####################
 
-    # A = ?
-    # a = ?
-    # s = ?
+    # initialize the array for s
+    s_model = np.empty((6, K))
+    # initialize s at t=0 with values from problem
+    s_model[:,0] = np.array([0, 0, 2, 15, 3.5, 4.0]).T
+    ## print s_model[:, 0]
+    ## print s_model.shape
 
-    # Initial conditions for s0
-    # Compute the rest of sk using Eq (1)
+    # construct the array for A by filling in diagonals
+    Adiag = np.array([1, 1, 1, 1-c*dt, 1-c*dt, 1-c*dt])
+    Adiag3 = np.array([dt, dt, dt])
+    A_prop = np.add(np.diag(Adiag), np.diag(Adiag3, k=3))
+    ## print A_prop 
+    
+    # initialize column array a
+    a = np.array([0, 0, 0, 0, 0, g*dt]).T
+    ## print a, a.shape
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '-k', label='Blind trajectory')
+    # compute the rest of s using Eq (1)
+    # starting with column 1 (column 0 already initialized)
+    # last column is (k-1)th
+    for i in xrange(1, K, 1):
+        s_model[:, i] = np.dot(A_prop, s_model[:, i-1])  # A*sk
+        s_model[:, i] = np.add(s_model[:, i], a)  # +a
+        ## print s_model[:, i]       
+
+    # extract first three ROWS to obtain series of positions
+    x_coords = s_model[0]
+    y_coords = s_model[1]
+    z_coords = s_model[2]    
+
+    ax.plot(x_coords, y_coords, z_coords,
+            '-k', label='Blind trajectory')
 
     #####################
     # Part 4:
