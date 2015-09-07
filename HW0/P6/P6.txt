@@ -1,1 +1,8 @@
 # Your answers here
+
+1. Jobs are not opened and closed sequentially, but some jobs are closed before some other jobs were even started.
+    This means we cannot just assume that processes that were started earlier have returned. A scenario in which this
+    would be important is when the output of a process that has not retrurned yet is needed for the start of the
+    execution of a new function.
+
+2.
