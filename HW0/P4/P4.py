@@ -82,7 +82,7 @@ if __name__ == '__main__':
     a = a.transpose()
 
     # s 6x121
-    s = np.matrix(np.zeros((6, K-1), float))
+    s = np.matrix(np.zeros((6, K), float))
 
 
     # Initial conditions for s0
@@ -91,7 +91,7 @@ if __name__ == '__main__':
     s[:,0] = s0
 
     # Compute the rest of sk using Eq (1)
-    for i in range(1, K-1):
+    for i in range(1, K):
         s[:,i] = A * s[:,i-1] + a
 
     s = np.asarray(s)
@@ -103,13 +103,61 @@ if __name__ == '__main__':
     #####################
 
     # B = ?
+    B = np.zeros((6, 6), float)
+    np.fill_diagonal(B, np.array([bx, by, bz, bvx, bvy, bvz]))
+    B = np.matrix(B)
+
     # C = ?
+    C = np.zeros((3, 3), float)
+    np.fill_diagonal(C, np.array([rx, ry, rz]))
+    C = np.matrix(np.hstack([C, np.zeros((3, 3), float)]))
+
 
     # Initial conditions for s0 and Sigma0
-    # Compute the rest of sk using Eqs (2), (3), (4), and (5)
+    Sigma0 = np.zeros((6, 6), float)
+    np.fill_diagonal(Sigma0, 0.01)
+    Sigma0 = np.matrix(Sigma0)
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '-r', label='Filtered trajectory')
+
+    # Compute the rest of sk using Eqs (2), (3), (4), and (5)
+    s_k_ = np.matrix(np.zeros((6, K), float))
+    s_k_[:,0] = s0
+    sigma_k = Sigma0
+
+    # Equ (2)
+    def predictS(s_):
+        return A * s_ + a
+
+    # Equ (3)
+    def predictSig(sig_):
+        return np.linalg.inv(A*sig_*A.T + B*B.T)
+
+    # Equ (4)
+    def updateSig(sig_tilde_):
+        return np.linalg.inv(sig_tilde_ + C.T*C)
+
+    # Equ (5)
+    def updateS(s_tilde_, sig_tilde_, sig_plus_1_, m_plus_1_):
+        return sig_plus_1_ * (sig_tilde_*s_tilde_ + C.T*m_plus_1_)
+
+    for i in range(1,K):
+        s_k = s_k_[:,i-1]
+        s_tilde = predictS(s_k)
+        sigma_tilde = predictSig(sigma_k)
+        sigma_plus_1 = updateSig(sigma_tilde)
+        
+        # measurement
+        m_plus_1_ = np.matrix(s_obs[i,:]).T
+        s_plus_1 = updateS(s_tilde, sigma_tilde, sigma_plus_1, m_plus_1_)
+        
+        # update
+        s_k_[:, i] = s_plus_1
+        sigma_k = sigma_plus_1
+    
+    # Convert into array
+    s_k_ = np.asarray(s_k_)
+    # Plot
+    ax.plot(s_k_[0,:], s_k_[1,:], s_k_[2,:], '-r', label='Filtered trajectory')
 
     # Show the plot
     ax.legend()
