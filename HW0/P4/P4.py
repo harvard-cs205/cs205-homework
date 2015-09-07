@@ -33,11 +33,10 @@ if __name__ == '__main__':
 
     s_true = np.loadtxt('P4_trajectory.txt', delimiter = ",") 
         #Load the trajectory text file into an array
-    print(s_true)  # make sure that it loaded correctly
 
-    x_coords = s_true[:, 0]
-    y_coords = s_true[:, 1]
-    z_coords = s_true[:, 2]
+    x_coords = s_true[:, 0]  # extract x coordinates
+    y_coords = s_true[:, 1]  # extract y coordinates
+    z_coords = s_true[:, 2]  # extract z coordinates
 
     ax.plot(x_coords, y_coords, z_coords,
              '--b', label='True trajectory')
@@ -48,8 +47,15 @@ if __name__ == '__main__':
     # Read the observation array and plot it (Part 2)
     #####################
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '.g', label='Observed trajectory')
+    s_meas = np.loadtxt('P4_measurements.txt', delimiter = ",")
+        #Load the measurements text file into an array
+
+    x_coords = s_meas[:, 0]  # extract x coordinates
+    y_coords = s_meas[:, 1]  # extract y coordinates
+    z_coords = s_meas[:, 2]  # extract z coordinates
+
+    ax.plot(x_coords, y_coords, z_coords,
+             '.g', label='Observed trajectory')
 
     #####################
     # Part 3:
