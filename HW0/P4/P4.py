@@ -14,6 +14,7 @@
 ###############################
 
 import numpy as np
+from numpy.linalg import inv
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
@@ -54,14 +55,14 @@ if __name__ == '__main__':
     # obvious anomalies or data entry errors/missing values
 
     filename_true = "P4_trajectory.txt"
-    s_true = np.loadtxt(filename_true,delimiter=",")
-    # print s_true.shape, s_true.dtype 
+    s_true = np.loadtxt(filename_true, delimiter=",")
+    ## print s_true.shape, s_true.dtype 
 
     # extract first three columns to obtain series of positions
     x_coords = s_true[:,0]
     y_coords = s_true[:,1]
     z_coords = s_true[:,2]
-    # print x_coords.shape, y_coords.shape, z_coords.shape
+    ## print x_coords.shape, y_coords.shape, z_coords.shape
 
     ax.plot(x_coords, y_coords, z_coords,
             '--b', label='True trajectory')
@@ -72,8 +73,43 @@ if __name__ == '__main__':
     # Read the observation array and plot it (Part 2)
     #####################
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '.g', label='Observed trajectory')
+    # We load the data from the file P4_measurements.txt
+    # which we assume is in the current working directory
+
+    # We previewed the data and noted it appeared to consist
+    # of 121 lines of three comma-separated values, with no
+    # obvious anomalies or data entry errors/missing values
+
+    filename_obs = "P4_measurements.txt"
+    mT_obs = np.loadtxt(filename_obs, delimiter=",")
+    ## print mT_obs.shape, mT_obs.dtype 
+
+    # given the values of the scaling matrix, we could simply divide
+    # all entries in the read array by the appropriate (rx, ry, rx)
+    # and pull the coordinates for plotting;
+    # while more complicated, we constructed the formula for x_est
+    # to practice implementation of equations involving matrices
+    m_obs = mT_obs.T  
+    r_values = [rx, ry, rz]
+    r_array = np.diag(np.array(r_values))
+    x_est = np.dot(inv(r_array), m_obs)
+    ## print m_obs.shape, r_array.shape, x_est.shape
+    
+    # extract first three ROWS to obtain series of positions
+    x_coords = x_est[0]
+    y_coords = x_est[1]
+    z_coords = x_est[2]
+    ## print x_coords.shape, y_coords.shape, z_coords.shape
+ 
+    ax.plot(x_coords, y_coords, z_coords,
+            '.g', label='Observed trajectory')
+
+    ## debug check
+    ## x_coords2 = mT_obs[:,0]/float(rx)
+    ## y_coords2 = mT_obs[:,1]/float(ry)
+    ## z_coords2 = mT_obs[:,2]/float(rz)
+    ## ax.plot(x_coords2, y_coords2, z_coords2,
+    ##        '.r', label='test Observed trajectory')
 
     #####################
     # Part 3:
