@@ -13,4 +13,9 @@
 5. I already took that into account in my answers above
 
 6. For 1 bag: 256 (hand to cashiers) + 256 / number of cashiers + 255 second communication time
-    For 2 bags: 128 (hand to cahsiers) + 128 / number of cashiers + 127 seconds communication time
+    For 2 bags: ( 128 (hand to cahsiers) + 128 / number of cashiers + 127 seconds communication time ) * 2 since we need
+    to count double the amount of bags.
+
+    A better strategy would be to count bags in parallel to the point where the decrease in counting time plus the
+    overhead communication costs reach a minimum. Doing a quick calculation minimizing 256/n + (n - 1) brings the optimum
+    to 16 cashiers.

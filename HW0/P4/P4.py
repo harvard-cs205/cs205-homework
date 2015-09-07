@@ -47,16 +47,16 @@ if __name__ == '__main__':
 
     r = [np.mean(r_array[:, 0]), np.mean(r_array[:, 1]), np.mean(r_array[:, 2])]
 
-    C = np.matrix([[1/r[0], 0, 0], [0, 1/r[1], 0], [0, 0, 1/r[2]]])
+    r_matrix = np.matrix([[1/r[0], 0, 0], [0, 1/r[1], 0], [0, 0, 1/r[2]]])
 
     def mult(matrix_row):
-        return C * matrix_row
+        return r_matrix * matrix_row
 
     x = measured.copy()
 
     i = 0
     for row in measured:
-        x[:][i] = np.dot(C, row.T)
+        x[:][i] = np.dot(r_matrix, row.T)
         i += 1
 
     ax.plot(x[:, 0], x[:, 1], x[:, 2], '.g', label='Observed trajectory')
@@ -115,7 +115,11 @@ if __name__ == '__main__':
                    [0, 0, 0, 0, bvy, 0],
                    [0, 0, 0, 0, 0, bvz]])
 
+    C = np.matrix([[rx, 0, 0, 0, 0, 0],
+                   [0, ry, 0, 0, 0, 0],
+                   [0, 0, rz, 0, 0, 0]])
 
+    measured_matrix = np.matrix(measured)
 
     def predictS(s):
         return (A * s) + a
@@ -123,26 +127,30 @@ if __name__ == '__main__':
     def predictSig(sigk):
         return np.linalg.inv(A * sigk * A.T + B * B.T)
 
-    def updateSig(sig):
-        return np.linalg.inv(predictSig(sig) + C.T * C)
+    def updateSig(predicted_sig):
+        return np.linalg.inv(predicted_sig + C.T * C)
 
-    def updateS(s, sigk, m):
-        return updateSig(sigk) * (predictSig(sigk) * s + C.T * m)
+    def updateS(updated_sig, predicted_sig, predicted_S, m_next):
+        return updated_sig * ((predicted_sig * predicted_S) + (C.T * m_next))
 
     sigma0 = 0.01 * np.identity(6)
 
+    s_array = np.empty((6, K-1))  # K-1 since there are only 120 entries
+
     sigmak = sigma0
     sk = s0
-    for mk in measured:
-        predicted_s = predictS(s0)
+    for n in range(0, measured_matrix.shape[0]):
+        if (n + 1) >= measured.shape[0]:
+            break
+        predicted_s = predictS(sk)
         predicted_sigma = predictSig(sigmak)
-        sigma = updateSig(predicted_sigma)
-        sk = updateS(sk, sigmak, mk)
-        print sk
-        # store sk after
+        updated_sigma = updateSig(predicted_sigma)
+        s_next = updateS(updated_sigma, predicted_sigma, predicted_s, measured_matrix[n + 1][:].T)
+        s_array[:, n] = s_next[:][0]
+        sk = s_next
+        sigmak = updated_sigma
 
-
-    ax.plot(x_coords, y_coords, z_coords,
+    ax.plot(s_array[0, :], s_array[1, :], s_array[2, :],
             '-r', label='Filtered trajectory')
 
     # Show the plot
