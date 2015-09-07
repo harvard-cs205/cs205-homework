@@ -1,1 +1,23 @@
-# Your answers here.
+# Qing Zhao (HUID: 80985053)’s answer for P5
+
+1. 255 seconds.
+
+2. The time for each of them to count 256 / 8 = 32 bags is 31 s; summing up 8 numbers takes at least 3s (2 ^ 3 = 8). Therefore, 8 cashiers can do this in 34 seconds.
+
+3. Since 2 ^ 8 = 256, the employees can verify the sum in 8 seconds.
+
+4. See ‘P5.png’
+
+5. With infinite employees, it will take 8 + 7 = 15 seconds to count 256 bags;
+
+6. 1 bag each: 256 + log2(256) + (log2(256) - 1) = 264 seconds;
+   2 bags each: 128 + log2(128) = 135 seconds;
+
+   Better strategy:
+	1) With fixed number of bags N and infinite cashiers, the overall time is decided by the number of bags x handed to each cashier:
+		t(x) = I/O cost + communication cost + computation cost
+		     = N/x + log2(N/x) - 1 + log2(N/x)
+		     = N/x + 2log2(N/x) - 1
+	2) take the derivative of x, we get when x = -N*In2, the overall time is minimum. 
+
+
