@@ -97,9 +97,10 @@ if __name__ == '__main__':
     # Use the Kalman filter for prediction
     #####################
 
-    # B = ?
+    B = np.matrix([[bx,0,0,0,0,0],[0,by,0,0,0,0],[0,0,bz,0,0,0]
+        ,[0,0,0,bvx,0,0],[0,0,0,0,bvy,0],[0,0,0,0,0,bvz]])
     # C = ?
-
+    
     # Initial conditions for s0 and Sigma0
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
 
