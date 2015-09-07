@@ -2,6 +2,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
+def predictS(A,s,a):
+  return A*s+a
+
+def predictSig(A,Sigma,B):
+  return np.linalg.inv(A*Sigma*A.T + B*B.T)
+
+def updateSig(Sigma,C):
+  return np.linalg.inv(Sigma+C.T*C)
+
+def updateS(Sigma_next,Sigma_appr,s,C,m):
+  return Sigma_next*(Sigma_appr*s+C.T*m)
 
 if __name__ == '__main__':
     # Model parameters
@@ -46,10 +57,10 @@ if __name__ == '__main__':
     #####################
 
     measure_file = open("P4_measurements.txt","r")
-    x_m = np.loadtxt(measure_file, delimiter=",").T
-    C = np.matrix([[1/rx,0,0],[0,1/ry,0],[0,0,1/rz]])
-    #print C
-    x_appr = C * x_m
+    x_m = np.matrix(np.loadtxt(measure_file, delimiter=",").T)
+    C_inv = np.matrix([[1/rx,0,0],[0,1/ry,0],[0,0,1/rz]])
+    
+    x_appr = C_inv * x_m
     x_coords = np.array(x_appr[0,:])[0]
     y_coords = np.array(x_appr[1,:])[0]
     z_coords = np.array(x_appr[2,:])[0]
@@ -107,14 +118,36 @@ if __name__ == '__main__':
 	[0,0,0,0,bvy,0],\
 	[0,0,0,0,0,bvz]\
 	])
-    # B = ?
-    # C = ?
-
+    C = np.matrix([\
+	[rx,0,0,0,0,0],\
+	[0,ry,0,0,0,0],\
+	[0,0,rz,0,0,0],\
+	])
+    
     # Initial conditions for s0 and Sigma0
+    Sigma = np.matrix(np.identity(6))
+    Sigma = 0.01*Sigma
+    
+    # Initial conditions for s0
+    s0 = np.matrix([0,0,2,15,3.5,4.0]).T
+    s[:,0] = s0
+    
+    print type(x_m)
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
+    for i in range(K-1):
+      # prediction steps
+      s_appr = predictS(A,s[:,i],a)
+      Sigma_appr = predictSig(A,Sigma,B)
+      # update steps
+      Sigma = updateSig(Sigma_appr,C)
+      s[:,i+1] = updateS(Sigma,Sigma_appr,s_appr,C,x_m[:,i+1])
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '-r', label='Filtered trajectory')
+    x_coords = np.array(s[0,:])[0]
+    y_coords = np.array(s[1,:])[0]
+    z_coords = np.array(s[2,:])[0]
+
+    ax.plot(x_coords, y_coords, z_coords,
+             '-r', label='Filtered trajectory')
 
     # Show the plot
     ax.legend()
