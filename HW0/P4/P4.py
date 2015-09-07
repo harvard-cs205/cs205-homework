@@ -62,7 +62,7 @@ if __name__ == '__main__':
                     [0,0,0,0,drag_per_dt,0],
                     [0,0,0,0,0,drag_per_dt]
                  ])
-    print A
+    #print A
     a = np.matrix([
                     [0],
                     [0],
@@ -74,7 +74,6 @@ if __name__ == '__main__':
     #print a
 
     # Initial conditions for s0
-    # Compute the rest of sk using Eq (1)
     s_column = np.matrix([
                     [s_true[0][0]],
                     [s_true[1][0]], 
@@ -83,22 +82,21 @@ if __name__ == '__main__':
                     [s_true[4][0]],
                     [s_true[5][0]]
                  ])
-    print s_column
+    #print s_column
 
     s = np.zeros([6,K])
     s = np.asmatrix(s)
+
     # construct s using Eq (1)
-    for k in range(0,K-1):
-        s[:,k+1] = A*s_column + a
-        s_column = s[:,k+1]
-        if (k < 10):
-            print s_column
+    s[:,0] = s_column
+    for k in range(1,K):
+        s[:,k] = A*s_column + a
+        s_column = s[:,k]
 
     s = np.array(s)
     x_coords = s[0]
     y_coords = s[1]
     z_coords = s[2]
-    z_coords[0] = s_true[2][0]
 
     ax.plot(x_coords, y_coords, z_coords,
              '-k', label='Blind trajectory')
