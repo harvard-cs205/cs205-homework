@@ -50,9 +50,26 @@ if __name__ == '__main__':
     s_meas = np.loadtxt('P4_measurements.txt', delimiter = ",")
         #Load the measurements text file into an array
 
+
     x_coords = s_meas[:, 0]  # extract x coordinates
     y_coords = s_meas[:, 1]  # extract y coordinates
     z_coords = s_meas[:, 2]  # extract z coordinates
+
+    s_meas_matrix = np.matrix([x_coords, y_coords, z_coords])
+        # Put them into a matrix to do matrix multiplication with
+
+    stretch_matrix = np.matrix([[1/rx, 0, 0], [0, 1/ry, 0], [0, 0, 1/rz]])
+        # Matrix with the stretching factors
+
+    corrected = stretch_matrix * s_meas_matrix
+        # Correct position by multiplying the stretch matrix by the measured position
+
+    # Now you have to get the coordinates out a different way because it's in a matrix,
+    #    not an array.  So I convert it to an array first.  
+    x_coords = np.array(corrected)[0, :]  # extract x coordinates
+    y_coords = np.array(corrected)[1, :]  # extract y coordinates
+    z_coords = np.array(corrected)[2, :]  # extract z coordinates
+
 
     ax.plot(x_coords, y_coords, z_coords,
              '.g', label='Observed trajectory')
