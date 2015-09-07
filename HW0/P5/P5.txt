@@ -1,1 +1,11 @@
-# Your answers here.
+1. The cashier should divide the bags into pairs and sum each pair: 256 bags / 2 = 128 pairs = 128 sums = 128 seconds.  Then divide those 128 sums into pairs and sum each pair: 64 seconds.  This pattern continues until we have the total.
+
+# of Seconds = 128 + 64 + 32 + 16 + 8 + 4 + 2 + 1 = 255 seconds
+
+2. Yes, they can sum to the total faster.  There are now 8 cashiers.  By dividing the bags into pairs in the same way, 8 sums can be calculated per second.  Thus the first round only takes 128/8 = 16 seconds.  Using the same logic on subsequent rounds:
+
+# of seconds = 16 + 8 + 4 + 2 + 1 + 1 + 1 + 1 = 34 seconds
+
+3.  We still have log-base-2(256) = 8 rounds of summing.  That means the best we can do is 8 seconds (we will always have a worker to do any available sum).
+
+4. 

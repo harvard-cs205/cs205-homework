@@ -5,13 +5,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 
-
-def time_with_infinite_workers(n):
-    '''
-    Returns the number of seconds it takes to add n numbers, where it takes 1 second to add 2 numbers, and only 2 numbers may be added by a single worker.
-    '''
-    return math.ceil(math.log(n,2))
-
 def time_with_one_worker(n):
     '''
     Returns the number of seconds it takes to add n numbers, where it takes 1 second to add 2 numbers, and only 2 numbers may be added by a single worker.
@@ -23,16 +16,20 @@ def time_with_one_worker(n):
         total_time += num_left
     return total_time
         
-num = range(1,1000)
-x = np.array(num)
+x_range = range(1,1000)
+x = np.array(x_range)
 y1 = np.ceil(np.log2(x))
 times = [0]*999
-print time_with_one_worker(8)
-for i in num:
+for i in x_range:
     times[i-1]=time_with_one_worker(i)
 y2 =  np.array(times)
-print x
 plt.ylim(0,100)
-plt.plot(x, y1, 'r--', x, y2, 'bs')
-plt.show()
+plt.plot(x, y1, 'r--', label="With infinite workers")
+plt.plot(x,y2,'g--',label="With one worker")
+plt.ylabel("Time (seconds)")
+plt.xlabel("# of Workers")
+plt.legend();
+#plt.show()
+plt.savefig("P5.png")
 plt.close()
+
