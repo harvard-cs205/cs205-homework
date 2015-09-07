@@ -43,7 +43,8 @@ if __name__ == '__main__':
     #
     # Read the observation array and plot it (Part 2)
     #####################
-    
+    s_measured = np.loadtxt("P4_measurements.txt", delimiter=',')
+    ax.plot((1/rx)*s_measured[:, 0], (1/ry)*s_measured[:,1], (1/rz)*s_measured[:,2], '.g', label='Observed trajectory')
     # ax.plot(x_coords, y_coords, z_coords,
     #         '.g', label='Observed trajectory')
 
@@ -51,16 +52,23 @@ if __name__ == '__main__':
     # Part 3:
     # Use the initial conditions and propagation matrix for prediction
     #####################
-
-    # A = ?
-    # a = ?
-    # s = ?
-
+    top_left = np.diag(np.ones(3))
+    top_right = np.diag(dt*np.ones(3))
+    bottom_left= np.zeros((3,3))
+    bottom_right = np.diag((1-c*dt)*np.ones(3))
+    A = np.hstack((np.vstack((top_left, bottom_left)), np.vstack((top_right, bottom_right))))
+    a = np.vstack((np.matrix(np.zeros(5)).transpose(), np.array([g*dt])))
+    s = np.matrix([0,0,2,15,3.5,4.0]).transpose()
     # Initial conditions for s0
-    # Compute the rest of sk using Eq (1)
+    s_current = s
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '-k', label='Blind trajectory')
+    # Compute the rest of sk using Eq (1)
+    for i in range(K):
+        s_next = np.dot(A,s_current) + a
+        s = np.hstack((s, s_next))
+        s_current = s_next
+    s = np.array(s)
+    ax.plot(s[0], s[1], s[2], '-k', label='Blind trajectory')
 
     #####################
     # Part 4:
