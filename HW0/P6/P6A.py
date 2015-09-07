@@ -1,4 +1,5 @@
 import multiprocessing as mp
+import numpy as np
 import time
 
 def burnTime(k):

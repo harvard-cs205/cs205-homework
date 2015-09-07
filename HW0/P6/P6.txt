@@ -1,1 +1,11 @@
 # Your answers here
+
+6A. First note since there are 4 processors used, the jobs appear sequentially in sets as follows: (0,1,2,3), (4,5,6,7), (8,9). Most of the time the order of jobs that start does not equal the order of jobs that finish. This is because there are factors other than the start times of the processors that influence the end time of the proessors (such as communication between the CPU and processors) even when running the same program (burnTime) that we do not have control over. 
+
+Also the next set of jobs often starts before the previous set of jobs finish. This is because jobs in the same set (of the 3 sets defined above) finish before others in the same set (for the same reason above) allowing the processor of the eariler jobs to start on jobs in the next set before jobs in the current set finish. This may influence how we program in parallel because we may require that certain sets of jobs finish before other sets of jobs start. This may be the case when jobs are streamed in sets/packets and the earlier packets need to be processed before later packets, for example if we're streaming a video or other time series data.
+
+6B. In figure 6B.png, the ratio of serial to parallel run time, in general, varies directly with the wait time. In parallel programming, there is runtime overhead represented by the communication/message passing between the CPU and the processors in the pool. Thus the time for the P processors to run N jobs of runtime X seconds in parallel is roughly M + NX/P, where M is the overhead time represented by the CPU and processor communication and other message passing. The time for 1 processor to run N jobs of runtime X seconds is roungly NX. Thus the serial to parallel runtime ratio is NX/(M + NX/P), which approachs P (in this case 4), as NX/P grows compared to M. Thus it makes sense that the ratio approachs 4 as X increases to 1 second. If NX/P is small compared to M, then the serial to parallel runtime ratio is abount NX/M, which goes to 0 as X decreases. Thus a parallel program can take longer than its serial version if the NX < M + NX/P or (P-1)*NX/P < M.
+
+
+
+ 
