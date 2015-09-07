@@ -60,7 +60,7 @@ if __name__ == '__main__':
     s_true = np.loadtxt(filename_true, delimiter=",")
     ## print s_true.shape, s_true.dtype 
 
-    # extract first three columns to obtain series of positions
+    # Extract first three columns to obtain series of positions
     x_coords = s_true[:, 0]
     y_coords = s_true[:, 1]
     z_coords = s_true[:, 2]
@@ -86,7 +86,7 @@ if __name__ == '__main__':
     mT_obs = np.loadtxt(filename_obs, delimiter=",")
     ## print mT_obs.shape, mT_obs.dtype 
 
-    # given the values of the scaling matrix, we could simply divide
+    # Given the values of the scaling matrix, we could simply divide
     # all entries in the read array by the appropriate (rx, ry, rx)
     # and pull the coordinates for plotting;
     # while more complicated, we constructed the formula for x_est
@@ -94,12 +94,10 @@ if __name__ == '__main__':
     m_obs = mT_obs.T  
     r_values = [rx, ry, rz]
     r_array = np.diag(np.array(r_values))
-
-    # take inverse of diagonal matrix to get 1/rx, 1/ry, 1/rz
     x_est = np.dot(inv(r_array), m_obs)
     ## print m_obs.shape, r_array.shape, x_est.shape
     
-    # extract first three ROWS to obtain series of positions
+    # Extract first three ROWS to obtain series of positions
     x_coords = x_est[0]
     y_coords = x_est[1]
     z_coords = x_est[2]
@@ -120,32 +118,32 @@ if __name__ == '__main__':
     # Use the initial conditions and propagation matrix for prediction
     #####################
 
-    # initialize the array for s
+    # Initialize the array for s
     s_model = np.empty((6, K))
-    # initialize s at t=0 with values from problem
+    # Initialize s at t=0 with values from problem
     s_model[:,0] = np.array([0, 0, 2, 15, 3.5, 4.0]).T
     ## print s_model[:, 0]
     ## print s_model.shape
 
-    # construct the array for A by filling in diagonals
+    # Construct the array for A by filling in diagonals
     Adiag = np.array([1, 1, 1, 1-c*dt, 1-c*dt, 1-c*dt])
     Adiag3 = np.array([dt, dt, dt])
     A_prop = np.add(np.diag(Adiag), np.diag(Adiag3, k=3))
     ## print A_prop 
     
-    # initialize column array a
+    # Initialize column array a
     a = np.array([0, 0, 0, 0, 0, g*dt]).T
     ## print a, a.shape
 
-    # compute the rest of s using Eq (1)
-    # starting with column 1 (column 0 already initialized)
+    # Compute the rest of s using Eq (1)
+    # starting with column 1 (column 0 already initialized);
     # last column is (k-1)th
     for i in xrange(1, K, 1):
         s_model[:, i] = np.dot(A_prop, s_model[:, i-1])  # A*sk
         s_model[:, i] = np.add(s_model[:, i], a)  # +a
         ## print s_model[:, i]       
 
-    # extract first three ROWS to obtain series of positions
+    # Extract first three ROWS to obtain series of positions
     x_coords = s_model[0]
     y_coords = s_model[1]
     z_coords = s_model[2]    
@@ -158,11 +156,117 @@ if __name__ == '__main__':
     # Use the Kalman filter for prediction
     #####################
 
-    # B = ?
-    # C = ?
+    # Initialize the array for B using values from problem
+    B_values = [bx, by, bz, bvx, bvy, bvz]
+    B_array = np.diag(np.array(B_values))
+    ## print B_array
+ 
+    # Initialize the array for C using values from problem
+    C_array = np.zeros((3, 6))
+    C_array[0, 0] = rx
+    C_array[1, 1] = ry
+    C_array[2, 2] = rz
+    ## print C_array
 
     # Initial conditions for s0 and Sigma0
+    s0 = s_model[:,0]  # from previous part
+    Sigma0 = 0.01 * np.identity(6) # A/B are 6x6 thus so is C from Eq (3)
+
+    # Initialize global variables
+    current_k = 0 
+    current_sigma = Sigma0  # holds Sigma at time k
+    ## print s0, Sigma0
+    print current_sigma
+
+    def predictS(sk):
+        '''Calculates an intermediate guess for s at time t=k+1.
+
+        Implements equation 2. Uses values for A and a from previous part.
+        
+        Args:
+            sk: A 6x1 array with values of s for time t=k.
+
+        Returns: 
+            A 6x1 array representing the guess for s at time t=k+1.
+        '''
+        return np.add(np.dot(A_prop, sk), a)
+
+    def predictSig(sigmak):
+        '''Calculates prediction for confidence matrix.
+
+        Implements equation 3. Uses values for A from previous part.
+        Uses 'global' matrix B defined earlier.
+        
+        Args:
+            sigmak: A 6x6 array representing a covariance matrix.
+
+        Returns:
+            A 6x6 array representing the prediction at next time step.
+        ''' 
+        first_term = np.dot(A_prop, sigmak)
+        first_term = np.dot(first_term, A_prop.T)
+        second_term = np.dot(B_array, B_array.T)
+        return inv(np.add(first_term, second_term))
+
+    def updateSig(sigma_tilde):
+        '''Calculates confidence/covariance matrix at next time step.
+ 
+        Implements equation 4. Uses 'global' matrix C defined earlier. 
+        
+        Args:
+            sigma_tilde: A 6x6 array representing a prediction for
+                         the covariance matrix.
+
+        Returns:
+            A 6x6 array representing sigma at time t=k+1.
+        '''
+        second_term = np.dot(C_array.T, C_array)
+        return inv(np.add(sigma_tilde, second_term))
+    
+    def updateS(old_sk):
+        '''Calculates the next column of s, for time t=k+1.
+      
+        Implements equation 5. Uses 'global' matrix C defined earlier.
+        Uses 'm' read in from file, and earlier functions.
+
+        Note that we update the value of 'global' variables 
+        current_sigma and k before we return the column vector for s. 
+        For a cleaner implementation, we could modify the set of
+        parameters for this function to accept these values and
+	return updated values along with the updated value for s.
+      
+        In this implementation, we call this function using only the 
+        old value of sk. We could have defined the above functions
+        within this one if we wanted to make them private to this
+        function.
+
+        Args:
+            sk: A 6x1 array with values of s for time t=k.
+
+        Returns: 
+            A 6x1 array with values of s at time t=k+1.  
+        '''
+
+        s_tilde = predictS(old_sk)  # from equation 2
+        bracket_term1 = np.dot(predictSig(current_sigma), s_tilde)
+        bracket_term2 = np.dot(C_array.T, m_obs[:, current_k + 1])
+        bracket_term = np.sum(bracket_term1, bracket_term2)
+
+        # update sigma values and time step
+        current_sigma = updateSig(predictSig(current_sigma))
+        current_k = current_k + 1
+        print current_k, current_sigma
+
+        return np.dot(current_sigma, bracket_term)        
+
+      
+    print updateS(s0)
+      
+        
+
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
+
+    
 
     # ax.plot(x_coords, y_coords, z_coords,
     #         '-r', label='Filtered trajectory')
