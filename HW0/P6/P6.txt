@@ -1,3 +1,5 @@
+# Count to Ten
+
 ## Sample output
 
 Hi Job 0
@@ -24,7 +26,7 @@ Bye Job 8
 
 ## Explanation
 
-Unlike in a single-threaded, single-process program, there are no guarantees about what order commands are executed in. In this case, with multiple processes, instructions will be scheduled for execution based on the scheduling algorithm. This algorithm can be setup in different ways to optimise certain characteristics depending on the nature of program. It is not necessarily going to be done on a first-come-first-served basis. 
+Unlike in a single-threaded, single-process program, there are no guarantees about what order the commands are executed in. In this case, with multiple processes, instructions will be scheduled for execution based on the scheduling algorithm. This algorithm can be setup in different ways to optimise certain characteristics depending on the nature of program. It is not necessarily going to be done on a first-come-first-served basis. 
 
 In such circumstances, there will often be frequent context switches which explains the interleaving of commands from different processes. For example, other processes run commands between the “Hi Job” and “Bye Job” commands for a particular process since it sleeps for 0.25 seconds. In addition, with multiple cores, the commands may be executed on different cores leading to further interleaving of commands. 
 
@@ -47,4 +49,14 @@ while True:
 
 The problem is that the function `doTenTimes()` might be executed more than 10 times. The interleaving of commands from different threads or processes means that a check of `counter < 10` could happen right after the 10th execution of doTenTimes(), but before `counter` could actually be updated to equal 10. The simple solution here is to use a lock with the shared variable `counter` when reading or writing to it.
 
+
+# How Much Faster?
+
+## Explaining the trend
+
+As the wait time increases, the advantage for the parallel program over the serial version increases as evidenced by the increasing ratio. The key here is the time taken to context switch from one processes to another. When a process is scheduled for execution, it takes time for the execution context to be loaded. This context includes memory mappings, stack information, and the program counter. Especially since the Python `multiprocessing` library uses processes rather than threads, this context-switching time can be significant.
+
+In fact, if the amount of processing delay from a process is low enough (from sleeping, or I/O etc.), it may make more sense for the CPU to burn cycles rather than spending the time to context-switch to another process to do more work. Specifically, suppose we have a CPU-bound task that sleeps for a singe block for `m` seconds, and it takes `n` seconds to perform a context-switch to a separate process. It would only be better to context-switch if `m > 2n`, otherwise we are better off just waiting. Unfortunately, CPU scheduling is a difficult problem to solve so the scheduler may not perform optimally.
+
+As we can see from the plot, it appears that parallel processing performs slower than the serial alternative for low wait times. This makes sense since the scheduling algorithm might decide to context-switch even when it would have been better to just simply burn cycles and wait. So if we have a situation where `m < 2n`, we should wait rather than context-switch, otherwise the parallel program could perform slower than the serial version.
 
