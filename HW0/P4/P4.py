@@ -172,12 +172,25 @@ if __name__ == '__main__':
     s0 = s_model[:,0]  # from previous part
     Sigma0 = 0.01 * np.identity(6) # A/B are 6x6 thus so is C from Eq (3)
 
-    # Initialize global variables
-    current_k = 0 
-    current_sigma = Sigma0  # holds Sigma at time k
+    # Initialize global variables (used to 'cache' one column of Sigma)
+    # global current_sigma_k 
+    # global current_sigma  # holds Sigma at time current_sigma_k
+    current_sigma_k = 0
+    current_sigma = Sigma0
     ## print s0, Sigma0
-    print current_sigma
+    ## print current_sigma
 
+    ####
+    #
+    # function definitions
+
+    def set_sigma_k(column, k):
+        '''Caches column vector and corresponding value for SigmaK)'''
+        ## print 12345, column, k
+        global current_sigma, current_sigma_k
+        current_sigma = column
+        current_sigma_k = k
+        
     def predictS(sk):
         '''Calculates an intermediate guess for s at time t=k+1.
 
@@ -246,31 +259,56 @@ if __name__ == '__main__':
         Returns: 
             A 6x1 array with values of s at time t=k+1.  
         '''
-
         s_tilde = predictS(old_sk)  # from equation 2
         bracket_term1 = np.dot(predictSig(current_sigma), s_tilde)
-        bracket_term2 = np.dot(C_array.T, m_obs[:, current_k + 1])
-        bracket_term = np.sum(bracket_term1, bracket_term2)
+        bracket_term2 = np.dot(C_array.T, m_obs[:, current_sigma_k + 1])
+        bracket_term = np.add(bracket_term1, bracket_term2)
 
         # update sigma values and time step
-        current_sigma = updateSig(predictSig(current_sigma))
-        current_k = current_k + 1
-        print current_k, current_sigma
+        print updateSig(predictSig(current_sigma))
+        print current_sigma_k+1
+        set_sigma_k(updateSig(predictSig(current_sigma)), 
+                    current_sigma_k + 1)
+        ## print "hello"
+        ## print current_sigma_k, current_sigma
 
         return np.dot(current_sigma, bracket_term)        
 
-      
-    print updateS(s0)
-      
-        
-
+    ## print updateS(s0)
+    ## print "goodbye"  
+    ## print current_sigma_k, current_sigma
+    ###########  
+    #
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
 
-    
+    # Initialize new array for s
+    s_kalman = np.empty((6, K))
+    # Initialize s at t=0 with same initial values
+    s_kalman[:, 0] = s_model[:, 0]
+    print s_kalman[:,0]
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '-r', label='Filtered trajectory')
+    # Compute the rest of s using Eq (1)
+    # starting with column 1 (column 0 already initialized);
+    # last column is (k-1)th
+    for i in xrange(1, K, 1):
+        print i
+        s_kalman[:, i] = updateS(s_kalman[:, i-1])
+        print i, current_sigma_k
+        
+        ## print s_model[:, i]       
 
-    # Show the plot
-    ax.legend()
+    # Extract first three ROWS to obtain series of positions
+    x_coords = s_kalman[0]
+    y_coords = s_kalman[1]
+    z_coords = s_kalman[2]    
+
+    ax.plot(x_coords, y_coords, z_coords,
+           '-r', label='Filtered trajectory')
+
+    # Show the plot (example copy stored as P4.png)
+    plt.title("Plots of real and modeled trajectories",
+               horizontalalignment='right')
+    ## plt.text(0.5, 1.08, "test", horizontalalignment='center', fontsize=5, transform=ax.transAxes)
+    ## ax.set_title("Plots of real and modeled trajectories")
+    ax.legend(loc='best')
     plt.show()
