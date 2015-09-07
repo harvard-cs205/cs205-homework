@@ -2,6 +2,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
+def predictS(A, s_k, a):
+    return np.dot(A, s_k) + a
+def predictSig(A, Sig_k, B):
+    return np.linalg.inv(A*Sig_k*(A.transpose()) + B*(B.transpose()))
+def updateSig(sig, C):
+    return np.linalg.inv(sig + (C.transpose())*C)
+def updateS(sig_k1, sig, s, C, m):
+    return sig_k1*(sig*s + (C.transpose())*m)
 
 if __name__ == '__main__':
     # Model parameters
@@ -33,8 +41,6 @@ if __name__ == '__main__':
 
     s_true = np.loadtxt("P4_trajectory.txt", delimiter=',')
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '--b', label='True trajectory')
     ax.plot(s_true[:,0], s_true[:,1], s_true[:,2],
             '--b', label='True trajectory')
     
@@ -45,8 +51,6 @@ if __name__ == '__main__':
     #####################
     s_measured = np.loadtxt("P4_measurements.txt", delimiter=',')
     ax.plot((1/rx)*s_measured[:, 0], (1/ry)*s_measured[:,1], (1/rz)*s_measured[:,2], '.g', label='Observed trajectory')
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '.g', label='Observed trajectory')
 
     #####################
     # Part 3:
@@ -75,14 +79,26 @@ if __name__ == '__main__':
     # Use the Kalman filter for prediction
     #####################
 
-    # B = ?
-    # C = ?
-
+    B = np.diag([bx, by, bz, bvx, bvy, bvz])
+    C = np.matrix(np.hstack((np.diag([rx, ry, rz]), np.zeros((3,3)))))
+    m = np.matrix(s_measured)
+    
     # Initial conditions for s0 and Sigma0
+    s = np.matrix([0,0,2,15,3.5,4.0]).transpose()
+    s_current = s
+    sigma_current = .01*np.matrix(np.identity(6))
+    
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
-
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '-r', label='Filtered trajectory')
+    for i in range(K):
+        s_pred = predictS(A, s_current, a)
+        sig_pred = predictSig(A, sigma_current, B)
+        sig_next = updateSig(sig_pred, C)
+        s_next = updateS(sig_next, sig_pred, s_pred, C, np.matrix(m[i]).transpose())
+        s = np.hstack((s, s_next))
+        s_current = s_next
+        sig_current = sig_next
+    s = np.array(s)
+    ax.plot(s[0], s[1], s[2], '-r', label='Filtered trajectory')
 
     # Show the plot
     ax.legend()
