@@ -1,6 +1,92 @@
-1. 255 seconds
-2. 248/8 + 3 = 34 seconds
-3. 8 seconds
-4. ceil(log(N))
-5. Assuming infinite employees, 8 + 7 = 15
-6. For 1 bag: 256 + 8 = 264? For 2 bags: 128 + 7 = 135
+## Question 1
+
+Two optimal strategies for the lone cashier which will take 255 seconds:
+
+### First strategy
+1. Randomly pair the bags and sum their total into an intermediate total
+2. Pair each of these intermediate totals and sum them again
+3. Repeat until we have the total sum of all the bags
+
+This process can be visualised as a complete binary tree with 256 bags as the leaves. We perform 2^8 - 1 operations in total so it takes 255 seconds.
+
+### Second strategy
+1. Line up the bags
+2. Sum up the first two bags into an intermediate total
+3. Continue adding bags to the intermediate total
+
+There are 255 operations so it takes 255 seconds.
+
+## Question 2
+
+Here, the first strategy from the first question is the only optimal one since now we have multiple workers capable of working in parallel.
+
+The 8 workers can progressively work their way up the tree from the base. Let the top layer be the 0th layer. At the 7th layer (just above the 256 leaves), it takes `128 / 8 = 16` seconds to complete.
+
+Similarly, we can do the same for each subsequent layer up to the 3rd layer:
+7th layer = 16 seconds
+6th layer = 8 seconds
+5th layer = 4 seconds
+4th layer = 2 seconds
+3rd layer = 1 second
+
+The problem is that now we are bottlenecked; there are 2^2 = 4 nodes on the 2nd layer, but there are 8 workers. The 4 workers who are idle cannot move ahead and work on the 1st layer because that requires the results from the 2nd layer. Therefore:
+2nd layer = 1 second
+1st layer = 1 second
+0th layer = 1 second
+
+For a total of 34 seconds which is much faster than the single cashier could do it.
+
+## Question 3
+
+Using similar logic to the 2nd question, the best we can do is to complete each layer in 1 second and then move up the tree until completion since we need the results from lower layers in order to compute the upper layers.
+
+Therefore, it still takes 8 seconds to verify the sum.
+
+## Question 4
+
+Again using similar logic to the 3rd question, we need to sum the totals one layer of the tree at a time. For N bags, it may not fit perfectly into a binary tree so an additional layer may need to be added. Since each layer takes one second, the total amount of time is the number of layers in the tree excluding the leaves.
+
+This is equal to ceil( lg(N) ).
+
+## Question 5
+
+Assuming there are an infinite number of employees. In this case, we need to also add a cost to the edges connecting layers of the tree. So it takes 1 second for a layer to communicate the total to the layer above.
+
+Continuing from question 3, it takes 8 seconds to calculate the totals since there are 8 layers to compute so therefore there are 7 communications between layers. We assume there is no communication on the base layer (with 256 leaves) since employees are given two bags each at the beginning.
+
+Therefore, the total time taken is 8 + 7 = 15 seconds.
+
+## Question 6
+
+### 1 bag at a time
+
+Since each cashier only takes one bag from us, they will need to either:
+1. Get a bag from another cashier; or
+2. Get the total of that bag from another cashier.
+
+In either case, the time taken is 1 second so for this problem it does not matter. For simplicity, assume each layer is composed of different cashiers so the cashiers on the base of the tree (at the leaves) each go and obtain 1 bag from us. They then communicate (possibly concurrently since that is allowed) the total of their bag to the cashiers at the level above them.
+
+It takes 256 seconds for all cashiers at the base layer to obtain bags. Then, the analysis proceeds as in question 5 with calculation and communication taking 15 seconds. It is possible for cashiers to start calculating their totals as soon as they receive their bags, but we will reach a bottleneck since only after 256 seconds do the cashiers on the base layer all have a bag. Therefore, the total time taken is the same regardless of whether they start calculating straight away or only after all base layer cashiers have bags.
+
+The total time taken is 256 + 8 + 7 = 271.
+
+### 2 bags at a time
+
+On the 7th layer, there are 128 cashiers who each require two bags. This will take 128 seconds if we can only hand bags out at a rate of 2 bags per second (per cashier). Whilst cashiers could get started calculating totals of the upper layers while we are still handing out bags, there is going to be a bottle neck since only after 129 seconds can the 7th layer be entirely completed.
+
+So, including communication time, it takes 128 + 8 + 7 = 143 seconds if we hand each cashier 2 bags at a time.
+
+# Better strategies
+
+The strategy so far seems to be hindered significantly by the time it takes us to hand the bags to the cashiers. Moving bags is slow and must be performed sequentially, but it seems that communication between cashiers is easier and can occur concurrently.
+
+Suppose there is an incredible communicator who can simultaneously communicate the labels on the bags to all cashiers on the 7th layer (without moving any of the bags.) Then it would make sense for us to give this person all 256 bags in 1 second. This person then takes 2 seconds to concurrently communicate 2 numbers to each cashier on the 7th layer (128 cashiers.)
+
+The total time taken would then be 1 + 2 + (8 + 7) = 18 seconds.
+
+Even if we cannot assume such superhuman abilities, we can still do better by giving cashiers more bags and then having them communicate or give bags to other cashiers. Let’s assume we need to distribute 6 bags to 3 cashiers (A, B, C) such that each cashier has 2 bags.
+
+1 second: We give cashier A 4 bags.
+2 seconds: We give cashier B 2 bags. Cashier A gives C 2 bags.
+
+The total time is now 2 seconds instead of 3 seconds since we benefit from A’s help. The point is, we want to reduce the amount of times we need to hand out bags by increasing the number of bags we give out each time.
