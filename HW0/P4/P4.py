@@ -51,9 +51,11 @@ if __name__ == '__main__':
     # for ploting measurements
 
     measurements_array = np.loadtxt('P4_measurements.txt', delimiter = ',')
-    x_coords = measurements_array[:,0]
-    y_coords = measurements_array[:,1]
-    z_coords = measurements_array[:,2]
+    fix_stretching = np.diag((1/float(rx), 1/float(ry), 1/float(rz)))
+    approx_postions = np.dot(fix_stretching, measurements_array.T)
+    x_coords = approx_postions[0,:]
+    y_coords = approx_postions[1,:]
+    z_coords = approx_postions[2,:]
     ax.plot(x_coords, y_coords, z_coords,'.g', label='Observed trajectory')
 
     #####################
