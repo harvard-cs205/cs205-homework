@@ -44,9 +44,10 @@ if __name__ == '__main__':
 
     #loaded measurement data using np.loadtxt like above
     m = np.loadtxt('P4_measurements.txt',delimiter=',')
+    m=m.transpose()    
     r = np.array([[1/rx,0,0],[0,1/ry,0],[0,0,1/ry]])
-    xk = r.*m
-    ax.plot(xk[:,0],xk[:,1],xk[:,2],'.g', label='Observed trajectory')
+    x=np.dot(r,m)
+    ax.plot(x[0,:],x[1,:],x[2,:],'.g', label='Observed trajectory')
 
     #####################
     # Part 3:
