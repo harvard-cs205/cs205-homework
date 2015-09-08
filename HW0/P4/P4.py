@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-
+from numpy.linalg import inv
 
 if __name__ == '__main__':
     # Model parameters
@@ -81,21 +81,25 @@ if __name__ == '__main__':
     # Part 4:
     # Use the Kalman filter for prediction
     #####################
-    
+    s0 = s0
+    Sigma0 = np.array([[1,0,0],[0,1,0],[0,0,1]])*0.01
     B = np.array([[bx,0,0,0,0,0],[0,by,0,0,0,0],[0,0,bz,0,0,0],[0,0,0,bvx,0,0],[0,0,0,0,bvy,0],[0,0,0,0,0,bvz]])
     
     def predictS(s,A,a):
         return np.dot(A,s)+a                
         
     def predictSig(A,Cov,B):
-        Sig_guess = np.dot(A,Cov)
-        Sig_guess = np.dot(Sig_guess,A.transpose())
-        Sig_guess = Sig_guess + np.dot(B,B.transpose())
-        Sig_guess = Sig_guess**-1
+        return inv(np.dot(np.dot(A,Cov),A.transpose())+np.dot(B,B.transpose()))
+        #Sig_guess = np.dot(A,Cov)
+        #Sig_guess = np.dot(Sig_guess,A.transpose())
+        #Sig_guess = Sig_guess + np.dot(B,B.transpose())
+        #Sig_guess = inv(Sig_guess)
     
     def updateSig(Sig_guess,C):
-        
-    def updateS():
+        return inv(Sig_Guess+np.dot(C.transpose(),C))
+    
+    def updateS(updatedSig,Sig_guess,s,C,m):
+        return np.dot(updatedSig,np.dot(Sig_guess,s)+np.dot(C.transpose(),m))
     
     B = np.array([bx,0,0,0,0,0],[,0,by,0,0,0,0],[0,0,bz,0,0,0],[0,0,0,bvx,0,0],[0,0,0,0,bvy,0],[0,0,0,0,0,bvz])
     # C = ?
