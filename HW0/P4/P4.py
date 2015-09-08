@@ -30,6 +30,7 @@ if __name__ == '__main__':
     # Load true trajectory and plot it
     # Normally, this data wouldn't be available in the real world
     #####################
+s_true = np.loadtxt(P4_trajectory.txt)
 
     # ax.plot(x_coords, y_coords, z_coords,
     #         '--b', label='True trajectory')
