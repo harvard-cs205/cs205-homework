@@ -30,4 +30,4 @@ The job numbers are not printed out in a given order, since the order in which t
 This would be important if there is an inherent order in the program logic. For example, the output of one process might be needed as an input to another process.
 
 B.
-As the wait time increases, the speedup with parallelism increases until it plateaus at around 4 times. It is indeed possible that a parallel program could take longer than its serial version. As shown in P6.png, at wait times below 1e-5 seconds, the speedup is below 1. This happens when the tradeoff of inter-process communication outweighs the speedup from parallelism, i.e. when the computation time is short relative to communication time.
+As the wait time increases, the speedup with parallelism increases until it plateaus at around 4 times. It is possible that a parallel program could take longer than its serial version. As shown in P6.png, at wait times below 1e-3 seconds, the speedup is below 1. This happens when the tradeoff of the coordination and communication overhead outweighs the speedup from parallelism, i.e. when the computation time is short relative to communication time.

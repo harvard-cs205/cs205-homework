@@ -31,7 +31,7 @@ if __name__ == '__main__':
         parallelTime = time.time() - start
 
         # Compute the ratio of these times
-        ratio.append(serialTime/parallelTime)
+        ratio.append(np.exp(np.log(serialTime)-np.log(parallelTime)))
 
     for t, r in zip(wait_time, ratio):
         print 'Wait Time: ' + str(t)
