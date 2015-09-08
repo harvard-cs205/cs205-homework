@@ -2,20 +2,20 @@
 It would take totally 255 seconds.
 
 #2 
-Yes they can do it faster. The fastest way to do this is to divide all the bags equally for the 8 people to count, and now there will be 256/8=32 bags for each person, so it will take 31 seconds to count individually, plus the time to sum them up, which is 7 seconds, so the fastest way to do this costs about 38 seconds.
+Yes they can do it faster. The fastest way to do this is to divide all the bags equally for the 8 people to count, and now there will be 256/8=32 bags for each person, so it will take 31 seconds to count individually, plus the time to sum them up, to sum up, it should follow a binary tree style, which is 3 seconds, so the fastest way to do this costs 34 seconds.
 
 #3 
-The shortest time it costs for the employees to count follows the equation: time=(#bags/#emplyees)+#employess-2, with #employees is between 1 and #bags. Simple math shows that when #employees is 16(square root of 256), the time hits its lowest point, which is 30 seconds.
+The shortest time it costs for the employees to count in a binary tree style, which first add 256/2 pairs of numbers, and then 256/4 pairs of numbers, and so on. So the time will be log_2(256)=8 seconds.
 
 #4 
 (P5.py) 
-When infinite employees, the calculation is just like question #3, replacing #bags by N. The shortest time to count is the square root of #bags.
+When infinite employees, the calculation is just like question #3. So the shortest time to count should be ceil(log_2(N)), which means round up.
 When a lone employee count all the bags, the time will be linear to the #bags, which is obvious.
 
 #5 
-The shortest time it costs for the employees to count follows the equation: time=(#bags/#emplyees)-1+2*(#employess-1) because now the time to sum up all the numbers each employee counted will be doubled for we include the communication time.
-So for 8 employees, it will now take 45 seconds.
-For infinite employees, it will now take about 42 seconds for fastest counting.
+The shortest time it costs for the employees to count should now add the communication time which is 1 second for a level in the "binary tree" except for the highest level.
+So for 8 employees, it will now take 37 seconds.
+For infinite employees, it will now take 16 seconds for fastest counting.
 
 #6
 Assume that the employees starts to count and communicate the next second I give them the bags.
