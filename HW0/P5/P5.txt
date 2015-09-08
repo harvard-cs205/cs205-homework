@@ -1,1 +1,26 @@
-# Your answers here.
+#1 
+It would take totally 255 seconds.
+
+#2 
+Yes they can do it faster. The fastest way to do this is to divide all the bags equally for the 8 people to count, and now there will be 256/8=32 bags for each person, so it will take 31 seconds to count individually, plus the time to sum them up, which is 7 seconds, so the fastest way to do this costs about 38 seconds.
+
+#3 
+The shortest time it costs for the employees to count follows the equation: time=(#bags/#emplyees)+#employess-2, with #employees is between 1 and #bags. Simple math shows that when #employees is 16(square root of 256), the time hits its lowest point, which is 30 seconds.
+
+#4 
+(P5.py) 
+When infinite employees, the calculation is just like question #3, replacing #bags by N. The shortest time to count is the square root of #bags.
+When a lone employee count all the bags, the time will be linear to the #bags, which is obvious.
+
+#5 
+The shortest time it costs for the employees to count follows the equation: time=(#bags/#emplyees)-1+2*(#employess-1) because now the time to sum up all the numbers each employee counted will be doubled for we include the communication time.
+So for 8 employees, it will now take 45 seconds.
+For infinite employees, it will now take about 42 seconds for fastest counting.
+
+#6
+Assume that the employees starts to count and communicate the next second I give them the bags.
+If each employee takes 1 bag from me, that will be 256 seconds for taking the bag, and for 256 employees to sum up all the bags, it will take 2*255 seconds(communications and add numbers), but they can start to count when I give out bags, and the overlap time will be 256-3+1 because the overlap begins at the time I give bag to the 3rd person. So the total time it costs will be 512 seconds.
+If each employee taks 2 bags from me, similarly, there will be 128 seconds for taking bags, and 1+3*127 seconds for counting, and an overlap of 127 seconds, so the total time will be 383 seconds.
+By math deduction, I find it's better for the employees to wait until I give out all the bags and then start to count at the same time, which would save a lot of time.
+
+
