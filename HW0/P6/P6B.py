@@ -17,18 +17,21 @@ if __name__ == '__main__':
 
     # Use a variety of wait times
     ratio = []
-    wait_time = np.linspace(10**-6,1,20)
+    wait_time = np.logspace(-6, 0, 20)
 
     for t in wait_time:
-         # Compute jobs serially and in parallel
+         
+         # Serial Loop
+         time_start = time.time()
          for ii in range(N):
               burnTime(t)
-        
-         # Use time.time() to compute the elapsed time for each
-         serialTime = 1 + time.time()
-        
-         results = pool.map(burnTime(t), range(N))
-         parallelTime = 1 + time.time()
+         serialTime = time.time() - time_start
+
+		 #Parallel loop
+         time_start = time.time()
+         for jj in range(N):
+             results = pool.map(burnTime(t), range(P))
+         parallelTime = time.time() - time_start
 
          # Compute the ratio of these times
          ratio.append(serialTime/parallelTime)
