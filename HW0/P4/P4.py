@@ -43,6 +43,10 @@ if __name__ == '__main__':
     #####################
 
     #loaded measurement data using np.loadtxt like above
+    #need to transpose matrix m to align with the mathematical formula
+    #needed to perform dot multiplication to account for broadcasting error
+    #plotted x which is the plot that takes into account dimensional stretching
+    
     m = np.loadtxt('P4_measurements.txt',delimiter=',')
     m=m.transpose()    
     r = np.array([[1/rx,0,0],[0,1/ry,0],[0,0,1/ry]])
@@ -53,13 +57,24 @@ if __name__ == '__main__':
     # Part 3:
     # Use the initial conditions and propagation matrix for prediction
     #####################
-
-    # A = ?
-    # a = ?
-    # s = ?
-
+    A=
+    a=
+    
     # Initial conditions for s0
+    s = np.zeros([6,k])
+    s0=np.array([0,0,2,15,3.5,4])
+    s0=s0.transpose()
+    i = 1
+    s[:,0]=s0
+    
     # Compute the rest of sk using Eq (1)
+    k = 120
+    while i <= k:
+        s[:,i]=np.dot(s[:,i-1],A)
+    
+
+    
+    
 
     # ax.plot(x_coords, y_coords, z_coords,
     #         '-k', label='Blind trajectory')
