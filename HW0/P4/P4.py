@@ -95,29 +95,30 @@ if __name__ == '__main__':
         return np.dot(x,np.dot(y,z)+np.dot(i.transpose(),j)) #to be Sk+1
     
     s0 = s0
-    Sigma0 = np.array([[1,0,0],[0,1,0],[0,0,1]])*0.01
+    Sigma0 = np.array([[1,0,0,0,0,0],[0,1,0,0,0,0],[0,0,1,0,0,0],[0,0,0,1,0,0],[0,0,0,0,1,0],[0,0,0,0,0,1]])*0.01
     B = np.array([[bx,0,0,0,0,0],[0,by,0,0,0,0],[0,0,bz,0,0,0],[0,0,0,bvx,0,0],[0,0,0,0,bvy,0],[0,0,0,0,0,bvz]])
-    C = r
+    C = np.array([[1/rx,0,0,0,0,0],[0,1/ry,0,0,0,0],[0,0,1/ry,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]])
      
     s_new = np.zeros([6,K])
     i = 1
     s_new[:,0]=s0
     Sigma=Sigma0
-    
+    m_append=np.zeros([3,121])
+    m=np.concatenate((m,m_append))
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
 
     while i <= K-1:
-        s_new[:,i]=predictS(A,s_new[:,i-1],a)
+       # s_new[:,i]=predictS(A,s_new[:,i-1],a)
+        s_predicted = predictS(A,s_new[:,i-1],a)        
         Sig_predicted = predictSig(A,Sigma,B)
         Sig_updated = updateSig(Sig_predicted,C)
-        s_new[:,i]=updateS(Sig_updated,Sig_predicted,s_new[:,i],C,m[:,i])
+        #s_new[:,i]=updateS(Sig_updated,Sig_predicted,s_new[:,i-1],C,m[:,i-1])
+        s_new[:,i]=updateS(Sig_updated,Sig_predicted,s_predicted,C,m[:,i-1])        
         i+=1
         
     
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '-r', label='Filtered trajectory')
-
+    ax.plot(s_new[0,:], s_new[1,:], s_new[2,:],'-r', label='Filtered trajectory')
     # Show the plot
     ax.legend()
     plt.show()
