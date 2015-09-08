@@ -31,12 +31,13 @@ if __name__ == '__main__':
     # Normally, this data wouldn't be available in the real world
     #####################
 
-    s_true = np.loadtxt('P4_trajectory.txt', delimiter = ",") 
-        #Load the trajectory text file into an array
+    s_true = np.transpose(np.mat(np.loadtxt('P4_trajectory.txt', delimiter = ","))) 
+        #Load the trajectory text file into a matrix
 
-    x_coords = s_true[:, 0]  # extract x coordinates
-    y_coords = s_true[:, 1]  # extract y coordinates
-    z_coords = s_true[:, 2]  # extract z coordinates
+    x_coords = np.array(s_true)[0, :]  # extract x coordinates
+    y_coords = np.array(s_true)[1, :]  # extract y coordinates
+    z_coords = np.array(s_true)[2, :]  # extract z coordinates
+        #Have to extract these as an array, otherwise each point gets its own label in the legend
 
     ax.plot(x_coords, y_coords, z_coords,
              '--b', label='True trajectory')
@@ -47,29 +48,19 @@ if __name__ == '__main__':
     # Read the observation array and plot it (Part 2)
     #####################
 
-    s_meas = np.loadtxt('P4_measurements.txt', delimiter = ",")
-        #Load the measurements text file into an array
-
-
-    x_coords = s_meas[:, 0]  # extract x coordinates
-    y_coords = s_meas[:, 1]  # extract y coordinates
-    z_coords = s_meas[:, 2]  # extract z coordinates
-
-    s_meas_matrix = np.matrix([x_coords, y_coords, z_coords])
-        # Put them into a matrix to do matrix multiplication with
+    s_meas = np.transpose(np.mat(np.loadtxt('P4_measurements.txt', delimiter = ",")))
+        #Load the measurements text file into a matrix
 
     stretch_matrix = np.matrix([[1/rx, 0, 0], [0, 1/ry, 0], [0, 0, 1/rz]])
         # Matrix with the stretching factors
 
-    corrected = stretch_matrix * s_meas_matrix
+    corrected = stretch_matrix * s_meas
         # Correct position by multiplying the stretch matrix by the measured position
-
-    # Now you have to get the coordinates out a different way because it's in a matrix,
-    #    not an array.  So I convert it to an array first.  
+ 
     x_coords = np.array(corrected)[0, :]  # extract x coordinates
     y_coords = np.array(corrected)[1, :]  # extract y coordinates
     z_coords = np.array(corrected)[2, :]  # extract z coordinates
-
+    
 
     ax.plot(x_coords, y_coords, z_coords,
              '.g', label='Observed trajectory')
@@ -92,13 +83,13 @@ if __name__ == '__main__':
     a = np.transpose(np.matrix([0, 0, 0, 0, 0, g*dt]))
     
     # Initial conditions for s0
-    s = np.transpose(np.matrix([0, 0, 2, 15, 3.5, 4.0]))
+    s0 = np.transpose(np.matrix([0, 0, 2, 15, 3.5, 4.0]))
 
     # Empty matrix to be filled with predicted values
     s_pred = np.matrix(np.empty(shape=(6, (K-1))))
 
-    # Insert inistial conditions into the first row
-    s_pred[:, 0] = s
+    # Insert initial conditions into the first row
+    s_pred[:, 0] = s0
     
     # Compute the rest of sk using Eq (1), one column at a time
     for i in range(1, K-1):
@@ -117,14 +108,67 @@ if __name__ == '__main__':
     # Use the Kalman filter for prediction
     #####################
 
-    # B = ?
-    # C = ?
+    # Matrix B describes the scale of the errors
+    B = np.matrix([[bx,  0,  0,  0,  0,  0],
+                   [ 0, by,  0,  0,  0,  0],
+                   [ 0,  0, bz,  0,  0,  0],
+                   [ 0,  0,  0,bvx,  0,  0],
+                   [ 0,  0,  0,  0,bvx,  0],
+                   [ 0,  0,  0,  0,  0,bvz]])
+
+    # Matrix C describes the dimensional stretching
+    C = np.matrix([[rx,  0,  0, 0, 0, 0],
+                   [ 0, ry,  0, 0, 0, 0],
+                   [ 0,  0, rz, 0, 0, 0]])
 
     # Initial conditions for s0 and Sigma0
+        # s0 was defined above in part 3
+    Sigma0 = 0.01 * np.mat(np.identity(6))    # 6X6 identity matrix
+
+    # Function predictS returns a predicted location as in Eq(2)
+    def predictS(s):
+        return (A * s + a)
+
+    # Function predictSig returns a predicted Sigma value as in Eq(3)
+    def predictSig(sig):
+        return np.linalg.inv(A * sig * np.transpose(A) + B * np.transpose(B))
+
+    # Function updateSig returns the next value of Sigma as in Eq(4)
+    def updateSig(sig):
+        return np.linalg.inv(sig + np.transpose(C) * C)
+
+    # Function updateS returns the next position as in Eq(5)
+    def updateS(m, sig, s):
+        return (updateSig(predictSig(sig)) * (predictSig(sig) * predictS(s) + 
+            np.transpose(C) * m))
+
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '-r', label='Filtered trajectory')
+    # Empty matrix to be filled with Kalman filtering predicted values
+    s_kalm = np.matrix(np.empty(shape=(6, (K-1))))
+
+    # Insert initial conditions into the first column
+    s_kalm[:, 0] = s0
+
+    # Intermediate storage variables for Sigma and s that will be used in the for loop
+    sig1 = Sigma0
+    s1 = s0
+
+    for i in range(1, K-1):
+        m1 = s_true[0:3, i]     # pick out the actual measurement to plug in to eq(5)
+        s1 = predictS(s1)       # find the next intermediate guess for s
+        sig1 = predictSig(sig1) # find the next sig to plug into eq(5)
+        s_kalm[:, i] = updateS(m1, sig1, s1) # fill in next column of s_kalm
+        
+        
+    x_coords = np.array(s_kalm)[0, :]  # extract x coordinates
+    y_coords = np.array(s_kalm)[1, :]  # extract y coordinates
+    z_coords = np.array(s_kalm)[2, :]  # extract z coordinates
+
+
+
+    ax.plot(x_coords, y_coords, z_coords,
+           '-r', label='Filtered trajectory')
 
     # Show the plot
     ax.legend()
