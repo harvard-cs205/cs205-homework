@@ -43,11 +43,11 @@ if __name__ == '__main__':
     #
     # Read the observation array and plot it (Part 2)
     #####################
-    s_obs=np.loadtxt("P4_measurements.txt", delimiter=",")
+    m = np.loadtxt("P4_measurements.txt", delimiter=",")
     C = np.array([[1./rx, 0.0, 0.0],
                   [0.0, 1./ry, 0.0],
                   [0.0, 0.0, 1./rz]])
-    s_obs=np.dot(C, s_obs.T)
+    s_obs=np.dot(C, m.T)
     
     x_coords=s_obs[0]
     y_coords=s_obs[1]
@@ -91,9 +91,9 @@ if __name__ == '__main__':
     #####################
 
     B = np.diag([bx, by, bz, bvx, bvy, bvz])
-    C = np.array([[1./rx, 0.0, 0.0, 0.0, 0.0, 0.0],
-                  [0.0, 1./ry, 0.0, 0.0, 0.0, 0.0],
-                  [0.0, 0.0, 1./rz, 0.0, 0.0, 0.0]])
+    C = np.array([[rx, 0.0, 0.0, 0.0, 0.0, 0.0],
+                  [0.0, ry, 0.0, 0.0, 0.0, 0.0],
+                  [0.0, 0.0, rz, 0.0, 0.0, 0.0]])
 
     # Initial conditions for s0 and Sigma0
     s0 = np.array([0.0, 0.0, 2.0, 15.0, 3.5, 4.0]).T
@@ -108,7 +108,7 @@ if __name__ == '__main__':
         s_tilt = np.dot(A, s) + a
         Sigma_tilt = np.linalg.inv(np.dot(A, np.dot(Sigma, A.T)) + np.dot(B, B.T))
         Sigma = np.linalg.inv(Sigma_tilt + np.dot(C.T, C))
-        s = np.dot(Sigma, (np.dot(Sigma_tilt, s_tilt)+ np.dot(C.T, s_obs[:,i])))
+        s = np.dot(Sigma, (np.dot(Sigma_tilt, s_tilt)+ np.dot(C.T, m.T[:,i])))
         sk[:, i] = s
 
     x_coords=sk[0]
