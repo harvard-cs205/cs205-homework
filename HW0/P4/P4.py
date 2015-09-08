@@ -130,17 +130,16 @@ if __name__ == '__main__':
         return (A * s + a)
 
     # Function predictSig returns a predicted Sigma value as in Eq(3)
-    def predictSig(sig):
-        return np.linalg.inv(A * sig * np.transpose(A) + B * np.transpose(B))
+    def predictSig(sig_k):
+        return np.linalg.inv(A * sig_k * np.transpose(A) + B * np.transpose(B))
 
     # Function updateSig returns the next value of Sigma as in Eq(4)
-    def updateSig(sig):
-        return np.linalg.inv(sig + np.transpose(C) * C)
+    def updateSig(sig_hat):
+        return np.linalg.inv(sig_hat + np.transpose(C) * C)
 
     # Function updateS returns the next position as in Eq(5)
-    def updateS(m, sig, s):
-        return (updateSig(predictSig(sig)) * (predictSig(sig) * predictS(s) + 
-            np.transpose(C) * m))
+    def updateS(m, sig_hat, sig_k, s):
+        return (sig_k * (sig_hat * s + np.transpose(C) * m))
 
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
 
@@ -151,14 +150,16 @@ if __name__ == '__main__':
     s_kalm[:, 0] = s0
 
     # Intermediate storage variables for Sigma and s that will be used in the for loop
-    sig1 = Sigma0
-    s1 = s0
+    sig_k = Sigma0               # First value: Sigma0
+    sig_hat = predictSig(Sigma0) # First value: based on Sigma0
+    s1 = s0                      # Initial value is the starting point
 
     for i in range(1, K-1):
-        m1 = s_true[0:3, i]     # pick out the actual measurement to plug in to eq(5)
+        m1 = s_meas[0:3, i]     # pick out the actual measurement to plug in to eq(5)
         s1 = predictS(s1)       # find the next intermediate guess for s
-        sig1 = predictSig(sig1) # find the next sig to plug into eq(5)
-        s_kalm[:, i] = updateS(m1, sig1, s1) # fill in next column of s_kalm
+        sig_k = updateSig(sig_hat)  # find the next sig2 to plug into eq(5)
+        s_kalm[:, i] = updateS(m1, sig_hat, sig_k, s1) # fill in next column of s_kalm
+        sig_hat = predictSig(sig_k) # update sig1 for the next loop
         
         
     x_coords = np.array(s_kalm)[0, :]  # extract x coordinates
