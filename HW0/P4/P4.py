@@ -41,10 +41,27 @@ if __name__ == '__main__':
     #
     # Read the observation array and plot it (Part 2)
     #####################
+
+    C_partial = np.matrix([
+                            [1.0/rx,0,0],
+                            [0,1.0/ry,0],
+                            [0,0,1.0/rz]
+                         ])
     s_measured = np.loadtxt('P4_measurements.txt', 
              delimiter = ',', unpack = True)
 
-    ax.plot(s_measured[0] * 1.0/rx, s_measured[1] * 1.0/ry, s_measured[2] * 1.0/rz,
+    s_measured = np.matrix(s_measured)
+    (cols, rows) = s_measured.shape
+
+    measured_output = np.zeros([cols,rows])
+    measured_output = np.asmatrix(measured_output)
+
+    for i in range(0,rows):
+        measured_output[:,i] = C_partial * s_measured[:,i]
+
+    measured_output = np.array(measured_output)
+
+    ax.plot(measured_output[0], measured_output[1], measured_output[2],
              '.g', label='Observed trajectory')
 
     #####################
@@ -129,7 +146,7 @@ if __name__ == '__main__':
     
     # Initial conditions for s0 and Sigma0
     sig_0 = 0.01 * np.identity(6)
-    m = np.matrix(s_measured)
+    m = s_measured
 
     s = np.zeros([6,K])
     s = np.asmatrix(s)
