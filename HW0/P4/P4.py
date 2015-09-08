@@ -81,44 +81,36 @@ if __name__ == '__main__':
     # Part 4:
     # Use the Kalman filter for prediction
     #####################
+    
+    def predictS(x,y,z):
+        return np.dot(x,y)+z #to be called s_predicted in loop   
+                         
+    def predictSig(x,y,z):
+        return inv(np.dot(np.dot(x,y),x.transpose())+np.dot(z,z.transpose())) #to be called Sig_predicted in loop
+    
+    def updateSig(x,y):
+        return inv(x+np.dot(y.transpose(),y)) #to be called Sig_updated in loop or Sig K+1
+    
+    def updateS(x,y,z,i,j):
+        return np.dot(x,np.dot(y,z)+np.dot(i.transpose(),j)) #to be Sk+1
+    
     s0 = s0
     Sigma0 = np.array([[1,0,0],[0,1,0],[0,0,1]])*0.01
     B = np.array([[bx,0,0,0,0,0],[0,by,0,0,0,0],[0,0,bz,0,0,0],[0,0,0,bvx,0,0],[0,0,0,0,bvy,0],[0,0,0,0,0,bvz]])
-    
-    def predictS(s,A,a):
-        return np.dot(A,s)+a                
-        
-    def predictSig(A,Cov,B):
-        return inv(np.dot(np.dot(A,Cov),A.transpose())+np.dot(B,B.transpose()))
-        #Sig_guess = np.dot(A,Cov)
-        #Sig_guess = np.dot(Sig_guess,A.transpose())
-        #Sig_guess = Sig_guess + np.dot(B,B.transpose())
-        #Sig_guess = inv(Sig_guess)
-    
-    def updateSig(Sig_guess,C):
-        return inv(Sig_Guess+np.dot(C.transpose(),C))
-    
-    def updateS(updatedSig,Sig_guess,s,C,m):
-        return np.dot(updatedSig,np.dot(Sig_guess,s)+np.dot(C.transpose(),m))
-    
-    B = np.array([bx,0,0,0,0,0],[,0,by,0,0,0,0],[0,0,bz,0,0,0],[0,0,0,bvx,0,0],[0,0,0,0,bvy,0],[0,0,0,0,0,bvz])
-    # C = ?
-
-    # Initial conditions for s0 and Sigma0
-    s0 = s0
-    Sigma0 = np.array([[1,0,0],[0,1,0],[0,0,1]])*0.01
-    
-
+    C = r
+     
     s_new = np.zeros([6,K])
     i = 1
     s_new[:,0]=s0
+    Sigma=Sigma0
     
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
 
     while i <= K-1:
-        s_new[:,i]=predictS(s_new[:,i-1],A,a)
-        Sig_guess = predictSig(A,Cov,B)
-        
+        s_new[:,i]=predictS(A,s_new[:,i-1],a)
+        Sig_predicted = predictSig(A,Sigma,B)
+        Sig_updated = updateSig(Sig_predicted,C)
+        s_new[:,i]=updateS(Sig_updated,Sig_predicted,s_new[:,i],C,m[:,i])
         i+=1
         
     
