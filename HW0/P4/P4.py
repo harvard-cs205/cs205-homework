@@ -3,6 +3,29 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import pdb
 
+#s,a are np.arrays and A is np.matrix
+def predictS(A,s,a):
+    #pdb.set_trace()
+    lhs = np.dot(A,s)
+    return np.array(lhs[0]) + a
+
+def predictSig(A,sig,B):
+    #pdb.set_trace()
+    asa = np.dot(A,sig)
+    asa = np.dot(asa,A.T)
+    newB = np.dot(B,B.T)
+    return np.linalg.inv(asa + newB)
+
+def updateSig(Sig,C):
+    #pdb.set_trace()
+    return np.linalg.inv(Sig+np.dot(C.T,C))
+#What is C???
+def updateS(Sigk,Sig,s,C,m):
+    #pdb.set_trace()
+    rhsl = np.dot(Sig,s)
+    rhsr = np.dot(C.T,m)
+    return np.dot(Sigk, (rhsl + rhsr).T)
+
 if __name__ == '__main__':
     # Model parameters
     K = 121    # Number of times steps
@@ -91,22 +114,47 @@ if __name__ == '__main__':
 
     ax.plot(s[0], s[1], s[2],
             'k', label='Blind trajectory')
-    plt.show()
+    #plt.show()
     #####################
     # Part 4:
     # Use the Kalman filter for prediction
     #####################
-
+    
     B = np.matrix([[bx,0,0,0,0,0],[0,by,0,0,0,0],[0,0,bz,0,0,0]
         ,[0,0,0,bvx,0,0],[0,0,0,0,bvy,0],[0,0,0,0,0,bvz]])
-    # C = ?
+    C = np.matrix([[rx,0,0,0,0,0],[0,ry,0,0,0,0],[0,0,rz,0,0,0]])
     
     # Initial conditions for s0 and Sigma0
-    # Compute the rest of sk using Eqs (2), (3), (4), and (5)
+    
+    #sigmaMatrix = np.zeros(K)
+    #sigmaMatrix[0] = Sigma0
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '-r', label='Filtered trajectory')
+    
+    
+    # Compute the rest of sk using Eqs (2), (3), (4), and (5)
+    
+    KalmanSMat = np.zeros((6,K))
+    KalmanSMat[:,0] = s0
+    Sigma0 = np.identity(6)*0.01
+    currentSigma = Sigma0
+    
+    for k in range(1,121):
+        #pdb.set_trace()
+        pS = predictS(A,KalmanSMat[:,k-1],a)
+        pS = pS[0]#formatting 
+        #pSigma = predictSig(A,sigmaMatrix[k-1],B)
+        pSigma = predictSig(A,currentSigma,B)
+        #sigmaMatrix[k] = updateSig(pSigma,C)
+        currentSigma = updateSig(pSigma,C)
+        #KalmanSMat[k] = updateS(sigmaMatrix[k],pSigma,pS,C,m)
+        #pdb.set_trace()
+        KalmanSMat[:,k] = np.array(updateS(currentSigma,pSigma,
+            pS,C,[float(x) for x in s_true2[k]]))[:,0]
+    #print KalmanSMat
+    #pdb.set_trace()
+    ax.plot(KalmanSMat[0], KalmanSMat[1], KalmanSMat[2],
+            'r', label='Filtered trajectory')
 
     # Show the plot
     #ax.legend()
-    #plt.show()
+    plt.show()
