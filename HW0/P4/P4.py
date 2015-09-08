@@ -5,7 +5,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 if __name__ == '__main__':
     # Model parameters
-    K = 121    # Number of times steps
+    K = 120    # Number of times steps
     dt = 0.01  # Delta t
     c = 0.1    # Coefficient of drag
     g = -9.81  # Gravity
@@ -57,21 +57,21 @@ if __name__ == '__main__':
     # Part 3:
     # Use the initial conditions and propagation matrix for prediction
     #####################
-    A=
-    a=
+    A = np.array([[1,0,0,dt,0,0],[0,1,0,0,dt,0],[0,0,1,0,0,dt],[0,0,0,1-c*dt,0,0],[0,0,0,0,1-c*dt,0,],[0,0,0,0,0,1-c*dt]])
+    
     
     # Initial conditions for s0
-    s = np.zeros([6,k])
+    s = np.zeros([6,K])
     s0=np.array([0,0,2,15,3.5,4])
     s0=s0.transpose()
     i = 1
     s[:,0]=s0
     
     # Compute the rest of sk using Eq (1)
-    k = 120
-    while i <= k:
-        s[:,i]=np.dot(s[:,i-1],A)
     
+    while i <= K:
+        s=np.dot(s,A)
+        i+=1
 
     
     
