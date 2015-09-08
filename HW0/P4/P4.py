@@ -62,8 +62,15 @@ if __name__ == '__main__':
     s_true = np.array(s_true)
     #print s_true[:,0]
     #print s_true[:10]
-    ax.plot([float(x) for x in s_true[:,0]], [float(y) for y in s_true[:,1]],
-     [float(z) for z in s_true[:,2]],'--b', label='True trajectory')
+    
+    testLT = np.loadtxt('P4_trajectory.txt',delimiter=',')
+    X0 = [float(x) for x in s_true[:,0]]
+    Y0 = [float(y) for y in s_true[:,1]]
+    Z0 = [float(z) for z in s_true[:,2]]
+    
+    ax.plot(testLT[:,0],testLT[:,1],testLT[:,2],'--b',label='True trajectory')
+    #ax.plot([float(x) for x in s_true[:,0]], [float(y) for y in s_true[:,1]],
+    # [float(z) for z in s_true[:,2]],'--b', label='True trajectory')
     #plt.show()
     #####################
     # Part 2:
@@ -77,8 +84,15 @@ if __name__ == '__main__':
         s_true2.append(line[:-1].split(','))
     #print s_true2
     s_true2 = np.array(s_true2)
-    ax.plot([float(x) for x in s_true2[:,0]],[float(y) for y in s_true2[:,1]],
-        [float(z) for z in s_true2[:,2]],'.g',label='Observed trajectory')
+
+    adjustArray = np.matrix([[1/rx,0,0],[0,1/ry,0],[0,0,1/rz]])
+    adjustedS_true2 = []
+    pdb.set_trace()
+    for i in range(len(s_true2)):
+        adjustedS_true2.append(np.array(np.dot(adjustArray,np.array([float(s) for s in s_true2[i]])))[0])
+    adjustedS_true2 = np.array(adjustedS_true2)
+    ax.plot(adjustedS_true2[:,0],adjustedS_true2[:,1],
+        adjustedS_true2[:,2],'.g',label='Observed trajectory')
     #plt.show()
     # ax.plot(x_coords, y_coords, z_coords,
     #         '.g', label='Observed trajectory')
@@ -156,5 +170,5 @@ if __name__ == '__main__':
             'r', label='Filtered trajectory')
 
     # Show the plot
-    #ax.legend()
+    ax.legend()
     plt.show()
