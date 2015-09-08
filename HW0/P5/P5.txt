@@ -66,9 +66,9 @@ Since each cashier only takes one bag from us, they will need to either:
 
 In either case, the time taken is 1 second so for this problem it does not matter. For simplicity, assume each layer is composed of different cashiers so the cashiers on the base of the tree (at the leaves) each go and obtain 1 bag from us. They then communicate (possibly concurrently since that is allowed) the total of their bag to the cashiers at the level above them.
 
-It takes 256 seconds for all cashiers at the base layer to obtain bags. Then, the analysis proceeds as in question 5 with calculation and communication taking 15 seconds. It is possible for cashiers to start calculating their totals as soon as they receive their bags, but we will reach a bottleneck since only after 256 seconds do the cashiers on the base layer all have a bag. Therefore, the total time taken is the same regardless of whether they start calculating straight away or only after all base layer cashiers have bags.
+It takes 256 seconds for all cashiers at the base layer to obtain bags. They then communicate the bag totals to the 128 cashiers on the 7th layer in 1 second. Then, the analysis proceeds as in question 5 with calculation and communication taking 15 seconds. It is possible for cashiers to start calculating their totals as soon as they receive their bags, but we will reach a bottleneck since only after 256 seconds do the cashiers on the base layer all have a bag. Therefore, the total time taken is the same regardless of whether they start calculating straight away or only after all base layer cashiers have bags.
 
-The total time taken is 256 + 8 + 7 = 271.
+The total time taken is 256 + 1 + 8 + 7 = 272.
 
 ### 2 bags at a time
 

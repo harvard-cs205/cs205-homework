@@ -115,6 +115,7 @@ if __name__ == '__main__':
     # Use the Kalman filter for prediction
     #####################
 
+    # Initial conditions for s0 and Sigma0
     sig_0 = 0.01 * np.eye(6)
 
     B = np.zeros((6,6))
@@ -128,6 +129,7 @@ if __name__ == '__main__':
 
     sig_k = sig_0
 
+    # Compute the rest of sk using Eqs (2), (3), (4), and (5)
     for cur_k in xrange(1, K):
         s_tild = predictS(A, kal_s[:, cur_k-1], a)
         sig_tild = predictSig(A, sig_k, B)
@@ -137,9 +139,6 @@ if __name__ == '__main__':
     x_coords = kal_s[0,:]
     y_coords = kal_s[1,:]
     z_coords = kal_s[2,:]
-
-    # Initial conditions for s0 and Sigma0
-    # Compute the rest of sk using Eqs (2), (3), (4), and (5)
 
     ax.plot(x_coords, y_coords, z_coords,
             '-r', label='Filtered trajectory')

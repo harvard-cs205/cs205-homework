@@ -36,7 +36,7 @@ As commands can be executed in a seemingly random fashion, additional tools such
 
 ## Scenarios where this is important
 
-Whenever we have multiple threads/processes potentially reading and modifying shared memory, this becomes critical. Suppose we are trying to execute a particular function `doTenTimes()` 10 times in parallel. The logical thing is to try and keep a counter of how many times the function has executed; let this be stored in some variable `counter`. Each thread/process checks the counter variable with something like 
+Whenever we have multiple threads/processes potentially reading and modifying shared memory, this becomes critical. Suppose we are trying to execute a particular function `doTenTimes()` 10 times in parallel. The logical thing is to try and keep a counter of how many times the function has executed; let this be stored in some shared variable `counter`. Each thread/process checks the counter variable with something like 
 
 ```python
 while True:
