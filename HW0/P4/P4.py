@@ -73,7 +73,7 @@ if __name__ == '__main__':
         s[:,i]=np.dot(A,s[:,i-1])+a
         i+=1
     
-    #s=np.array
+    #Do i still need to convert to an array? appears to already be an ndarray
     
     ax.plot(s[0,:], s[1,:], s[2,:],'-k', label='Blind trajectory')
 
@@ -81,12 +81,43 @@ if __name__ == '__main__':
     # Part 4:
     # Use the Kalman filter for prediction
     #####################
-
-    # B = ?
+    
+    B = np.array([[bx,0,0,0,0,0],[0,by,0,0,0,0],[0,0,bz,0,0,0],[0,0,0,bvx,0,0],[0,0,0,0,bvy,0],[0,0,0,0,0,bvz]])
+    
+    def predictS(s,A,a):
+        return np.dot(A,s)+a                
+        
+    def predictSig(A,Cov,B):
+        Sig_guess = np.dot(A,Cov)
+        Sig_guess = np.dot(Sig_guess,A.transpose())
+        Sig_guess = Sig_guess + np.dot(B,B.transpose())
+        Sig_guess = Sig_guess**-1
+    
+    def updateSig(Sig_guess,C):
+        
+    def updateS():
+    
+    B = np.array([bx,0,0,0,0,0],[,0,by,0,0,0,0],[0,0,bz,0,0,0],[0,0,0,bvx,0,0],[0,0,0,0,bvy,0],[0,0,0,0,0,bvz])
     # C = ?
 
     # Initial conditions for s0 and Sigma0
+    s0 = s0
+    Sigma0 = np.array([[1,0,0],[0,1,0],[0,0,1]])*0.01
+    
+
+    s_new = np.zeros([6,K])
+    i = 1
+    s_new[:,0]=s0
+    
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
+
+    while i <= K-1:
+        s_new[:,i]=predictS(s_new[:,i-1],A,a)
+        Sig_guess = predictSig(A,Cov,B)
+        
+        i+=1
+        
+    
 
     # ax.plot(x_coords, y_coords, z_coords,
     #         '-r', label='Filtered trajectory')
