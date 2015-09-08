@@ -1,1 +1,35 @@
 # Your answers here.
+
+1) In order to add 256 bags a cashier needs to perform 255 additions.
+Each addition cost 1 second.
+So it will take 255 seconds.
+
+2) The integer division of 256 by 7 is 36. The rest is 4.
+So 4 workers will need to perform the sum of 37 bags (36 additions) and 3
+workers need the sum of 36 bags (35 addition).
+At t=36s, w1 (for worker 1) sums the sum of w1 and w2, w3 waits, and the 4
+other do their last addition.
+t=37s, all workers are now done with their initial number of addition w3 adds
+sum of w3 and w4, w5 adds the sums of w5 and w6, w7 sums the sum of w1 and w7.
+t=38s w3 adds the sums of w3 and w5
+t=39s w3 adds the sums of w3 and w7.
+So the overall process takes 39s.
+
+3) If the addition are organized in a binary tree, the fastest computation
+take the logarithm base 2 of 256 which is 8seconds.
+
+4) For N bag.
+The lonely worker always takes N-1 seconds.
+The infinitely many workers take log(N) if this number is an integer,log(N)+1
+if not. See P5.png for the plot.
+
+5) In the binary tree structure, we now add 1 second at each node for the
+communication. It will now take (1+1)*7+1=15s
+
+6) It takes 256s to hand the 256bags to 256workers. Then 2*8=16s to compute.
+So 272s is needed.
+It takes 128s to hand 256bags to 128workers. They compute in one secund and
+then 7*2=14s is needed.
+So 142s is needed.
+If we compute the time needed with those conditions in question 2, we see that
+it takes 49s. So having 7 workers is a better strategy.
