@@ -30,9 +30,11 @@ if __name__ == '__main__':
     # Load true trajectory and plot it
     # Normally, this data wouldn't be available in the real world
     #####################
-s_true = np.loadtxt('P4_trajectory.txt',delimiter=',')
+    #loaded the actual trajectory data using np.loadtxt function
+    #indicated delimiter as a comma
 
-ax.plot(s_true[0], s_true[1], s_true[2],'--b', label='True trajectory')
+    s_true = np.loadtxt('P4_trajectory.txt',delimiter=',')
+    ax.plot(s_true[:,0], s_true[:,1], s_true[:,2],'--b', label='True trajectory')
 
     #####################
     # Part 2:
@@ -40,8 +42,11 @@ ax.plot(s_true[0], s_true[1], s_true[2],'--b', label='True trajectory')
     # Read the observation array and plot it (Part 2)
     #####################
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '.g', label='Observed trajectory')
+    #loaded measurement data using np.loadtxt like above
+    m = np.loadtxt('P4_measurements.txt',delimiter=',')
+    r = np.array([[1/rx,0,0],[0,1/ry,0],[0,0,1/ry]])
+    xk = r.*m
+    ax.plot(xk[:,0],xk[:,1],xk[:,2],'.g', label='Observed trajectory')
 
     #####################
     # Part 3:
@@ -73,5 +78,5 @@ ax.plot(s_true[0], s_true[1], s_true[2],'--b', label='True trajectory')
     #         '-r', label='Filtered trajectory')
 
     # Show the plot
-    #ax.legend()
-    #plt.show()
+    ax.legend()
+    plt.show()
