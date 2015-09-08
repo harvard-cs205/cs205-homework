@@ -1,1 +1,3 @@
 # Your answers here.
+1. 255 seconds (4 min 15 seconds). It takes (n-1) seconds to add up the totals of n bags. Thus, 256-1 = 255 seconds
+2. 31 seconds. There are now 8 simultaneous workers counting bags. 256 / 8 = 32. Thus, each worker only needs to count 32 bags by themselves. Since everyone is counting at the same time and it is assumed each worker takes the same amount of time each to count, then we know it takes (n-1) seconds to add up the totals of n bags. Thus, 32-1 = 31 seconds. 
