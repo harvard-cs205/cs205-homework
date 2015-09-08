@@ -153,10 +153,11 @@ if __name__ == '__main__':
     sig_k = Sigma0               # First value: Sigma0
     sig_hat = predictSig(Sigma0) # First value: based on Sigma0
     s1 = s0                      # Initial value is the starting point
+                                 # After tweaking my code, this initial value is no longer used
 
     for i in range(1, K-1):
         m1 = s_meas[0:3, i]     # pick out the actual measurement to plug in to eq(5)
-        s1 = predictS(s1)       # find the next intermediate guess for s
+        s1 = predictS(s_kalm[:, i - 1])       # find the next intermediate guess for s
         sig_k = updateSig(sig_hat)  # find the next sig2 to plug into eq(5)
         s_kalm[:, i] = updateS(m1, sig_hat, sig_k, s1) # fill in next column of s_kalm
         sig_hat = predictSig(sig_k) # update sig1 for the next loop
