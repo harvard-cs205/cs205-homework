@@ -49,7 +49,7 @@ if __name__ == '__main__':
     xObs_coords, yObs_coords, zObs_coords = ObsTraj[:,0], ObsTraj[:,1], ObsTraj[:,2]
     
     #Plotting the measured position
-    ax.plot(xObs_coords, yObs_coords, zObs_coords,'.g', label='Observed trajectory')
+    #ax.plot(xObs_coords, yObs_coords, zObs_coords,'.g', label='Observed trajectory')
     
     xtld = ObsTraj.dot(np.diag([1/rx, 1/ry, 1/rz])) # I decided to try and streamline this...
                                            #  which may be a sign that I'm getting comfy
@@ -67,8 +67,9 @@ if __name__ == '__main__':
     A = np.diag([1, 1, 1, 1-c*dt, 1-c*dt, 1-c*dt]) + np.diag([dt, dt, dt],3)
     
     #Accounting for gravity in update
-    a = np.zeros(A.shape[0]) 
+    a = np.zeros((A.shape[0])) 
     a[-1] = g*dt
+    a = a.reshape([6,1])
     # s = ?
 
     # Initial conditions for s0
@@ -79,7 +80,7 @@ if __name__ == '__main__':
     sK[:,0] = s0                              #Placing initial measurement as first column
     
     for i in range(1,np.amax(TruTraj.shape)):
-         sK[:,i] = A * sK[:,i-1] + np.matrix(a).T
+         sK[:,i] = A * sK[:,i-1] + a
     
     sK = np.asarray(sK) # Converting state prediction matrix to an array (for plotting??)
     
@@ -100,40 +101,41 @@ if __name__ == '__main__':
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
     
     def predictS(priorState): # Eq(2)
-         #Will fill out code structure here based on state update from part 3
-         predS = A * priorState + np.matrix(a).T
-         return predS
+        #Will fill out code structure here based on state update from part 3
+        predS = np.add(np.dot(A,priorState),a)
+        return predS
          
     def predictSig(priorSig): # Eq(3)
-         #Will fill out code structure here to predict SigmaK update
-         predSig = np.linalg.inv(A * priorSig * A.T + B * B.T)
-         return predSig
+        #Predict SigmaK update
+        predSig = np.linalg.inv(np.add(np.dot(np.dot(A, priorSig),np.transpose(A)),np.dot(B,np.transpose(B))))
+        return predSig
          
     def updateSig(predSig): # Eq(4)
-         #Will fill out structure here to update SigmaK
-         sigUpdate = np.linalg.inv(predSig + C.T.dot(C))
-         return sigUpdate
+        #Update SigmaK
+        sigUpdate = np.linalg.inv(np.add(predSig,np.dot(np.transpose(C),C)))
+        return sigUpdate
          
     def updateS(predS,sigmaUpdate,predSig,curMeas): # Eq (5)
-         #Will fill out structure here to update state estimate
-         stateUpdate = sigmaUpdate * (predSig * predS + C.T * curMeas)
-         return stateUpdate
+        #Update state estimate
+        stateUpdate = np.dot(sigmaUpdate, np.add(np.dot(predSig,predS), np.dot(np.transpose(C),curMeas).reshape([6,1])))
+        return stateUpdate
          
     # Set up state estimation data structure and convert measurements array to a matrix
     sK_kalman = np.matrix(np.zeros((6,np.amax(TruTraj.shape))))
     sK_kalman[:,0] = s0_kalman
-    Measurements = np.matrix(ObsTraj)
+    Measurements = ObsTraj
     
          
-    # Run Kalman filter to determine estimate of trajectory     
+     # Run Kalman filter to determine estimate of trajectory     
     for ii in range(1,np.amax(TruTraj.shape)):
-         if ii == 1:
-              sigUpdate = Sigma0
+        if ii == 1:
+            sigUpdate = Sigma0
               
-         sPred = predictS(sK_kalman[:,ii-1])
-         sigPred = predictSig(sigUpdate)
-         sigUpdate = updateSig(sigPred)
-         sK_kalman[:,ii] = updateS(sPred,sigUpdate,sigPred,Measurements[ii,:].T)
+        sPred = predictS(sK_kalman[:,ii-1])
+        sigPred = predictSig(sigUpdate)
+        sigUpdate = updateSig(sigPred)
+        sK_kalman[:,ii] = updateS(sPred,sigUpdate,sigPred,Measurements[ii,:].T)
+    
     
     sK_kalman = np.asarray(sK_kalman) # Converting state prediction matrix to an array (for plotting??)
 
