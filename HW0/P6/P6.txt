@@ -1,1 +1,24 @@
 # Your answers here
+# 6a
+Naively, I would expect the code in P6A.py to produce Hi Job 0-9 and Bye Job 0-9 to complete in sequence. However, we get something of the following:
+Hi Job 0
+Hi Job 3
+Hi Job 1
+Hi Job 2
+Bye Job 2
+Hi Job 4
+Bye Job 0
+Hi Job 5
+Bye Job 1
+Hi Job 6
+Bye Job 3
+...
+
+The above code output shows that Job 2 finished in front of Job 0, even though Job 0 is initiated in front of Job 2. The results show that threads are sent to the different processors and are executed at different times and can finish at different times depending on the system resources. Therefore, we cannot exactly control the execution and finish times.
+
+This phenomenon has big implications for parallel computing, especially for processes where input/output are time dependent. For example, if one of the jobs/threads, Job 1, is dependent on the output of Job 2, then the programmer needs to take into account on executing dependent jobs. Any mis-timing would result in miscalculations. Therefore, there are some problems that are hard to parallelize.
+
+This would be important for a task where we are running data cleaning threads and machine learning threads. If the machine learning threads read the data before the data cleaning threads are done with cleaning the data, this can result in errors and wrong predictions. Therefore, timing is important in these programs.
+
+# 6b
+From the P6.png, we can see that as we increase wait time, the ratio of serial/parallel approaches 4. Serial and Parallel approaches take the same time around Wait Time of 10e-3. It is possible for the Serial approach to be faster than the Parallel approach since there is an overhead cost to pool the jobs and keep track of the different jobs. From the graph, we can surmise thaht it is not worth the time to parallelize the code when execution time is small. However, as execution time exceeds 10e-3, we can quickly see the benefit of parallelizing the code as the ratio quickly reaches 4.

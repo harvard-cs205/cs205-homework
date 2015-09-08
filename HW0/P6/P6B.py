@@ -1,6 +1,7 @@
 import multiprocessing as mp
 import time
 import matplotlib.pyplot as plt
+import numpy as np
 
 # Sleep for t seconds
 def burnTime(t):
@@ -16,16 +17,33 @@ if __name__ == '__main__':
 
     # Use a variety of wait times
     ratio = []
-    wait_time = []
+    wait_time = np.logspace(-6, 0, 20) # wait time from 10e-6 to 10e0
+    print(wait_time)
 
     for t in wait_time:
         # Compute jobs serially and in parallel
         # Use time.time() to compute the elapsed time for each
-        serialTime = 1
-        parallelTime = 1
 
         # Compute the ratio of these times
         # ratio.append(serialTime/parallelTime)
+
+        # Serial Timing
+        start_s = time.time()
+        for i in range(N):
+            burnTime(t)
+        serialTime = time.time() - start_s
+
+        # Parallel Timing
+        start_p = time.time()
+        for i in range(N/4):
+            pool.apply(burnTime, (t,)) # each loop runs 4 burnTime processes
+        parallelTime = time.time() - start_p
+
+        # Append Ratio
+        ratio.append(serialTime/parallelTime*1.0)
+
+        print(serialTime)
+        print(parallelTime)
 
     # Plot the results
     plt.plot(wait_time, ratio, '-ob')

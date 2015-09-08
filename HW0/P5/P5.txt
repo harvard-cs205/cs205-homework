@@ -1,1 +1,4 @@
 # Your answers here.
+
+# Question 1
+It would take (n-1) seconds to sum up . It would take 255 seconds to add up all the bags.

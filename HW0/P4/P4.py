@@ -74,8 +74,8 @@ if __name__ == '__main__':
     top
     bottom
 
+    # A
     A = np.vstack([top, bottom])
-    A
 
     # a
     a = np.matrix([0,0,0,0,0,g*dt])
@@ -94,6 +94,7 @@ if __name__ == '__main__':
     for i in range(1, K):
         s[:,i] = A * s[:,i-1] + a
 
+    # Convert back to array
     s = np.asarray(s)
     ax.plot(s[0,:], s[1,:], s[2,:], '-k', label='Blind trajectory')
 
@@ -112,12 +113,10 @@ if __name__ == '__main__':
     np.fill_diagonal(C, np.array([rx, ry, rz]))
     C = np.matrix(np.hstack([C, np.zeros((3, 3), float)]))
 
-
     # Initial conditions for s0 and Sigma0
     Sigma0 = np.zeros((6, 6), float)
     np.fill_diagonal(Sigma0, 0.01)
     Sigma0 = np.matrix(Sigma0)
-
 
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
     s_k_ = np.matrix(np.zeros((6, K), float))
@@ -142,15 +141,15 @@ if __name__ == '__main__':
 
     for i in range(1,K):
         s_k = s_k_[:,i-1]
-        s_tilde = predictS(s_k)
-        sigma_tilde = predictSig(sigma_k)
-        sigma_plus_1 = updateSig(sigma_tilde)
+        s_tilde = predictS(s_k) # Equ (2)
+        sigma_tilde = predictSig(sigma_k) # Equ (3)
+        sigma_plus_1 = updateSig(sigma_tilde) # Equ (4)
         
         # measurement
         m_plus_1_ = np.matrix(s_obs[i,:]).T
-        s_plus_1 = updateS(s_tilde, sigma_tilde, sigma_plus_1, m_plus_1_)
+        s_plus_1 = updateS(s_tilde, sigma_tilde, sigma_plus_1, m_plus_1_) # Equ (5)
         
-        # update
+        # update s_k_ and sigma_k with k+1
         s_k_[:, i] = s_plus_1
         sigma_k = sigma_plus_1
     
