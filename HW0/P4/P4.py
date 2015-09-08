@@ -50,9 +50,14 @@ if __name__ == '__main__':
     #####################
 
     x_coords, y_coords, z_coords = np.loadtxt('P4_measurements.txt', delimiter=',', unpack=True)
-    
+
     #create a matrix of the measurements for part 5
     measurements = np.matrix([x_coords, y_coords, z_coords])
+    
+    x_coords = x_coords/rx
+    y_coords = y_coords/ry
+    z_coords = z_coords/rz    
+    
 
     ax.plot(x_coords, y_coords, z_coords,
              '.g', label='Observed trajectory')
