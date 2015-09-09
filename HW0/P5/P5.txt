@@ -3,4 +3,3 @@
 3. The fastest way to count is to seperate the job to 16 people, then they can do it in 30 seconds.
 5. 43 seconds.
 6. 1 bag: 299 seconds. 2 bags: 171 seconds. The best strategy is to give bags to each person once and give them all they need at that time. 
-# Your answers here.
