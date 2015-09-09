@@ -1,1 +1,22 @@
-# Your answers here
+parallel time for wait_time 0.000001s is 0.000881s
+serial time for wait_time 0.000001s is 0.000019s
+ratio for wait_time 0.000001s is 0.021645s
+parallel time for wait_time 0.000010s is 0.002084s
+serial time for wait_time 0.000010s is 0.000877s
+ratio for wait_time 0.000010s is 0.420776s
+parallel time for wait_time 0.000100s is 0.004967s
+serial time for wait_time 0.000100s is 0.004579s
+ratio for wait_time 0.000100s is 0.921903s
+parallel time for wait_time 0.001000s is 0.007374s
+serial time for wait_time 0.001000s is 0.020969s
+ratio for wait_time 0.001000s is 2.843610s
+parallel time for wait_time 0.010000s is 0.044739s
+serial time for wait_time 0.010000s is 0.170441s
+ratio for wait_time 0.010000s is 3.809671s
+parallel time for wait_time 0.100000s is 0.403619s
+serial time for wait_time 0.100000s is 1.623609s
+ratio for wait_time 0.100000s is 4.022627s
+parallel time for wait_time 1.000000s is 4.006371s
+serial time for wait_time 1.000000s is 16.025993s
+ratio for wait_time 1.000000s is 4.000127s
+
