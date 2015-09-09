@@ -16,19 +16,21 @@ if __name__ == '__main__':
 
     # Use a variety of wait times
     ratio = [] #empty ratio array to be filled in below
-    wait_time = np.array([10**-6,10**-5,10**-4,10**-3,10**-2,.5*10**-1,10**-1,1])
+    wait_time = np.array([10**-6,10**-5,10**-4,0.5*10**-2,0.5*10**-1,10**-1,1])
 
     for t in wait_time:
         # Compute jobs serially and in parallel
-        pool.map(burnTime(t),range(N))        
-        parallelTime = time.time()        
+        begin = time.time()
+        pool.map(burnTime(t),range(N))                        
+        parallelTime = time.time() - begin   
         
         i = 1
+        begin2 = time.time()
         while i<=N:
             burnTime(t)
-            serialTime = time.time()
             i+=1
-
+        serialTime = time.time() - begin2
+        
         # Compute the ratio of these times
         ratio.append(serialTime/parallelTime)
 
