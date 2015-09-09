@@ -1,1 +1,19 @@
 # Your answers here.
+
+1) When there is at least 2 bags, each addition of the cashier merges 2 bags in 1 in 1 s. As a result, each second the number of bags to be counted decreases of 1. From 256 bags to 2 bags, we have 255 steps of 1 s.
+It would take 255 s.
+
+2) Each of the cashier takes 32 bags and sums them: it takes 31 s. At the end we get 8 numbers, 4 cashiers can sum 2 of this number then 2 for the next step and 1 for the last one. It takes 3s.
+The employees can verify the sum in 34s.
+
+3) We have an infinite number of employees. At each step we can divide the number of bags to be counted by 2 (same reasoning that in the last part of the previous question).
+It would take 8s for the employee (256 = 2**8).
+
+4) See plot and script
+
+5) Between two steps, the employee need to hear from another the number of its bag. Previously, we had with an infinite number of cashiers 8 steps. This change adds 7s.
+The answer increased by 7s, it is now 15s.
+
+6) Except for the preliminary step, where the cashiers get the bags from me, this change adds 1s between each step too.
+For the preliminary step, it adds 2 * n_e s with n_e the number of employees used if each employee takes one bag (because they will take after the second one) and n_e s if each one takes two of them.
+

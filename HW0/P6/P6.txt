@@ -1,1 +1,14 @@
 # Your answers here
+
+COUNT TO TEN:
+
+If we run several times the program, we observe that the prints are in a different orders. Even though the result list at the end is always the same, the order of execution of the different threads changes.
+This means that we should programm in parallel only for independant tasks because we cannot predict which thread will be executed first in a multi processing.
+
+
+HOW MUCH FASTER?
+
+The speed up curve is divided in two part: the second one above 5 * 10 ** (-3)s which is constant and the part before. Several execution of the program lead to the same second part but the first one may be different. But it still contains a maximum around 10 ** (-4) with a steep increase before and a steep decrease after.
+
+The second part is what we expected as we run in parallel the same code on 4 processors, so it's 4 times faster than if we had runned it in serial.
+We can explain the first part of the curve if we consider the inherent execution time of a loop and of the mapping between different processors of different threads (time to launch a thread on it and to get back its result), we see that 
