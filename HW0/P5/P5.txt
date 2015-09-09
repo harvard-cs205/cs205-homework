@@ -1,4 +1,18 @@
 # Your answers here.
 
-# Question 1
+1.
 It would take (n-1) seconds to sum up . It would take 255 seconds to add up all the bags.
+
+2.
+With 8 cashiers, they can work in parallel and process 256/8 bags in 256/8 - 1  = 31 seconds. Then it would take an additional 3 seconds to add up 8 numbers. Therefore, in total it would take 31+3 = 34 seconds to process 256 bags with 8 cashiers.
+
+3.
+With an infinite number of cashiers, we will be limited by the number of bags. 256 cashiers can count 1 bag each so the total time is for the 256 cashiers to add up all the bags. Therefore, total time = log2(256) = 8 seconds.
+
+4.
+Lone cashier function: N - 1. Infinite cashier function ceil(log2(N)). Plot is shown in P5.png.
+
+5.
+Assuming that we have infinite cashiers and that communications between the cashiers take 1 second. We can see that when we have 4 sums/bags left, having 1 cashier or 2 cashiers to count both take 3 seconds. Therefore, the last 4 sums take 3 seconds instead of 4 seconds. So it is easy to see that since communications double for every stage of log2 except for the very last stage where it takes -1 seconds. We can see that the total time to count 256 bags would be 8*2 - 1 = 15 seconds.
+
+6. 
