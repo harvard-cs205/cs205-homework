@@ -1,3 +1,13 @@
 # Your answers here.
-1. 255 seconds (4 min 15 seconds). It takes (n-1) seconds to add up the totals of n bags. Thus, 256-1 = 255 seconds
-2. 31 seconds. There are now 8 simultaneous workers counting bags. 256 / 8 = 32. Thus, each worker only needs to count 32 bags by themselves. Since everyone is counting at the same time and it is assumed each worker takes the same amount of time each to count, then we know it takes (n-1) seconds to add up the totals of n bags. Thus, 32-1 = 31 seconds. 
+1. 255 seconds (4 min 15 seconds). It takes n-1 seconds to add up the totals of n bags. Thus, 256-1 = 255 seconds.
+
+2. 31 seconds. There are now 8 simultaneous workers counting bags. 256 / 8 = 32. Thus, each worker only needs to count 32 bags by themselves. Since everyone is counting at the same time and it is assumed each worker takes the same amount of time each to count, then we know it takes n-1 seconds to add up the totals of n bags per worker. So 32-1 equals 31 seconds per worker. This assumes each worker knows they only have to arrive at a number equal to 1/8 * the price of the textbooks and that we can assume that all workers can come to this conclusion simultaneously and instantaneously on the 31st second. I believe question 5 broaches the question of communication between workers.
+
+
+3. 0 seconds (theoretically). As the number of coworkers, c, increases, the fewer number of bags each individual worker has to count (lim c-> inf (256/c) = zero). So as coworkers goes to infinity, number of bags n to count goes to zero. It takes n-1 seconds to add up the totals of n bags, but, since time cannot be negative, we stop at 0 seconds. 
+
+4. 
+
+
+5. It will take +3 more seconds (34 total). We are left with each worker, 8 in total, having a sum they have calculated. The 8 sums must now by combined into one single total, which can be done by each pair (4 in total) combining simultaneously, then each resulting pair combining (2 in total), and finally the final pair (1 in total) combining. That is 3 additional pairings at 1 second each resulting in a total of 3 additional seconds for the 8 workers to communicate. So 31+3 = 34 seconds total.
+ 
