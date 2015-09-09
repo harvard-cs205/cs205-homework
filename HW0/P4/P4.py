@@ -21,8 +21,6 @@ if __name__ == '__main__':
     ry = 5.0
     rz = 5.0
 
-    C = np.diag(1./np.array([rx,ry,rz]))
-
     # Create 3D axes for plotting
     ax = Axes3D(plt.figure())
 
@@ -48,6 +46,8 @@ if __name__ == '__main__':
 
     arr = np.loadtxt('P4_measurements.txt', delimiter=',')
 
+    C = np.diag(1./np.array([rx,ry,rz]))
+
     x_coords, y_coords, z_coords = [x.flatten() for x in np.hsplit(np.dot(arr,C), 3)]
 
     ax.plot(x_coords, y_coords, z_coords,
@@ -58,15 +58,20 @@ if __name__ == '__main__':
     # Use the initial conditions and propagation matrix for prediction
     #####################
 
-    # A = ?
-    # a = ?
-    # s = ?
+    A = np.identity(6) - np.diag([0,0,0,c*dt,c*dt,c*dt]) + np.diag([dt,dt,dt],k=3)
+    a = np.array([0,0,0,0,0,g*dt])
+    s = np.zeros(6*K).reshape(K,6)
 
+    s[0] = np.array([0, 0, 2, 15, 3.5, 4.0])
     # Initial conditions for s0
     # Compute the rest of sk using Eq (1)
+    for k in range(1,K):
+        s[k] = np.dot(A,s[k-1]) + a
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '-k', label='Blind trajectory')
+    x_coords, y_coords, z_coords = [x.flatten() for x in np.hsplit(s, 6)][:3]
+
+    ax.plot(x_coords, y_coords, z_coords,
+            '-k', label='Blind trajectory')
 
     #####################
     # Part 4:
