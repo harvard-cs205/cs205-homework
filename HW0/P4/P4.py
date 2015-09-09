@@ -56,15 +56,31 @@ if __name__ == '__main__':
     # Use the initial conditions and propagation matrix for prediction
     #####################
 
-    # A = ?
-    # a = ?
-    # s = ?
+    A = np.identity(6)
+    A[0:3,3:6] = np.identity(3) * dt
+    A[3:6,3:6] = np.identity(3) - c * dt * np.identity(3)
+    a = np.matrix([[0.0, 0.0, 0.0, 0.0, 0.0, g * dt]]).transpose()
 
     # Initial conditions for s0
-    # Compute the rest of sk using Eq (1)
+    s0 = np.matrix([[0, 0, 2, 15, 3.5, 4.0]]).transpose()
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '-k', label='Blind trajectory')
+
+    # Compute the rest of sk using Eq (1)
+    s = np.zeros((6, K))
+    s[0:6,0] = s0.transpose()
+
+
+    # compute 
+    for i in range(1, K):
+        s[0:6, i] = (A * np.matrix(s[0:6, (i-1)]).transpose() + a).reshape((6)) # somehow python needs this reshaping command...
+
+    x_coords = s[0,:]
+    y_coords = s[1,:]
+    z_coords = s[2,:]
+
+
+    ax.plot(x_coords, y_coords, z_coords,
+             '-k', label='Blind trajectory')
 
     #####################
     # Part 4:
