@@ -43,8 +43,8 @@ if __name__ == '__main__':
     # Read the observation array and plot it (Part 2)
     #####################
     ms = np.loadtxt('P4_measurements.txt', delimiter=',')
-    C = np.matrix([[1.0/rx, 0, 0], [0, 1.0/ry, 0], [0, 0, 1.0/rz]])
-    xs = ms*C
+    mat = np.matrix([[1.0/rx, 0, 0], [0, 1.0/ry, 0], [0, 0, 1.0/rz]])
+    xs = ms*mat
     xs = np.array(xs)
     x_coords = [x[0] for x in xs]
     y_coords = [x[1] for x in xs]
