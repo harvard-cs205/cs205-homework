@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-
 if __name__ == '__main__':
     # Model parameters
     K = 121    # Number of times steps
@@ -31,8 +30,8 @@ if __name__ == '__main__':
     # Normally, this data wouldn't be available in the real world
     #####################
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '--b', label='True trajectory')
+    s_true = np.loadtxt( "P4_trajectory.txt", delimiter = ',', usecols = ( 0, 1, 2 ) ).transpose()
+    ax.plot( s_true[0], s_true[1], s_true[2], '--b', label = 'True trajectory' )
 
     #####################
     # Part 2:
@@ -40,14 +39,21 @@ if __name__ == '__main__':
     # Read the observation array and plot it (Part 2)
     #####################
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '.g', label='Observed trajectory')
+    measurements_matrix = np.mat( np.loadtxt( "P4_measurements.txt", delimiter = ',' ).transpose() )
+    dim_stretching_inverse_matrix = np.mat( [ [ 1/rx, 0, 0 ], [ 0, 1/ry, 0 ], [ 0, 0, 1/rz ] ] )
+    position_estimate_matrix = dim_stretching_inverse_matrix * measurements_matrix
+    
+    position_estimate_array = np.array( position_estimate_matrix )
+    
+    ax.plot( position_estimate_array[0], position_estimate_array[1], position_estimate_array[2], 
+             '.g', label='Observed trajectory')
 
     #####################
     # Part 3:
     # Use the initial conditions and propagation matrix for prediction
     #####################
 
+    s_initial = array( [ 0, 0, 2, 15, 3.5, 4.0 ] )
     # A = ?
     # a = ?
     # s = ?
