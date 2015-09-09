@@ -12,15 +12,13 @@ def singleWorkerTime(N): #create function that calculates time to count n bags b
         return N-1
 
 def infiniteWorkersTime(N):
-    time = 0
-    n=0    
+    time = 0   
     if N < 2:
         return 0
     else:
         while N > 1:
             N = N / 2.0
-            n+=1
-        time = n
+            time+=1
         return time    
         
 single_worker = np.zeros(len(num_bags)) #initialize single worker vector
@@ -31,7 +29,6 @@ for N in num_bags:
 
 for N in num_bags:
     infinite_workers[N] = infiniteWorkersTime(N) #fill in single worker vector
-
 
 plt.plot(num_bags,single_worker,'r-',label='1 worker')
 plt.plot(num_bags,infinite_workers,'b-',label='infinite workers')

@@ -4,7 +4,8 @@
 
 3. 8 seconds. We now have an infinite supply of workers that can be used in this problem. Since the problem deals with adding two numbers together, we know that each worker, to be working, needs at least 2 bags to count. Thus, we can take 256 / 2 = 128 workers. Thus, each worker has 2 bags to count, which happens simultaneously after 1 second. We are now left with 128 workers with 1 number each that we now have to combine. So 128 becomes 64 which becomes 32 which becomes 16 which becomes 8 which becomes 4 which becomes 2 which becomes 1. That is 7 additional seconds. Thus 1+7 = 8 seconds.
 
-4. 
+4. See P5.py code and P5.png for graph.
 
-5. 
+ 
+5. it will take an additional 7 seconds, 15 in total since it now takes an additional second to count up numbers calculated by each worker.  
  
