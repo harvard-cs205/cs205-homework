@@ -2,9 +2,25 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-bags=256 #number of bags to count
-workers = 8 #number of workers
 
+N = 1000 #number of bags
+x_bags = np.linspace(2,1001,1000) #what we will plot on x axis
+
+
+def singleWorkerTime(N):
+    return N-1
+    
+i = 0
+single = np.zeros(N)
+
+while i <= N:
+    single[i] = singleWorkerTime(i)
+    i+=1
+
+plt.plot(x_bags,single,label='1 workers')
+
+
+"""
 def time(bags,workers):
     if bags <=1:
         return 0
@@ -39,4 +55,4 @@ plt.show()
 
 
 #def timeToCountBags(num_bags,num_workers):
- #   return num_bags/num_workers - 1
+ #   return num_bags/num_workers - 1"""
