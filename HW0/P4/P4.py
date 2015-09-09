@@ -33,21 +33,31 @@ if __name__ == '__main__':
     #####################
     #s_true = np.loadtxt('P4_trajectory.txt', delimiter=',', usecols = (0,1,2))
     # ax.plot(x_coords, y_coords, z_coords,
-    #         '--b', label='True trajectory')
-    print s_true[0]
+    #         '--b', label='True trajectory
+    arrX = s_true['x']
+    arrY = s_true['y']
+    arrZ = s_true['z']
   
-    #for x in s_true:
-    #    ax.plot(x[0],x[1],x[2], '--b', label='True trajectory')
+    for s in s_true:
+        ax.plot(arrX, arrY, arrZ, '--b', label='True trajectory')
         
     #####################
     # Part 2:
     #
     # Read the observation array and plot it (Part 2)
+        
+    m = np.loadtxt('P4_measurements.txt', delimiter=',', dtype={'names':('mx', 'my', 'mz'), 'formats': (np.float, np.float, np.float)}, usecols = (0,1,2))
     #####################
 
     # ax.plot(x_coords, y_coords, z_coords,
     #         '.g', label='Observed trajectory')
-
+    
+    
+    arrMX = 1. / rx * m['mx']
+    arrMY = 1. / ry * m['my']
+    arrMZ = 1. / rz * m['mz']
+    
+    ax.plot(arrMX, arrMY, arrMZ, '.g', label='Observed trajectory')
     #####################
     # Part 3:
     # Use the initial conditions and propagation matrix for prediction
