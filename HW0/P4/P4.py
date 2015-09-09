@@ -30,9 +30,14 @@ if __name__ == '__main__':
     # Load true trajectory and plot it
     # Normally, this data wouldn't be available in the real world
     #####################
-
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '--b', label='True trajectory')
+    
+    s_true = np.loadtxt('P4_trajectory.txt',delimiter=',')
+    x_coords = s_true[:,0]
+    y_coords = s_true[:,1]
+    z_coords = s_true[:,2]
+	
+    ax.plot(x_coords, y_coords, z_coords,
+            '--b', label='True trajectory')
 
     #####################
     # Part 2:
@@ -40,23 +45,39 @@ if __name__ == '__main__':
     # Read the observation array and plot it (Part 2)
     #####################
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '.g', label='Observed trajectory')
+    s_m = np.loadtxt('P4_measurements.txt',delimiter=',')
+    c_mat = np.array([[1/rx,0,0],[0,1/ry,0],[0,0,1/rz]])
+    s_approx = np.dot(s_m,c_mat)
+    x_coords = s_approx[:,0]
+    y_coords = s_approx[:,1]
+    z_coords = s_approx[:,2]  
+
+    ax.plot(x_coords, y_coords, z_coords,
+             '.g', label='Observed trajectory')
 
     #####################
     # Part 3:
     # Use the initial conditions and propagation matrix for prediction
     #####################
-
-    # A = ?
-    # a = ?
-    # s = ?
-
+    A = np.matrix(
+	[[1,0,0,dt,0,0],[0,1,0,0,dt,0],
+	[0,0,1,0,0,dt],[0,0,0,1-c*dt,0,0],
+	[0,0,0,0,1-c*dt,0],[0,0,0,0,0,1-c*dt]])
+    a = np.matrix([[0,0,0,0,0,g*dt]]).transpose()
+    s = np.zeros((6,K))
     # Initial conditions for s0
+    s[:,0] = [0,0,2,15,3.5,4.0]
+    s = np.asmatrix(s)
     # Compute the rest of sk using Eq (1)
-
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '-k', label='Blind trajectory')
+    for x in xrange(1,K):
+      s[:,x] = np.dot(A,s[:,x-1])+a
+    s = np.squeeze(np.asarray(s))
+    x_coords = s[0]
+    y_coords = s[1]
+    z_coords = s[2]  			
+      
+    ax.plot(x_coords, y_coords, z_coords,
+             '-k', label='Blind trajectory')
 
     #####################
     # Part 4:
