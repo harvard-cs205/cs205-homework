@@ -2,57 +2,38 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+num_bags = range(0,1000) #initialize number of bags array
+#represnted like 0,1,2,3,4,5,6 bags...
 
-N = 1000 #number of bags
-x_bags = np.linspace(2,1001,1000) #what we will plot on x axis
-
-
-def singleWorkerTime(N):
-    return N-1
-    
-i = 0
-single = np.zeros(N)
-
-while i <= N:
-    single[i] = singleWorkerTime(i)
-    i+=1
-
-plt.plot(x_bags,single,label='1 workers')
-
-
-"""
-def time(bags,workers):
-    if bags <=1:
+def singleWorkerTime(N): #create function that calculates time to count n bags by single worker
+    if N < 2:
         return 0
     else:
-        return bags / workers - 1
+        return N-1
 
-i=0 #initialize loop
-time_array = np.zeros(bags+1)
-while i<=bags:    
-    time_array[i] = time(i,workers)
-    i+=1
+def infiniteWorkersTime(N):
+    time = 0
+    n=0    
+    if N < 2:
+        return 0
+    else:
+        while N > 1:
+            N = N / 2.0
+            n+=1
+        time = n
+        return time    
+        
+single_worker = np.zeros(len(num_bags)) #initialize single worker vector
+infinite_workers = np.zeros(len(num_bags)) 
 
-x=np.linspace(0,bags,bags+1)
-plt.plot(x,time_array,'--b', label='infinite workers')
+for N in num_bags:
+    single_worker[N] = singleWorkerTime(N) #fill in single worker vector
 
-c = 1 #number of workers
+for N in num_bags:
+    infinite_workers[N] = infiniteWorkersTime(N) #fill in single worker vector
 
-i=2 #initialize loop
-time = np.zeros(N+1)
-time[0]=0
-time[1]=0
-while i<=N:    
-    time[i] = timeToCountBags(i,c)
-    i+=1
 
-plt.plot(x,time,label='1 workers')
+plt.plot(num_bags,single_worker,'r-',label='1 worker')
+plt.plot(num_bags,infinite_workers,'b-',label='infinite workers')
 plt.legend()
 
-plt.show()
-
-
-
-
-#def timeToCountBags(num_bags,num_workers):
- #   return num_bags/num_workers - 1"""
