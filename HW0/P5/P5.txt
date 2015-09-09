@@ -1,1 +1,11 @@
 # Your answers here.
+1, 255 seconds
+2, 128 seconds. Two people takes 127 seconds to add 128 elements, and take another 1 second to add the total number.
+3, 8 seconds
+4, done
+5, computing time = 8 seconds. However the communication time is 64+32+16+8+4+2+1 = 127s,
+so the total time is 135s
+6, If each cashier comes and takes 1 bag. It takes 256 + 8 = 264 seconds.
+if each cashier comes and takes 2 bags. It takes 128 + 8 to finish
+and No, there is not a better strategy to shorten the time.
+
