@@ -61,8 +61,9 @@ if __name__ == '__main__':
     ##################### 
     s_obs = np.loadtxt('P4_measurements.txt',delimiter =',')
     C = np.matrix([[1/rx,0,0],[0,1/ry,0],[0,0,1/rz]])
-    meas = s_obs * C;
-    ax.plot(s_obs[:,0],s_obs[:,1],s_obs[:,2],
+    meas = C*s_obs.T
+    meas = np.array(meas)
+    ax.plot(meas[0,:],meas[1,:],meas[2,:],
              '.g', label='Observed trajectory')
 
     #####################
