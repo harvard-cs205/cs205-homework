@@ -1,4 +1,3 @@
-# Your answers here
 6A. The unexpected results are that we spin up jobs in order: 0, 1, 2, 3, etc… and we expect the output to follow this numbering. Specifically, we would expect to see “hi job #” starting w/ 0 and moving incrementally up followed by “bye job #” starting w/ 0 and moving incremental up. However, we see sometimes certain jobs start/end before we expect them to, and the sequence gets out of order. For example, 
 
 	Hi Job 5
