@@ -39,8 +39,10 @@ if __name__ == '__main__':
     # Read the observation array and plot it (Part 2)
     #####################
 
+    # load data
     measurements_matrix = np.mat( np.loadtxt( "P4_measurements.txt", delimiter = ',' ).transpose() )
     dim_stretching_inverse_matrix = np.mat( [ [ 1/rx, 0, 0 ], [ 0, 1/ry, 0 ], [ 0, 0, 1/rz ] ] )
+    # compute position estimates
     position_estimate_matrix = dim_stretching_inverse_matrix * measurements_matrix
     
     position_estimate_array = np.array( position_estimate_matrix )
@@ -53,16 +55,31 @@ if __name__ == '__main__':
     # Use the initial conditions and propagation matrix for prediction
     #####################
 
-    s_initial = array( [ 0, 0, 2, 15, 3.5, 4.0 ] )
-    # A = ?
-    # a = ?
-    # s = ?
-
     # Initial conditions for s0
+    s_initial = np.mat( [ 0, 0, 2, 15, 3.5, 4.0 ] ).transpose()
+    A = np.mat( [ [ 1, 0, 0, dt, 0, 0 ],         
+                  [ 0, 1, 0, 0, dt, 0 ], 
+                  [ 0, 0, 1, 0, 0, dt ], 
+                  [ 0, 0, 0, (1 - c*dt), 0, 0 ],
+                  [ 0, 0, 0, 0, (1 - c*dt), 0 ],
+                  [ 0, 0, 0, 0, 0, (1 - c*dt) ] ] )
+    
+    a = np.mat( [ [ 0, 0, 0, 0, 0, g*dt ] ] ).transpose()
+    
+    s_complete = np.mat( np.zeros( shape = ( 6, K ) ) )
+    s_complete[:,0] = s_initial
+    counter = 1
+    
     # Compute the rest of sk using Eq (1)
-
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '-k', label='Blind trajectory')
+    # total number of measurements is 121 but number of points in trajectory is only 120 (including s0). 
+    # I have thus taken 120 steps for a total of 121 position values
+    while counter < K:
+        s_complete[:,counter] = A * s_complete[:,counter-1] + a
+        counter += 1
+   
+    s_complete = np.array( s_complete )
+    
+    ax.plot(s_complete[0], s_complete[1], s_complete[2], '-k', label='Blind trajectory')     
 
     #####################
     # Part 4:
