@@ -83,16 +83,16 @@ if __name__ == '__main__':
     #####################
     
     def predictS(x,y,z):
-        return np.dot(x,y)+z #to be called s_predicted in loop   
+        return np.dot(x,y)+z #to be called s_predicted in loop or sk
                          
     def predictSig(x,y,z):
-        return inv(np.dot(np.dot(x,y),x.transpose())+np.dot(z,z.transpose())) #to be called Sig_predicted in loop
+        return inv(np.dot(np.dot(x,y),x.transpose())+np.dot(z,z.transpose())) #to be called Sig_predicted in loop or Sigk
     
     def updateSig(x,y):
         return inv(x+np.dot(y.transpose(),y)) #to be called Sig_updated in loop or Sig K+1
     
     def updateS(x,y,z,i,j):
-        return np.dot(x,np.dot(y,z)+np.dot(i.transpose(),j)) #to be Sk+1
+        return np.dot(x,np.dot(y,z)+np.dot(i.transpose(),j)) #to be called s_new in loop or  Sk+1
     
     s0 = s0
     Sigma0 = np.array([[1,0,0,0,0,0],[0,1,0,0,0,0],[0,0,1,0,0,0],[0,0,0,1,0,0],[0,0,0,0,1,0],[0,0,0,0,0,1]])*0.01
