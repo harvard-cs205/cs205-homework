@@ -1,1 +1,30 @@
-# Your answers here
+6A. 
+Example Output:
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 2
+Bye Job 1
+Bye Job 3
+Hi Job 4
+Hi Job 5
+Bye Job 0
+Hi Job 6
+Hi Job 7
+Bye Job 6
+Hi Job 8
+Bye Job 5
+Hi Job 9
+Bye Job 7
+Bye Job 4
+Bye Job 9
+Bye Job 8
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+
+After running the code multiple times, I identified two interesting behaviors: first, the threads may finish executing in a different order than they were started, and second, the main process waits for map() to finished executing before continuing execution.  This is evident by the result list being in order after each run of the script.
+    The threads completing execution in an unpredictable order complicates programming in parallel, as this may cause concurrency issues if threads are reading and writing to a shared data structure.  Suppose had a pool of 2 threads running a function, for a total of 100 function calls where each time, the function reads the value of an integer variable, added 1 to the value, and stored the new value in that variable.  If thread 1 were interrupted (a context switch occured) after reading the value, but before updating the value and thread 2 then updated the value, then thread 1 wouldn't have the current value of the integer.  When thread 1 updates the value, it overwrites Thread 2's update of the value, and the value would not be 100 when map() finishes.
+    The second interesting behavior is just a cool insight into how map() works and something to be aware of when coding.
+
+6B.  The trend is that as the sleep time increases, the ratio of serial time to parallel time increases to some threshold (i.e. the parallel performance improves relative to the serial performance).  This is because multithreading has substantial overhead.  This overhead comes from context switches (switching between threads) and communication between threads.  The computation time of the task (here the sleep time) must be great enough to outweigh the communication and coordination delay time.  Thus when the sleep time is small enough, the parallel version can take longer than the serial version.
