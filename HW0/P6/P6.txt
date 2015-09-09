@@ -1,1 +1,44 @@
 # Your answers here
+
+
+1)
+A typical result I get when I run P6A.py is:
+Hi Job 0
+Hi Job 2
+Hi Job 3
+Hi Job 1
+Bye Job 0
+Hi Job 4
+Bye Job 3
+Hi Job 5
+Bye Job 2
+Bye Job 1
+Hi Job 6
+Hi Job 7
+Bye Job 4
+Hi Job 8
+Bye Job 5
+Hi Job 9
+Bye Job 7
+Bye Job 6
+Bye Job 8
+Bye Job 9
+
+We see that Jobs are not finished in the same order as they are started.
+We also see that jobs are not started in the right order.
+A possible explanation is that there are sometimes some lock in the
+communication.
+The fact that jobs don't start in the right order can be a problem if a
+job needs some information depending on a previous job.
+An example is for example is we apply the function x->(x+j)**2 to the input
+with j the number of the jobs. This being non linear, will not give the right
+answer if jobs are not computed in the right order.
+
+2)
+The serial goes way faster than the paralell program for small waiting time.
+The parallel program is slowed down by communication and locks.
+For all tested time, serial was faster.
+But we can see that parallel program is only twice slower for 1s of waiting
+time. And the ratio is growing with an almost exponential trend.
+Most likely it will outperform serial program for longer waiting time.
+
