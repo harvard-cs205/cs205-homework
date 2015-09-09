@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from numpy.linalg import inv
 
+
 if __name__ == '__main__':
     # Model parameters
     K = 121    # Number of times steps
