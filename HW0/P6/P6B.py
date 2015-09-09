@@ -28,7 +28,7 @@ if __name__ == '__main__':
 
         # Compute jobs in parallel
         start_parallel = time.time()
-        pool.map(burnTime, range(N))
+        pool.map(burnTime, [t]*N)
         end_parallel = time.time()
 
         # Compute the elapsed time for each
