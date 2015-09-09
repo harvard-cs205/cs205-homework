@@ -21,6 +21,8 @@ if __name__ == '__main__':
     ry = 5.0
     rz = 5.0
 
+    C = np.diag(1./np.array([rx,ry,rz]))
+
     # Create 3D axes for plotting
     ax = Axes3D(plt.figure())
 
@@ -31,8 +33,12 @@ if __name__ == '__main__':
     # Normally, this data wouldn't be available in the real world
     #####################
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '--b', label='True trajectory')
+    x_coords, y_coords, z_coords = np.loadtxt('P4_trajectory.txt',
+                                              delimiter=',', usecols=(0,1,2),
+                                              unpack=True)
+
+    ax.plot(x_coords, y_coords, z_coords,
+            '--b', label='True trajectory')
 
     #####################
     # Part 2:
@@ -40,8 +46,12 @@ if __name__ == '__main__':
     # Read the observation array and plot it (Part 2)
     #####################
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '.g', label='Observed trajectory')
+    arr = np.loadtxt('P4_measurements.txt', delimiter=',')
+
+    x_coords, y_coords, z_coords = [x.flatten() for x in np.hsplit(np.dot(arr,C), 3)]
+
+    ax.plot(x_coords, y_coords, z_coords,
+            '.g', label='Observed trajectory')
 
     #####################
     # Part 3:
