@@ -124,7 +124,7 @@ if __name__ == '__main__':
         return sk
 
     # Initial conditions for s0 and Sigma0
-    p_sig = 0.01 * np.eye(6)
+    sig = 0.01 * np.eye(6)
 
     kfS = np.zeros((6, K))
     kfS[:,0] = np.array([0,0,2,15,3.5,4.0]).T
@@ -132,7 +132,7 @@ if __name__ == '__main__':
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
     for i in range(1, K):
         si = predictS(kfS[:, i - 1])
-        p_sig = predictSig(p_sig)
+        p_sig = predictSig(sig)
         sig = updateSig(p_sig)
         m = measurements_array[i, :].T
         kfS[:,i] = updateS(si, p_sig, sig, m).reshape(6,)
