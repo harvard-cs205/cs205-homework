@@ -1,1 +1,14 @@
 # Your answers here.
+#1. It would take the cashier 255 seconds, because it takes 255 times to sum up all the 256 numbers if add two numbers at a time, and it takes one second to add two numbers.
+
+#2. They can verify the total sum faster than the original cashier. They can do in 38 seconds.
+The fastest way is for each cashier to verify the same number of bags: 256/8 = 32, it takes all of them 31 seconds. Then it takes 7 seconds to add the 7 numbers. In total, it is 38 seconds.
+
+#3. If the store has infinite number of employees, it will take no time to verify.
+
+#4. Assume we have N bags, it will take no time for infinite number of employees to verify.
+    (graph neede!!)
+
+#5. It can take infinite number of seconds to verify, because there are infinite number of employees and it takes one second for two employees to communicate.
+
+#6. If the cashier comes to me and takes only one bag, 
