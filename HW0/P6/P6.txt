@@ -1,1 +1,11 @@
 # Your answers here
+The unexpected results are that we spin up jobs in order: 0, 1, 2, 3, etc… and we expect the output to follow this numbering. Specifically, we would expect to see “hi job #” starting w/ 0 and moving incrementally up followed by “bye job #” starting w/ 0 and moving incremental up. However, we see sometimes certain jobs start/end before we expect them to, and the sequence gets out of order. For example, 
+
+	Hi Job 5
+	Hi Job 4
+	Hi Job 6
+	Hi Job 7
+	Bye Job 5Bye Job 4Bye Job 6Bye Job 
+
+We see job 5 got ahead of job 4. This affects how we program in parallel because if certain jobs finish/start out of sequence, this may pose problems for our code. For example, let’s say we are programming in parallel and one processes is updating a parameter while a second processes which is to occur after the first, takes that parameter and puts it into a function. If the sequence here gets mixed up, then the second process may pull a non-updated parameter and will plug that into the function resulting in an incorrect output. 
+
