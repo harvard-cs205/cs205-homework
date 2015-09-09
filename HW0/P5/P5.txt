@@ -1,1 +1,19 @@
 # Your answers here.
+1) It would take 255 seconds to one cashier to add the totals of 256 bags.
+   To calculate this we decompose the operations in the successive number of sums that must be done:
+   total_time = 128/1 + 64/1 + 32/1 + 16/1 + 8/1 + 4/1 + 2/1 + 1/1
+
+2) Yes, they can verify the total sum faster than the original cashier by herself. 
+   It would take them 34 seconds:
+   total_time = 128/8 + 64/8 + 32/8 + 16/8 + 8/8 + maximum(4/8,1) + maximum(2/8,1) + maximum(1/8,1)
+
+3) If there are infinite employees then the result corresponds to the binary logarithm of N (where N=number of bags).
+   total_time = log(N)/log(2)
+   In this case N = 256, so total_time = 8 seconds.
+
+4) See P5.png
+
+5)
+
+6)
+
