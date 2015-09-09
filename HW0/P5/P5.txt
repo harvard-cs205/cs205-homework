@@ -1,1 +1,7 @@
 # Your answers here.
+1. 255 seconds.
+2. 32 seconds. 256/2/8+256/4/8+256/8/8+256/16/8+256/32/8+1=32 They work faster by each person counting simutaneously segmentations of 2 bags.
+3. 8 seconds. 256 = 2^8. Each person in every counting stage takes two bags and thus converting 256 to base 2.
+4. int(log_2(N)+0.5) seconds. 
+5. 15 seconds. 8+7=15. Say that A gets a number and B gets a number, it shall take 1 second for B to communicate to A and A takes another second to count the sum.
+6. 271 if every cashier comes and takes one bag. 15+256=271. Best practice of getting bags may be tree like structure: One divide the stack of bags in to N equal groups and then in each group divide into smaller groups to take advantage of parallelism. Take group number of 2 for example: 2*(log_2(256))=16. Therefore, it takes 15+16=31 seconds.
