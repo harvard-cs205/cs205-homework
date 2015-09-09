@@ -31,8 +31,6 @@ if __name__ == '__main__':
     # Normally, this data wouldn't be available in the real world
     #####################
     
-    
-
     s_true = np.loadtxt('P4_trajectory.txt',delimiter=',') #loaded the actual trajectory data using np.loadtxt function. indicated delimiter as a comma
     ax.plot(s_true[:,0], s_true[:,1], s_true[:,2],'--b', label='True trajectory') #plot data
 
@@ -74,29 +72,27 @@ if __name__ == '__main__':
     # Use the Kalman filter for prediction
     #####################
     
-    def predictS(A,s,a):
-        return np.add(np.dot(A,s),a) #to be called s_predicted in loop or sk
+    def predictS(A,s,a): #to be called s_predicted in loop or sk
+        return np.add(np.dot(A,s),a) 
                          
     def predictSig(A,Sigma,B): #to be called Sig_predicted in loop or Sigk
         return inv(np.add(np.dot(np.dot(A,Sigma),A.transpose()),np.dot(B,B.transpose())))
         
-    def updateSig(x,y):
-        return inv(np.add(x,np.dot(y.transpose(),y))) #to be called Sig_updated in loop or Sig K+1
+    def updateSig(x,y): #to be called Sig_updated in loop or Sig K+1
+        return inv(np.add(x,np.dot(y.transpose(),y))) 
     
-    def updateS(x,y,z,i,j):
-        return np.dot(x,np.add(np.dot(y,z),np.dot(i.transpose(),j))) #to be called s_new in loop or  Sk+1
+    def updateS(x,y,z,i,j): #to be called s_new in loop or  Sk+1
+        return np.dot(x,np.add(np.dot(y,z),np.dot(i.transpose(),j))) 
     
-    s0 = s0
+    s0 = s0 #initialize parameters and initial conditions below
     Sigma0 = np.array([[1,0,0,0,0,0],[0,1,0,0,0,0],[0,0,1,0,0,0],[0,0,0,1,0,0],[0,0,0,0,1,0],[0,0,0,0,0,1]])*0.01
     B = np.array([[bx,0,0,0,0,0],[0,by,0,0,0,0],[0,0,bz,0,0,0],[0,0,0,bvx,0,0],[0,0,0,0,bvy,0],[0,0,0,0,0,bvz]])
     C = np.array([[rx,0,0,0,0,0],[0,ry,0,0,0,0],[0,0,rz,0,0,0]])
      
-    s_new = np.zeros([6,K])
+    s_new = np.zeros([6,K]) #initialize s_new vector to be filled in
     i = 1
     s_new[:,0]=s0
     Sigma=Sigma0
-    #m_append=np.zeros([3,121])
-    #m=np.concatenate((m,m_append))
     
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
     while i <= K-1:
@@ -106,7 +102,6 @@ if __name__ == '__main__':
         s_new[:,i]=updateS(Sig_updated,Sig_predicted,s_predicted,C,m[:,i])        
         i+=1
         
-    ax.plot(s_new[0,:], s_new[1,:], s_new[2,:],'-r', label='Filtered trajectory')
-    # Show the plot
+    ax.plot(s_new[0,:], s_new[1,:], s_new[2,:],'-r', label='Filtered trajectory') #plot filtered trajectory
     ax.legend()
     plt.show()
