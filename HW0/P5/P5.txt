@@ -1,1 +1,12 @@
-# Your answers here.
+1.it takes 255 seconds to finish the counting
+
+2.it's faster for 8 cashier to do it. They can finish it in 31+log2(8)=34 seconds
+
+3.if the store has infinite employers, then it takes log2(256)=8 seconds
+
+5.it takes 15 seconds for infinite cashiers to count the coins.
+
+6.If cashier come and take 1 bag each time, then the total time would be 15+256=271 seconds
+  If cashier come and take 2 bags each time, then the total time would be 15+128=143 seconds
+
+A better strategy would be give 16 person each 16 bags, each cashier add 16 bags alone, then they can communicate to sum all the bags. In this case, the total time would be: 16+15+8=39 seconds
