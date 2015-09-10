@@ -1,1 +1,79 @@
 # Your answers here
+
+
+--------------------------------
+example Output:
+
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 0
+Bye Job 2
+Bye Job 1
+Bye Job 3
+Hi Job 4
+Hi Job 5
+Hi Job 6
+Hi Job 7
+Bye Job 4
+Hi Job 8
+Bye Job 5
+Bye Job 6
+Bye Job 7
+Hi Job 9
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+[Finished in 0.9s]
+---
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 0
+Bye Job 2
+Bye Job 1
+Hi Job 4
+Hi Job 5
+Hi Job 6
+Bye Job 3
+Hi Job 7
+Bye Job 4Bye Job 6
+Bye Job 5
+
+Bye Job 7
+Hi Job 9Hi Job 8
+
+Bye Job 9
+Bye Job 8
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+[Finished in 0.9s]
+
+--------------------------------
+
+Questions:
+============
+
+If you run the above code a number of times, you may see some unexpected results. Explain these results.:
+---
+If we look at the ouput, we see that threads nor start serially nor end serially in the expected order. However, the result is in order which is thanks to the map function. This resembles one major challenge of parallel programming: Starting threads serially in your programs does not guarantee at all that these threads get executed in the same order. Instead, execution is handled by the OS and the hardware and can be regarded as random. 
+
+
+How could this affect how we program in parallel?
+---
+Thus, any needed synchronization has to be explicitely programmed and stated by hand. A critical scenario is for example when threads try to access resources which they do at random times. The programmer however did not recognize this and thought threads run in order. 
+
+
+Describe a scenario where this would be important
+---
+I.e. imagine the programmer wants to produce the string 'ABABABABABABABABABABA....'. He starts one thread that will append 'A' and another that appends 'B'. The result will be something random but most times not the expected one. 
+
+
+Try to explain the trend you observe:
+---
+Generally, if we increase the waiting / sleeping time we can observe a higher speed factor. However, it seems to be bounded from above with a limit lower than 4 (i.e. parallel execution won't lead to 4x faster speed!)
+
+Is it possile that a parallel program could take longer than its serial version? Under what conditions?
+----
+Yes! Actually, code P6B.py is a perfect example for this. When the speedup factor is less than 1, this means that the serial program has been faster than the corresponding parallel version. This is true for small waiting times and can be clearly observed in the plot. The reason for this is, that when we execute parallel, the OS & processor need to schedule threads with all scheduling consequences. Thus, if the code is faster than the overhead caused by scheduling a serial program outperforms the parallel version. In conclusion, it does not make sense to parallelize code that only needs very few time to execute because parallel speedup won't outrace the scheduling overhead! The scheduling overhead is also the reason why it is never possible to gain with 4 processes a speedup >= 4! (If one ever sees a plot who is suggesting this, I would doubt highly!)
