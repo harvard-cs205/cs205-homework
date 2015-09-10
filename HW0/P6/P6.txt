@@ -35,3 +35,15 @@ computations. For example, say we wanted to write a program to count the number 
 to a website. We could have a task in the background which increments the tally everytime there
 is a new request. However, because these requests do not arrive in order, we could have a 
 situation where two requests try to increment the same number, thus causing incorrect result.
+
+For parallel speedup, it appears that for small sleep time the parallel map is actually slower
+than its serial counterpart. This could be due to the overhead of spawning & managing jobs by 
+the pool, which could easily add to more than 1e-5 sec average per iteration. We do see a trend 
+of speedup converging on 4 which is expected as there are 4 processes in the pool.
+
+Moreover, as we see in the figure, it is possible for a parallel program to take longer to run.
+This could be because the amount of work is negligible compared to the overhead of managing 
+concurrent threads. Also, if a parallel program locks certain resources that create contention
+between threads, it may end up being no better or even worse than a serial execution as threads
+have to queue up to do work. Certain conditions such as deadlock or livelock can even cause the 
+program to get stuck in a limbo state as well.
