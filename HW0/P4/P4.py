@@ -88,10 +88,10 @@ if __name__ == '__main__':
     cvec=np.array([rx,ry,rz])
     c1=np.asmatrix(np.diag(cvec))
     C=np.bmat([[c1, np.zeros([3,3])]])
-    m=np.asmatrix(np.zeros([3,K]))
-    s_t=np.bmat([[np.transpose(np.asmatrix(s_meas))],[np.asmatrix(np.ones([3,K]))]])
-    for i in range(1,K):
-        m[:,i]=np.dot(C,s_t[:,i])
+    m=np.transpose(np.asmatrix(s_meas))
+#    s_t=np.bmat([[np.transpose(np.asmatrix(s_meas))],[np.asmatrix(np.ones([3,K]))]])
+#     for i in range(1,K):
+#         m[:,i]=np.dot(C,s_t[:,i])
            
     # Initial conditions for s0 and Sigma0
     sK=np.asmatrix(np.zeros([6,K]))
