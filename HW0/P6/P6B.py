@@ -38,7 +38,7 @@ if __name__ == '__main__':
 
         # Now parallel job
         start_time = time.time()
-        for i in range(N/4): # Each time the pool is run, burntime is called 4 times!
+        for i in range(N/4): # Each time the pool is run, burntime is called P times!
             pool.apply(burnTime, args=(t,))
         time_elapsed = time.time() - start_time
         parallel_time.append(time_elapsed)
