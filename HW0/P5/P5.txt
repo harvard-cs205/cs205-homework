@@ -42,4 +42,15 @@ the equation above gives an intuitive result; in the infinite case,
 
  t_infinite = 8 seconds
 
- 4.
+ 4. So again, if there are N bags and zeta employees, the general
+ formula is given by
+
+ t_minimum = [(N/zeta - 1) + Log2(zeta)]t_add
+
+
+The two limits we are interested in yield
+
+t_one = (N - 1)t_add
+t_infinite = Log2[N]t_add
+
+See P5_part4.py for the python program to produce the plot.
