@@ -77,12 +77,30 @@ if __name__ == '__main__':
     # Part 4:
     # Use the Kalman filter for prediction
     #####################
-
-    # B = ?
-    # C = ?
+    b_vals = np.array([bx,by,bz,bvx,bvy,bvz])
+    B = np.diag(b_vals)
+    C = np.matrix([[rx,0,0,0,0,0],
+                   [0,ry,0,0,0,0],
+                   [0,0,rz,0,0,0]])
 
     # Initial conditions for s0 and Sigma0
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
+    Sigma0 = .01*np.identity(6)
+    m = np.matrix([x_meas,y_meas,z_meas])
+    def predictS(s):
+        return A*s+a
+
+    def predictSig(Sigma):
+        return np.linalg.inv(A*Sigma*A.T + B*B.T)
+
+    def updateSig(Sigma):
+        return np.linalg.inv(Sigma + C.T*C)
+
+    def updateS(updatedSig,estS,estSig, m):
+        return updatedSig*(estSig*estS + C.T*m)
+    s = np.matrix([0,0,2,15,3.5,4.0]).transpose()
+    for k in xrange(0,3):
+        s = 
 
     # ax.plot(x_coords, y_coords, z_coords,
     #         '-r', label='Filtered trajectory')
