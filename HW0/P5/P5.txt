@@ -1,1 +1,13 @@
-# Your answers here.
+1. 	255 seconds, given the sum of 2^n from 0 to N-1 is always 2^(N)-1, here where
+	N=8.
+
+2.	With 8 workers, it will take the same amount of time as one worker counting one-
+	eighth of the pile, so it will take (256/8)-1 = 31 seconds. 
+
+3.	An infinite number of workers would bring the computation down to log(n) time,
+	so it would take log(256) = 8 seconds. 
+
+4.	As mentioned in the previous problem, it would take the ceiling of log(N) time.
+	This will be demonstrated graphically.
+
+5.	Requiring another second fo 
