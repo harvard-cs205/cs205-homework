@@ -1,6 +1,6 @@
 #####################################################################
-A) We do see some behavior that I would naively expect. We initiate
-a pool of four processes and naively expect that the jobs
+A) We see behavior that I did not expect when running the script.
+We initiate a pool of four processes and expect that the jobs
 1-10 should complete in order. Instead what we see is something like:
 
 Hi Job 0
@@ -13,22 +13,28 @@ Bye Job 3
 Bye Job 2
 
 Somehow, Job 2 is launched before job 3 *and* job 1! Then, even though
-job 2 was launched before job 3, it finishes after job 3; I would not
-expect this. Evidently it is not possible to control precisely when
-each thread executes and finishes!
+job 2 was launched before job 3, it finishes after job 3. I expected processes to
+launch and finish in order. Evidently it is not possible to control precisely
+when each process executes and finishes!
 
 The inability to control exactly when threads execute and finish has
-large implications for parallel computing. We cannot expect results
-from our computations to be returned in the order we submitted the jobs;
-we will consequently have to keep track of exactly what was run on each
-thread. Also, if threads depend on results from other threads, we will
-have to be very careful about when we execute the dependent threads; timing
-will be a big issue. It may be hard to parallelize some tasks for this reason.
+large implications for parallel computing. If threads need to communicate with
+each other, we must code a scheduler of some sort that controls the appropriate time
+when they communicate (i.e. you have to wait for the other thread to finish). Based on
+our readings, I believe this is the main challenge of parallel programming!
+Furthermore, if several processes are running and competing for resources and a
+less important process manages to run first (i.e. job 2 runs before job 1),
+it may hog computational resources and prevent more important processes from running.
+We also need to account for this possibility in our coding. It may be hard to parallelize
+some code due to these issues.
 
-One scenario where this would be important is trying to have multiple
-data-analyzing threads reading from a set of data that another thread is producing(
-a data producing thread). If timing is not carefully controlled, the data-analyzing
-threads may try to read a dataset that does not yet exist, causing problems.
+One scenario where this would be important is having multiple
+threads reading from a set of data that another thread is producing.
+If timing is not carefully controlled, the data-analyzing
+threads may try to read a dataset that does not yet exist, causing problems!
+Furthermore, if the data-analyzing threads somehow hogged the computational resources
+as well, the data-producing thread may be unable to function, rendering the data-analysis
+threads useless.
 
 ###############################################################################
 B) Naively, we expect that the serial time divided by the parallel time
