@@ -9,3 +9,9 @@ Answers:
 6. a) at least 256 s b) at least 128 s c) We should try to increase bandwidth
 
 Explanations (TBA):
+1. Addition is commutative and associative, and addition requires two "bags" to be processed at once. Therefore, the cashier must add 256 - 1 = 255 times to obtain the total.
+2. 8 workers together can process 16 bags per second. To process 256 bags, it will require 16 seconds; the 128 sums can be summed in 8 seconds, the resulting 64 sums can be processed in 4 seconds, and the following 32 sums in 2 seconds, yielding 16 sums requiring an additional 1 second to be further combined to 8 sums, in a binary tree fashion. However, further computations will be unable to take advantage of the available labor, as future computations require the present computations to complete first. Thus, each further summation will be an additional 1 second, halving the number of "sums" until the total sum remains (thus, 16 + 8 + 4 + 2 + 1 + 1 + 1 + 1 = 34 s)
+3. All 256 bags could be used by a maximum of 128 employees in the first "round" of computation, yielding 128 numbers to be added up. Then, in the second "round" of computation, 64 sums would be maximally obtained. In a binary tree fashion, we would see a halving of calculations needing to be done at each step. Thus, 8 rounds of computation would be required to analyze all 256 bags (2^8 = 256).
+4. With a countably "infinite" number of employees, the time required would be, in seconds, a ceiling of log base 2 of the number of bags, whereas a single employee would require N - 1 seconds.
+5. Going back to #3, neglecting communication delay, it requires 8 s to complete this task. Now, with communication delay, each round of computation requires a round of cross-talk between cashiers, which means that there is a 1 s delay between each of the 8 stages. Therefore, there is an additional 7 s delay on top of the 8 s = 15 s.
+6. 
