@@ -5,7 +5,6 @@ def burnTime(k):
     print("Hi Job {}".format(k))
     time.sleep(0.25)
     print("Bye Job {}".format(k))
-    print k,'======='
     return k
 
 if __name__ == '__main__':
