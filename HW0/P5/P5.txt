@@ -1,1 +1,38 @@
-# Your answers here.
+Problem 1
+
+If the cashier first added the totals of individuals pairwise, they could make 128 additions of the totals of two bags.  
+They could then make 64 additions of the totals of four bags, 32 additions of the totals of eight bags, 16 additions of the totals of sixteen bags, 8 additions of the totals of thirty-two bags, 4 additions of the totals of sixty-four bags, 2 additions of the totals of one hundred twenty eight bags, and 1 final addition that would be the total of all the bags.  
+This would be a total of 128+64+32+16+8+4+2+1 = 255 additions, which is the same number as if they had simply added the bags one by one and kept a running total.  
+It would take one cashier 255 seconds to sum the bags.  
+
+
+Problem 2
+Second 1: Each of the eight cashiers totals a pair of bags, leaving 8 sums and 240 unsummed bags.  
+Second 2: Each of the eight cashiers totals a pair of bags, leaving 16 sums and 224 unsummed bags.  
+Second 3: Each of the eight cashiers totals a pair of bags, leaving 24 sums and 208 unsummed bags.  
+...
+Second 16: Each of the eight cashiers totals a pair of bags, leaving 128 sums and 0 unsummed bags.  
+Second 17: Each of the eight cashiers totals a pair of sums, leaving 120 sums.
+Second 18: Each of the eight cashiers totals a pair of sums, leaving 112 sums.
+...
+Second 30: Each of the eight cashiers totals a pair of sums, leaving 16 sums. 
+Second 31: Each of the eight cashiers totals a pair of sums, leaving 8 sums.  
+Second 32: Four of the cashiers total a pair of sums, leaving 4 sums.  
+Second 33: Two of the cashiers total a pair of sums, leaving 2 sums.  
+Second 34: One of the cashiers totals the last pair of sums.  
+It would take 34 seconds for the eight cashiers to sum the bags.  
+
+
+Problem 3
+Second 1: Each of 128 employees total a pair of bags, leaving 128 sums.  
+Second 2: 64 employees each total a pair of sums, leaving 64 sums.  
+Second 3: 32 employees each total a pair of sums, leaving 32 sums. 
+...
+Second 7: 2 employees each total a pair of sums, leaving 2 sums.  
+Second 8: 1 employee totals the final pair of sums.  
+It would take an infinite number of employees 8 seconds to sum the bags.  
+
+
+Problem 4
+Looking at the number of seconds that it would take an infinite number of employees to sum N bags (looking at the range from N = 2 to N = 17, I see a pattern that the amount of time is equal to:
+log_base_2(N) rounded up to the nearest whole number.  
