@@ -12,7 +12,7 @@ Hi Job 4
 Bye Job 3
 Bye Job 2
 
-Somehow, Job 2 is launched before job 3 *and* job 1! Then, even though
+Somehow, Job 2 is launched *before* job 3 and job 1! Then, even though
 job 2 was launched before job 3, it finishes after job 3. I expected processes to
 launch and finish in order. Evidently it is not possible to control precisely
 when each process executes and finishes!
@@ -25,16 +25,15 @@ our readings, I believe this is the main challenge of parallel programming!
 Furthermore, if several processes are running and competing for resources and a
 less important process manages to run first (i.e. job 2 runs before job 1),
 it may hog computational resources and prevent more important processes from running.
-We also need to account for this possibility in our coding. It may be hard to parallelize
-some code due to these issues.
+It may be hard to parallelize some code due to these issues.
 
-One scenario where this would be important is having multiple
+One scenario where process timing would be important is having multiple
 threads reading from a set of data that another thread is producing.
 If timing is not carefully controlled, the data-analyzing
 threads may try to read a dataset that does not yet exist, causing problems!
-Furthermore, if the data-analyzing threads somehow hogged the computational resources
-as well, the data-producing thread may be unable to function, rendering the data-analysis
-threads useless.
+Furthermore, if the data-analyzing threads somehow hogged the computational resources,
+the data-producing thread may be unable to function, rendering the data-analysis
+threads useless. This problem could deadlock the entire program!
 
 ###############################################################################
 B) Naively, we expect that the serial time divided by the parallel time
