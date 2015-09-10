@@ -25,12 +25,12 @@ if __name__ == '__main__':
     for t in wait_time:
         # Compute jobs serially and in parallel
         # Use time.time() to compute the elapsed time for each
-        serialTime = 0
-        parallelTime = 0
+        serialTime = 1
+        parallelTime = 10
 
         # run N times with simple loop
         time_start = time.time()
-        for _ in range(N):
+        for _ in xrange(N):
             burnTime(t)
 
         serialTime = time.time() - time_start
