@@ -5,6 +5,28 @@ import pandas as pd
 import sys
 
 
+# Define functions here
+
+
+def predictS(A,s,a):
+	s_tilde = A.dot(s) + a
+	return s_tilde
+
+def predictSig(Sig, A, B):
+	Sig_tilde = (A.dot(Sig)).dot(A.T) + B.dot(B.T)
+	Sig_tilde = np.linalg.inv(Sig_tilde)
+	return Sig_tilde
+
+def updateSig(Sig_tilde, C):
+	Sig_update = Sig_tilde + (C.T).dot(C)
+	sig_update = np.linalg.inv(Sig_update)
+	return Sig_update
+
+def updateS(Sig_update, Sig_tilde, s_tilde, C, m):
+	s_update = Sig_update.dot(Sig_tilde.dot(s_tilde) + (C.T).dot(m)  )
+	return s_update
+
+
 if __name__ == '__main__':
     # Model parameters
     K = 121    # Number of times steps
@@ -85,7 +107,8 @@ if __name__ == '__main__':
     #####################
     # Part 4:
     # Use the Kalman filter for prediction
-    #####################
+    ####################
+
 
     # B = ?
     # C = ?
