@@ -1,3 +1,5 @@
+Note: I (minimally) collaborated with Taylor K. on this particular question. Specifically, he helped clarify the prompt of the question, as i had found parts of it to be initially a bit ambiguous. 
+
 1. 255 seconds. It takes n-1 seconds to add up the totals of n bags by a single worker. Thus, 256-1 = 255 seconds.
 
 2. 34 seconds. There are now 8 simultaneous workers counting bags. 256 / 8 = 32. Thus, each worker only needs to count 32 bags by themselves. Since everyone is counting at the same time and it is assumed each worker takes the same amount of time each to count, then we know it takes n-1 seconds to add up the totals of n bags per worker. So 32-1 equals 31 seconds per worker. We are now left with each worker, 8 in total, having a sum they have calculated. The 8 sums must now by combined into one single total, which can be done by each pair (4 in total) combining simultaneously, then each resulting pair combining together (2 in total), and finally the final pair (1 in total) combining together. That is 3 additional pairings at 1 second each, resulting in a total of 3 additional seconds for the 8 workers to communicate. So 31+3 = 34 seconds total.
