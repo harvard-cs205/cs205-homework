@@ -24,8 +24,9 @@
 	Starting at 256 bags, we only need 128 workers working 1 sec to get 128 numbers
 	Similarly, 128 numbers only takes 64 workers 1 sec to get 64 numbers.
 	Using steps above we get total time= 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 = 8secs
+	Or we can use log2(256)=8
 
-4)PLOT
+4)See PNG file
 
 5)15 secs
 	For 256 bags, we have 128 workers with no need for communication

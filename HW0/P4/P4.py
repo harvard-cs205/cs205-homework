@@ -87,7 +87,7 @@ if __name__ == '__main__':
 
     adjustArray = np.matrix([[1/rx,0,0],[0,1/ry,0],[0,0,1/rz]])
     adjustedS_true2 = []
-    pdb.set_trace()
+    #pdb.set_trace()
     for i in range(len(s_true2)):
         adjustedS_true2.append(np.array(np.dot(adjustArray,np.array([float(s) for s in s_true2[i]])))[0])
     adjustedS_true2 = np.array(adjustedS_true2)
