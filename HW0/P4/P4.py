@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
+from numpy.linalg import inv
+
 
 if __name__ == '__main__':
     # Model parameters
@@ -44,11 +46,11 @@ if __name__ == '__main__':
     # Read the observation array and plot it (Part 2)
     #####################
 
-    arr = np.loadtxt('P4_measurements.txt', delimiter=',')
+    ms = np.loadtxt('P4_measurements.txt', delimiter=',')
 
-    C = np.diag(1./np.array([rx,ry,rz]))
+    unstretch = np.diag(1./np.array([rx,ry,rz]))
 
-    x_coords, y_coords, z_coords = [x.flatten() for x in np.hsplit(np.dot(arr,C), 3)]
+    x_coords, y_coords, z_coords = [x.flatten() for x in np.hsplit(np.dot(ms,unstretch), 3)]
 
     ax.plot(x_coords, y_coords, z_coords,
             '.g', label='Observed trajectory')
@@ -66,7 +68,7 @@ if __name__ == '__main__':
     # Initial conditions for s0
     # Compute the rest of sk using Eq (1)
     for k in range(1,K):
-        s[k] = np.dot(A,s[k-1]) + a
+        s[k] = A.dot(s[k-1]) + a
 
     x_coords, y_coords, z_coords = [x.flatten() for x in np.hsplit(s, 6)][:3]
 
@@ -78,14 +80,36 @@ if __name__ == '__main__':
     # Use the Kalman filter for prediction
     #####################
 
-    # B = ?
-    # C = ?
+    B = np.diag([bx,by,bz,bvx,bvy,bvz])
+    C = np.concatenate((np.diag([rx,ry,rz]),np.zeros(3*3).reshape(3,3)),
+                       axis=1)
 
     # Initial conditions for s0 and Sigma0
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
+    def predictS(prev_s):
+        return A.dot(prev_s) + a
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '-r', label='Filtered trajectory')
+    def predictSig(prev_sig):
+        return inv(A.dot(prev_sig).dot(A.T) + B.dot(B.T))
+
+    def updateSig(pred_sig):
+        return inv(pred_sig + C.T.dot(C))
+
+    def updateS(pred_s, pred_sig, curr_sig, curr_m):
+        return curr_sig.dot(pred_sig.dot(pred_s) + C.T.dot(curr_m))
+
+    s2 = np.zeros(6*K).reshape(K,6)
+    s2[0] = np.array([0, 0, 2, 15, 3.5, 4.0])
+
+    curr_sig = 0.01 * np.identity(6)
+    for k in range(1,K):
+        pred_sig = predictSig(curr_sig)
+        curr_sig = updateSig(pred_sig)
+        s2[k] = updateS(predictS(s2[k-1]), pred_sig, curr_sig, ms[k])
+
+    x_coords, y_coords, z_coords = [x.flatten() for x in np.hsplit(s2, 6)][:3]
+    ax.plot(x_coords, y_coords, z_coords,
+            '-r', label='Filtered trajectory')
 
     # Show the plot
     ax.legend()
