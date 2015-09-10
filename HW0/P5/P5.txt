@@ -3,11 +3,11 @@
 2. 34 seconds.  Split into 8 equal size groups of 
 3. 8 seconds. First split into 128 groups of 2, we can add all these in 1 second. Then split the 128 sums into 64 groups of 2, which we can add in 1 second. Continuing in this fashion we are left with one sum after 8 steps, which is the sum of all of the bags. 
 
-4. log_2(N), using the above reasoning. 
+4. log_2(N), using the above reasoning (each time we half the number of computations, we can do this log_2(N) times before we have one number, which is the total sum)
 
 5. 15 seconds. First step takes 1 second and the subsequent steps each require 1 extra second for the transfer of numbers between half of the workers. This happens for 7 steps giving a total of 7 * 2 + 1 sec nds. 
 
 6. We assume that first we must distribute all of the bags (before doing any of the additions) 
-i)  256 + 1 + 2 * 8 each intermediate step takes 2 seconds, 1 to compute the sum of two numbers, 1 to communicate the new sum to another worker. First we must pass out 256 bags. Then we need 1 second to pass bags between workers so 128 of them have 2 bags to sum. Then we run the intermediate steps of add and communicate. 
-ii) 128 + 2 * 8. We lose the additional second from the term in i) because each worker starts with 2 bags.
-iii) If we hand people x bags, the amount of time that the whole process takes is 256/x + (x - 1) + 2 \ceil{log_2(256/x)}. The first term is the passing out cost. The second term is the cost for one worker to sum x bags, and the third term is the cost of combining all of the sums. The last step has a ceiling on it because we always need to do an integral number of steps, and summing 6 numbers with infinite workers takes the same number of time as 8 numbers. This is minimized at 16, which we can verify numerically. 
+i)  273 = 256 + 1 + 2 * 8 each intermediate step takes 2 seconds, 1 to compute the sum of two numbers, 1 to communicate the new sum to another worker. First we must pass out 256 bags. Then we need 1 second to pass bags between workers so 128 of them have 2 bags to sum. Then we run the intermediate steps of add and communicate. 
+ii) 144 = 128 + 2 * 8. We lose the additional second from the term in i) because each worker starts with 2 bags.
+iii) If we hand people x bags, the amount of time that the whole process takes is 256/x + (x - 1) + 2 \ceil{log_2(256/x)}. The first term is the passing out cost. The second term is the cost for one worker to sum x bags, and the third term is the cost of combining all of the sums. The last step has a ceiling on it because we always need to do an integral number of steps, and summing 6 numbers with infinite workers takes the same number of time as 8 numbers. This is minimized at 16, which we can verify numerically. The resulting is 39 seconds.
