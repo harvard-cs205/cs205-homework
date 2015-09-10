@@ -33,6 +33,13 @@ job needs some information depending on a previous job.
 An example is for example is we apply the function x->(x+j)**2 to the input
 with j the number of the jobs. This being non linear, will not give the right
 answer if jobs are not computed in the right order.
+I found an interesting quote from "how to survive the multicore revolution"
+that explains the type of issue raised by multiprocessors named "race
+condition".
+"A race condition occurs when concurrent software tasks access a shared-memory
+location and at least one of the tasks stores a value into the location.
+Depending on the scheduling of the tasks, the software may behave differently."
+This better explains the point that I wanted to make.
 
 2)
 The serial goes way faster than the paralell program for small waiting time.
