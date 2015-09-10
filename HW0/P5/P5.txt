@@ -1,1 +1,24 @@
-# Your answers here.
+1. 255 m
+2. Yes.
+	8 people in total
+	First, each person count 32 cases, take them 31 ms, result in 8 new numbers
+	Second, 4 people each sum 2 of the 8 numbers, take them 1 m, result in 4 new numbers
+	Thirdly, 2 people each sum 2 of the 4 numbers, take them 1 m, result in 2 new numbers
+	Finally, sum the 2 numbers, take them 1m
+	In total, they spend 34 ms
+
+	They can count all cases in 34ms.
+3.8ms
+4.log2(n)
+5.8 + 7 = 15
+6. if one person take one bag at a time: it tooks 8 + 8 + 256 = 272 ms
+   if one person take two bags at a time: 15 + 128 = 143 ms 
+   Best strategy:
+	Yes, best way can be achieved by reducing time wasted on getting bags
+	for example:
+		16 people each take 16 bags, take 16 ms
+		take 15 ms for each person to count
+		take 4 + 4 ms for them to sum up numbers
+		in total, it take 16 + 15 + 8 = 39 ms
+
+			
