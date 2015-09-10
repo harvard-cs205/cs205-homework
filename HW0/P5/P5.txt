@@ -35,4 +35,4 @@ It would take an infinite number of employees 8 seconds to sum the bags.
 
 Problem 4
 Looking at the number of seconds that it would take an infinite number of employees to sum N bags (looking at the range from N = 2 to N = 17, I see a pattern that the amount of time is equal to:
-log_base_2(N) rounded up to the nearest whole number.  
+log_base_2(N) rounded up to the nearest whole number.  This makes sense, because if N is equal to a power of 2, there are no leftover sets of numbers that didn't pair up and need to be added in an additional step.  
