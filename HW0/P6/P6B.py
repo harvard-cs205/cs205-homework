@@ -26,7 +26,7 @@ if __name__ == '__main__':
 	    burnTime(t)
 	serialTime = time.time() - start
 	start = time.time()
-	pool.map(burnTime,range(16))
+	pool.map(burnTime(t),range(16))
 	parallelTime = time.time() - start
 
         # Compute the ratio of these times
