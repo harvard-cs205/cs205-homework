@@ -33,6 +33,7 @@ if __name__ == '__main__':
     x_coords,y_coords,z_coords,x_vel,y_vel,z_vel = np.loadtxt('P4_trajectory.txt', delimiter=',', unpack =True)
     ax.plot(x_coords, y_coords, z_coords,'--b', label='True trajectory')
 
+
     #####################
     # Part 2:
     #
