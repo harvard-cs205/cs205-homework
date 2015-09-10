@@ -65,9 +65,11 @@ if __name__ == '__main__':
 	[0,0,0,0,1-c*dt,0],[0,0,0,0,0,1-c*dt]])
     a = np.matrix([[0,0,0,0,0,g*dt]]).transpose()
     s = np.zeros((6,K))
+
     # Initial conditions for s0
     s[:,0] = [0,0,2,15,3.5,4.0]
     s = np.asmatrix(s)
+    
     # Compute the rest of sk using Eq (1)
     for x in xrange(1,K):
       s[:,x] = np.dot(A,s[:,x-1])+a
