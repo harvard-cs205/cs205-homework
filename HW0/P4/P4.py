@@ -97,20 +97,19 @@ if __name__ == '__main__':
     
     # predictS gives intermediate estimate ~s based on known s_k 
     def predictS(s_k):
-        #return np.squeeze(np.asarray(np.dot(A,s_k)+a))
-        return np.dot(A,s_k)+a
+        return np.dot(A,s_k)+a #matrix
     
     # predictSig predicts intermediate ~Sigma given Sigmak
     def predictSig(Sig_k):
-        return np.linalg.inv(A*Sig_k*A.transpose() + B*B.transpose())
+        return np.linalg.inv(A*Sig_k*A.transpose() + B*B.transpose()) #matrix
         
     # updateSig takes covariance matrix predictor (from predictSig) and outputs (k+1)th Sigma
     def updateSig(Sig_pred):
-        return np.linalg.inv(Sig_pred + C.transpose() * C)
+        return np.linalg.inv(Sig_pred + C.transpose() * C) #matrix
         
     # updateS calculates value of (k+1)th s
     def updateS(Sig_k,s_k,l):
-        return updateSig(predictSig(Sig_k)) * (predictSig(Sig_k) * predictS(s_k).T + C.T * np.asmatrix(m[l+1]).transpose())
+        return updateSig(predictSig(Sig_k)) * (predictSig(Sig_k) * predictS(s_k).T + C.T * np.asmatrix(m[l+1]).transpose()) #matrix
 
     # initialize list S with value of s0
     S = [s0]
@@ -120,7 +119,7 @@ if __name__ == '__main__':
     # convert value to 1D array, and append to end of S
     for k in xrange(1,K-1):
         S.append(np.squeeze(np.asarray(updateS(Sigma_next,S[len(S)-1],k))))
-        Sigma_next = updateSig(Sigma_next)
+        Sigma_next = updateSig(predictSig(Sigma_next))
     
     # transpose list of arrays to obtain (x, y, z) coordinates
     x_filt, y_filt, z_filt = np.asarray(S).T[0:3]
