@@ -58,7 +58,7 @@ Explanation
         if P=4, this step takes 2*t_add time;
         if P=8, this step takes 3*t_add time, etc.
 
-    It seems that an added (log P) iterations is required. We can
+    It seems that an added (log P) iterations are required. We can
     show that in general, ceil(log P) iterations are required.
 
     When t_add = 1s and P = 8, we need (log 8)*1 = 3 seconds more.
@@ -73,7 +73,7 @@ Explanation
     bags to P workers, each worker will have a bag, and any additional
     workers would not receive one and would be idle. Also, since each
     iteration in (3) is done by at most half the workers simultaneously,
-    the additional workers will still be idle. 
+    the additional workers will still be idle during (3). 
 
     Put another way, it will take the same amount of time for P=N
     workers to complete the task as for P>N workers. Therefore, we need
@@ -98,7 +98,7 @@ Explanation
             total = t_add * (8 + log N/8 - 1) = t_add * k + 4
         and we note the totals keep getting bigger.
 
-    It seems that the fastest we can do this is 
+    It seems that the fastest we can complete the task is 
         t_add * k = t_add * log N
 	
     which can be achieved with any number of workers from N/2 to N
@@ -124,8 +124,8 @@ Explanation
 5.  The additional overhead for communicating counts between workers
     occurs in step (3) of the process mentioned in question 2 above.
 
-    Let t_share be the time it takes, for worker A to communicate a
-    count to worker B so that B can then proceed to perform an addition.
+    Let t_share be the time it takes for worker A to communicate a
+    count to worker B, so that B can then proceed to perform an addition.
 
     As in question 2, We can divide P counts into pairs (which we assume
     takes no time or is accounted for in the time to share counts), and
@@ -194,20 +194,22 @@ Explanation
 
     We shall assume that bags need only exchange hands at the very
     beginning; after that, workers need only communicate counts
-    (which takes t_share time). In this particular example, the time
-    to communicate a count or to hand off a bag are the same so it 
+    (which takes t_share time). [In this particular example, the time
+    to communicate a count or to hand off a bag are the same so at
+    least for the case where a worker may have a choice to communicate a
+    count or pass off _one bag_ (after the initial handoff), it 
     will not affect our conclusion anyway assuming they will either
-    verbally communicate a count or pass a bag, and not both.
+    verbally communicate a count or pass a bag, but not both.]
 
     The problem also indicates that you cannot hand out bags to
     more than one person at a time. This means it will take an extra
         P * t_give 
     time to complete the handing out of bags. 
 
-    This is also the minimum time it will take to complete the 
-    entire counting task, but can only be practically achieved if
+    This is also the absolute minimum time it will take to complete the 
+    entire counting task, which can only be practically achieved if
     adding bags (i.e. t_add = 0) and communicating counts 
-    (i.e. t_share = 0) took no time. 
+    (i.e. t_share = 0) were to take no time. 
 
     Wait-and-Combine Strategy
 
@@ -231,7 +233,8 @@ Explanation
     in no more than:
         (P*t_give)+(t_add*(ceil(N/P)-1))+(t_share+t_add)*ceil(log P)
 
-    For t_give = t_add = t_share = 1, this reduces to:
+    For the particular case where t_give = t_add = t_share = 1, 
+    this reduces to:
         P + ceil(N/P)-1 + 2*ceil(log P)   ( * )
 
     (a) Therefore, in the worst case, if we have N=256 bags and only
@@ -277,18 +280,19 @@ Explanation
     process of giving out bags and the counting that is done prior to
     counts being consolidated. 
 
-    One factor to consider is that we always have to wait until the last
+    One factor to consider is that we always have to wait for the last
     person to get his bags, and to count them, before we can move on
     to the quick consolidation process. Since we are not constrained to
     giving each worker the same number of bags, we can give more bags
     at the beginning and fewer bags at the end. Importantly, this 
-    means that while the last worker is waiting for his bag(s), the 
-    other workers can start counting their bags.
+    means that while the last worker is waiting to be given his 
+    bag(s), the other workers can start counting their bags.
 
     Further, if all workers complete their counting at the same time,
     we can then start consolidating counts immediately after.
 
-    To demonstrate this strategy, we work backwards:
+    To demonstrate this strategy, we work backwards, assuming 
+    t_give = t_add = 1):
         time for 1 worker to receive AND count 1 bag = 1 + 0 = 1
         time for 1 worker to receive AND count 2 bags = 1 + 1 = 2
         time for 1 worker to receive AND count 3 bags = 1 + 2 = 3
@@ -303,7 +307,7 @@ Explanation
 
         1 + 2 + 3 + ... + m = m(m+1)/2
 
-    Setting this equal to N = 256 and solving for m, we get m=22.13,
+    Setting this equal to N = 256 and solving for m, we get m = 22.13,
     which we round up to 23.
 
        Strategy:
@@ -316,7 +320,7 @@ Explanation
     All 18 workers will finish counting their bags no later than
     m = 23 seconds (the first 17 workers should finish simultaneously).
 
-    Then, we consolidate counts per step (3), which takes
+    Then, we consolidate counts per step (3), which takes an additional
        2 * ceil(log P) = 2 * 5 = 10 seconds.
 
     Accordingly, with this front-loading strategy, we can complete
