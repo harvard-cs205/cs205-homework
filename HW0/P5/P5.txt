@@ -20,7 +20,8 @@
 5. In this case, they can start off with 256 people each having a bag (assuming infinite number of employees). 
    Then in the first round, half of them need to communicate the bag numbers with the other half so the latter 
    each has 2 numbers to add. This round takes 2 seconds to complete. Similarly for every consequent round. 
-   Since there are 8 rounds in total, it will take 2 * 8 = 16 seconds.
+   Since there are 8 rounds in total (in round 8, 2 people each has 1 bag, so one needs to communicate to the 
+   other, and the other can add the final two numbers), it will take 2 * 8 = 16 seconds. 
    
 6. The following strategy assumes that I (as the adversarial customer) does not want to communicate the bag size 
    to the cashiers, but instead prefers to hand the bags over to them in order to prolong the time. 
