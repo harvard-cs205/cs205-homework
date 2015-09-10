@@ -30,18 +30,17 @@ if __name__ == '__main__':
     # Load true trajectory and plot it
     # Normally, this data wouldn't be available in the real world
     #####################
-
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '--b', label='True trajectory')
+    x_coords,y_coords,z_coords,x_vel,y_vel,z_vel = np.loadtxt('P4_trajectory.txt', delimiter=',', unpack =True)
+    ax.plot(x_coords, y_coords, z_coords,'--b', label='True trajectory')
 
     #####################
     # Part 2:
     #
     # Read the observation array and plot it (Part 2)
     #####################
-
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '.g', label='Observed trajectory')
+    x_meas, y_meas, z_meas = np.loadtxt('P4_measurements.txt', delimiter=',', unpack=True)
+    ax.plot(x_meas/rx, y_meas/ry, z_meas/rz,
+            '.g', label='Observed trajectory')
 
     #####################
     # Part 3:
@@ -54,9 +53,24 @@ if __name__ == '__main__':
 
     # Initial conditions for s0
     # Compute the rest of sk using Eq (1)
+    A = np.matrix([[1,0,0,dt,0,0],
+         [0,1,0,0,dt,0],
+         [0,0,1,0,0,dt],
+         [0,0,0,(1-c*dt),0,0],
+         [0,0,0,0,(1-c*dt),0],
+         [0,0,0,0,0,(1-c*dt)]])
+    a = np.matrix([0,0,0,0,0,(g*dt)]).transpose()
+    s = np.matrix([0,0,2,15,3.5,4.0]).transpose()
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '-k', label='Blind trajectory')
+    full_s = np.empty((6,0), int)
+    for k in xrange(0,K):
+        s = A*s+a
+        full_s = np.concatenate((full_s,s),axis=1)
+    x_coords1 = np.array(full_s[0,1:])[0].tolist()
+    y_coords1 = np.array(full_s[1,1:])[0].tolist()
+    z_coords1 = np.array(full_s[2,1:])[0].tolist()
+    ax.plot(x_coords1, y_coords1, z_coords1,
+            '-k', label='Blind trajectory')
 
     #####################
     # Part 4:
