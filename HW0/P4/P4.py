@@ -1,6 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+import pandas as pd
+
+
 
 
 if __name__ == '__main__':
@@ -21,8 +24,6 @@ if __name__ == '__main__':
     ry = 5.0
     rz = 5.0
 
-    # Create 3D axes for plotting
-    ax = Axes3D(plt.figure())
 
     #####################
     # Part 1:
@@ -31,17 +32,26 @@ if __name__ == '__main__':
     # Normally, this data wouldn't be available in the real world
     #####################
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '--b', label='True trajectory')
+    # Read the data
+    s_true = pd.read_csv('P4_trajectory.txt',header= None, names= ['x','y','z','vx','vy','vz'])
+    s_true.head()
+    x_coords = s_true.x
+    y_coords = s_true.y
+    z_coords = s_true.z
+    ax = Axes3D(plt.figure())
+    ax.plot(x_coords, y_coords, z_coords,
+        '--b', label='True trajectory')
 
     #####################
     # Part 2:
     #
     # Read the observation array and plot it (Part 2)
     #####################
+    s_obs = pd.read_csv('P4_measurements.txt',header= None, names= ['x','y','z'])
+    s_obs.head()
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '.g', label='Observed trajectory')
+    ax.plot(s_obs.x/rx, s_obs.y/ry, s_obs.z/rz,'.g', label='Observed trajectory');
+
 
     #####################
     # Part 3:
