@@ -1,1 +1,37 @@
-# Your answers here
+Here is the output from the multiprocessing print:
+
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+BBBBye Job 3ye Job 1ye Job 0ye Job 2
+
+
+
+HHHi Job 4Hi Job 5i Job 6
+i Job 7
+
+
+BBBBye Job 4ye Job 7ye Job 5ye Job 6
+
+
+
+HHi Job 8i Job 9
+
+BBye Job 8ye Job 9
+
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+As we can see, the printed output overlaps with each other. This is probably due to the fact
+that "print" is not an atomic operation. Thus concurrent requests to print cause the output 
+to overlap each other as the start cursor was likely incremented from a previous request.
+
+Another property is that even though the "Hi Job" messages are printed in order, "Bye Job"
+messages are not. This is likely because the multiprocessing module starts job sequentially, 
+but due to nature of concurrency, a later job can finish earlier.
+
+Because of this, in writing concurrent programs, we cannot expect any order of results from 
+computations. For example, say we wanted to write a program to count the number of visitors
+to a website. We could have a task in the background which increments the tally everytime there
+is a new request. However, because these requests do not arrive in order, we could have a 
+situation where two requests try to increment the same number, thus causing incorrect result.
