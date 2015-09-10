@@ -2,7 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import pandas as pd
+import sys
 
+plt.close("all")
+sys.exit('error message')
 
 
 
@@ -38,6 +41,7 @@ if __name__ == '__main__':
     x_coords = s_true.x
     y_coords = s_true.y
     z_coords = s_true.z
+    plt.close("all")
     ax = Axes3D(plt.figure())
     ax.plot(x_coords, y_coords, z_coords,
         '--b', label='True trajectory')
@@ -57,16 +61,30 @@ if __name__ == '__main__':
     # Part 3:
     # Use the initial conditions and propagation matrix for prediction
     #####################
+    A = np.array([[1,0,0,dt,0,0],
+        [0,1,0,0,dt,0],
+        [0,0,1,0,0,dt],
+        [0,0,0,1-c*dt,0,0]
+        ,[0,0,0,0,1-c*dt,0]
+        ,[0,0,0,0,0,1-c*dt]])
+    a = np.zeros([6,1])
+    a[-1,0] = g*dt
+    s = np.array([[0],[0],[2],[15],[3.5],[4.0]])
+    print s_true.shape
+    # Create matrix to store the s's
+    s_blind = np.zeros((6,K-1))
+    s_blind[:,0] = s[:,0]  
+    print s_blind[:,K-2]
 
-    # A = ?
-    # a = ?
-    # s = ?
-
-    # Initial conditions for s0
-    # Compute the rest of sk using Eq (1)
-
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '-k', label='Blind trajectory')
+    for k in range(1,K-1):
+        s = A.dot(s) + a
+        s_blind[:,k] = s[:,0]
+    
+    # Now extract values of x, y and z
+    x_blind = s_blind[0,:]
+    y_blind = s_blind[1,:]
+    z_blind = s_blind[2,:]
+    ax.plot(x_blind, y_blind, z_blind,'-k', label='Blind trajectory')
 
     #####################
     # Part 4:
