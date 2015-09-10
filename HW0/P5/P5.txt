@@ -1,1 +1,43 @@
 # Your answers here.
+a) It takes an employee 255 seconds to add 256 bags.
+
+b) If each of the 8 employees takes care of 32 bags, they would each be done in:
+
+T_each=31s
+
+If then 4 employees add each a couple of the previous totals, and then 2 and then 1, they would be done in 3s.
+
+So in total: T_tot= 34s.
+
+c) By allocating 128 to sum 2 bags each (1s), and then 64 (1s), etc... until only allocating 2 (1s), we have a total of:
+
+T_tot=8s
+
+d) To evaluate the time needed for N bags, we use the decomposition of N as a sum of powers of 2. If N=2^pn + ... 2^p1, then the time needed is:
+	T= Sum(pi)+(n-1) if p1>0
+	T=Sum(pi)+n if p1=0
+
+We use the following python code to evaluate the time:
+
+import numpy as np
+def timeneeded(N):
+	Nbis=N
+	powers=np.array([])
+	while Nbis>1:
+		p=Nbis.bit_length()-1
+		powers=np.append(powers,p)
+		Nbis=Nbis-2**p
+	if Nbis==0:
+		time=np.sum(powers)+len(powers)-1 
+		return time
+	if Nbis==1:
+		time=np.sum(powers)+len(powers)
+		return time
+
+e) If we account for the 1s lag then they would need 15s to check the amount. 
+
+f)
+
+
+
+	
