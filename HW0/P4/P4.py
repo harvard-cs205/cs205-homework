@@ -85,7 +85,7 @@ if __name__ == '__main__':
 
     # Initial conditions for s0 and Sigma0
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
-    Sigma0 = .01*np.identity(6)
+    Sigma0 = .4*np.identity(6)
     m = np.matrix([x_meas,y_meas,z_meas])
     def predictS(s):
         return A*s+a
@@ -98,12 +98,22 @@ if __name__ == '__main__':
 
     def updateS(updatedSig,estS,estSig, m):
         return updatedSig*(estSig*estS + C.T*m)
-    s = np.matrix([0,0,2,15,3.5,4.0]).transpose()
-    for k in xrange(0,3):
-        s = 
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '-r', label='Filtered trajectory')
+    full_s2 = np.empty((6,0), int)
+    s = np.matrix([0,0,2,15,3.5,4.0]).transpose()
+    Sigma = Sigma0
+
+    for k in xrange(0,K):
+        estSig = predictSig(Sigma)
+        updatedSig = updateSig(estSig)
+        s = updateS(updatedSig,predictS(s), estSig, m[:,k])
+        full_s2 = np.concatenate((full_s2,s),axis=1)
+
+    x_coords1 = np.array(full_s2[0,1:])[0].tolist()
+    y_coords1 = np.array(full_s2[1,1:])[0].tolist()
+    z_coords1 = np.array(full_s2[2,1:])[0].tolist()
+    ax.plot(x_coords, y_coords, z_coords,
+            '-r', label='Filtered trajectory')
 
     # Show the plot
     ax.legend()
