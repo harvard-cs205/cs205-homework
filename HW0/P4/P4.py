@@ -48,7 +48,7 @@ if __name__ == '__main__':
     position_estimate_array = np.array( position_estimate_matrix )
     
     ax.plot( position_estimate_array[0], position_estimate_array[1], position_estimate_array[2], 
-             '.g', label='Observed trajectory' )
+             '.g', label = 'Observed trajectory' )
 
     #####################
     # Part 3:
@@ -80,7 +80,7 @@ if __name__ == '__main__':
    
     s_complete = np.array( s_complete )
     
-    ax.plot( s_complete[0], s_complete[1], s_complete[2], '-k', label='Blind trajectory' )     
+    ax.plot( s_complete[0], s_complete[1], s_complete[2], '-k', label = 'Blind trajectory' )     
 
     #####################
     # Part 4:
@@ -140,7 +140,7 @@ if __name__ == '__main__':
    
     s_complete = np.array( s_complete )
     
-    ax.plot( s_complete[0], s_complete[1], s_complete[2], '-r', label='Filtered trajectory' )
+    ax.plot( s_complete[0], s_complete[1], s_complete[2], '-r', label = 'Filtered trajectory' )
 
     # Show the plot
     ax.legend()
