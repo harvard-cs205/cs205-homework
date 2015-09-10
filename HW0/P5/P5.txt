@@ -1,12 +1,16 @@
 Problem 1
-
+-------------
 If the cashier first added the totals of individuals pairwise, they could make 128 additions of the totals of two bags.  
 They could then make 64 additions of the totals of four bags, 32 additions of the totals of eight bags, 16 additions of the totals of sixteen bags, 8 additions of the totals of thirty-two bags, 4 additions of the totals of sixty-four bags, 2 additions of the totals of one hundred twenty eight bags, and 1 final addition that would be the total of all the bags.  
 This would be a total of 128+64+32+16+8+4+2+1 = 255 additions, which is the same number as if they had simply added the bags one by one and kept a running total.  
-It would take one cashier 255 seconds to sum the bags.  
+
+Answer: It would take one cashier 255 seconds to sum the bags.  
+
+
 
 
 Problem 2
+------------------
 Second 1: Each of the eight cashiers totals a pair of bags, leaving 8 sums and 240 unsummed bags.  
 Second 2: Each of the eight cashiers totals a pair of bags, leaving 16 sums and 224 unsummed bags.  
 Second 3: Each of the eight cashiers totals a pair of bags, leaving 24 sums and 208 unsummed bags.  
@@ -20,19 +24,93 @@ Second 31: Each of the eight cashiers totals a pair of sums, leaving 8 sums.
 Second 32: Four of the cashiers total a pair of sums, leaving 4 sums.  
 Second 33: Two of the cashiers total a pair of sums, leaving 2 sums.  
 Second 34: One of the cashiers totals the last pair of sums.  
-It would take 34 seconds for the eight cashiers to sum the bags.  
+
+Answer: It would take 34 seconds for the eight cashiers to sum the bags.  
+
+
 
 
 Problem 3
+-----------------
 Second 1: Each of 128 employees total a pair of bags, leaving 128 sums.  
 Second 2: 64 employees each total a pair of sums, leaving 64 sums.  
 Second 3: 32 employees each total a pair of sums, leaving 32 sums. 
 ...
 Second 7: 2 employees each total a pair of sums, leaving 2 sums.  
 Second 8: 1 employee totals the final pair of sums.  
-It would take an infinite number of employees 8 seconds to sum the bags.  
+
+Answer: It would take an infinite number of employees 8 seconds to sum the bags.  
+
+
 
 
 Problem 4
+------------------
 Looking at the number of seconds that it would take an infinite number of employees to sum N bags (looking at the range from N = 2 to N = 17, I see a pattern that the amount of time is equal to:
 log_base_2(N) rounded up to the nearest whole number.  This makes sense, because if N is equal to a power of 2, there are no leftover sets of numbers that didn't pair up and need to be added in an additional step.  
+
+Answer: In python, it takes infinite employees np.ceil(np.log2(this_many)) seconds to count this_many bags.  
+
+
+
+
+Problem 5
+------------------
+This would add a second between each of the eight steps.  
+
+Answer: It would take them 15 seconds.   
+
+
+
+
+Problem 6
+---------------
+Assuming that I have to hand out each bag to one of 256 cashiers, that is, it takes me 256 seconds just to pass out the bags.  In the meantime, they are passing bags to each other, making additions, and communicating numbers to each other.  I am assuming that anyone needing to make an addition also needs to be holding the bags for the totals they are adding, and that they cannot add, communicate or pass bags, or receive bags simultaneously.  
+
+Second1: 
+I pass out my first bag to cashier 1.  
+I have 255 bags left, one cashier is holding one bag.  
+Second 2:
+I pass out the second bag to cashier 2.  
+I have 254 bags left, two cashiers are each holding a bag.  
+Second 3:
+I pass out a third bag to cashier 3.  
+I have 253 bags left.  Cashier 2 hands her bag to cashier 1 and then vanishes.  
+Second 4:
+I pass out a fourth bag.  
+I have 252 bags left.  Cashier 1 adds the first two bags together. Cashier 3 is standing idle.  
+Second 5:
+I pass out a fifth bag to cashier 5.  
+I have 251 bags left.  Cashier 4 hands her bag to cashier 3 and vanishes.  Cashier 1 is idle.  
+Second 6:
+I pass out a sixth bag to cashier 6.  
+I have 250 bags left.  Cashier 3 adds the two bags that she is holding.  Cashier 5 hands her bag to cashier 1 and vanishes.  
+Second 7:
+I pass out a seventh bag to cashier 7.  
+I have 249 bags left.  Cashier 1 sums the bags that she is holding.  Cashier 6 hands her bag to cashier 3 and vanishes.  
+Second 8:
+I pass out an eighth bag to cashier 8.  
+I have 248 bags left.  Cashier 3 sums the bags that she is holding.  Cashier 7 hands her bag to Cashier 1 and vanishes.  
+Second 9:
+I pass out a ninth bag to cashier 9.  
+I have 247 bags left.  Cashier 1 sums the bags that she is holding.  Cashier 8 hands her bag to cashier 3 and vanishes.  
+...
+In this way, cashier 1 and cashier 3 are keeping a running total, and no one is communicating anything.  
+...
+Second 256:
+I pass out the 256th bag to cashier 256.  
+I have no bags left.  Cashier 3 sums the bags that she is holding.  Cashier 255 hands her bag to cashier 1.  
+Second 257:
+Cashier 1 sums the bags that she is holding.  Cashier 3 is idle.  
+Second 258:
+Cashier 3 hands her bags to cashier 1.  
+Second 259:
+Cashier 3 tells cashier 1 her running total.  
+Second 260:
+Cashier 1 adds the last two numbers together.  
+
+Answer: In the first situation described, it takes 260 seconds for the cashiers to verify 256 bags.   
+
+-------------
+Now, if I can pass out 2 bags at a time, the flow is different:
+Second 1: 
