@@ -1,1 +1,45 @@
 # Your answers here.
+
+1. It will take (N-1) addition operations to sum the totals of N bags.
+Each addition operation takes t_add = 1s, so the time required is
+
+t_required = (N-1)t_add = 255 seconds
+
+2. Yes, they definitely can verify the total sum faster. If there are
+zeta employees, the minimum time to add the total of N bags is
+
+t_minimum = [(N/zeta - 1) + Log2(zeta)]t_add
+
+The first step corresponds to giving N/zeta bags to each employee and
+the employees sum all of the bags given to them. The second step
+(the Log2 one) corresponds to employees summing their totals up a
+binary tree, i.e. reading the below figure from top to bottom,
+
+x x x x x x x x
+ |   |   |   |
+ x   x   x   x
+   |       |
+   x       x
+       |
+       x
+
+where the number of x's in the first row are the number of employees. I
+believe this is the fastest way for them to pool their totals.
+
+The minimum time for this step is, plugging in N=256, zeta=8, is
+
+t=34 seconds
+
+3. The minimum number of bags that employees can initially have and
+help add the totals is 1. Therefore, the maximum number of employees
+that can meaningfully help out is zeta=N. Plugging in zeta=N into
+the equation above gives an intuitive result; in the infinite case,
+ employees just have to sum up the tree. Therefore,
+
+ t_infinite = Log2[N]t_add
+
+ Plugging in numbers yields
+
+ t_infinite = 8 seconds
+
+ 4.
