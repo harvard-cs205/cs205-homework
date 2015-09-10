@@ -20,14 +20,12 @@ def infTime(N,t): #wrote a recursive formula to calculate number of seconds it w
     elif N % 2 == 0:
         N = N / 2.0
         t += 1 
-        print "elif"
         return infTime(N,t)
     else:
         N = N-1
         N = N / 2.0
         N += 1
         t += 1
-        print "else"
         return infTime(N,t)
 
         
@@ -42,5 +40,47 @@ for N in num_bags:
 
 plt.plot(num_bags,single_worker,'r-',label='1 worker')
 plt.plot(num_bags,infinite_workers,'b-',label='infinite workers')
+plt.xlabel('Number of Bags (N)')
+plt.ylabel('Time (Seconds)')
 plt.legend()
 
+#tried writing a function that takes communication and bag distribution into account. realized it was no longer needed when i read hte prompt further.
+"""def infTimeOneBag(N,t): #wrote a recursive formula to calculate number of seconds it would take infinite workers to count N bags
+    if  N < 2:
+        return t
+    elif N == 2 & t <= 2:
+        t += 1 #assumes there was only 1 cashier and no need to communicate with others. so only 1  second to count the 2 bags individually
+        return t
+    elif N == 2:
+        t+=2 #2 for communication and for the calculation
+        return t
+    elif N % 2 == 0 & t <= N:
+        N = N / 2.0
+        t += 1 #no communication first step
+        return infTimeOneBag(N,t)
+    elif N % 2 == 0 & t > N:
+        N = N / 2.0
+        t += 2 #communication here between cashiers
+        return infTimeOneBag(N,t)
+    elif N % 2 != 0 & t <= N:
+        N = N-1
+        N = N / 2.0
+        N += 1
+        t += 1 #no communication in first step
+        return infTimeOneBag(N,t)
+    else:
+        N = N-1
+        N = N / 2.0
+        N += 1
+        t += 2 #communication here between cashiers
+        return infTimeOneBag(N,t)
+
+print infTimeOneBag(0,0)
+print infTimeOneBag(1,1)
+print infTimeOneBag(2,2)
+print infTimeOneBag(3,3)
+print infTimeOneBag(4,4)
+print infTimeOneBag(5,5)
+print infTimeOneBag(256,256)
+print infTimeOneBag(256,128)
+print singleWorkerTime(256)"""
