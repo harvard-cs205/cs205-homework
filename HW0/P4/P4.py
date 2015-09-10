@@ -48,17 +48,17 @@ if __name__ == '__main__':
     c[0,0]=rx
     c[1,1]=ry
     c[2,2]=rz
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '.g', label='Observed trajectory')
+    ax.plot(x_coords, y_coords, z_coords,
+            '.g', label='Observed trajectory')
 
     #####################
     # Part 3:
     # Use the initial conditions and propagation matrix for prediction
     #####################
 
-    # A = ?
-    # a = ?
-    # s = ?
+    A = ?
+    a = ?
+    s = ?
 
     # Initial conditions for s0
     # Compute the rest of sk using Eq (1)
