@@ -1,1 +1,9 @@
 # Your answers here.
+
+(1) In order to add the totals of 256 bags, the cashier will organize the bags into 128 pairs and add them up to create 128 sums, which will take 128 simulations. Following this logic, it will take 128+64+32+16+8+4+2+1 = 255 simulations, which will take 255 seconds.
+
+(2) Yes, they will verify the total sum faster than the original cashier by herself. We first divide the 256 bags into 8 piles with 32 bags per each pile. Each worker add up each pile, which will take 31 seconds, according to the logic in (1). Then take the sum of pairs of remaining 8 piles, which will require 4 workers, and it will take 1 second. Then again, we take the sum of pairs of remaining 4 piles, which will require 2 workers, and it will take 1 second. Finally, one worker will take the sum of remaining two piles, which will take an additional second. Therefore, in total, it takes 31 + 1 + 1 + 1 = 34 seconds.
+
+(3) With an infinite number of employees, the shortest time it will take them to verify the sum is log_2(256) = 8 seconds, first having 128 employees sum 128 pairs which takes a second, 64 employees sum resulting 64 pairs which takes a second… a employee sum two numbers. Therefore, it takes a total of 8 seconds. Another way to look at it is to think of it as a binary tree
+
+(4) It will take log_2(N) seconds
