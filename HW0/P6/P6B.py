@@ -11,7 +11,7 @@ def burnTime(t):
 if __name__ == '__main__':
     N = 16  # The number of jobs
     P = 4   # The number of processes
-    n = 100 # The number of sleep times
+    n = 10 # The number of sleep times
 
     # A thread pool of P processes
     pool = mp.Pool(P)
@@ -31,7 +31,7 @@ if __name__ == '__main__':
 
         # serially
         serialTime = time.time()
-        for i in range(0,N):
+        for i in range(N):
             burnTime(t)
         serialTime = time.time() - serialTime
 
@@ -49,4 +49,5 @@ if __name__ == '__main__':
     plt.xlabel('Wait Time (sec)')
     plt.ylabel('Serial Time (sec) / Parallel Time (sec)')
     plt.title('Speedup versus function time')
+    plt.savefig('P6.png', format='png')
     plt.show()
