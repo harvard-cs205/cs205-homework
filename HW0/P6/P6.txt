@@ -1,1 +1,55 @@
 # Your answers here
+
+(1) Count to Ten
+
+Example Outputs: 
+
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 0
+Bye Job 3
+Bye Job 2
+Bye Job 1
+Hi Job 4
+Hi Job 5
+Hi Job 6
+Hi Job 7
+Bye Job 4
+Hi Job 8
+Bye Job 5
+Bye Job 6
+Hi Job 9
+Bye Job 7
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+——————————————————
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 0
+Bye Job 1
+Bye Job 2
+Bye Job 3
+Hi Job 4
+Hi Job 5
+Hi Job 6
+Hi Job 7
+Bye Job 4
+Hi Job 8
+Bye Job 7
+Bye Job 5
+Bye Job 6
+Hi Job 9
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+—————————————————————————
+From the output, we observe that the some of the threads not always start/finish in the right order (in the sequential order which we have expected). In other words, the order we have started the thread does not necessarily in the same order they end. Therefore, for situations where ordering matters, for example the Kalman Filter Question in Problem 4 where the order of computation matters or else will produce wrong result, we have to make sure to put locks to make sure the computations are in sequential order.
+
+ 
