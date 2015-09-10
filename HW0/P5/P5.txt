@@ -5,7 +5,9 @@
 4, done
 5, computing time = 8 seconds. However the communication time is 64+32+16+8+4+2+1 = 127s,
 so the total time is 135s
-6, If each cashier comes and takes 1 bag. It takes 256 + 8 = 264 seconds.
-if each cashier comes and takes 2 bags. It takes 128 + 8 to finish
-and No, there is not a better strategy to shorten the time.
+6, If each cashier comes and takes 1 bag. It takes 256 + 8 + 8 = 272 seconds.
+if each cashier comes and takes 2 bags. It takes 128 + 8 +7 to finish
+and yes, there is better strategies to shorten the time.
 
+For me the best way to is pick 23 to the first guy, and 22 to the second guy, etc.. 
+so we need 23 seconds to sum the numbers up, and its also the time required to finish the pick up precedures. And it needs 2*int(log2(23)) = 5*2 to calculate and communicate. So in total is 32 seconds.
