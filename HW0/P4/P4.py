@@ -19,13 +19,13 @@ rx = 1.0
 ry = 5.0
 rz = 5.0
 
-A = np.empty([6,6])
+A = np.zeros([6,6])
 A[0,0] = A[1,1] = A[2,2] = 1
 A[0,3] = A[1,4] = A[2,5] = dt
 A[3,3] = A[4,4] = A[5,5] = 1 - c*dt
-a = np.array([0,0,0,0,0,g*dt])
+a = np.array([0,0,0,0,0,g*dt]).T
 
-C = np.empty([3,6])
+C = np.zeros([3,6])
 C[0,0] = rx
 C[1,1] = ry
 C[2,2] = rz
@@ -62,11 +62,11 @@ def main():
     # Initial conditions for s0
     # Compute the rest of sk using Eq (1)
 
-    s_k = [0,0,2,15,3.5,4.0]
-    s = [s_k]
+    s_k = np.array([0,0,2,15,3.5,4.0]).T
+    s = [s_k.T]
     for i in range(K-1):
         s_k1 = np.dot(A, s_k) + a
-        s = np.vstack((s, s_k1))
+        s = np.vstack((s, s_k1.T))
         s_k = s_k1    
 
     ax.plot([x[0] for x in s], [x[1] for x in s], [x[2] for x in s], '-k', label='Blind trajectory')
@@ -83,17 +83,17 @@ def main():
     # A, B, C are defined outside this block
 
 
-    s_k = [0,0,2,15,3.5,4.0]
+    s_k = np.array([0,0,2,15,3.5,4.0]).T
     Sig_k = np.identity(6)*0.01
-    s = [s_k]
+    s = [s_k.T]
 
     for i in range(K-1):
         s_tilda = predictS(s_k)
         Sig_tilda = predictSig(Sig_k)
         Sig_k1 = updateSig(Sig_tilda)
-        s_k1 = updateS(s_tilda, Sig_k1, Sig_tilda, s_observed[i+1][:3])
+        s_k1 = updateS(s_tilda, Sig_k1, Sig_tilda, np.array(s_measured[i+1][:3]).T)
         # add to storage matrix
-        s = np.vstack((s, s_k1))
+        s = np.vstack((s, s_k1.T))
         # update s_k and Sig_k
         s_k = s_k1
         Sig_k = Sig_k1
@@ -111,7 +111,7 @@ def predictS(s_k):
     return s_tilda
 
 def predictSig(Sig_k):
-    B = np.empty([6,6])
+    B = np.zeros([6,6])
     B[0,0] = bx
     B[1,1] = by
     B[2,2] = bz
@@ -119,15 +119,15 @@ def predictSig(Sig_k):
     B[4,4] = bvy
     B[5,5] = bvz
 
-    Sig_tilda = np.linalg.inv(np.dot(A,np.dot(Sig_k,np.transpose(A)))+np.dot(B,np.transpose(B)))
+    Sig_tilda = np.linalg.inv(np.dot(np.dot(A, Sig_k),A.T)+np.dot(B,B.T))
     return Sig_tilda
 
 def updateSig(Sig_tilda):
-    Sig_k1 = np.linalg.inv(Sig_tilda+np.dot(np.transpose(C),C))
+    Sig_k1 = np.linalg.inv(Sig_tilda+np.dot(C.T,C))
     return Sig_k1
 
-def updateS(s_tilda, Sig_k1, Sig_tilda, m_k1):
-    S_k1 = np.dot(Sig_k1,(np.dot(Sig_tilda, s_tilda) + np.dot(np.transpose(C),m_k1)))
+def updateS(s_tilda,  Sig_k1, Sig_tilda, m_k1):
+    S_k1 = np.dot(Sig_k1, (np.dot(Sig_tilda, s_tilda) + np.dot(C.T, m_k1)).T)
     return S_k1
 
 if __name__ == '__main__':
