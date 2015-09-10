@@ -1,7 +1,18 @@
-import numpy as np
+﻿import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
+def predictS(A, sk, a):
+    return (A * sk) + a
+
+def predictSig(A, sigmak, B):
+    return np.linalg.inv((A * sigmak * (A.transpose())) + (B * B.transpose()))
+
+def updateSig(sigmatilda, C):
+    return np.linalg.inv(sigmatilda + ((C.transpose()) * C))
+
+def updateS(sigmakplus1, sigmatilda, stilda, C, mkplus1):
+    return sigmakplus1 * ((sigmatilda * stilda) + ((C.transpose()) * mkplus1))
 
 if __name__ == '__main__':
     # Model parameters
@@ -31,8 +42,10 @@ if __name__ == '__main__':
     # Normally, this data wouldn't be available in the real world
     #####################
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '--b', label='True trajectory')
+    s_true = np.loadtxt('P4_trajectory.txt', delimiter=',')
+
+    ax.plot(s_true[:,0], s_true[:,1], s_true[:,2],
+            '--b', label='True trajectory')
 
     #####################
     # Part 2:
@@ -40,37 +53,85 @@ if __name__ == '__main__':
     # Read the observation array and plot it (Part 2)
     #####################
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '.g', label='Observed trajectory')
+    m = np.loadtxt('P4_measurements.txt', delimiter=',')
+
+    Cinv = np.matrix([
+        [1/rx, 0, 0], 
+        [0, 1/ry, 0], 
+        [0, 0, 1/rz]
+    ])
+    xtilda = Cinv * (m.transpose())
+    xtilda = np.asarray(xtilda.transpose())
+
+    ax.plot(xtilda[:,0], xtilda[:,1], xtilda[:,2],
+            '.g', label='Observed trajectory')
 
     #####################
     # Part 3:
     # Use the initial conditions and propagation matrix for prediction
     #####################
-
-    # A = ?
-    # a = ?
-    # s = ?
-
+    
+    A = np.matrix([
+        [1, 0, 0, dt,     0,      0     ],
+        [0, 1, 0, 0,      dt,     0     ],
+        [0, 0, 1, 0,      0,      dt    ],
+        [0, 0, 0, 1-c*dt, 0,      0     ],
+        [0, 0, 0, 0,      1-c*dt, 0     ],
+        [0, 0, 0, 0,      0,      1-c*dt]
+    ])
+    a = np.matrix([0, 0, 0, 0, 0, g*dt]).transpose()
+    s = np.asmatrix(np.zeros([6, K]))
+    
     # Initial conditions for s0
-    # Compute the rest of sk using Eq (1)
+    s[:,0] = np.matrix([0, 0, 2, 15, 3.5, 4.0]).transpose()
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '-k', label='Blind trajectory')
+    # Compute the rest of sk using Eq (1)
+    i = 1
+    while i < K:
+        s[:,i] = A * s[:,i-1] + a
+        i = i + 1
+    s = np.asarray(s)
+
+    ax.plot(s[0,:], s[1,:], s[2,:],
+            '-k', label='Blind trajectory')
 
     #####################
     # Part 4:
     # Use the Kalman filter for prediction
     #####################
 
-    # B = ?
-    # C = ?
+    B = np.matrix([
+        [bx, 0, 0, 0,  0,   0  ],
+        [0, by, 0, 0,  0,   0  ],
+        [0, 0, bz, 0,  0,   0  ],
+        [0, 0, 0, bvx, 0,   0  ],
+        [0, 0, 0, 0,   bvy, 0  ],
+        [0, 0, 0, 0,   0,   bvz]
+    ])
+    C = np.matrix([
+        [rx, 0, 0, 0, 0, 0], 
+        [0, ry, 0, 0, 0, 0], 
+        [0, 0, rz, 0, 0, 0]
+    ])
 
     # Initial conditions for s0 and Sigma0
+    s = np.asmatrix(np.zeros([6, K]))
+    s[:,0] = np.matrix([0, 0, 2, 15, 3.5, 4.0]).transpose()
+    
+    sigma = np.asmatrix(np.eye(6)) * .01
+    
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
+    i = 1
+    while i < K:
+        stilda = predictS(A, s[:,i-1], a)
+        sigmatilda = predictSig(A, sigma, B)
+        sigma = updateSig(sigmatilda, C)
+        s[:,i] = updateS(sigma, sigmatilda, stilda, C, np.asmatrix(m[i,:]).transpose())
+        i = i + 1
+    s = np.asarray(s)
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '-r', label='Filtered trajectory')
+    ax.plot(s[0,:], s[1,:], s[2,:],
+            '-r', label='Filtered trajectory')
 
     # Show the plot
     ax.legend()
