@@ -95,25 +95,26 @@ if __name__ == '__main__':
         [0,0,0,0,bvy,0],
         [0,0,0,0,0,bvz]
         ])
-    C = np.asarray([
-        [1/rx,0,0,0,0,0],
-        [0,1/ry,0,0,0,0],
-        [0,0,1/rz,0,0,0]
+    C = np.asmatrix([
+        [rx,0,0,0,0,0],
+        [0,ry,0,0,0,0],
+        [0,0,rz,0,0,0]
         ])
 
     def predictS(sk) :
         return A * sk + a
 
     def predictSig(sigmak) :
-        inner = A * sigmak * np.transpose(A) + B.dot(np.transpose(B))
+        inner = A * sigmak * np.transpose(A) + B*np.transpose(B)
         return np.linalg.inv(inner)
 
     def updateSig(sigmap) :
-        return np.linalg.inv(sigmap + np.transpose(C).dot(C))
+        inner = sigmap + np.transpose(C) * C
+        return np.linalg.inv(inner)
 
     def updateS(sigmak, sigmap, sp, mk) :
-        inner = sigmap.dot(sp) + np.transpose(C).dot(mk)
-        return sigmak.dot(inner)
+        inner = sigmap * sp + np.transpose(C) * mk
+        return sigmak * inner
 
     X = np.asmatrix(np.loadtxt('P4_measurements.txt', 
         delimiter=',', usecols=range(3), unpack=True))
@@ -124,18 +125,16 @@ if __name__ == '__main__':
    
      # Initial conditions for s0
     s = np.transpose(np.asmatrix([0, 0, 2, 15, 3.5, 4.0]))
-    sigma = 0.01*np.identity(6)
-    print sigma
+    sigmak = 0.01*np.identity(6)
     T = np.zeros((6,K))
     for k in xrange(K) :
         T[:,k] = np.transpose(s)
         if(k + 1 == K) :
             break
-        s = predictS(s)
-        sigmap = predictSig(sigma)
-        # sigma = updateSig(sigmap)
-        # m = X[:,k+1]
-        # s = updateS(sigma, sigmap, sp, m)
+        sigmap = predictSig(sigmak)
+        sigmak = updateSig(sigmap)
+        m = X[:,k+1]
+        s = updateS(sigmak, sigmap, predictS(s), m)
 
 
     x_coords = T[0,:]
