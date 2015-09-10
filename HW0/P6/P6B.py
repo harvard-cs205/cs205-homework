@@ -4,6 +4,7 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 # Sleep for t seconds
 def burnTime(t):
     time.sleep(t)
