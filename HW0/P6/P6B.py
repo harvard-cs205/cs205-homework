@@ -18,6 +18,8 @@ if __name__ == '__main__':
 
     # Use a variety of wait times
     ratio = []
+
+    # use 15 wait times from 10^-6 to 10^0
     wait_time = np.logspace(-6, 0, 15)
 
     for t in wait_time:
