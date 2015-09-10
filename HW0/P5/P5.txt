@@ -4,7 +4,7 @@ Answers:
 1. 255 s
 2. 34 s
 3. 8 s
-4. ceiling(log2(N)) or N-1
+4. ceiling(log2(N)) or N-1 (see attached)
 5. 15s
 6. a) at least 256 s b) at least 128 s c) We should try to increase bandwidth
 
@@ -14,4 +14,4 @@ Explanations (TBA):
 3. All 256 bags could be used by a maximum of 128 employees in the first "round" of computation, yielding 128 numbers to be added up. Then, in the second "round" of computation, 64 sums would be maximally obtained. In a binary tree fashion, we would see a halving of calculations needing to be done at each step. Thus, 8 rounds of computation would be required to analyze all 256 bags (2^8 = 256).
 4. With a countably "infinite" number of employees, the time required would be, in seconds, a ceiling of log base 2 of the number of bags, whereas a single employee would require N - 1 seconds.
 5. Going back to #3, neglecting communication delay, it requires 8 s to complete this task. Now, with communication delay, each round of computation requires a round of cross-talk between cashiers, which means that there is a 1 s delay between each of the 8 stages. Therefore, there is an additional 7 s delay on top of the 8 s = 15 s.
-6. 
+6. a. The first cashier takes a bag (1 s), the second cashier takes the second bag (1 s), the third cashier takes the third bag + the first cashier talks with the second cashier (1 s), the fourth cashier takes the fourth bag + the first cashier adds up the amount (1 s), the fifth cashier takes the fifth bag + the fourth cashier talks with the third cashier (1 s), the sixth cashier takes the sixth bag + the third cashier adds up the amount (1 s), the seventh cashier takes the seventh bag + the sixth cashier talks with the fifth cashier (1 s) + the third cashier talks with the first cashier (1 s). Let's look at patterns: for 2 bags, it will require 4 seconds; for 4 bags, it will require 
