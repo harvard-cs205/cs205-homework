@@ -4,10 +4,6 @@ from mpl_toolkits.mplot3d import Axes3D
 import pandas as pd
 import sys
 
-plt.close("all")
-sys.exit('error message')
-
-
 
 if __name__ == '__main__':
     # Model parameters
