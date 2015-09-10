@@ -12,7 +12,7 @@ t_minimum = [(N/zeta - 1) + Log2(zeta)]t_add
 
 The first step corresponds to giving N/zeta bags to each employee and
 the employees sum all of the bags given to them. The second step
-(the Log2 one) corresponds to employees summing their totals up a
+(the Log2 one) corresponds to employees summing their totals down a
 binary tree, i.e. reading the below figure from top to bottom,
 
 x x x x x x x x
@@ -34,7 +34,7 @@ t=34 seconds
 help add the totals is 1. Therefore, the maximum number of employees
 that can meaningfully help out is zeta=N. Plugging in zeta=N into
 the equation above gives an intuitive result; in the infinite case,
- employees just have to sum up the tree. Therefore,
+ employees just have to sum down the tree. Therefore,
 
  t_infinite = Log2[N]t_add
 
@@ -53,4 +53,23 @@ The two limits we are interested in yield
 t_one = (N - 1)t_add
 t_infinite = Log2[N]t_add
 
-See P5_part4.py for the python program to produce the plot.
+See P5_part4.py for the python program to produce the plot. See P5.png
+for the plot.
+
+5. We are supposed to assume we can still utilize an infinite number of
+employees. The fastest way employees can total, even with the
+communication barrier, is via summing down the binary tree. Per level
+of the tree, it will now take
+
+t_per_level = t_add + t_communicate
+
+Giving us, in the case of an infinite number of employees,
+
+t_infinite = Log2[N](t_add + t_communicate)
+
+Since t_add=t_communicate=1s, t_infinite will be doubled, giving us
+(when we plug in numbers)
+
+t_infinite = 16 seconds
+
+6. This last piece is a little more tricky.
