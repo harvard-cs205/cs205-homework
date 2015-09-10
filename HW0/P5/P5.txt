@@ -25,7 +25,7 @@ And recurse until we have 2 subtotals left.
 Total time needed = log2(256) = 8 seconds
 
 4.
-If we keep splitting the bags so that each cashier only needs to add 2 numbers during each iteration, total time needed = log2(N).
+If we keep splitting the bags so that each cashier only needs to add 2 numbers during each iteration, total time needed = ceiling(log2(N)).
 
 5.
 Considering overhead associated with people communicating, 
