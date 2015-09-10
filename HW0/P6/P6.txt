@@ -1,1 +1,34 @@
 # Your answers here
+A: 
+The sequences of the number for each run are different and not in order but 
+sometimes we need the sequence to be the same and in order. For example, if we 
+would like to print all the student name in alphabetic order then we need the 
+output be in order and the same sequence every time of the run.
+Here is the example output.
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+Hi Job 1
+Hi Job 0
+Hi Job 2
+Hi Job 3
+Bye Job 1Bye Job 0Bye Job 2Bye Job 3
+
+Hi Job 5
+Hi Job 6
+Hi Job 4
+Hi Job 7
+Bye Job 5Bye Job 6Bye Job 4Bye Job 7
+
+Hi Job 8
+Hi Job 9
+Bye Job 8Bye Job 9
+
+B: 
+The trend I observe is an increasing near-linear curve,where the increase rate
+get lower when wait time get larger. And the ratio approaches to 4 when the 
+waiting time get larger.
+Yes, it is possible that a parallel program could take longer than its serial
+version when the wait time is very small because the time saved by 
+mulitprocessing would be consumed by the mapping time.
+
+
+
