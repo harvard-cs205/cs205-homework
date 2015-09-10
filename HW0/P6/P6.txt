@@ -1,1 +1,2 @@
 # Your answers here
+After running the code a number of times it is possible to notice that the tasks don't finish necessarily in the same order they were sent. The reason for this is that the processors have different speeds, so they will perform the same task in a different amount of time.
