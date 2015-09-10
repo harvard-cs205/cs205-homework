@@ -1,1 +1,11 @@
-# Your answers here.
+Problem 5.
+
+Answers:
+1. 255 s
+2. 34 s
+3. 8 s
+4. ceiling(log2(N)) or N-1
+5. 15s
+6. a) at least 256 s b) at least 128 s c) We should try to increase bandwidth
+
+Explanations (TBA):
