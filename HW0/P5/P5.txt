@@ -11,7 +11,7 @@ zeta employees, the minimum time to add the total of N bags is
 t_minimum = [(N/zeta - 1) + Log2(zeta)]t_add
 
 The first step corresponds to giving N/zeta bags to each employee and
-the employees sum all of the bags given to them. The second step
+each employee sums all of the bags given to them. The second step
 (the Log2 one) corresponds to employees summing their totals down a
 binary tree, i.e. reading the below figure from top to bottom,
 
@@ -26,7 +26,8 @@ x x x x x x x x
 where the number of x's in the first row are the number of employees. I
 believe this is the fastest way for them to pool their totals.
 
-The minimum time for this step is, plugging in N=256, zeta=8, is
+The minimum time for this step is, plugging in N=256, zeta=8 (original cashier
+plus seven friends), is
 
 t=34 seconds
 
@@ -76,12 +77,12 @@ t_infinite = 16 seconds
 
 a) If it takes 1 second to hand a bag to an employee and we only add one
 bag at a time, it does not matter how many employees are working;
-there is a huge bottleneck here! The employee will certainly have to wait
+there is a huge bottleneck! The employee will *at least* have to wait
 
 t_wait = N*t_hand
 
-before obtaining the total. After receiving the final bag, the employee
-will have to add that one. Therefore,
+before having all of the bags to total. After receiving the
+final bag, the employee will have to add that one. Therefore,
 
 t_one_bag_at_a_time = t_wait + 1 = N t_hand + 1
 t_one_bag_at_a_time = 257 seconds
