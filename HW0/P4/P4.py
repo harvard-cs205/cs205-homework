@@ -2,6 +2,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
+def predictS(A, sk, a):
+    return np.dot(A, sk) + a
+
+def predictSig(A, Ek, B):
+    return np.linalg.inv(np.dot(np.dot(A, Ek), A.T) + np.dot(B, B.T))
+
+def updateSig(Ep, C):
+    return np.linalg.inv(Ep + np.dot(C.T, C))
+
+def updateS(Ek, Ep, sp, C, mk):
+    return np.dot(Ek, np.dot(Ep, sp) + np.dot(C.T, mk)) 
 
 if __name__ == '__main__':
     # Model parameters
@@ -40,39 +51,73 @@ if __name__ == '__main__':
     #
     # Read the observation array and plot it (Part 2)
     #####################
-    
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '.g', label='Observed trajectory')
+    m = np.loadtxt('P4_measurements.txt', delimiter=',') 
+    R = np.diag([1.0/rx, 1.0/ry, 1.0/rz])
+    approx_pos = np.dot(R, m.T).T
+    ax.plot(approx_pos[:, 0], approx_pos[:, 1], approx_pos[:, 2],
+             '.g', label='Observed trajectory')
 
     #####################
     # Part 3:
     # Use the initial conditions and propagation matrix for prediction
     #####################
 
-    # A = ?
-    # a = ?
-    # s = ?
-
+    A = np.array(
+        [[1, 0, 0, dt, 0, 0],
+        [0, 1, 0, 0, dt, 0],
+        [0, 0, 1, 0, 0, dt],
+        [0, 0, 0, 1 - c * dt, 0, 0],
+        [0, 0, 0, 0, 1 - c * dt, 0],
+        [0, 0, 0, 0, 0, 1 - c * dt]])
+    a = np.array([0, 0, 0, 0, 0, g * dt])
+    s = np.eye(6, K)
     # Initial conditions for s0
+    s[:, 0] = np.array([0, 0, 2, 15, 3.5, 4.0])
+     
     # Compute the rest of sk using Eq (1)
+    for i in range(K-1):
+        s[:, i+1] = np.dot(A, s[:, i]) + a
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '-k', label='Blind trajectory')
+    x_coords, y_coords, z_coords  = s[0, :], s[1, :], s[2, :]
+    ax.plot(x_coords, y_coords, z_coords,
+            '-k', label='Blind trajectory')
 
     #####################
     # Part 4:
     # Use the Kalman filter for prediction
     #####################
 
-    # B = ?
-    # C = ?
+    B = np.array(
+            [[bx, 0, 0, 0, 0, 0],
+            [0, by, 0, 0, 0, 0],
+            [0, 0, bz, 0, 0, 0],
+            [0, 0, 0, bvx, 0, 0],
+            [0, 0, 0, 0, bvy, 0],
+            [0, 0, 0, 0, 0, bvz]])
+    C = np.array(
+            [[rx, 0, 0, 0, 0, 0],
+             [0, ry, 0, 0, 0, 0],
+             [0, 0, rz, 0, 0, 0]])
 
     # Initial conditions for s0 and Sigma0
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
+    s = np.eye(6, K)
+    # Initial conditions for s0
+    s[:, 0] = np.array([0, 0, 2, 15, 3.5, 4.0])
+    last_E = 0.01 * np.eye(6, 6) 
+    for i in range(K-1):
+        cur_sp = predictS(A, s[:, i], a) 
+        cur_Ep = predictSig(A, last_E, B)
+        cur_Ek = updateSig(cur_Ep, C)
+        s[:, i+1] = updateS(cur_Ek, cur_Ep, cur_sp, C, m[i+1, :])
+        last_E = cur_Ek
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '-r', label='Filtered trajectory')
+    x_coords, y_coords, z_coords  = s[0, :], s[1, :], s[2, :]
+    ax.plot(x_coords, y_coords, z_coords,
+            '-r', label='Filtered trajectory')
 
     # Show the plot
     ax.legend()
     plt.show()
+
+
