@@ -12,8 +12,10 @@ Therefore, it would take 8 seconds.
 ceiling of the log base 2 of N seconds 
 to count N bags with an infinite number of employees. The ceiling is in case N is not a power of 2, in which case there would be one number left to add at the end. This is represented by the blue line on the plot. The lone cashier would take N-1 seconds, her time is represented by the red line on the plot.
 
-5- The first N/2 additions can be done immediately in 1 second. The following N/4 require 1 second for half of the N/2 employees to tell the other half the result of their addition. The N/4 employees who now each have two results will add them and take a second. This process keeps repeating. Therefore, the total time required is: 
+5- For N bags, the first N/2 additions can be done immediately in 1 second. The following N/4 require 1 second for half of the N/2 employees to tell the other half the result of their addition. The N/4 employees who now each have two results will add them and take a second. This process keeps repeating. Therefore, the total time required is: 
 2*(ceiling of log base 2 of N) - 1 seconds. 
-We subtract 1 because the first additions do not require communication. 
+We subtract 1 because the first additions do not require communication.
+Therefore, for N = 256, the total time required will be:
+2*8 - 1 = 15 seconds. 
 
 6- 
