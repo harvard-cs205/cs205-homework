@@ -1,1 +1,19 @@
 # Your answers here.
+
+1- It would take 255 seconds. The cashier starts with the first number (no computation necessary), adds the second number and now has a result (after 1 second). Repeat this process for the 254 remaining bags using the result of previous additions as the first number in each sum. So 255 additions in total, which takes 255 seconds.
+
+2- The 8 cashiers can work in parallel. So each would worry about adding 256/8 = 32 bags. From the previous question, we know that one cashier would take 31 seconds to add 32 bags. At the end, we have 8 results left to add. 4 cashiers can each take two numbers to add, which would take 1 second and at the end of which there would be 4 numbers left to add. Two cashiers can each take two numbers of those numbers and add them, which would take 1 second and at the end of which there would be 2 numbers left to add. One cashier can add those two numbers in one second.
+So the total amount of time required is 31+1+1+1 = 34 seconds.
+
+3- After 1 second, 128 cashiers can each add up 2 numbers. It takes another 1 second, to bring that down to 64 numbers left to add up. Repeat this process halving the number of employees used and the number of bags left to add up, until there is only one number left. The whole process takes log base 2 of 256 = 8.
+Therefore, it would take 8 seconds.
+
+4- Similarly to last question, it would take:
+ceiling of the log base 2 of N seconds 
+to count N bags with an infinite number of employees. The ceiling is in case N is not a power of 2, in which case there would be one number left to add at the end. This is represented by the blue line on the plot. The lone cashier would take N-1 seconds, her time is represented by the red line on the plot.
+
+5- The first N/2 additions can be done immediately in 1 second. The following N/4 require 1 second for half of the N/2 employees to tell the other half the result of their addition. The N/4 employees who now each have two results will add them and take a second. This process keeps repeating. Therefore, the total time required is: 
+2*(ceiling of log base 2 of N) - 1 seconds. 
+We subtract 1 because the first additions do not require communication. 
+
+6- 
