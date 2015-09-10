@@ -7,7 +7,6 @@
 3. If 128 employees sum 2 bags, and then 64 employees sum their total with another cashier's total, etc.,  it will take log_{2}{256} = 8
 
 4. It will take an infinite number of employees log_2{N} seconds.
-{{ PLOT }}
 
 5. The first step still takes 1 second, but all subsequent steps take 2 seconds. In the first step, 128 employees sum 2 bags in 1 second. In the seconds step, each cashier tells their sum to the cashier next to them in 1 second, and one of them sums the 2 numbers in 1 second, and so on. This takes 1 + 2(log_{2}{256} - 1) = 15 seconds
 

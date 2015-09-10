@@ -26,7 +26,7 @@ Bye Job 8
 [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 ```
 
-This would be a problem any time one job depends on the result of another. For example, a bank processing transactions would want to make sure one is processed before the other, in case there are insufficient funds in an account due to a prior transaction.
+The jobs start in sequential order, but do not necessarily finish in sequential order. For example, jobs 0, 1, 2, 3, start in that order, but job 1 finishes first. This would be a problem any time one job depends on the result of the one preceding it. For example, a bank processing transactions would want to make sure they are processed in sequential order, in case there are insufficient funds in an account due to a prior transaction.
 
 # How Much Faster?
 For very short sleep times, the serial program is faster than the parallelized one. This makes sense because there is overhead associated with starting the parallel program (breaking the task into multiple threads, etc.). If the overhead is greater than the savings from doing the sleep time in parallel (as it will be when the sleep time is very short), the parallel program will be slower than the serial one. After this point, which appears to be between 10^-5 and 10^-4 seconds of sleep time, the parallel program becomes much faster than the serial one.
