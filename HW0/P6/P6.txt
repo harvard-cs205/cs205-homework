@@ -1,1 +1,6 @@
 # Your answers here
+# A.
+Sometimes, the starts and ends of jobs are in reverse orders. For example, job 8 starts before job 9, but job 8 ends after job9.
+This could affect how we program in parallel. If all the jobs are dependent on one and another in sequence, for instance, we have to finish job 8 in order to start job 9, but job 9 starts before job 8 finishes, this could cause error.
+
+# B. When wait time gets longer, the ratio of parallel time and serial time becomes bigger. When wait time is very short, it is possible that a parallel program could take longer than it's serial version. 

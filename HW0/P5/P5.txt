@@ -1,1 +1,24 @@
 # Your answers here.
+
+#1. It would take the cashier 255 seconds, because it takes 255 times to sum up all the 256 numbers if add two numbers at a time, and it takes one second to add two numbers.
+
+#2. They can verify the total sum faster than the original cashier. They can do this in 38 seconds. The fastest way is for each cashier to verify the same number of bags: 256/8 = 32, it takes all of them 31 seconds. Then it takes 7 seconds to add the 8 numbers. In total, it takes 38 seconds.
+
+#3. If the store has an infinite number of employees, it takes 7 seconds to verify the sum. First, all 256 bags are verified using 1 second. Then add two numbers at a time, there are 128 counts using another 1 second. Continue this process, it takes 7 steps to add all numbers, which uses 7 seconds.
+
+#4. Suppose the time to count total is x, for these N bags, we have 2^(x+1) = N if adding two bags at a time. Thus the time to count is log2(N) - 1. 
+
+#5. If we also consider the time to communicate, the answer would be double the amount of time in #3, 7*2 = 14 seconds, since while adding two numbers, it also takes 1 second to communicate.
+
+#6. If the each cashier only takes 1 bag, it will take 256+7 = 263 seconds, since it takes 1 second to hand bags to each cashier, then plus the counting time.
+
+If each cashier takes 2 bags, we will need 128 cashiers. The time they need is 128+1+6 = 135 seconds, in which 128 is the handing bag time, 1 is the time for each cashier to add two bags and 6 is the time for 128 cashiers to count.
+
+A better strategy is to make balance between hand-bag time and count-number time. We hand 16 bags to each of the 16 cashiers, it will take them 16+15+3 = 34 seconds to verify, in which 16 is the hand-bag time, 15 is the time for each cashier to count 16 bags, and 3 is the time to add all cashiers.
+
+
+
+
+
+
+
