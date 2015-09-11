@@ -1,10 +1,56 @@
-# Your answers here
+***sample output***
+
+In two consecutive runs:
+
+1)
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 0
+Bye Job 2
+Bye Job 3
+Bye Job 1
+Hi Job 4
+Hi Job 5
+Hi Job 6
+Hi Job 7
+Bye Job 6
+Bye Job 7
+Bye Job 4
+Bye Job 5
+Hi Job 8
+Hi Job 9
+Bye Job 8
+Bye Job 9
+
+2)
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 1
+Bye Job 2
+Bye Job 0
+Bye Job 3
+Hi Job 4
+Hi Job 5
+Hi Job 6
+Hi Job 7
+Bye Job 7
+Bye Job 6
+Bye Job 4
+Bye Job 5
+Hi Job 9
+Hi Job 8
+Bye Job 8
+Bye Job 9
+
+***answers to questions***
 
 "If you run the above code a number of times, you may see some unexpected
 results. Explain these results. How could this affect how we program in
 parallel? Describe a scenario where this would be important."
-
-In two consecutive runs, lines 4-8 were respectively:
 
 These differences happen because of the nondeterminism in how processes are
 scheduled on your computer, as well as other sources of nondeterminism in
@@ -17,3 +63,25 @@ be important if we have a pipeline of data processing, for example if we have
 three processes who rely on each other's output, and we mistakenly think one
 process has finished, when it in fact hasn't -- we might accidentally read
 garbage.
+
+"Try to explain the trend you observe. Is it possible that a parallel program
+could take longer than it’s serial version? Under what conditions?"
+
+The trend seems to be that at low wait times, the serial version significantly
+outperforms the parallel version, because it has essentially no overhead,
+while the parallel version has the overhead of launching 4 processes, and of
+communication between these processes. But at larger wait time sizes, about
+10^{-3} seconds or more, we see the parallel program significantly outperform
+the serial version -- being able to do multiple computations at the same time,
+as expected, provides a huge speedup when the overhead is small compared to the
+job size. With larger wait time sizes, the parallel version achieves or very
+nearly achieves the optimum speedup of 4x.
+
+It is certainly possible that a parallel program could take longer than its
+serial counterpart -- this is because parallelization typically requires
+significant overhead: processes must communicate with each other and usually
+with some central controller.  There may also be overhead associated with other
+aspects of parallelization, for example with dividing up the data.  So when the
+amount of data is small enough, the overhead can outweigh the performance
+benefit gained from parallelizing -- this is exactly what we see in practice!
+
