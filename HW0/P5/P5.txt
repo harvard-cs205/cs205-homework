@@ -11,7 +11,9 @@
    total_time = log(N)/log(2)
    In this case N = 256, so total_time = 8 seconds.
 
-4) See P5.png
+4) If there are infinite employees and N bags then the total time is:
+   total_time = log(N)/log(2) 
+   See P5.png for the plot.
 
 5) If it takes one second to communicate a number between two employees, then we need to add one second to each batch of sums and remove one for the last one since no communication happens at that stage.
    total_time = 8*2 -1 = 15 seconds 
