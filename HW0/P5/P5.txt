@@ -1,1 +1,34 @@
-# Your answers here.
+
+
+1. If one cashier were to add the totals of 256 bags, how long would it take?
+
+	With one cashier, assuming 1 second per operaiton, it will take (n-1) seconds, or 255 seconds, where n is equal to the number of bags.
+
+2. Seven of the cashier’s coworkers approach to see this ridiculous sight. The bright (and perhaps a bit opportunistic) cashier recruits them to help count. By working together, can they verify the total sum faster than the original cashier by herself? 
+
+	Yes, by working together they can verify the total sum faster than the original cashier by herself. 
+
+If so, how fast can they do this?
+
+	Since there is now 8 total cashiers counting, the cashiers can now split the bags into 8 equal groups.With this split, the cashiers will now each have 32 bags, which will require a total of 31 seconds (n-1) for all cashiers to total up their respective bags in parallel. Each cashier will now have a number representing their total penny counts, which must now be summed this will require log2(8), or three more seconds to count, for a total of 34 seconds to count all 256 bags of pennies with 8 cashiers counting. 
+
+3. Imagine the store is big. . . very big. As a matter of fact, the store has an infinite number of employees. How fast can the employees verify the sum?
+
+	No matter how many employees are present, the limiting factor is the number of bags and the addition operation which must be executed. This limiting number is (n/2) employees, where n is the number of bags. So in this case, even with unlimited or infinite employees, not more than 256 / 2 or 128 employees are neccessary to optimize the bag counting process. With 128 employees, which will be the same as unlimited, the counting the bags will require (256/128) - 1 + log2(128) seconds, or 8 seconds.This is the lowest number of seconds to count all the bags, no matter how many employees you have, as long as you have at least 128. 
+
+4. If you were feeling especially frustrated, perhaps you may use more than 256 bags. Instead, assume there are N bags. How long will it take the infinite number of employees to count the total? 
+
+	With N bags, the following formula can be used to determine the how long it will take to count the bags: (N / employees) - 1 + log2(N / 2)
+
+Using Python, plot the result with bag count on the horizontal and counting time on the vertical. 
+
+	See plot
+
+On the same graph, plot the time it would take the lone cashier to do this by herself.
+
+	See plot
+
+5. We’ve been neglecting any overhead associated with people communicating. How does the answer for 256 bags change, if it takes one second to communicate a number between two employees?
+
+
+6. Also assume it takes one second to hand a bag (or any number of bags) between two people (including from you to a cashier). How long will it take to verify 256 bags worth of coins if each cashier comes to you and takes 1 bag? What about 2 bags? Is there a better strategy? Assume you can’t be handing bags to more than one person at a time.
