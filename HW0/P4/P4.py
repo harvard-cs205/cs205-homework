@@ -88,10 +88,10 @@ if __name__ == '__main__':
     # Part 4:
     # Use the Kalman filter for prediction
     #####################
-    Sig0 = 0.01 * np.eye(len(s0))
+    Sig0 = 1e-2 * np.eye(len(s0))
     B = np.diag([bx, by, bz, bvx, bvy, bvz])
-    C = np.hstack([np.diag([1, 2, 3]), np.diag([0, 0, 0])])
-
+    C = np.hstack([np.diag([rx, ry, rz]), np.diag([0, 0, 0])])
+    print([Sig0, B, C])
     def predictS(s_prev):
         return getNextStep(s_prev)
     def predictSig(Sig_prev):
@@ -106,10 +106,9 @@ if __name__ == '__main__':
     state_kalman = [s0]
     Sig_kalman = [Sig0] 
     for step_i in range(K - 1):
-        print(step_i) 
         s_prev = state_kalman[step_i] 
         Sig_prev = Sig_kalman[step_i]
-        m_curr = dat_measure[step_i, :] 
+        m_curr = dat_measure[step_i + 1, :] 
         # Calculate model predictions
         s_pred = predictS(s_prev) 
         Sig_pred = predictSig(Sig_prev)
@@ -119,12 +118,12 @@ if __name__ == '__main__':
         state_kalman.append(s_new)
 
     state_kalman_mat = np.vstack(state_kalman)
-    
-    xcoords = state_kalman_mat[:, 0]
-    ycoords = state_kalman_mat[:, 1]
-    zcoords = state_kalman_mat[:, 2]
-    #ax.plot(x_coords, y_coords, z_coords,
-    #        '-r', label='Filtered trajectory')
+    xcoord = state_kalman_mat[:, 0]
+    ycoord = state_kalman_mat[:, 1]
+    zcoord = state_kalman_mat[:, 2]
+
+    ax.plot(xcoord, ycoord, zcoord,
+           '-r', label='Filtered trajectory')
 
     # Show the plot
     ax.legend()
