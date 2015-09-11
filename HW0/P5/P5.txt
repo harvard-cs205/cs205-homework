@@ -5,7 +5,7 @@
 
 3) Since a single person can add the sum of at most 2 bags in a time step, that means that in the first time step, the most comparisons that can be made 128. Likewise, in the second, it will be 64, and so on. So, the number of seconds it will take is log_2(256) which is 8.
 
-4) It would be the ceil(log_2(N)).
+4) It would be the ceil(log_2(N)). You can see the png file illustrating this in P5.png. Note that the y-axis in that chart has a logarithmic scale.
 
 5) Basically, we get the same approach as before, except that all steps after the first one take two seconds instead of just one, just we now have to communicate. Since it previously took 8 steps, now 7 of those will take an extra second. Note that this works since you would still split the work until there are only 2 bags per cashier, because if there were 4 bags, it would take 3 seconds for one person to calculate it, but only 2 seconds for two people. So, we would still maintain the same distribution of 128 cashiers in time step 1, 64 in step 2, etc. So the total is 8 + 7 = 15 seconds.
 
