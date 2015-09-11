@@ -46,6 +46,7 @@ if __name__ == '__main__':
     #####################
 
     s_m = np.loadtxt('P4_measurements.txt',delimiter=',')
+    m = s_m
     c_mat = np.array([[1/rx,0,0],[0,1/ry,0],[0,0,1/rz]])
     s_approx = np.dot(s_m,c_mat)
     x_coords = s_approx[:,0]
@@ -68,7 +69,7 @@ if __name__ == '__main__':
 
     # Initial conditions for s0
     s[:,0] = [0,0,2,15,3.5,4.0]
-    s = np.asmatrix(s)
+    s = np.matrix(s)
     
     # Compute the rest of sk using Eq (1)
     for x in xrange(1,K):
@@ -85,36 +86,56 @@ if __name__ == '__main__':
     # Part 4:
     # Use the Kalman filter for prediction
     #####################
-
+    A = np.array([[1,0,0,dt,0,0],[0,1,0,0,dt,0],
+    [0,0,1,0,0,dt],[0,0,0,1-c*dt,0,0],
+    [0,0,0,0,1-c*dt,0],[0,0,0,0,0,1-c*dt]])
+    a = np.array([0, 0, 0, 0, 0, g * dt])
     B = np.diag([bx,by,bz,bvx,bvy,bvz])
-    C = c_mat 
+    C = np.zeros((3,6))
+    C[0,0] = rx
+    C[1,1] = ry
+    C[2,2] = rz
 
     # Initial conditions for s0 and Sigma0
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
     s = np.zeros((6,K))
-    s[:,0] = [0,0,2,15,3.5,4.0]
-    Sigma0 = 0.01 * np.identity(6)
 
-    # Returns s tilde
-    def predictS(sk):
-      return np.add(np.dot(A,priorState),a)
+    #initial s
+    s[:,0] = np.array([0,0,2,15,3.5,4.0])
     
-    # Returns sigma tilde
-    def predictSig(covk):
-      return np.linalg.inv(np.add(np.dot(np.dot(A,covk),np.transpose(A)),np.dot(B,np.transpose(B))))
+    #initialize Sigma
+    sigma = 0.01 * np.identity(6)
     
-    # Returns sigma k+1
-    def updateSig(covt):
-      return np.linalg.inv(np.add(covt,np.dot(np.transpose(C),C)))
+    # Returns s_t
+    def predictS(s_k):
+      return np.add(np.dot(A,s_k), a)
 
-    # Returns s k+1
-    def updateS(covk1,covt,st,mk1)
-      return np.dot(covk1, np.add(np.dot(covt,st),np.dot(np.transpose(C),mk1)))
+    # Returns sigma_t
+    def predictSig(sigma_k):
+      return np.linalg.inv(np.add(np.dot(np.dot(A, sigma_k), A.T), np.dot(B, B.T)))
     
+    # Returns sigma_k+1
+    def updateSig(sigma_t):
+      return np.linalg.inv(np.add(sigma_t, np.dot(C.T, C)))
+
+    # Returns s_k+1
+    def updateS(sigma,sigma_t,st,mk1):
+      return np.dot(sigma, np.add(np.dot(sigma_t, s_t), np.dot(C.T, mk1)))
     
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '-r', label='Filtered trajectory')
+    for k in xrange(0, K - 1):
+        s_t = predictS(s[:,k])
+        sigma_t = predictSig(sigma)
+        sigma = updateSig(sigma_t)
+        s[:, k + 1] = updateS(sigma, sigma_t, s_t, m[k + 1])  
+
+    x_coords = s[0]
+    y_coords = s[1]
+    z_coords = s[2]  
+    ax.plot(x_coords, y_coords, z_coords,
+             '-r', label='Filtered trajectory')
 
     # Show the plot
     ax.legend()
+    plt.savefig('P4.png', format='png')
     plt.show()
+
