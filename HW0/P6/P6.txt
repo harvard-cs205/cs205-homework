@@ -1,1 +1,86 @@
-# Your answers here
+Problem 6.
+
+Count to Ten
+
+We are using 4 parallel processors to run the individual "Job"s. We would expect that the gap between starting and stopping a process would be 0.25 s, and the order that jobs start would be the order that jobs end. Furthermore, we would expect jobs to start and end sequentially as processors become available. 
+
+Expected output:
+Assuming no latency...
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3 ### <0.25 s pause>
+Bye Job 0
+Hi Job 4
+Bye Job 1
+Hi Job 5
+Bye Job 2
+Hi Job 6
+Bye Job 3
+Hi Job 7 ### <0.25 s pause>
+Bye Job 4
+Hi Job 8
+Bye Job 5
+Hi Job 9
+Bye Job 6
+Bye Job 7 ### <0.25 s pause>
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+What we get in practice is not the expected ordering, although we obtain our "sorted" ouput in the end. This may be a consequence of difference in latency, compute time, bandwidth between processors. 
+
+When the order of the computation influences the results (e.g., recursion), it may be difficult to parallelize the computation. Or, some sorting may be required before providing the final output. 
+
+Actual output:
+
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 0
+Hi Job 4
+Bye Job 1
+Hi Job 5
+Bye Job 2
+Bye Job 3
+Hi Job 6
+Hi Job 7
+Bye Job 4
+Hi Job 8
+Bye Job 5
+Hi Job 9
+Bye Job 6
+Bye Job 7
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+Hi Job 0
+Hi Job 2
+Hi Job 1
+Hi Job 3
+Bye Job 3
+Hi Job 4
+Bye Job 2
+Hi Job 5
+Bye Job 0
+Hi Job 6
+Bye Job 1
+Hi Job 7
+Bye Job 4
+Hi Job 8
+Bye Job 6
+Hi Job 9
+Bye Job 5
+Bye Job 7
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+
+How Much Faster?
+
+### note: I chose to use arithmetic averages of ratios and standard errors in my graph because I noticed wild variation between my graphs...
+
+When computation times are short enough (in this case, around 10^-6 s), the overhead cost of parallelization becomes significant relative to the processing time, thereby causing the serial approach to be faster.
