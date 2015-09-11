@@ -12,4 +12,5 @@ if __name__ == '__main__':
 
     # Apply burnTime to this list of "job numbers" using the pool
     result = pool.map(burnTime, range(10))
+    
     print(result)
