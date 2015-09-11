@@ -4,7 +4,7 @@
 
 # 2. 'Yes. 34 seconds' -- Split the bags evenly between the 8 employees for 32 bags per employee, which they can add up in 31 seconds in parallel.  Then 3 seconds to merge them (8->4, 4->2, 2->1)
 
-# 3. '8 seconds.' --  2 ^ n = 256 -> n = 8 seconds
+# 3. '8 seconds.' --  2 ^ n = 256 -> n = 8 seconds, or n = log2(256)
 
 # 4. Plot Infinite Employees v. 1 Employee
 import matplotlib.pyplot as plt
@@ -29,4 +29,13 @@ plt.legend()
 plt.title('Bag Count v. Counting Time')
 plt.show()
 
-#5. 
+# 5. '15 seconds' -- The formula becomes n = 2log2(256) - 1, since it will take twice as long as before cause we are essentially adding one second to each calculation, minus the first calculation which the employees don't need to talk to anyone for
+
+# 6. One bag at a time:
+#        '259 seconds' -- If you can only hand out 1 bag at a time, 256 seconds to hand out the bags, with each cashier returning to get a second bag.  While cashiers are waiting on other people to receive their bags
+
+#    Two bags at a time:
+#         '131 seconds' -- If you can hand two bags to one employee at a time, then it will take 128 seconds to hand out the bags and 15 seconds to count the bags.
+
+#     Fastest:
+#        '23 seconds' - Assuming that employees can pass bags to one another, and that you yourself can't count (because the bank doesn't trust you), then the fastest way to do it would be to pass half of the bags to one employee, so that they had 128 bags, and then in the 2nd second pass the other half of the bags to a second employee.  Both of these employees could then distribute half their bags in the second and third seconds, respectively, doubling the number of cashiers holding bags, until each cashier had 2 bags remaining.  Then it just defaults to the question we had above.  So it takes 7 seconds for the first cashier and his underlings to finish distributing bags, but 8 seconds for the second casheier because he didn't receive his half of the bags until 1 second in.  So the first cashier's side will have to wait 1 second (run idle) while the second cashier's side finishes counting, so that they can add up.  In total it will be 8 seconds + 15 seconds.
