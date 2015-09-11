@@ -1,7 +1,7 @@
-1.  For one cashier, there are a total of 255 additions to do, so it will
+5.1.For one cashier, there are a total of 255 additions to do, so it will
     take 255 seconds.
 
-2.  Yes, they will be able to verify the amount faster.
+5.2.Yes, they will be able to verify the amount faster.
     One of the methodologies the cashiers could adopt is as follows:
         a.  all 8 cashiers start by adding totals concurrently, without
             touching other cashiers' bags
@@ -15,7 +15,7 @@
     This will take 31+1+1+1=34 seconds, instead of 255 seconds, a 7.5x
     improvement.
 
-3.  It will take ceiling(log2(256))=8 seconds.
+5.3.It will take ceiling(log2(256))=8 seconds.
     The methodology used in (2) and here is based on backward thinking-
     before the final answer comes up, the last step must be 1 addition
     from the remaining 2 sums; the second last step, if fully utilized,
@@ -25,18 +25,18 @@
     (additional cashiers won't help in this case), and then 64, then 32...
     This leads to my calculation of log2(256)=8 steps.
 
-4.  Derived from the logic in (3), at the nth second from the end, there
+5.4.Derived from the logic in (3), at the nth second from the end, there
     can be at most 2^n bags remaining to be added. Hence:
         2^t > N
     t = ceiling(log2(N))
     For a single cashier, N bags take N-1 seconds to count. Please see
     graph attached.
 
-5.  If an overhead of 1s is added, then before each additions when there are
+5.5.If an overhead of 1s is added, then before each additions when there are
     less sums than cashiers, 1 second will be added to each additions. In the
     case of 256 bags, it will take 8+7=15 seconds.
 
-6.  If each cashier comes to me and takes 1 bag, then it will take 256 seconds
+5.6.If each cashier comes to me and takes 1 bag, then it will take 256 seconds
     for me to hand out all the bags, plus 1 second during which half of the
     cashiers hand their bags to other cashiers for the first sum. Then the total
     time will be at most 256+1+15=272 seconds. However, the best time under this

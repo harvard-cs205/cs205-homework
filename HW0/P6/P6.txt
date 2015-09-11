@@ -1,1 +1,41 @@
-# Your answers here
+6.1.Sometimes the jobs did not stat in order, and more often they did not end in order.
+    This may create problems if the flow of operations are not independent and actually
+    rely on "previous state", like the Kalman Filtering method. A potentially minor issue
+    is that the output may not be in the desired order which may cause problems where
+    sorting is important.
+
+    Sample output:
+        Hi Job 0
+        Hi Job 2
+        Hi Job 1
+        Hi Job 3
+        Bye Job 0
+        Hi Job 4
+        Bye Job 2
+        Bye Job 1
+        Bye Job 3
+        Hi Job 5
+        Hi Job 6
+        Hi Job 7
+        Bye Job 6
+        Hi Job 8
+        Bye Job 7
+        Hi Job 9
+        Bye Job 4
+        Bye Job 5
+        Bye Job 8
+        Bye Job 9
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+6.2.Based on the graph from multiple runs, the parallel program generally runs
+    more slowly than the serial program when wait time is very low, and the trend
+    is generally reversed when wait time is high. The difference results from the
+    relation between the overhead cost versus the job time. When the wait time is
+    low, the overhead cost generated from the communication between computing units
+    override the time saved by running jobs in a parallel fashion.
+    Another observation is that the efficiency factor approaches 4 after wait time
+    becomes higher. This confirms to the intuition that having x processors would
+    at most speed up the job by x tims. However, this rull seems to be violated
+    sometimes, especially between 10^-5 to 10^-4 range. I'm curious to learn if
+    any back-stage mechanisms are playing a role here, since our "multi-core" machine
+    is simulated.
