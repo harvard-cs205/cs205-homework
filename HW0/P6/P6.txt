@@ -1,2 +1,30 @@
 # Your answers here
-After running the code a number of times it is possible to notice that the tasks don't finish necessarily in the same order they were sent. The reason for this is that the processors have different speeds, so they will perform the same task in a different amount of time.
+6A)
+After running the code a number of times it is possible to notice that the tasks don't finish necessarily in the same order as they were sent. The reason for this is that the processors might be accomplishing  other instructions (that were sent before), so they will start performing the task at a different time.
+Here is an example output:
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 1
+Hi Job 4
+Bye Job 2
+Hi Job 5
+Bye Job 0
+Bye Job 3
+Hi Job 6
+Hi Job 7
+Bye Job 6
+Bye Job 4
+Bye Job 7
+Hi Job 8
+Bye Job 5
+Hi Job 9
+Bye Job 9
+Bye Job 8
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+
+6B)
+As we can see in the plot P6.png there is a clear trend. For sleep times between 10-6 and 10-4 (approx) the serial program is faster than the parallel one. After 10-4 seconds this changes and the parallel program stars executing faster than the serial one. The ratio settles at approx 10-3 seconds with a value of 4 (which actually corresponds to the number of used processors). 
+The parallel program takes longer than the serial one for the smallest values of the sleep time. The reason for this could be that the time of sending the tasks to the different processors is bigger than the actual time needed for running them. 
