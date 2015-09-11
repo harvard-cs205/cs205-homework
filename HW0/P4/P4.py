@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-# Must take in all params as numpy arrays, true for all
+# All of these functions require numpy arrays as input
 def predictS(A, s_k, a):
   return np.dot(A,s_k) + a
 
@@ -45,7 +45,6 @@ if __name__ == '__main__':
     #####################
 
     traj = np.loadtxt('P4_trajectory.txt', delimiter=',')
-
     ax.plot(traj[:,0], traj[:,1], traj[:,2],
              '--b', label='True trajectory')
 
@@ -56,8 +55,6 @@ if __name__ == '__main__':
     #####################
 
     observations = np.loadtxt('P4_measurements.txt', delimiter=',')
-    #scaled = [[rx*triplet[0], ry*triplet[1], rz*triplet[2]] for triplet in observations]
-    #print scaled
     ax.plot((1.0/rx)*observations[:,0], (1.0/ry)*observations[:,1], (1.0/rz)*observations[:,2],
              '.g', label='Observed trajectory')
 
@@ -88,7 +85,6 @@ if __name__ == '__main__':
     big_mat = []
     for q in range(0,6):
       big_mat.append([0.0]*K)
-    
     big_mat = np.array(big_mat)
 
     for i in range(6):
@@ -132,7 +128,6 @@ if __name__ == '__main__':
     big_mat_k = []
     for q in range(0,6):
       big_mat_k.append([0.0]*K)
-    
     big_mat_k = np.array(big_mat_k)
 
     for i in range(6):
@@ -142,7 +137,6 @@ if __name__ == '__main__':
     sig0 = 0.01*np.identity(6)
     sigma_ks.append(sig0)
 
-    #still have s0 and k
     obs_array = np.array(observations)
 
     for i in range(1, K):
