@@ -23,7 +23,7 @@ if __name__ == '__main__':
 
     # Create 3D axes for plotting
     ax = Axes3D(plt.figure())
-
+    
     #####################
     # Part 1:
     #
@@ -86,6 +86,7 @@ if __name__ == '__main__':
     ax.plot(xk, yk, zk,
             '-k', label='Blind trajectory')
 
+    
     #####################
     # Part 4:
     # Use the Kalman filter for prediction
@@ -101,7 +102,7 @@ if __name__ == '__main__':
         return np.linalg.inv(S + C.T * C)
 
     def updateS(S_kp1, S, s, m_kp1): 
-        return S_kp1 * (S*s + C.T*m_kp1)
+        return S_kp1 * (S * s + C.T * m_kp1)
 
     
     B = np.diag([bx, by, bz, bvx, bvy, bvz])
@@ -112,9 +113,7 @@ if __name__ == '__main__':
         ])
 
 
-    m = [np.matrix([x_coords[i], y_coords[i], z_coords[i]]).T for i in range(K)]
-
-    print "Length: ", len(m)
+    m = [np.matrix([x_coords[i] * rx, y_coords[i] * ry, z_coords[i] * rz]).T for i in range(K)]
 
     Sigma = np.diag([0.01 for _ in range(6)])
     s = np.matrix([0., 0., 2, 15, 3.5, 4.0]).T
@@ -140,12 +139,12 @@ if __name__ == '__main__':
         #print "Sigma", Sigma
 
         s = updateS(Sigma, Sigma_pred, s_pred, m[k])
+
         ss.append(s)
         xs.append(s.item((0,0)))
         ys.append(s.item((1,0)))
         zs.append(s.item((2,0)))
 
-        break
     # Initial conditions for s0 and Sigma0
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
 

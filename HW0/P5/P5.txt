@@ -1,1 +1,54 @@
 # Your answers here.
+
+1. It would take 255 or 256 seconds (depending on whether or not you count
+adding the first value to 0 as a second or not) 
+
+2. We have that 256 / 8 = 32, so in just 32 seconds, each of the 8 workers 
+will have a number that represents the number of pennies they counted
+indivudually. Then, assuming that communication takes no time, in 1 second we 
+could take the 8 numbers and make them into 4, by assigning 4 people 2 numbers 
+to add each. Then, in another second, we could turn 4 numbers into 2, and 
+then 2 numbers into 1. Therefore, in total, this process takes 35 seconds. 
+
+3. Assuming that it doesn't take any time just to type a number into the 
+calculator, every second we will cut the number of numbers left to add in 
+half. Therefore, we will finish in log_2(n) steps, where n is the number of 
+bags. In our case, log_2(256) = 8. 
+
+4. As N grows large, we see that the amount of time for one person to 
+count grows linearly, while if parallelized with infinite number of cashiers
+grows logarithmically. See graph, where the red line is non-parallelized 
+and the green line is. 
+
+5. If it takes time to commnicate, then it takes around 2 * log_2(N) seconds 
+because at each step, in addition to adding two numbers, each cashier will 
+need to communicate and receive the second number from someone else. 
+
+6. If we pass out the bags 1 at a time, then it would take us at least 
+256 seconds to complete the job. We have two people serve as the counters. 
+At every even second, one person will receive a communication from somone 
+who just received a bag. At every odd second, the other person will get a communication
+while the even person will perform a sum. This alternates back and forth, 
+with each of the two designated people doing sums and communications. This 
+means that every 2 seconds, we will have summed 2 bags. Therefore, it takes 
+256 + x seconds, where x is a small number. In this case, x = 3 because once 
+we have passed out the last bag, it takes 1 second to communicate, 1 second to 
+sum. Then finally, it takes 1 second to communicate between the 2 people who 
+were counting, and then 1 final second to sum. This makes a total of 260 seconds. 
+
+If we pass out 2 bags at a time, we again designate 2 people to be the counters. 
+Then, for every second after the first, one of the 2 people will receive a number, while 
+the other person will perform a sum. This means that in 2 seconds, we would have 
+processed 4 bags. Then, in 128 seconds, when the bags are all passed out, we are 
+very close to being done. It takes 5 more seconds to process the last pair of bags. 
+Thus, it takes 133 seconds total. 
+
+If we could choose how to pass out the bags, we could do the following: 
+
+Give each person half of the number of bags you have remaining. And then each person
+with > 2 bags will also give out half of their bags at each second. This is essentially 
+parallelizing the process of giving N/2 people N bags each. This takes log_2(N) time 
+because at each second, the maximum number of bags any person holds on to is cut in half. 
+Therefore, after log_2(N) seconds, we have finished dishing out all the bags. Now, in 
+another 2 * log_2(N) seconds, we will have counted everything. This makes a grand total of 
+3 * log_2(N) seconds. 
