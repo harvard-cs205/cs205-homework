@@ -31,8 +31,7 @@ if __name__ == '__main__':
     # Normally, this data wouldn't be available in the real world
     #####################
     strue = np.loadtxt('P4_trajectory.txt', delimiter=',')
-    ax.plot(strue[:, 0], strue[:, 1], strue[:, 2],
-            '--b', label='True trajectory')
+    ax.plot(strue[:, 0], strue[:, 1], strue[:, 2], '--b', label='True trajectory')
 
     #####################
     # Part 2:
@@ -43,9 +42,7 @@ if __name__ == '__main__':
 
     position = strue[:, :3]
 
-    r_array = np.divide(position, measured)
-
-    r = [np.mean(r_array[:, 0]), np.mean(r_array[:, 1]), np.mean(r_array[:, 2])]
+    r = [rx, ry, rz]
 
     r_matrix = np.matrix([[1/r[0], 0, 0], [0, 1/r[1], 0], [0, 0, 1/r[2]]])
 
@@ -85,17 +82,17 @@ if __name__ == '__main__':
 
     s0 = np.matrix('0 0 2 15 3.5 4.0').T
 
-    result = np.zeros((6, K))
+    result = np.zeros((6, len(strue)))
+    result = np.asmatrix(result)
 
-    i = 0
-    s_current = s0
-    for k in range(K):
-        s_new = (A * s_current) + a
-        result[:, i] = s_new[0]
-        s_current = s_new
-        i += 1
+    result[:, 0] = s0
 
-    ax.plot(result[0], result[1], result[2], '-k', label='Blind trajectory')
+    for i in range(len(strue) - 1):
+        result[:, i+1] = A * result[:, i] + a
+
+    result = np.asarray(result)
+
+    ax.plot(result[0, :], result[1, :], result[2, :], '-k', label='Blind trajectory')
 
     #####################
     # Part 4:
