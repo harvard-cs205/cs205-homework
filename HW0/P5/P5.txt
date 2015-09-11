@@ -35,3 +35,12 @@ each second.
 half of them must communicate the value to their neighbor before the process can
 continue). Using the same approach as (3), this gives 16 seconds as the total
 (15 if we assume the last cashier doesn't need to tell anyone the value).
+
+Generalizing, it takes (c+b-1)log_2(N) = clog_b(N) + (b-1)log_b(N) to count N bags 
+using the divide and conquer method discussed. We know we can optimze this with 
+b = 2 (all other b's have the same complexity), so setting b = 2, we want to compare
+(c+1)log_2(N) to N - 1 and select the method with the smaller cost. This means that
+when c > N-1/(log_2(N)) - 1, the linear method with a single cashier actually works
+better. 
+
+6.
