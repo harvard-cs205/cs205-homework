@@ -101,11 +101,29 @@ Skalman[:,1]=s0
 Skalman=np.asmatrix(Skalman)
 mt=np.append(m,np.zeros(shape=(3,121)),0)
 
+def predictS(A,Skalman,i,a):
+	return np.asarray((np.asmatrix(A)*np.asmatrix(Skalman[:,i]))+np.asmatrix(a).T)
+
+def predictSig(Sigma,A,B):
+	return np.linalg.inv(A*Sigma*A.T+B*B.T)
+
+def updateSig(Sigmatil,C):
+	return np.linalg.inv(Sigmatil+C.T*C)
+
+def updateS(Sigma,Sigmatil,stil,C,m,i):
+	return np.asarray(Sigma*(Sigmatil*stil+C.T*np.asmatrix(m[:,i+1]).T))
+
 for i in range(0,(K-1)):
-	stil=np.asarray((np.asmatrix(A)*np.asmatrix(Skalman[:,i]))+np.asmatrix(a).T)
-	Sigmatil=np.linalg.inv(A*Sigma*A.T+B*B.T)
-	Sigma=np.linalg.inv(Sigmatil+C.T*C)
-	Skalman[:,(i+1)]=np.asarray(Sigma*(Sigmatil*stil+C.T*np.asmatrix(mt[:,(i+1)]).T))
+	stil = predictS(A,Skalman,i,a)
+	Sigmatil=predictSig(Sigma,A,B)
+	Sigma=updateSig(Sigmatil,C)
+	Skalman[:,(i+1)]=updateS(Sigma,Sigmatil,stil,C,mt,(i))
+
+#for i in range(0,(K-1)):
+#	stil=np.asarray((np.asmatrix(A)*np.asmatrix(Skalman[:,i]))+np.asmatrix(a).T)
+#	Sigmatil=np.linalg.inv(A*Sigma*A.T+B*B.T)
+#	Sigma=np.linalg.inv(Sigmatil+C.T*C)
+#	Skalman[:,(i+1)]=np.asarray(Sigma*(Sigmatil*stil+C.T*np.asmatrix(mt[:,(i+1)]).T))
 
 Skalman2=np.asarray(Skalman)
 ax.plot(Skalman2[0], Skalman2[1], Skalman2[2],
