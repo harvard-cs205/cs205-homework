@@ -15,13 +15,11 @@ Question 4: log2(N), please find attached P5.png
 Question 5: 15 seconds
 	Every time there is a sum between two numbers there is one additional second, except for the first case. 
 
-Question 6: 
-	(each cashier comes and takes 1 bag): 257 seconds 
-		It would take 257 secods to count all bags because it would take 256 secods to hand out all of the bags and as your are handing out the bags the employees with the bags can already start counting the bags. The last emplyee to get a bag then has to sum up the last bag with the bag it just received so it would take 1 extra second
+Question 6: **this part was done in colaboration with Thibaut Perol**
+	(each cashier comes and takes 1 bag): 230 seconds
+		picture attached 'P6_1bagperworker-8bags.jpg,P6_1bagperworker-16bags.jpg'
 
-	(each cashier comes and takes 2 bags): 130 seconds
-		It would take them all getting two bags: 128 seconds
-		the last cashier has to take count thier two bags: 1 second
-		the last cahsier has to add their count to total count: 1 second
-	(Better strategy?): yes, using a recursive relation for dividing up the work
-		Better strategy is coded up
+	(each cashier comes and takes 2 bags): 132 seconds
+		picture attached 'P6_2bagperworker-16bags.jpg'
+
+	(Better strategy?): No, for having a system where we count two bags at one time, we cannot do better than handing each person two bags at a time. If they were able to count more than two bags at a time, then we would be able to change this strategy.
