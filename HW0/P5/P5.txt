@@ -1,1 +1,17 @@
 # Your answers here.
+
+1. 255s, because the first two bags are paired and there is an additional second for every subsequent bag.
+
+2. Yes. In the first second, all 8 cashiers sum 2 bags each, for a total of 16 bags. In each subsequent second, each cashier adds an additional bag to their running total, for an additional 8 bags per second. Then, the final 8 sums would have to be added together, which can be done in parallel - log base 2. Therefore, 256 bags will take 1 + ((256-16)/8) + 3 = 34s.
+
+3. Infinite cashiers means that we can assume that we always have the exact number of cashiers we need to sum the bags most efficiently. In the first second, all bags can be converted to pairs that are added together, leaving half the number of numbers to sum as before. This repeats until there is a single sum of all the bags. This is the pattern for log base 2, meaning that the bags can be added in 8s.
+
+4. [See graph. Note that each curve has a distinctly labeled y-axis.]
+
+5. With 1 cashier, since there is no one else to communicate with, the answer for 256 bags remains unchanged. With infinite cashiers, we can use the same process as before except that for every pair of sums that has already been calculated by a pair of cashiers, one cashier informs the other of the total and the informed cashier does the subsequent sum. e.g. Cashier 1 sums bags A and B while cashier 2 sums bags C and D. Cashier 2 tells cashier 1 the sum of C+D and then cashier 1 sums (A+B)+(C+D). This means that for every step except the first, an additional second is added as one cashier communicates with the next. The number of communications always equals the number of bags that are about to be summed, so they can be done by the same groupings. Therefore, the total amount of time taken for 256 bags is 2*(log base 2 of 256) - 1, or 15s.
+
+6. If each cashier takes 1 bag from me and I can only hand one person a bag at a time, that is an additional 1s/bag with no parallelization possible before counting even begins. Then, since each cashier only has access to one bag, they must either hand that bag to a cashier or inform a cashier of the number on the bag. Since both operations take 1s, they are equivalent. These can best be parallelized if the cashiers are paired as before, allowing this to happen in a single second. After this point, the problem reduces to problem 5, meaning that the total time taken is 256 + 1 + 15 = 272s.
+    If each cashier takes 2 bags from me, then there is an additional 1s/2bags = 128s. They can then sum the first pair of bags without communicating, so after picking up the bags, the problem reduces to problem 5, meaning that the total time taken is 128 + 15 = 143s.
+    4 bags - 64, 3 sums without communicating, 64 bags left with communication, so 6*2 = 64 + 3 + 12 = 79
+    8 bags - 32, 7 sums without communicating, 32 bags left with communication, so 5*2 = 32 + 7 + 10 = 49
+    Each cashier takes n bags: 256/n handoffs + n-1 sums without communicating, followed by 256/n bags left with communication which can be done in 2*(log base 2 of n) steps. Therefore, we want to find the value of n which minimizes 256/n + (n-1) + 2*(log base 2 of n) which is between 14 and 15. Because of rounding, these should take about the same amount of time as n=16.
