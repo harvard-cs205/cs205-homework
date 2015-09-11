@@ -2,14 +2,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-# Problem constants.
-filename = "P4_trajectory.txt"
 columns = { 'x_pos': 0,
             'y_pos': 1,
             'z_pos': 2,
             'x_vel': 3,
             'y_vel': 4,
             'z_vel': 5 }
+
 
 if __name__ == '__main__':
     # Model parameters
@@ -38,7 +37,7 @@ if __name__ == '__main__':
     # Load true trajectory and plot it
     # Normally, this data wouldn't be available in the real world
     #####################
-    s_true = np.loadtxt(filename, delimiter=",")
+    s_true = np.loadtxt("P4_trajectory.txt", delimiter=",")
     x_coords = s_true[:,columns['x_pos']]
     y_coords = s_true[:,columns['y_pos']]
     z_coords = s_true[:,columns['z_pos']]
@@ -51,9 +50,14 @@ if __name__ == '__main__':
     #
     # Read the observation array and plot it (Part 2)
     #####################
-
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '.g', label='Observed trajectory')
+    s_measure = np.loadtxt("P4_measurements.txt", delimiter=",")
+    C = np.diag([1.0 / rx, 1.0 / ry, 1.0 / rz])
+    coords = np.dot(s_measure,C)
+    x_coords = coords[:,columns['x_pos']]
+    y_coords = coords[:,columns['y_pos']]
+    z_coords = coords[:,columns['z_pos']]
+    ax.plot(x_coords, y_coords, z_coords,
+        '.g', label='Observed trajectory')
 
     #####################
     # Part 3:
