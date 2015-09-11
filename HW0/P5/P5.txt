@@ -1,1 +1,62 @@
 # Your answers here.
+
+
+
+1/ It takes 1 s to add 2 numbers. For 2 bags, it takes 1 s. For 3 bags, it takes 2 s. For 4 bags, it takes 3 s. Therefore for 256 bags, it takes 255 s.
+
+2/ There are 8 workers in total. There are 256 bags. Each worker can take 32 bags and count. It takes 31 s for each worker to count their 32 bags. There are now 8 bags. Use 4 workers to count, it takes 1 s for each worker. Then use 2 workers to count the 4 bags, it takes an other 1 s. Finally use 1 worker to count the 2 bags, it takes 1 s. The sum is obtained after 31 + 1 + 1 +1 = 34 s.
+
+3/ If there is at least 128 workers, the most efficient strategy is to
+
+Use 128 workers to count the 256 bags, it takes 1 s. 
+Use 64 workers to count the 128 bags, it takes 1 s. 
+Use 32 workers to count the 64 bags, it takes 1 s. 
+Use 16 workers to count the 32 bags, it takes 1 s. 
+Use 8 workers to count the 16 bags, it takes 1 s. 
+Use 4 workers to count the 8 bags, it takes 1 s. 
+Use 2 workers to count the 4 bags, it takes 1 s. 
+Use 1 workers to count the 2 bags, it takes 1 s. 
+
+Finally it takes 8 s. Note that 2^8 = 256.
+
+4/ 
+
+Using the note from the previous question, we find that 
+N = 2^{total time}
+when there is an infinite number of employees. Therefore total time = log_2(N) where log_2 is the binary log.
+
+See P5.png
+
+5/ Here is the workflow
+
+Use 128 workers to count the 256 bags, it takes 1 s. 
+Takes 1 s to communicate
+Use 64 workers to count the 128 bags, it takes 1 s. 
+Takes 1 s to communicate
+Use 32 workers to count the 64 bags, it takes 1 s. 
+Takes 1 s to communicate
+Use 16 workers to count the 32 bags, it takes 1 s. 
+Takes 1 s to communicate
+Use 8 workers to count the 16 bags, it takes 1 s. 
+Takes 1 s to communicate
+Use 4 workers to count the 8 bags, it takes 1 s. 
+Takes 1 s to communicate
+Use 2 workers to count the 4 bags, it takes 1 s. 
+Takes 1 s to communicate
+Use 1 workers to count the 2 bags, it takes 1 s. 
+
+Therefore it takes 8 + 7 = 15 s to count the bags.
+
+6/ 
+
+If each cashier takes 1 bag while I distribute one bag to each of the cashier they can start working and communicating. In the case of a total of bag  b = 4, I attach the workflow in Workertake1bag_b8.jpg. Their workflow is always the same, 1 s to communicate , 1 s to count and then 1 s to communicate. I find that the total time T = b + 4. I do the same thing for 16 bags (see Workertake1bag_b8.jpg) and find that T = b + 4. A recursive method allows us to say that it would take 260 s to count the 256 bags with this method.
+
+
+If each cashier takes 2 bags, the method is fairly similar. The sheme is shown in Workertake2bags_b16.jpg. In this case I find T= b/2 + 4.
+
+The most efficient method could probably arrive to T = b/2 + 2. However, I am still working on it.
+
+
+
+
+
