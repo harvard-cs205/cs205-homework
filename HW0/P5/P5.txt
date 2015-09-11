@@ -1,1 +1,36 @@
 # Your answers here.
+
+1. No matter the order in which the bags are summed, it will take the single
+   cashier 255 seconds.
+
+2. Now that there are eight cashiers, they can effectively sum 8 pairs of
+   bags per second. This would work best if we gave each cashier 256/8 = 32 bags
+   to sum. This will take them 31 seconds to sum these groups of bags, and now
+   we have 8 values to sum. Using the maximum number of calculators and cashiers
+   possible per second (it is fewer than 8 now), this will take 3 more seconds,
+   for a total of 33 seconds.
+
+3. The situation is similar to the one before, but we always have a surplus of
+   cashiers and calculators. Each second, the number of values left to sum is
+   halved, so this will take the employees 8 seconds to sum
+
+4. In the general case, it will take the ceiling of the base 2 logarithm of N
+   seconds to count N values.
+   Code for the plot is in P5.py.
+
+5. There needs to be one second of communication after each iteration of
+   calculation (except for the last), so counting 256 bags would take 15secs.
+
+6. Let's first count the time it will take for employees to hand bags off to
+   each other, assuming that they already all have the bags from you. This is
+   the same as the communication time - it would add one second after each
+   round of calculation.
+   In the case that you have to initially hand bags to employees, you will
+   become the limiting factor. In the case of either 1 or 2 bags, you will take
+   a minimum of 256 or 128 seconds to hand all the bags out respectively,
+   by which time all the bags you've already handed out will have been summed,
+   except for the last single or pair of bags.
+   A much better and more realistic way to do it is to leave all the bags spread
+   out and ask the poor employees to take bags at will, which will still be
+   faster than having you hand them out, even if we assume a 1 or 2 second
+   overhead for each time an employee picks up a pair of bags.
