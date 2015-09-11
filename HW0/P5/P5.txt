@@ -2,7 +2,7 @@
 
 1. If one cashier were to add the totals of 256 bags, how long would it take?
 
-	With one cashier, assuming 1 second per operaiton, it will take (n-1) seconds, or 255 seconds, where n is equal to the number of bags.
+	With one cashier, assuming 1 second per operation, it will take (N-1) seconds, or 255 seconds, where n is equal to the number of bags. 
 
 2. Seven of the cashier’s coworkers approach to see this ridiculous sight. The bright (and perhaps a bit opportunistic) cashier recruits them to help count. By working together, can they verify the total sum faster than the original cashier by herself? 
 
@@ -10,25 +10,46 @@
 
 If so, how fast can they do this?
 
-	Since there is now 8 total cashiers counting, the cashiers can now split the bags into 8 equal groups.With this split, the cashiers will now each have 32 bags, which will require a total of 31 seconds (n-1) for all cashiers to total up their respective bags in parallel. Each cashier will now have a number representing their total penny counts, which must now be summed this will require log2(8), or three more seconds to count, for a total of 34 seconds to count all 256 bags of pennies with 8 cashiers counting. 
+	Since there is now 8 total cashiers counting, the cashiers can now split the bags into 8 equal groups.With this split, the cashiers will now each have 32 bags, which will require a total of 31 seconds (N-1) for all cashiers to total up their respective bags in parallel. Each cashier will now have a number representing their total penny counts, which must now be summed this will require log2(8) (employees counting = 8), or three more seconds to count, for a total of 34 seconds to count all 256 bags of pennies with 8 cashiers counting. 
 
 3. Imagine the store is big. . . very big. As a matter of fact, the store has an infinite number of employees. How fast can the employees verify the sum?
 
-	No matter how many employees are present, the limiting factor is the number of bags and the addition operation which must be executed. This limiting number is (n/2) employees, where n is the number of bags. So in this case, even with unlimited or infinite employees, not more than 256 / 2 or 128 employees are neccessary to optimize the bag counting process. With 128 employees, which will be the same as unlimited, the counting the bags will require (256/128) - 1 + log2(128) seconds, or 8 seconds.This is the lowest number of seconds to count all the bags, no matter how many employees you have, as long as you have at least 128. 
+	No matter how many employees are present, the limiting factor is the number of bags and the addition operation which must be executed. This limiting number is (N/2) employees, where N is the number of bags. So in this case, even with unlimited or infinite employees, no more than 256 / 2 or 128 employees are neccessary to optimize the bag counting process. With 128 employees, which will be the same as unlimited, the counting the bags will require (256/128) - 1 + log2(128) seconds, or 8 seconds.This is the lowest number of seconds to count all the bags, no matter how many employees you have, as long as you have at least 128. 
 
 4. If you were feeling especially frustrated, perhaps you may use more than 256 bags. Instead, assume there are N bags. How long will it take the infinite number of employees to count the total? 
 
-	With N bags, the following formula can be used to determine the how long it will take to count the bags: (N / employees) - 1 + log2(N / 2)
+	With N bags, the following formula can be used to determine the how long it will take to count the bags: (N / 128) - 1 + log2(N / 2)
 
 Using Python, plot the result with bag count on the horizontal and counting time on the vertical. 
 
-	See plot
+	See plot P5.png
 
 On the same graph, plot the time it would take the lone cashier to do this by herself.
 
-	See plot
+	See plot P5.png
 
 5. We’ve been neglecting any overhead associated with people communicating. How does the answer for 256 bags change, if it takes one second to communicate a number between two employees?
 
+	Communication between employees will effect the model with an addition of log2(employees counting) time, when employee counting is less than the number of bags divided by 2 or N/2. The general equation for for 256 bags will be (256 / employees counting) - 1 + 2 log2(employees counting), where employees counting does not exceed N / 2. For the 8 employee case this will be 37 seconds and for the infinite number of employees, which does not exceed 128 employees counting, this will be 15 seconds. 
+
 
 6. Also assume it takes one second to hand a bag (or any number of bags) between two people (including from you to a cashier). How long will it take to verify 256 bags worth of coins if each cashier comes to you and takes 1 bag? What about 2 bags? Is there a better strategy? Assume you can’t be handing bags to more than one person at a time.
+
+	For one bag hand-off at a time, assuming 8 employees and 256 bags, it will first take 8 seconds to hand off the first round of bags, and then 8 seconds to handoff the second set of bags so that the employees have enough bags to count. We must add an additional second for the 8th employee to count his two bags. This will be 16 + 1 seconds total for the first 16 bags. 256 bags / 16 will be 16 rounds of full hand offs, which will take 16 * 16 + 1 seconds or 257 seconds total. We then add the communication and addition cost of the last computation which will be 2 * log2(8), which is 6, so this will take a total of 263 seconds. 
+
+	For a two bag handoff, assuming 8 employees and 256 bags, it will first take (N / 2) seconds to count each round of bag handoff. We must add 2 seconds onto the final handoff number in order to account for the last employee to count his bag after the last round of handoffs. This leads us to (N / 2) + 1 seconds, plus the time to combine numbers which is 2 * log2(2). The complete calculation is (N / 2) + 2 * log2(employees) + 1 = 128 + 1 + 2 * 3 = 135 seconds. 
+
+	For a better strategy, assuming 8 employees and 256 bags, we should evenly distribute the bags amongst the employees, at 32 bags per employee. As we hand out the bags, employees will begin counting in parallel to the handout operation. This allows us to form the following general calculation: ( N / employees) - 1 + employees, or in this specfic case, (256 / 8) - 1 + 8 = 39 seconds.  
+
+
+
+
+
+
+
+
+
+
+
+
+
