@@ -4,7 +4,7 @@ import math
 
 # Main
 if __name__ == '__main__':
-	x = np.linspace(1, 100, 20)
+	x = np.linspace(1, 1000, 20)
 	y1 = [math.log(i, 2) for i in x]
 	y2 = [(i - 1) for i in x]
 	plt.plot(x, y1, '-b', label = 'Infinite number of employees')

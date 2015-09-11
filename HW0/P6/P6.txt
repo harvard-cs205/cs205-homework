@@ -2,8 +2,33 @@
 
 Count to Ten:
 
-These results are random. If we program this in parallel, it will take much more time to run this program if the task is relatively small, since opening a processor costs much more time. But if the task is relatively large, using multiprocessor will make the whole process much faster. 
+These results are random. 
 
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 0
+Hi Job 4
+Bye Job 1
+Hi Job 5
+Bye Job 2
+Bye Job 3
+Hi Job 6
+Hi Job 7
+Bye Job 4
+Hi Job 8
+Bye Job 5
+Hi Job 9
+Bye Job 6
+Bye Job 7
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+Since Job 0 to Job 3 is in ascending order, but it not terminate with in this order. Since Synchronization is very important in parallel which effect the whole process. 
+
+ 
 How much faster? 
 
-Under the condition from 10^(-6)—>10^(-4), since the task is relatively small, serial version is faster than parallel version. However, under the condition from 10^(-3)->10^(0), the task is relatively large, parallel version will take shorter than serial version. 
+Under the condition from 10^(-6)—>10^(-4), since the task is relatively small, serial version is faster than parallel version. However, under the condition from 10^(-3)->10^(0), the task is relatively large, parallel version will take shorter than serial version. Therefore, if we program this in parallel, it will take much more time to run this program if the task is relatively small, since opening a processor costs much more time. But if the task is relatively large, using multiprocessor will make the whole process much faster.
