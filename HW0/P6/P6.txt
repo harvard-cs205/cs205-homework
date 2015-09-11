@@ -1,1 +1,95 @@
 # Your answers here
+
+
+
+Part A:
+
+Example output:
+feifei@feifei-VirtualBox:~/cs205-homework/HW0/P6$ python P6A.py
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 1
+Bye Job 2
+Bye Job 3
+Hi Job 4
+Bye Job 0
+Hi Job 5
+Hi Job 6
+Hi Job 7
+Bye Job 6
+Hi Job 8
+Bye Job 4
+Hi Job 9
+Bye Job 5
+Bye Job 7
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+feifei@feifei-VirtualBox:~/cs205-homework/HW0/P6$ python P6A.py
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 2
+Hi Job 4
+Bye Job 1
+Hi Job 5
+Bye Job 0
+Hi Job 6
+Bye Job 3
+Hi Job 7
+Bye Job 5
+Hi Job 8
+Bye Job 6
+Hi Job 9
+Bye Job 4
+Bye Job 7
+Bye Job 9
+Bye Job 8
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+feifei@feifei-VirtualBox:~/cs205-homework/HW0/P6$ python P6A.py
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 0
+Hi Job 4
+Bye Job 1
+Hi Job 5
+Bye Job 2
+Hi Job 6
+Bye Job 3
+Hi Job 7
+Bye Job 4
+Hi Job 8
+Bye Job 5
+Hi Job 9
+Bye Job 6
+Bye Job 7
+Bye Job 9
+Bye Job 8
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+Explanation: Each time we run the program, we get a different sequence of 
+starting and ending order. This is because the processes do not strictly
+work simultaneously. 
+We need to pay special attention when utilizing parallel programming.
+For example, we may not want two persons to edit the same file at the same time.
+
+
+
+Part B:
+
+As sleep times get longer, the ratio gets larger. 
+
+When the time required for performing a job is short, it will take relatively longer time 
+to communicate between cooperators. So performing the job alone costs less time.
+On the contrary, when the time required for performing a job is long, even if it takes
+some time to communicate between cooperators, performing in parallel costs less time.
+
+It is possible that a parallel program could take longer than it's serial version.
+Under the conditions that the time required for performing jobs is very short.
+
+
