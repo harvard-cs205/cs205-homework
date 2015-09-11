@@ -1,5 +1,6 @@
 1. 255 seconds.
 2. Yes. There are 8 people totally. They can distribute 32 bags to one person and each person only count their own bags. 31+3=34 seconds. In this case, they just need 34 seconds to do it.
-3. The fastest way to count is to seperate the job to 16 people, then they can do it in 30 seconds.
+3. If there are infinite number of people. They can use divide and conquer algorithm. They can use 128 people to sum each 2 bags first. And then sum them two by two at the same time and continue again until we have one sum. This strategy takes log(256)=8 seconds.
+4. If we have N bags. The fastest time to count them would be ceil(log(N))
 5. 43 seconds.
 6. 1 bag: 299 seconds. 2 bags: 171 seconds. The best strategy is to give bags to each person once and give them all they need at that time. 
