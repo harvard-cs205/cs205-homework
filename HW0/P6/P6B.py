@@ -21,21 +21,19 @@ if __name__ == '__main__':
     wait_time = np.logspace(-6, 0, num=20)
     # print wait_time
     for t in wait_time:
-        print "Current wait time: ", t
         # Compute jobs serially and in parallel
         # Use time.time() to compute the elapsed time for each
         serialTime = 1
         parallelTime = 1
+        # Serial code section
         startSerialTime = time.time()
-        # Insert serial code here
         for i in range(N):
             burnTime(t)
         serialTime = time.time() - startSerialTime
-
-        startParellelTime = time.time()
-        # Insert parellel code here
+        # Parallel Code section
+        startParallelTime = time.time()
         pool.map(burnTime, N*[t])
-        parallelTime = time.time() - startParellelTime
+        parallelTime = time.time() - startParallelTime
         # Compute the ratio of these times
         ratio.append(serialTime/parallelTime)
 
