@@ -33,3 +33,9 @@ This could require us to burn time to synchronize the outputs to make sure that 
 For example, if we were processing time-series data, it would be important for all of the outputs to come out in order.  
 
 
+How Much Faster?
+
+The plot P6.png shows that the ratio becomes more favorable for the Parallel process the longer the wait time is.  There is a point of diminishing returns, however, with a ratio of approximately 4, that becomes nearly flat for wait times any longer than 1/10 of a second.   The ratio of 4 for time-consuming tasks reflects that the tasks are completed 4 times as quickly by the 4 processes.  For quicker tasks, however, other considerations (communication between the processes, for instance), become more relevant and the advantage of parallel processing diminishes.  Somewhere between 10E-4 and 10E-5 seconds, the ratio crosses 1 (the point where the time for parallel and serial are equal), and for very quick tasks the serial approach is actually quicker than the parallel approach.  For these tasks in the 10E-6 to 10E-5 seconds range, the serial approach is faster because it does not incur the costs of communication between the processes and such.  
+
+### Acknowledgements: I overheard Taylor Killian mention using the np.logspace() function to create the range of time arguments for this problem, which was helpful.  
+

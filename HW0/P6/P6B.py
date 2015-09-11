@@ -20,13 +20,27 @@ if __name__ == '__main__':
     wait_time = np.logspace(-6, 0)
     
     for t in wait_time:
-        start_serial = time.time()
-        burnTime(t)
-        stop_serial = time.time()
-        # Compute jobs serially and in parallel
-        # Use time.time() to compute the elapsed time for each
-        serialTime = stop_serial - start_serial
-        parallelTime = 1
+        #### Compute the elapsed time for serial time
+        start_serial = time.time() # Start the clock
+        
+        x = 0 # counter for the while loop
+
+        while x < N:
+            burnTime(t)
+            x += 1
+                
+        stop_serial = time.time()  # Stop the clock
+        serialTime = stop_serial - start_serial  #Subtract to find elapsed time
+
+        
+        #### Compute the elapsed time for parallel time
+        start_parall = time.time() # Start the clock
+
+        pool.map(burnTime, [t]*N)
+
+        stop_parall = time.time() # Stop the clock
+
+        parallelTime = stop_parall - start_parall
 
         # Compute the ratio of these times
         ratio.append(serialTime/parallelTime)
