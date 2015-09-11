@@ -1,1 +1,54 @@
 # Your answers here.
+
+1. one cashier has too add 256 numbers, which means 255 additions.
+Therefore, 255 seconds.
+
+Answer : 255 sec
+
+
+2. total 8 coworkers will work together. So each person will have 256/8 = 32 bags.
+So adding up 32 bags will take 31 seconds.
+After that, each person has to add up what they've got with the coworker to get the total sum.
+If we think about tree structure, the height of the tree will be 3.
+Summing up each level will take 1 seconds,
+thereby resulting total time to be 31+3 = 34 seconds.
+
+Answer : 34 sec
+
+
+3. If there are infinite number of employees,
+then we could think of a tree that has 256 leaf nodes at the bottom.
+Since the height of the tree is log2(256) = 8,
+it will take 8 seconds.
+
+Answer : 8 sec
+
+
+4. in P5.png
+alone : N-1 sec
+infinite : log2(N) sec
+
+
+5. Again, when we draw a tree, the height would be 8 in total.
+So between each steps, communication has to be made.
+Therefore, 8-1 = 7 seconds will take additionally because of communication in total.
+So 8 sec (for calculation) + 7 sec (for communication) = 15 sec.
+
+Answer : 15 sec
+
+
+6. 1 bag at a time : In addition to the time we got from problem #5, which is 15 sec,
+ 256 seconds will take to hand in 256 bags one by one.
+ Answer : 256 + 15 = 271 sec
+
+ 2 bags at a time : bags should be handed in 128 times (thus total 256 bags),
+ 128 sec will take additionally.
+ Answer : 128 + 15 = 143 sec
+
+ Better strategy : giving 16 bags to each person is better way to reduce the time.
+ Then each person will take 15 seconds to sum up 16 given bags,
+ and 256/16 = 16 seconds will take to hand in bags,
+ and 3 seconds to communicate with each other,
+ and 4 seconds to sum up through the level in each tree structure.
+ Therefore, total 38 seconds.
+
