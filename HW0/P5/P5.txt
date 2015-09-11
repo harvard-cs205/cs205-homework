@@ -13,30 +13,48 @@ c) By allocating 128 to sum 2 bags each (1s), and then 64 (1s), etc... until onl
 
 T_tot=8s
 
-d) To evaluate the time needed for N bags, we use the decomposition of N as a sum of powers of 2. If N=2^pn + ... 2^p1, then the time needed is:
-	T= Sum(pi)+(n-1) if p1>0
-	T=Sum(pi)+n if p1=0
+d) To evaluate the time needed for N bags, we take into account the fact that we can only sum two numbers at a time. We therefore look at the highest power of 2 in N and set the following rule:
+if N=2**p, then T=p seconds
+if 2**p<N<2**(p+1) then T=p+1 seconds
 
-We use the following python code to evaluate the time:
+We use the following python code to evaluate the time and plot:
 
-import numpy as np
 def timeneeded(N):
-	Nbis=N
-	powers=np.array([])
-	while Nbis>1:
-		p=Nbis.bit_length()-1
-		powers=np.append(powers,p)
-		Nbis=Nbis-2**p
-	if Nbis==0:
-		time=np.sum(powers)+len(powers)-1 
-		return time
-	if Nbis==1:
-		time=np.sum(powers)+len(powers)
-		return time
+	Nbis=N.astype(int)
+	p=Nbis.bit_length()-1
+	if Nbis==2**p:
+		return p
+	else:
+		return p+1
 
-e) If we account for the 1s lag then they would need 15s to check the amount. 
 
-f)
+N=np.linspace(10,300,29)
+Time_para=[timeneeded(i) for i in N]
+Time_solo=[(i-1) for i in N]
+plt.plot(N,Time_solo,'-b',label='1 employee')
+plt.plot(N,Time_para,'-g',label='Infinite employees')
+plt.xlabel('Number of bags')
+plt.ylabel('Time in seconds')
+plt.show()
+
+e) If we account for the 1s lag then they would need 15s to check the amount. We need 1s to go from 256 to 128 amounts, then 2s to go to 64 (1 for communication and 1 for computing), 2s to go to 32 etc until 1 amount: 1+7*2=15 s
+
+f) If only on cashier can collect a bag at a time, the result will depend on what order the cashiers come to get the bag. Let's say each cashier goes twice in row to pick up a bag, let's try to spot a pattern:
+
+1-2    3-4    5-6    7-8  9-10   11-12    13-14   15-16
+ 3      5      7      8    11      12       15      17       here it only takes 1s as no communication is needed
+     7      						Now we need 2 sec as we need communication in between cashiers
+          9        
+                 11  
+                       13
+                              15
+                                     17
+                                             19
+
+So we spot a pattern that would lead to an added 251s for 256 bags for a total of 259 seconds. And this is without adding time for bringing the bags from one cashier to another. If cashiers were allowed to take 2 bag at a time, then we would reduce the time. 
+
+The strategy is to find the right balance between how many bags to take and how many employees to use. We might be able to gain some time by taking fewer employees in order to save the time they have to take to transfer the bags and communicating.
+
 
 
 
