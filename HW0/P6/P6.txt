@@ -40,8 +40,7 @@ Process A               Process B
     |
    End
 
-This affect the parallel programming in that processes are not synchronized well. Synchronization is important in any situation where 
-
+This affect the parallel programming in that processes are not synchronized well. Synchronization is important in any situation where multiple processes are going to write to the same memory area. Also, some scenarios would require a process to be "atomic" in that processes cannot be interleaved.
 # --- P6B ---
 
-From P6B.png we can see that, as the sleeping interval increases, the ratio goes from nearly 0 to approximately 4. This is because there may be some overhead that is invisible to user when starting a new process. This overhead is negligible when the process itself will take much more time to run. However, as the execution time of the process is of the same scale, or smaller than that of the overhead time, then this overhead must be considered as thus, running the same amount of processes in parallel can actually be slower than running in serial.
+From P6B.png we can see that, as the sleeping interval increases, the ratio goes from nearly 0 to approximately 4. This is because there may be some overhead that is invisible to user when starting a new process. This overhead is negligible when the process itself will take much more time to run. However, as the execution time of the process is of the same scale, or smaller than that of the overhead time, then this overhead must be considered as thus, running the same amount of processes in parallel can actually be slower than running in serial. Suppose that the overhead takes 10^(-3)s, when a process takes 1 s to execute. It will take a total of 4 * (1 + 10^(-3)) ~ 4s to execute in parallel and 16s in serial. However, if it takes 10^(-6)s to run a process, then the total time will approximately be 4*10^(-3)s and 1.6 * 10^(-5)s, under which condition execution in parallel is actually slower.
