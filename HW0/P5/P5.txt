@@ -6,5 +6,12 @@ Problem 5
       --> 32+4+1 = 37s ==> 6.89x faster
    3. 8s ==> 31.875x faster
    4. P5.py 
-   5. 
+   5. need to take one second to move numbers everytime after additions are done
+      8 + 7 = 15s
+   6. For this case, performance is limited by how many bags can be moved at
+      once, memory bandwidth. 
+      1) 1 sec to hand a bag from you to a cashier
+         1 sec to move the bag from the cashier to a worker
+         1 sec to get one more bag to the worker to add them
+         1 sec to add the two numbers
 

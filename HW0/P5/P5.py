@@ -2,18 +2,6 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 
-def predictS(A,s,a):
-  return A*s+a
-
-def predictSig(A,Sigma,B):
-  return np.linalg.inv(A*Sigma*A.T + B*B.T)
-
-def updateSig(Sigma,C):
-  return np.linalg.inv(Sigma+C.T*C)
-
-def updateS(Sigma_next,Sigma_appr,s,C,m):
-  return Sigma_next*(Sigma_appr*s+C.T*m)
-
 if __name__ == '__main__':
     # P5.4
     N = [float(2**exp) for exp in range(1,11)]
@@ -26,4 +14,5 @@ if __name__ == '__main__':
     plt.xlabel("Num of Bags")
     plt.ylabel("Time (s)")
     plt.legend()
+    plt.savefig('P5.png')
     plt.show()
