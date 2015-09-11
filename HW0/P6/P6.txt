@@ -33,3 +33,19 @@ PART A.
     payment is deducted from the user's account, resulting in overdraft fees).
 
 PART B.
+    The speedup of parallel relative to serial execution increases as the wait
+    time increases, finally plateauing at roughly the theoretical maximum of
+    4x speedup for wait times on the order of 10^-2 through 10^0 seconds.
+    There's some amount of overhead involved in splitting up the processes, so
+    for shorter wait times, this cuts into the speedup (for long wait times,
+    there's the same amount of overhead, but it's negligible relative to the
+    wait time itself).
+
+    For very short wait times (in this case, on the order of 10^-5 seconds),
+    the parallel version actually takes more time than the serial version
+    (i.e., speedup < 1), which is possible if the overhead to assign the
+    threads is a significant fraction of the total time it takes to run the
+    function serially. The hand-each-cashier-one-bag version of P5.6 shows one
+    theoretical example of this: it takes longer to verify the total in that 
+    case than in the one-cashier-working-alone case, because so much time is
+    spent handing one bag at a time to each cashier.
