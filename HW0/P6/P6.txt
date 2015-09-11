@@ -1,1 +1,15 @@
 # Your answers here
+When I run the program several times, I see that the jobs do not start and stop in the same order every time. 
+For example:
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 3
+Bye Job 1
+Bye Job 0
+Bye Job 2
+Sometimes one job ends up taking slightly longer than another job, based on the way that the jobs get distributed. This can be important if, for example, we are passing information from one worker to another or operating on a shared variable. 
+
+
+When comparing serial execution to parallel execution for processes of various lengths, we see that, for wait times of ~<5E-3 sec, the parallel execution starts to work less than 4 times as quickly as the serial execution (4 times faster is expected for 4 processes). Below ~1e-4 sec the serial execution starts to work more quickly than the parallel execution. This can be explained by assuming that there is some constant time required to load and unload jobs from the process. As the computation time per job decreases relative to the load/unload time for the process, that load/unload time begins to dominate the overall computation time.  If we assume that that load/unload time is constant and that the serial computation time scales linearly with wait time, we can estimate how long the load/unload time is by looking at these ratios. When the serial time/parallel time is ~ 1, that means that the load/unload time is ~3 x longer than the wait time. That is, while the serial process runs 4 times, each of the 4 parallel processes run once and then lags for some time equal to 3x the wait time. Thus, the load/unload time is around 1E-4 sec, or .1 ms. 

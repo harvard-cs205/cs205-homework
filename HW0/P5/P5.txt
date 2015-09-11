@@ -1,1 +1,18 @@
 # Your answers here.
+Problem 5
+
+1. One cashier is required to add up 256 numbers, and can add up 2 numbers at a time, so it should take 255 seconds.
+
+2. If they divide the 256 bags into 8 bundles of 32 bags each. Each coworker is in charge of adding one of those bundles. Each coworker finishes counting their bundle in 31 seconds. They then have to count 8 numbers. Neglecting communication time, they can further parallelize that by dividing it up into 4 groups of 2 each (1 second), and then 2 groups of 2 each (1 second), and then 1 group of 2 each (1 second). This comes to a total of 34 seconds.
+
+3. With an infinite number of employees, N numbers can be added by taking N/2 employees (assuming N is even), thereby reducing the number of numbers to add by a factor of 2. This takes 1 second. This can be repeated sequentially. Since 256 is 2^8, this counting should take 8 seconds. 
+
+4. See Plot
+
+5. Employees need to communicate in between each calculation. They do not need to communicate before the first calculation. Thus, the time should be 2*8-1=15 seconds.
+
+6. The goal is to distribute the 256 bags among 128 employees, so that each employee has 2 bags each. If you hand one bag to one employee at a time, this will take 256*2=512 seconds, since each employee will have 1 bag and will then have to hand it over to someone else (or tell someone the number of coins in that bag). Then the computation could take place and would take 15 seconds longer, for a total of 527 seconds. 
+
+If you hand two bags to one employee at a time, it would take 128 seconds to reach the goal of 128 employees with 2 bags each. At that point, the computation could take place. In total this would take 143 seconds. 
+
+A better way to distribute the bags would be if you could pass many bags to a single employee. If, for example, you are very strong and can hand 128 bags to one employee, then hand the other 128 bags to another. The two employees begin distributing the bags in a reverse way to the way that they counted them. Because they can only hand bags to a single person at a time, this should take 8*2=16 seconds, and so the total counting process should take 31 seconds. You could potentially do even better by having the employees keep 2 of the bags they are given each time (for example, when they receive 128 bags, they distribute 63 bags to two other employees. In the original scheme, the original worker would then be idle, but now they can begin adding. Although I did not calculate this explicitly, I expect that the computation could be complete 1 or two iterations after the distribution had been completed.
