@@ -1,1 +1,10 @@
-# Your answers here
+Problem 6
+
+1.) Count to Ten
+This program executes 10 instances of the function  burnTime(k) with k in from 1 to 10. A single thread/processor program would execute all instances in a consecutively (“Hi Job 1”, “Bye Job 1”, “ Job 2”, “Bye Job 2” …). 
+
+Using the multiprocessing package enables concurrency. Four instances of the function are executed at simultaneously. The waiting time (time.sleep(0.25)) within the burnTime function allows the processor to start a new instance before the previous one has finished. After the execution of the first four instances have been initiated (“Hi Job 1”, “Hi Job 2”, “Hi Job 3”, “Hi Job 4”) the sequence in which these instances finish and other instances start and finish becomes unpredictable and differs overtime the script is run. The sequence in which the instances start and finish depends on how the processor internally organizes it’s workload. Among other things this depends on background processes (e.g. OS). 
+
+A non-parallelized program can be thought of a linear (and branched) chain of events. Parallelization disturbs this linearity. This can cause problems when outputs of different steps depend on each other. For example when calculating a + b = c, a and b can be calculated in parallel, but before c can be calculated the results of the both previous calculations must be available. Thus the processes that calculate and b need to communicate with one another.
+
+2.) The serial version of the program is faster when the waiting times are short. The parallel version is faster when the waiting times are long. Parallel execution requires the processor to coordinate the processes that are running in parallel. This takes time and resources. When the waiting times are short this overhead slows the execution down. When the waiting times are long, the processor has enough time to coordinate the execution of the instances that are running in parallel. This leads to a speed up. 
