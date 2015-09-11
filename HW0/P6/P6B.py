@@ -36,7 +36,7 @@ if __name__ == '__main__':
         #parallelTime = 1
         
         start_parallel = time.time()
-        result = pool.map(burnTime(t), range(N))
+        result = pool.map(burnTime, N * [t])
         parallelTime = time.time() - start_parallel
 
 
