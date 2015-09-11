@@ -9,9 +9,13 @@ Problem 5
    5. need to take one second to move numbers everytime after additions are done
       8 + 7 = 15s
    6. For this case, performance is limited by how many bags can be moved at
-      once, memory bandwidth. 
-      1) 1 sec to hand a bag from you to a cashier
-         1 sec to move the bag from the cashier to a worker
-         1 sec to get one more bag to the worker to add them
-         1 sec to add the two numbers
-
+      once, like how computing power is limited by memory bandwidth.
+      1) if cashier takes 1 bag?
+        all computations cannot be done until 256 bags are handed to cashiers.
+        After the last bag is moved to a cashier, the last addition can be 
+        made. So, I guess it will take 257s (256s + 1s)
+      2) if cashier takes 2 bags?
+        if 2 bags can be taken by a cashier, performance is going to be 
+        increased compared to the first case. it will take 129s(128s + 1s)
+      ==> strategy : we need to offer enough nuber of bags that are handed to
+                     cashiers so that computing powers cannot be limited. 
