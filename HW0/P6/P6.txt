@@ -1,1 +1,47 @@
 # Your answers here
+Below are a few outputs of running P6A.py. One unexpected result is Job 7 (in both runs), which immediately finishes before the 3 other jobs that were started before it. The other unexpected result is that the order of operation in each run is slightly different. This suggests some randomness in assignment of tasks and availability of the units perhaps due to limitations of the central controller that manages the schedule of these units.  This feature could be important to think about when there are uneven job sizes and complex assymetric job dependencies. In such a case we would want to enforce a prioritization of attention to the completion of certain tasks over others in order minimize unnecessary waiting of resources. 
+
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 1
+Hi Job 4
+Bye Job 3
+Bye Job 2
+Hi Job 5
+Hi Job 6
+Bye Job 0
+Hi Job 7
+Bye Job 7
+Bye Job 4
+Hi Job 8
+Bye Job 6
+Hi Job 9
+Bye Job 5
+Bye Job 9
+Bye Job 8
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 3
+Bye Job 2
+Hi Job 4
+Bye Job 0
+Hi Job 5
+Bye Job 1
+Hi Job 6
+Hi Job 7
+Bye Job 7
+Hi Job 8
+Bye Job 5
+Hi Job 9
+Bye Job 6
+Bye Job 4
+Bye Job 9
+Bye Job 8
+
