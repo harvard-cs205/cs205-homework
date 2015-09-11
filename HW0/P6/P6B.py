@@ -3,6 +3,7 @@ import numpy as np
 import time
 import matplotlib.pyplot as plt
 
+
 # Sleep for t seconds
 def burnTime(t):
     time.sleep(t)
@@ -26,9 +27,10 @@ if __name__ == '__main__':
         # Compute jobs serially and in parallel
         # Use time.time() to compute the elapsed time for each
         start_ite_time = time.time()
-        for k in xrange(16):
+        for k in range(N):
             burnTime(t)
         serialTime = time.time() - start_ite_time
+
         start_par_time = time.time()
         pool.map(burnTime, t * np.ones((N,)))
         parallelTime = time.time() - start_par_time

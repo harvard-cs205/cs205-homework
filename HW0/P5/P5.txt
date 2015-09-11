@@ -14,6 +14,38 @@ It would take 8s for the employee (256 = 2**8).
 5) Between two steps, the employee need to hear from another the number of its bag. Previously, we had with an infinite number of cashiers 8 steps. This change adds 7s.
 The answer increased by 7s, it is now 15s.
 
-6) Except for the preliminary step, where the cashiers get the bags from me, this change adds 1s between each step too.
-For the preliminary step, it adds 2 * n_e s with n_e the number of employees used if each employee takes one bag (because they will take after the second one) and n_e s if each one takes two of them.
+6) Here we need to change the strateg in the two case as the bandwith in the network is upper bounded. If we use many cashiers as previously, most of them would be useles as they won't have access to bags.
+
+In the case of 1 bag, a better strategy is to use only two cashiers: each second, one will be adding his two bags while the other is taking one bag to you. There is no wastefulness here.
+For 256 bags with the two cashier c1 and c2 and me
+1sec: me to c1 (c1: 1, c2: 0)
+2sec: me to c1 (c1: 2, c2: 0)
+3sec: c1 computes, me to c2 (c1: 1, c2: 1)
+4sec: me to c1 (c1: 2, c2: 1)
+5sec: c1 computes, me to c2 (c1: 1, c2:2) (5 bags given)
+then it alternates between c1 and c2
+until 256 secs where all the bags has been given and we have the state:
+257sec: c1 computes (c1:1, c2:1)
+258sec: C1 to c2 (c1:0, c2:2)
+259sec: c2 computes
+
+So the total time is 259s.
+
+In the case of 2 bags, with the same reasoning we need this time 3 cashiers to be optimal.
+For 256 bags with the cashiers c1, c2 and c3 and me
+1sec: me to c1 (c1: 2, c2: 0, c3:0)
+2sec: c1 computes, me to c2 (c1: 1, c2: 2, c3:0)
+3sec: c2 computes, me to c3 (c1: 1, c2: 1, c3:2)
+4sec: c3 computes, me to c1, c2 to c1 (c1: 2, c2: 0, c3:1)
+5sec: c1 computes, me to c2, c3 to c2 (c1: 1, c2:2, c3:0) (10 bags given)
+then it keeps going until 128 secondes.
+129: c1 computes (c1: 1, c2:1, c3:0)
+130: c1 to c2 (c1: 0, c2:2, c3:0)
+131sec: c2 computes
+
+Total time here is 131s
+257: c1 to c2 (c1: 0, c2:2, c3:0)
+
+
+ 
 
