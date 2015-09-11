@@ -31,12 +31,11 @@ P6A:
 
 -How could this affect how we program in parallel?
 
-	This could definately have an affect on programs we execute in parallel, as we are not certain which specific processor will be complete with which process first. When executing programs in serial this is always obvious. 
+	This could definately have an affect on programs we execute in parallel, as we are not certain which specific processor will be complete with which process first. If a subsequent process has a dependency on a previous process completion the order of exectution and subsequent information is important. With this parallel method this order of output is not clear. When executing programs in serial this is always obvious. 
 
 -Describe a scenario where this would be important.
 
-	Any program where executions are dependent upon one another would break down in this method of parallel exection, as we are not certain in what order information will become available. 
-
+	Any program where executions are dependent upon one another would break down in this method of parallel exection, as we are not certain in what order information will become available.
 
 
 P6B:
