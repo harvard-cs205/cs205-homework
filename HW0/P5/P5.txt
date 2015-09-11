@@ -1,1 +1,17 @@
-# Your answers here.
+1. 255 seconds. 
+
+2. Yes. Each cashier can take 1/8th of the bags of pennies, 32 per person, and add the totals for their 32 bags. The cashiers could then pair off to sum their totals, and pair off again, and pair off again. Each cashier can sum their 32 bags in parallel, taking 31 seconds. The eight cashiers can pair off and sum their totals, taking another second. The four remaining cashiers can pair off, another second. And, finally, the remaining two cashiers pair off, another second. In total, 34 seconds. 
+
+3. Assuming no costs for communication or for handing out the bags, 128 cashiers each have two bags. In 1 second, the cashiers each sum their two bags. The cashiers pair off and communicate, which takes no time by assumption. In 1 additional second, the 64 remaining cashiers add two bags again. The employees can do this 7 times (as 2^7=128), thus taking 7 seconds. 
+
+4. It would take the infinite number of employees log(N) time to count the total. See plot.
+
+5. Assuming 8 cashiers, as in question 2, each time the cashiers pair off, the communication cost takes a second. As this pairing interaction occurs 3 times in question 2, this takes an additional 3 seconds, taking 37 seconds in total. 
+
+Assuming infinitely many cashiers, wherein 128 are useful, the cost of communication in pairing off (from 128 employees to 64 to 32 ...) takes an additional 7 seconds, and so takes 14 seconds total.
+
+6. Assuming 256 cashiers, let each cashier take 1 of the 256 bags; this takes 256 seconds. As each cashier only takes 1 bag, the cashiers cannot start their sums until all bags have been distributed. Then, the cashiers pair off, communicate, and add their bags. They repeat this process 8 times with a cost of 2 seconds per iteration. This takes 16 seconds. The total time is 272 seconds. 
+
+If 256 bags and 128 cashiers each take 2 bags, this takes a total of 128 seconds. Cashiers #1 - 127 can sum their bags and communicate while the distribution is happening. For example, say I hand 2 bags to cashier (1 second). Then, cashier 1 sums their bags (1 second); meanwhile, I hand 2 bags to cashier 2. Cashier 2 sums (1 second); meanwhile, I hand 2 bags to cashier 3. Cashiers 1 and 2 communicate (1 second); meanwhile, cashier 3 sums, and I hand 2 bags to cashier 4. Cashier 4 sums (1 second); meanwhile, cashiers 3 and 1 communicate, I hand 2 bags to cashier 4 (or I can reuse cashier 2), and so on. The whole process then takes 128 seconds.  
+
+A better strategy would be for you to hand 256 bags to a cashier; the cashier would each then hand 128 to two additional cashiers, who would then hand two additional cashiers 64 bags, and so on. Thus we can parallelize not just the computation but also the communication. This takes 8 additional seconds, as well as the 14 seconds required to compute the sum, or 22 seconds total. 

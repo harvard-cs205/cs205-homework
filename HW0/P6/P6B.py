@@ -1,6 +1,8 @@
 import multiprocessing as mp
 import time
 import matplotlib.pyplot as plt
+import math
+import numpy as np
 
 # Sleep for t seconds
 def burnTime(t):
@@ -16,14 +18,13 @@ if __name__ == '__main__':
 
     # Use a variety of wait times
     ratio = []
-    # this is a trick to place 5 evenly spaced points 
-    # in each of 6 buckets between 10^-6 and 10^0
-    wait_time = [pow(10,0.2 * x) * pow(10,-6) for x in range(0,31)]
+    # place points at 40 locations between 10^-7 and 10^0
+    wait_time = np.logspace(np.log10(pow(10,-7)), np.log10(pow(10,0)), 40)
+    print wait_time
     for t in wait_time:
         #print wait_time
         # Compute jobs serially and in parallel
         # Use time.time() to compute the elapsed time for each
-
         startTime = time.time()
         #Serial computation
         for i in range(N):
