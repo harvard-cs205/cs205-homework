@@ -1,1 +1,6 @@
-# Your answers here.
+1) Adding together the numbers takes 255 operations (seconds) since each number has to be added in at some point
+2) It would take 34 seconds. You give each friend 32 numbers to add which takes 31 seconds and produces 8 sums. Then you pair wise add to 4 sums, once again to 2, and finally one more second to get to one. This is a total of 34 seconds. 
+3) If everyone is working it is the log base 2 of 256 which is 8 seconds. This only requires 128 people, any more would be redundant
+4) Like part 3 it's the log base two of N since you add two numbers at a time and combine them and repeat. On the plot the blue is the linear time it takes one person to add the numbers, and the green is the logarithmic time 
+5) This is 15 seconds. It takes twice as long as in part three because after every round of counting, you need exactly one second for half the people to tell the other half. It is 1 less than double because at the end you don't need to tell anyone the final count. 
+6) Assuming it still takes one second to communicate a number, 

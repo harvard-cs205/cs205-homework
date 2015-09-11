@@ -1,1 +1,6 @@
 # Your answers here
+A) The output changes because you are telling four processors to run a function and print the output. Because these are running in parallel, you don't actually know which processor is going to finish first since that depends on small differences and race conditions. It always prints out all the output, just not in the same order
+
+If you are expecting output in a certain order, you should make processors wait until printing out their answer. An example where this could be bad is if you are trying to translate some text to another language by breaking it up into sentences and multi processing each one. If the translated sentences aren't printed in correct order then the paragraph won't make sense.
+
+B) It is clear that as wait time gets larger, parallel processing becomes more efficient. It is actually interesting that around 10^-5 wait time the ration drops below 1. This means that for very small wait times, serial is more efficient. The reason why is unclear but might be due to the overhead of communicating between parallel processors when this overhead becomes large relative to the wait time. 
