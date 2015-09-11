@@ -2,11 +2,11 @@
 
 1. It would take 255 seconds, as we need to perform 255 summations.
 
-2. They definitely can verify the total sum faster.  We can split the 256 bags into 7 groups of 36 bags, so it will take us 35 seconds to get 7 sums and 4 remaining bags.
+2. They definitely can verify the total sum faster.  We can split the 256 bags into 8 groups of 32 bags, so it will take us 31 seconds to get 8 sums.
 
-At this point, we have 11 values left.  5 people can take 1 second to return 5 sums with 1 bag remaining, leaving 6 values remaining.  3 people will take 1 second to return 3 sums, which in turn takes 2 seconds to finish summing.
+Now, with 8 sums, we have sufficent number of people to handle exactly 2 bags each, so 8 -> 4 -> 2 ->1 takes 3 additional seconds.  
 
-Thus, the total amount of time is 35 + 1 + 1 + 2 = 39 seconds.
+Total time is 34 seconds.  
 
 3. With an infinite number of employees, it will take us 8 seconds.  With an infinite number of employee, we can cut down the number of remaining values to sum up by half each time.  256 = 2^8, so to reach one sum, we need to cut down the sum by half 8 times.
 
@@ -23,6 +23,7 @@ Time: ceil(log2(N))
 Total: 15 seconds
 
 6.
+Assumption: Cashiers can only interact with one action at a time.
 If each cashier comes to you and takes 1 bag, we get the following sequence.
 G means grab bag from you, C means communicate, S means sum, _k means the specific cashier
 (G_0, G_0, (S_0, G_1), G_1, (S_1, G_0), (G_1, S_0). (G_0, S_1), ... )
@@ -38,7 +39,7 @@ If each cashier comes to you and takes 2 bags, we get the following sequence.
 (G_0, (S_0,G_1), (S_1, G_2), (S_2,G_0), (S_0, G_1), (S_0, S_1, G_2), (S_1,S_2, G_0), (S_0, S_2, G_1), (S_0, S_1, G_2), ... )
 This takes 128 seconds.
 
-When we make the final grab, we have person zero with 1 value, person one with 2 values, and  person three with 3 values left. 
+When we make the final grab, we have person zero with 1 value, person one with 2 values, and  person two with 3 values left. 
 Thus, we need one last sequence.  (S_1,S_2), (C_{1,0}, S_2), S_0, C_{2,0}, S_0 which is 5 additional seconds.
 
 The final answer is 128 + 5 = 133.
