@@ -18,9 +18,8 @@ So for 8 employees, it will now take 37 seconds.
 For infinite employees, it will now take 16 seconds for fastest counting.
 
 #6
-Assume that the employees starts to count and communicate the next second I give them the bags.
+Assume that the employees starts to count and communicate the next second I give them the bags, and they just communicate in serial, not parallel.
 If each employee takes 1 bag from me, that will be 256 seconds for taking the bag, and for 256 employees to sum up all the bags, it will take 2*255 seconds(communications and add numbers), but they can start to count when I give out bags, and the overlap time will be 256-3+1 because the overlap begins at the time I give bag to the 3rd person. So the total time it costs will be 512 seconds.
 If each employee taks 2 bags from me, similarly, there will be 128 seconds for taking bags, and 1+3*127 seconds for counting, and an overlap of 127 seconds, so the total time will be 383 seconds.
-By math deduction, I find it's better for the employees to wait until I give out all the bags and then start to count at the same time, which would save a lot of time.
-
+It would be much faster if I give them number of bags in a decreasing order so that when I finish giving bags, all the employees have already counted the bags in their hands and can start to communicate in parallel. For example, I give the 1st employee 22 bags, and give the second 21 bags, and so on. When I give out the last bag, all 22 employees should be ready to communicate their numbers, so this step would cost 22 seconds. And then the communication time would be ceil(log_2(22)) because there are 22 employees. And the calculation time between these communications would also be ceil(log_2(22)), so the total time will be about 32 seconds.
 
