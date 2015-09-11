@@ -3,25 +3,24 @@
 If you run the above code a number of times, you may see some unexpected results. Explain these results.  
 One strange phenomenon observed was that before Job 0 was finished, Job 1,2,3 began
 executing. This is because the processes are executing in parallel.
-Also, even though Job 0 began first, 'Bye Job 1' came before 'Bye Job 0' indicates that Job 1 actually ended before Job 0. Even though Job 0 started first, Job 1 may have been given more time by the scheduler to execute its job than the time given to Job 0. 
+Also, even though Job 0 began first, 'Bye Job 1' indicates that Job 1 actually ended
+first. Even though Job 0 started first, Job 1 may have been given more time by the scheduler to execute its job than the time given to Job 0. 
 
 How could this affect how we program in parallel?
-This affects the way we program because many problems will occur if our processes share a resource and want to change its value at the same time.
+This affects the way we program because many problems will occur if our processes share a resource.
 
 Describe a scenario where this would be important.
 For example, if a two processes want to add 1 to a shared variable x only if x==0. Process A checks and sees that x==0, but is interrupted by Process B. B checks x==0 is true and adds one to x. A continues to execute without realizing that B already changed the value of x and thus adds another 1 to x. Now x's value is 2. This could have serious consequences if not noticed.
 
 Try to explain the trend you observe. Is it possible that a parallel program could take longer than it’s serial version? Under what conditions?
-My program generates 16 random numbers between [10^-6,1] and sorts them first. 
-From the results and graph provided, we see that serial execution of burntime takes less time than parallel execution in the latter half. This may be due to the overhead associated with parallel execution. Since the calculations are small, the overhead cannot be overlooked. 
+From the results and graph provided, we see that serial execution of burntime takes more time than parallel execution. I think this is due to multiple processes calling burnTime in parallel, thus there is no need to wait for one process to finish before processing the next one. Parallel programs could take longer than serial if there is a shared resource. Communication between processes for that resource could result in a longer execution time. 
 
 			---Results---
+Serial Results = [2.5987625122070312e-05, 0.012671947479248047, 0.04170989990234375, 0.05911707878112793, 0.1894969940185547, 1.6128921508789062] 
 
-Wait times = [0.0603525336883 0.195778566497 0.359350347877 0.506500678743 0.599673975847 0.661736130064 0.697767539925 0.72718314628 0.729908307491 0.760210801602 0.794386312009 0.804551131597 0.816468653932 0.878843893363 0.930214837658 0.948115849061 ]
+Parallel Results = [0.0009679794311523438, 0.01710677146911621, 0.006604909896850586, 0.011857986450195312, 0.04976081848144531, 0.40621113777160645]
 
-Serial Execution Time = [0.0606820583344 0.196182966232 0.360553026199 0.508473157883 0.601711988449 0.662832975388 0.698096990585 0.729152917862 0.732080221176 0.762843132019 0.795902013779 0.806244850159 0.819178819656 0.880455970764 0.930999994278 0.950592041016 ]
+Wait times = [0.000001,0.00001,0.0001,0.001,0.01,0.1]
 
-Parallel Execution Time = [0.0623750686646 0.196998119354 0.361349105835 0.50886297226 0.663861989975 0.860236167908 1.06065320969 1.23767518997 1.39541316032 1.62073898315 1.85699820518 2.04346609116 2.21322798729 2.49983716011 2.78893518448 2.99192619324 ]
-
-Ratios(serial/parallel) = [0.972857579696 0.995862127392 0.997796923743 0.999233950203 0.906381141767 0.770524421218 0.658176474846 0.589131077176 0.524633307175 0.470676117467 0.428596005939 0.394547701891 0.370128529171 0.352205329536 0.333819157741 0.317719081161 ]
+Ratios = [0.026847290640394088, 0.7407562263940572, 6.314983936757752, 4.985423033617501, 3.8081566943922724, 3.970575892445766]
 
