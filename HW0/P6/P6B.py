@@ -16,10 +16,9 @@ if __name__ == '__main__':
 
     # Use a variety of wait times
     ratio = []
-    wait_time = []
+    wait_time = [1e-6,5e-6,1e-5,5e-5,1e-4,5e-4,1e-3,5e-3,1e-2,5e-2,1e-1,5e-1,1]
 
     for t in wait_time:
- 	wait_time.append(t)
         # Compute jobs serially and in parallel
         # serially
 	start_serial = time.time()
@@ -28,12 +27,13 @@ if __name__ == '__main__':
 	end_serial = time.time()
         # in parallel
 	start_parallel = time.time()
- 	result = pool.map(burnTime, range(N))
+ 	pool.map(burnTime, N*[t])
 	end_parallel = time.time()
         # Use time.time() to compute the elapsed time for each
         serialTime = end_serial-start_serial
         parallelTime = end_parallel-start_parallel
-
+        print serialTime
+        print parallelTime
         # Compute the ratio of these times
         ratio.append(serialTime/parallelTime)
 
@@ -43,4 +43,5 @@ if __name__ == '__main__':
     plt.xlabel('Wait Time (sec)')
     plt.ylabel('Serial Time (sec) / Parallel Time (sec)')
     plt.title('Speedup versus function time')
+    plt.savefig('P6.png')
     plt.show()
