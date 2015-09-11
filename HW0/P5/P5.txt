@@ -1,1 +1,32 @@
 # Your answers here.
+
+1. Depends on how the cashier counts. If she's not clever, she'll sum the
+bags linearly, taking a total of 255 seconds (1 second to sum the first two
+values, then 1 second to add the next bag to the current count).
+
+It's not possible for her to improve this, even if she tries to be clever.
+The single cashier has to add the value on bag i at least once. With 256 bags,
+the least amount of time she can take is 255 seconds.
+
+2. They can verify it much faster. Each cashier can take 31 seconds to sum
+32 bags, giving a total of 8 integers that now need summing. If we continue to
+parallelize, it takes 1 second for 4 cashiers to each sum 2 integers giving us
+4 new integers. In the next second, 2 cashiers each sum two integers again,
+giving us 2 integers. Then we have the last cashier sum these two values in
+another second. The total time taken is 31 + 1 + 1 + 1 = 34 seconds.
+
+3. If we follow the idea at the end of (2) above, given 256 values, we use
+128 cashiers in 1 second to reduce values in half (128). Then in the next second,
+we use 64 cashiers to reduce the values in half (64). We can continue this process
+until we use 1 cashier to reduce the value to a single integer. For 256 values,
+it takes a total of log_2(256) = 8 seconds.
+
+In general, it took 1 second per step because the cashiers summed only two bags.
+The general formula is (b-1)log_b(256), which is valid only for (b-1) > 0. It
+turns out that this formula is strictly increasing as a function of b on [2,infinity],
+so 8 seconds, given the problem statement, is the absolute minimum.
+
+4. Generalizing the bags, it would take log_2(N) to sum N bags if we have an
+infinite number of cashiers at our disposal. First use N/2 cashiers in 1 second
+to sum N numbers into N/2, then repeat, cutting the number of integers in half
+each second.
