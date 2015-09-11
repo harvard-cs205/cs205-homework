@@ -1,1 +1,14 @@
 # Your answers here.
+
+1. 255 seconds
+2. Yes, 38 seconds. 31 Seconds per person. Then 7 Seconds to sum the 8 people's totals together.
+3. The fastest you could sum the numbers is 30 seconds with 16 people. 
+4. It would take 2sqrt(N)-2 Seconds.
+5. It would take 42 seconds. 
+6. For 1 Bag/second:
+Time = 256 + 256/N - 3 + 2N
+Optimal Amount of People:12
+Time = 299 seconds
+For 2 Bag/second:
+Time = 171 seconds
+The best strategy is to hand out the number of bags that each cashier is expected to count all at once. So in this case, hand 23 bags to 8 people and 24 bags to 3 people then you are only adding 11 seconds of time instead of 256 or 128 seconds. 

@@ -1,1 +1,8 @@
-# Your answers here
+P6A
+The code is written so that Hi Job should print first and Bye Job should print second.
+Instead the Hi Job and Bye Job lines are intermixed. This could be a problem when coding
+in parallel if there are lines that must be executed in order. An example could be 
+
+P6B
+With a fast sleep time, parallel and serial times are similar. However, with longer sleep times parallel code is much faster. This is because the sleep time is distributed to the different cores
+in parallel while in serial the processor must wait the cumulative sleep time. It's possible for a parallel program to take longer than a serial process if the the communication time between cores is long. 
