@@ -46,9 +46,6 @@ if __name__ == '__main__':
 
     r_matrix = np.matrix([[1/r[0], 0, 0], [0, 1/r[1], 0], [0, 0, 1/r[2]]])
 
-    def mult(matrix_row):
-        return r_matrix * matrix_row
-
     x = measured.copy()
 
     i = 0
@@ -119,36 +116,42 @@ if __name__ == '__main__':
     measured_matrix = np.matrix(measured)
 
     def predictS(s):
-        return (A * s) + a
+        return np.dot(A, s) + a
 
     def predictSig(sigk):
-        return np.linalg.inv(A * sigk * A.T + B * B.T)
+        return np.linalg.inv(np.dot(np.dot(A, sigk), A.T) + (B * B.T))
 
     def updateSig(predicted_sig):
-        return np.linalg.inv(predicted_sig + C.T * C)
+        return np.linalg.inv(predicted_sig + (C.T * C))
 
     def updateS(updated_sig, predicted_sig, predicted_S, m_next):
         return updated_sig * ((predicted_sig * predicted_S) + (C.T * m_next))
 
     sigma0 = 0.01 * np.identity(6)
 
-    s_array = np.empty((6, K-1))  # K-1 since there are only 120 entries
+    s_array = np.empty((6, measured_matrix.shape[0] - 1))  # K-1 since there are only 120 entries
+    s_matrix = np.asmatrix(s_array)
 
     sigmak = sigma0
     sk = s0
-    for n in range(0, measured_matrix.shape[0]):
-        if (n + 1) >= measured.shape[0]:
-            break
+
+    for n in range(0, measured_matrix.shape[0] - 1):
+
+        # Predict
         predicted_s = predictS(sk)
         predicted_sigma = predictSig(sigmak)
+
+        # Update
         updated_sigma = updateSig(predicted_sigma)
-        s_next = updateS(updated_sigma, predicted_sigma, predicted_s, measured_matrix[n + 1][:].T)
-        s_array[:, n] = s_next[:][0]
+        s_next = updateS(updated_sigma, predicted_sigma, predicted_s, measured_matrix[n + 1].T)
+        s_matrix[:, n] = s_next[:, 0]
+
+        # Next steps
         sk = s_next
         sigmak = updated_sigma
 
-    ax.plot(s_array[0, :], s_array[1, :], s_array[2, :],
-            '-r', label='Filtered trajectory')
+    s_matrix = np.asarray(s_matrix)  # For matplotlib
+    ax.plot(s_matrix[0, :], s_matrix[1, :], s_matrix[2, :], '-r', label='Filtered trajectory')
 
     # Show the plot
     ax.legend()
