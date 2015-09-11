@@ -86,13 +86,13 @@ if __name__ == '__main__':
     s0 = np.transpose(np.matrix([0, 0, 2, 15, 3.5, 4.0]))
 
     # Empty matrix to be filled with predicted values
-    s_pred = np.matrix(np.empty(shape=(6, (K-1))))
+    s_pred = np.matrix(np.empty(shape=(6, (K))))
 
     # Insert initial conditions into the first row
     s_pred[:, 0] = s0
     
     # Compute the rest of sk using Eq (1), one column at a time
-    for i in range(1, K-1):
+    for i in range(1, K):
         s_pred[:, i] = A * s_pred[:, i-1] + a
 
     # Extract coordinate values from the top three rows
@@ -144,7 +144,7 @@ if __name__ == '__main__':
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
 
     # Empty matrix to be filled with Kalman filtering predicted values
-    s_kalm = np.matrix(np.empty(shape=(6, (K-1))))
+    s_kalm = np.matrix(np.empty(shape=(6, (K))))
 
     # Insert initial conditions into the first column
     s_kalm[:, 0] = s0
@@ -155,7 +155,7 @@ if __name__ == '__main__':
     s1 = s0                      # Initial value is the starting point
                                  # After tweaking my code, this initial value is no longer used
 
-    for i in range(1, K-1):
+    for i in range(1, K):
         m1 = s_meas[0:3, i]     # pick out the actual measurement to plug in to eq(5)
         s1 = predictS(s_kalm[:, i - 1])       # find the next intermediate guess for s
         sig_k = updateSig(sig_hat)  # find the next sig2 to plug into eq(5)
@@ -175,3 +175,5 @@ if __name__ == '__main__':
     # Show the plot
     ax.legend()
     plt.show()
+
+#### Acknowledgements: Victor Lei gave me feedback on Piazza that was helpful in identifying that I was implementing the algorithm incorrectly.  His description of his own results made me realize that I was supposed to use my new predicted position to predict subsequent positions, rather than continuing with the "intern's" predictions.  
