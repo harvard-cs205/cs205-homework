@@ -35,8 +35,7 @@ if __name__ == '__main__':
 
         # Parallel Timing
         start_p = time.time()
-        for i in range(N/4):
-            pool.apply(burnTime, (t,)) # each loop runs 4 burnTime processes
+        pool.map(burnTime, [t]*N)
         parallelTime = time.time() - start_p
 
         # Append Ratio
