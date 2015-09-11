@@ -1,1 +1,34 @@
 # Your answers here.
+
+1. It would take 255 seconds, as we need to perform 255 summations.
+
+2. They definitely can verify the total sum faster.  We can split the 256 bags into 7 groups of 36 bags, so it will take us 35 seconds to get 7 sums and 4 remaining bags.
+
+At this point, we have 11 values left.  5 people can take 1 second to return 5 sums with 1 bag remaining, leaving 6 values remaining.  3 people will take 1 second to return 3 sums, which in turn takes 2 seconds to finish summing.
+
+Thus, the total amount of time is 35 + 1 + 1 + 2 = 39 seconds.
+
+3. With an infinite number of employees, it will take us 8 seconds.  With an infinite number of employee, we can cut down the number of remaining values to sum up by half each time.  256 = 2^8, so to reach one sum, we need to cut down the sum by half 8 times.
+
+Thus, the total amount of time will be 8 seconds.  
+
+4. If there are N bags, it will take us ceil(log2(N)) seconds as being between powers of 2 simply means we're aren't able to fully utilize a parallel workflow for some of the bags.
+
+The chart plots for N up to 64 in order to illustrate the stepping nature of having infinite number of employees.
+
+Time: ceil(log2(N)) 
+
+5. It takes 1 second to communicate between 1 employees. Everytime we half the workload, one employee must talk to a second employee.  Thus, we add a total of 7 additional seconds (8 times we half the workload, which means 7 transfers) for a total of 15 seconds.
+
+Total: 15 seconds
+
+6. It will take 256 + 15 = 271 seconds if each cashier comes to you and takes 1 bag.  
+If each cashier comes to you and takes 2 bags, then we spend only 128 + 15 = 143 seconds.  
+
+There is very clearly a better strategy, which again can be solved through a divide and conquer method.  One person comes and takes all 256 bags.  This person (and any subsequent person with more than 2 bags) then hands out exactly half of the number of bags to another person who has no bags until he/she has until she has 2 bags.  
+
+The reason why we take all 256 bags is that we use the fact that the original person with the bags can also perform the summation when he/she has only 2 bags left.
+
+Through this strategy, we take 1 second to grab all the bags and only need the half the number of bags 7 times (128, 64, 32,16,8,4,2) so we add only 8 additional seconds.
+
+Thus the most efficent method requires 15 + 8 = 23 seconds.  
