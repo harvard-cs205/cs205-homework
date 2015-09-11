@@ -4,4 +4,4 @@ Count to 10:
 	The order in which the jobs are completed change from one run to the other, this is a result of doing the jobs in parallel. This could be a problem when the input of a job requires an output of a previous job or a job that is in the order of the process. Another possible issue when we want the output to be in order of processes. For example, I know I have 4 cores, so I have the dependence of job 5 on one of the 4 first jobs. This scenario could create a conflict.
 
 How much faster?:
-	
+	Yes, it is possible. If the compute time takes less than order 10^-5, the serial computation is faster than the parallel computation. That is due to the exchange overhead as explained by the worker analogy of the last problem. Handing out the jobs to different workers takes an overhead time that makes the process slower than directly computing it with one core. This overhead can be seen from the graph to be around order 10^-5 time. Full capacity is then reached at 10^-2 time where it is 4 times better to have 4 cores working on it than 1 core, as the switchin overhead time becomes negligible compared to the benefit of having 4 cores working on it at the same time. 
