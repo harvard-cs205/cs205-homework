@@ -1,1 +1,13 @@
 # Your answers here
+P6A:
+	The output of print Jobs has different order each time the script run.
+	After several times of running, I found the order of each sentence appearing is random.
+	I think the randomness happened because there is only one input flow for the I/O. 
+	Since the burnTime function is run on 4 processor simultaneous, the processors turn the data into I/O at the same time.
+	Then the I/O randomly pick one statement to print out.
+	We need to make sure that in parallel programming, given specific instructions to handle the situations that severals happened at same time.
+	This would be important if we want to print out result of calculation which are solved parallelly and finish at same time.
+	In this situation, we may want the result to be printed at a specific order instead of random order.
+
+P6B:
+	
