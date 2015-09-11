@@ -1,1 +1,31 @@
 # Your answers here
+Here is the sample output from the P6A.py script:
+
+        Hi Job 0
+        Hi Job 1
+        Hi Job 2
+        Hi Job 3
+        Bye Job 0
+        Bye Job 1
+        Bye Job 2
+        Bye Job 3
+        Hi Job 4
+        Hi Job 5
+        Hi Job 6
+        Hi Job 7
+        Bye Job 6
+        Bye Job 5
+        Bye Job 4
+        Bye Job 7
+        Hi Job 8
+        Hi Job 9
+        Bye Job 8
+        Bye Job 9
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+Since these are being run in parallel, they are not appearing in order.  We can see that with the four processes, four jobs are run at a time, roughly starting and finishing at the same time.  When these complete the processes pick up four new processes and then those finish at the same time.  This is great for calculations that are unrelated.  And we can greatly increase the speed of functions or calcs that are unrelated.  However, when these jobs are modifying shared memory, then this could cause very tricky problems where they are trying to modify the same memory at the same time, or modifying it out of order.
+
+How Much Faster?
+The graph shows an increasing trend as the wait time increases for Serial Time over Parallel Time.  However, this levels off around .001 seconds.  The serial processes are much slower at larger times, because they all have to wait in line to run, while the processes that run in parallel can run four at a time, which is why the ratio levels off around 4.  However, at small times, the Parallel is slower than the Serial because of the setup time associated with creating processes and the overhead of the Pool.
+
+Parallel programs could take longer to run than serial programs if the number of processes is low and the processes complete very fast.
