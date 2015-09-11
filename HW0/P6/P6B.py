@@ -16,7 +16,7 @@ if __name__ == '__main__':
 
     # Use a variety of wait times
     ratio = []
-    wait_time = [10e-6, 5e-6,10e-5,5e-5,10e-4,5e-4,10e-3,5e-3,10e-2,5e-2,10e-1,5e-1,1]
+    wait_time = [10**-6, 10**-5,10**-4,10**-3,10**-2,10**-1,1]
 
     for t in wait_time:
         # Compute jobs serially and in parallel

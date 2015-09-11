@@ -10,4 +10,8 @@ P6A:
 	In this situation, we may want the result to be printed at a specific order instead of random order.
 
 P6B:
+	When a task take relative short to complete, in our case when the sleep time is 10^-6 s, complete the task in serial take same time as complete the task in parallel.
+	As the task take longer time to complete, in our case when the slepp time increase to 10^-3 or 10^0 s, completing the task in parallel become more effienct than completing in serial.
+	However, since we only have 4 processors, the best we can do in parallel computing in this case is complete the tasks in 4 times effiency.
+
 	
