@@ -1,1 +1,33 @@
 # Your answers here.
+
+1. This would take 255 seconds
+
+2. 
+16s to get 256 bags -> 128
+8s to get 128 bags -> 64
+4s to get 128 bags -> 32
+2s to get 32 bags -> 16
+1s to get 16 bags -> 8
+1s to get 8 bags -> 4
+1s to get 4 bags -> 2
+1s to get 2 bags -> answer
+
+= 34 seconds
+
+3. 2^x = 256,
+x = 8 seconds
+
+4. It would take log(n)/log(2) seconds. Same as log_2 (N).
+See attached plot
+
+5. It will take 7 extra seconds because in each round we will need
+to take an extra second to talk to another person (except the last). So 15 seconds.
+
+6. Once we are able to hand out all the bags to the cashiers, this problem can reduce to 
+be the same as problem 5 above. It takes us 256 seconds to hand out every bag to all the cashiers,
+and one second to pass bags between workers so that they are able to have two bags to be able to add
+together. From there on, we have the same situation as above, and can do 256 + 1 + 15 to get a total of
+272 seconds. 
+From the second part, when we can hand out 2 bags at a time, we cut the amount of time that we need to hand
+out the bags in half and also remove the need to take an additional second to allow cashiers to sum two bags
+(since they already have 2 to begin with). So this ends up being (256/2) + 15 = 128 + 15 = 143 seconds.
