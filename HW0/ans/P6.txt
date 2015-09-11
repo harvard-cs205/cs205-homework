@@ -1,0 +1,7 @@
+A. (1) By coding it for several times, the results are different each time. The results printed can be grouped every four items. In each group, the set of the four items are the same each time while the order of the four items are random.
+(2) Because the multiprocessing module deals with a batch of jobs at the same time in parallel, so it will not print results in sorted order. Whoever comes up with the result will output it at first.
+(3) When we program, we should keep in mind that when the order is strictly restrained, we may not program in parallel or sort it using algorithms after that.
+(4) We'd better program in parallel when the jobs are indepedent, meaning that results of each job will not affect another.
+
+B. (1) When sleep time increases, the ratio of serial to parallel execution increases. Parallel execution saves more time and become more efficient when increasing sleep time.
+(2) I think it's possible under the situation where the jobs can be done at a very, very fast speed.

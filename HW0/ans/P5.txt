@@ -1,0 +1,11 @@
+1. 255 seconds.
+2. Yes, it's faster.
+Each cashier counts 32 bags, which costs 31 seconds. Then they need to count these 8 sums, which costs 3 seconds. In total, in 34 seconds.
+3. 8 seconds.
+4. Using one cashier, it can be verified in N-1 seconds.
+Using infinite cashiers, it can be verified in [log2(N)]+1 seconds.
+5. Using 128 cashiers, each person counts 2 bags at first, costing 1 second. Then they count these 8 sums, costing 7*2=14 seconds. In total, it costs 15 seconds in total.
+6. (1) If 1 bag each time, it takes 260 seconds. 
+   (2) If two bags each time, it takes 133 seconds.
+   (3) It's better to take 16 bags each person, which costs 35 seconds in total.
+
