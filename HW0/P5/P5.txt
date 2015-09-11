@@ -3,15 +3,25 @@
    256 - 1 = 255 seconds
 
 2. Now the bookstore can add 16 numbers each time, but the count of next round needs to wait the previous round ended:
-   16 + 8 + 4 + 2 + 1 + 1 + 1 + 1 = 34
+   16 + 8 + 4 + 2 + 1 + 1 + 1 + 1 = 34 seconds
 
 3. Now each round only needs 1 second to count:
-   1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 = log2(256) = 8
+   1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 = log2(256) = 8 seconds
 
 4. See P5.png. Single cashier takes N - 1 seconds. Infinite cashiers takes ceiling(log2(N)) seconds.
    Plot number of bags from 2 to 1200
 
 5. The communicating time takes effect since the second round count. Each round increases 1 second.
-   1 + 2 + 2 + 2 + 2 + 2 + 2 + 2 = 15
-
-6. 
+   1 + 2 + 2 + 2 + 2 + 2 + 2 + 2 = 15 seconds
+ 
+6. The cashier who holds all the 256 bags in the beginning distributes the bags to other cashiers. They distribute the bags based on this rule: give the half number of bags in hand to another cashier who has no bags in hand.
+   1) Distribute repeatedly till cashiers have only one bag in hand: distributing time costs log2(256) = 8 seconds.
+      Communicating the one bag in hand costs 1 second, and then each round costs 2 seconds(communicate and sum up). 8 rounds in total.
+      8 + 1 + 8*2 = 25 seconds.
+   2) Distribute repeatedly till cashiers have two bags in hand: distributing time costs log2(256/2) = 7 seconds.
+      Summing up the two bags in hand costs 1 second, and then each round costs 2 seconds. 7 rounds in total.
+      7 + 1 + 7*2 = 22 seconds.
+   3) Better strategy:
+      Distribute repeatedly till cashiers have four bags in hand: distributing time costs log2(256/4) = 6 seconds.
+      Summing up the four bags in hand costs 4 - 1 = 3 seconds, and then each round costs 2 seconds. 6 rounds in total.
+      6 + 3 + 6*2 = 21 seconds.

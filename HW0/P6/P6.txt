@@ -1,5 +1,5 @@
 # Your answers here
-For P6A
+P6A
 One result is:
 Hi Job 1
 Hi Job 2
@@ -22,17 +22,16 @@ Hi Job 9
 Bye Job 8
 Bye Job 9
 
-
 We can see there are unexpected results of the job orders:
 1) The order jobs begin does not match the order we send in code.
 2) The order jobs end does not match the order they begin.
 3) Run this program several times, the sequences may different every time.
 
-1) would be a concern when we need to serve many identical tasks with different owners. In order to be fair, generally the policy should be first come first serve. This result prevents us from guaranteeing this policy.
+1) would be a concern when we need to serve many identical tasks with different owners. In general, we should follow the rule: first come, first served. However, this program cannot guarantee this fiarness.
 
-2) and 3) would be a concern when we care about the schedule. For example, when a user split one tasks to multiple independent tasks to benefit from parallel computing. The user still needs to wait all the tasks finished. This result blocks us from minimizing the waiting time.
+2) and 3) would be a concern when we care about the schedule. For example, when a user split one tasks to multiple independent tasks to benefit from parallel computing. The user still needs to wait all the tasks finished. This program cannot predict the ending sequence and thus schedule the tasks to end close to the same time that minimizes the user's waiting time.
 
 ===================================================================================================================
 
-For P6B
-Based on the plot, we can see the running time saved by paralleling becomes more significant when one single burnTime task takes more time. We can explain it as that there are overheads to distribute tasks to multiprocessors, and the time saved from paralleling is the running time of tasks. If the task running time is too few, the time we saved from paralleling will be few as well. If this time is less than the overheads of paralleling, then a parallel program could take longer than its serial version.
+P6B
+Based on the plot P6.png, we can see the running time saved by paralleling becomes more significant when one burnTime task takes more time. We can explain it as that there are overheads to distribute tasks to multiprocessors, and the time saved from paralleling comes from multiple burnTime tasks running together. If burnTime's running time is few, the time we saved from paralleling will also be few. If this time is less than the overheads of paralleling, then a parallel program could take longer than its serial version. In my case, the parallel program runs slower than its serial version when burnTime runs less than 10e-7 second.
