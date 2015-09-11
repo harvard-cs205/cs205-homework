@@ -1,1 +1,7 @@
-# Your answers here
+By: Matheus C. Fernandes
+
+Count to 10:
+	The order in which the jobs are completed change from one run to the other, this is a result of doing the jobs in parallel. This could be a problem when the input of a job requires an output of a previous job or a job that is in the order of the process. Another possible issue when we want the output to be in order of processes. For example, I know I have 4 cores, so I have the dependence of job 5 on one of the 4 first jobs. This scenario could create a conflict.
+
+How much faster?:
+	
