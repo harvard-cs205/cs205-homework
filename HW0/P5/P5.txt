@@ -1,1 +1,18 @@
-# Your answers here.
+By: Matheus C. Fernandes
+
+Question 1: 255 seconds
+	If one cashier were counting the add the totals of 256 bags it would take 255 seconds because the first count 1+1=2 would count as one secong and every count thereafter would also count as one second 
+
+Question 2: 34 seconds
+	Yes, assuming they imidiatelly divide up the work evenly, they can deivide the 256 bags by 8 workers. Each worker than has to count 32 bags which would take 31 seconds to count. Then 4 workers can add up the other bags, taking 1 additional second. Then 2 workers take the sum of 4 people, taking 1 additional second. Finally, the 1 worker adds the final sum of two people, during the last 1 second.
+
+Question 3: 8 seconds
+	Assuming there is no communication time between workers, it would take 8 seconds. This starts with having 256 workers and taking each second to add each of the half of the workers namely it takes log2(256)=8.
+	
+Question 4: log2(N), please find attached P5.png
+	It would take infinite number of employees log2(N) seconds to count N bags.
+
+Question 5: 15 seconds
+	Every time there is a sum between two numbers there is one additional second, except for the first case. 
+
+Question 6:
