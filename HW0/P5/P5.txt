@@ -1,1 +1,22 @@
 # Your answers here.
+
+1) Label the bags from 1 to 256. First, assume the cashier uses the most naive algorithm possible: add bag 1 to bag 2, then add bag 3 to the result of adding bag 1 to bag 2, and so on. This will require 255 additions and hence 255s.
+
+2) Yes. They split the 256 bags into 8 piles of 32 (assuming this splitting process is instantaneous). Each person does 31 additions (in parallel), and thus it takes 31 seconds to sum all 8 piles. Now they need to sum these sums, which they can also do in parallel. It takes one second to reduce the 8 sums to 4 sums, another second to reduce the 4 to 2, and another second to reduce the 2 to 1. Thus, in total, they can do it in 34s, assuming it does not take any time to tell each other the results of their sums, but just that they take time adding them.
+
+3) By assigning a worker to each bag, and then pairing off workers to add their bags together in parallel, we get that the amount of time is log_2(256) = 8s.
+
+4) Using the procedure described in the previous question, it takes log_2(N) in parallel vs N in serial. This is plotted on P5.png, although we use log(N) rather than log_2 for simplicity - the trend is conserved.
+
+5) We do everything in the exact same way as before, except now we must first communicate the amount in each pile before adding. Clearly the communication can be done in parallel, so this simply modifies the constant for each "addition" from 1 to 2. Thus, we double the amount of time it takes, and the answer is 2 * log_2(256) = 16s. But actually, if we hand two bags to each person, we can avoid communication for the first layer and get an optimal result of 15s.
+
+6) We can write down a cost function for N bags and q workers as C(N, q) = q + (N/q - 1) + 2 * log_2(q). The first (q) term is the amount of time it takes to hand out the bags to the workers, it takes (N/q - 1) seconds for each worker to count their own bags, and then it takes 2 * log_2(q) to communicate and add the sums between the workers in parallel. Thus we have:
+
+Each takes one bag = C(256, 256) = 256 + 2 * log_2(256) = 272s.
+Each takes two bags = C(256, 128) = 128 + 1 + 2 * log_2(128) = 143s. 
+
+Taking the derivative of C(256, q) with respect to q and solving the resulting quadratic equation and rounding down gives an optimal q ~ 14.622. This gives C(256, 14.62) = 38.87. Clearly, we need to choose between q = 14 and q = 15 in real life, and q = 15 tives the slightly better answer of C(256, 15) = 38.88.
+
+An added complication is that for q = 14 or 15, 256 / q is not an integer. This means that, for q = 14, the best (even) distribution we can do is 18 bags per person. Because 14 * 18 = 252, we will assign one extra bag to four separate people. This will addone extra computation to the first layer, and thus our optimal time is 39.88s. 
+
+One final complication is that, because addition can occur while the bags are still being passed out, the time will actually be slightly less than stated here. Finding the optimal division appears to be an integer programming problem that I do not know how to solve, so I felt that this was sufficient.
