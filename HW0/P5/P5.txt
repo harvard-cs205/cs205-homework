@@ -1,10 +1,14 @@
 # Your answers here.
 
-1. It will take 255 seconds.
-2. Yes, they can do it faster and a sample strategy can be the following. Let each of 8 cashiers take 256 / 8 = 32 bags, and add them up by themselves. Then they can add up all 8 sums into the final result by pairing up. The entire process may take no longer than 31 + 3 = 34 seconds.
-3. They can verify the sum in 8 seconds. The number of bags/numbers can at most reduced to its half in a single second. Therefore the time cannot be less than ceil(log_2(256)) = 8.
-4. The plotted function is ceil(log2(N)), and the plot is attached as P5.png.
-5. If we take communicating time into account, we may notice that for 4 bags, it takes exactly the same amount of time (3 seconds) for 1 cashier or 2. Therefore we have no need to split a work of less than 4 bags to more than 1 cashier. In the meanwhile, the communication doubles the time we add up between cashiers. Then for 256 bags, we need 8 * 2 - 1 = 15 seconds to verify the sum.
-6. If each cashier takes 1 bag, the adding and communicating time would be 17 seconds as calculated above. Additionally, log_2(256) + 1 = 9 seconds will be needed to hand bags to each cashier. Hence the total time would be 26 seconds.
-   If each cashier takes 2 bags, the adding and communicating time would be 15 seconds and log_2(256/2) + 1 = 8 seconds will be needed to hand bags. The total time would be 23 seconds.
-   As we have analyzed above, 4 bags for each cashier is a better strategy. The toal time would be 15 + 7 = 22 seconds.
+1.  It will take 255 seconds.
+2.  Yes, they can do it faster and a sample strategy can be the following. Let each of 8 cashiers take 256 / 8 = 32 bags, and add them up by themselves. Then they can add up all 8 sums into the final result by pairing up. The entire process may take no longer than 31 + 3 = 34 seconds.
+3.  They can verify the sum in 8 seconds. The number of bags/numbers can at most reduced to its half in a single second. Therefore the time cannot be less than ceil(log_2(256)) = 8.
+4.  The plotted function is ceil(log2(N)), and the plot is attached as P5.png.
+5.  Now we start taking communicating time into account. In this case, we would like to find the maximal number N with the following property - a cashier with N bags can finish his job faster than finding another cashier to help him. With simple attemptings, we may notice N = 4, since either 1 cashier or 2 cashiers would take 3 seconds to finish the work.
+    Therefore, we only split the work when there exists at least one cashier with more than 4 bags. Then for 256 bags, we need 256 / 4 = 64 cashiers. And it is no longer difficult to calculate that we need log2(64) * 2 + (4 - 1) = 15 seconds to verify the sum.
+6.  We consider the time cost as two parts - handing the bags and adding up.
+    Handing the bags - If we need C cashiers, then we need at least (ceil(log2(N + 1)) seconds to assign bags to all cashiers. The previous statement is true since every seconds, the number of people who have bags in their hands (including myself) can at most be doubled.
+    Adding up - As we did in Question 5.
+    Thus, if each cashier takes 1 bag, we need 256 cashier. The time should be (log2(256) * 2 + (1 - 1)) + (ceil(log2(256 + 1))) = 25 seconds.
+    If each cashier takes 2 bags, we need 128 cashier. The time should be (log2(128) * 2 + (2 - 1)) + (ceil(log2(128 + 1))) = 23 seconds.
+    If we generalize it to B bags, we should have (ceil(log2(256 / B)) * 2 + (B - 1)) + (ceil(log2(256 / B + 1)) seconds, and the minimum could be achieved when B = 4. And the total time would be 22 seconds.
