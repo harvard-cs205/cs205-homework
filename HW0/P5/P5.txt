@@ -1,1 +1,21 @@
 # Your answers here.
+
+1. 255 sec. Since we have 256 bags, adding two numbers cost 1 second, so the total will be 255 seconds. 
+
+2. Yes, they can verify the total sum faster than the original cashier by herself. They can do this in 34 seconds. 
+
+First, we can split 256 bags into 8 groups, each group has 32 bags. For one person, she can count 32 bags in 31 seconds. Now we have 8 bigger bags now. Then split the 8 bigger bags into 4 groups, each group has 2 bags, so 4 people can count in 1 second. Now we have 4 bigger bags that use 1 second to count as well. Finally, we have two bags that use 1 second as well. Therefore, total time is 31 + 1 + 1 + 1 = 34 sec.
+
+3. 8 seconds.
+
+Same idea but now we have infinity people to count. From 256 -> 128 -> 64 -> 32 -> 16 -> 8 -> 4 -> 2 which is 8 seconds.
+
+4. Please check P5.py and P5.png
+
+5. 15 seconds. Let’s say a complete "action” includes sum step and communicate step. Since all people can communicate and sum at the same time and each step only takes 1 sec, so the fastest method is the one that requires the least actions. Thus, we should get the as many people involved in each communicate or sum step as possible to reduce actions needed. We split 256 bags into 128 groups, each group has 2 bags. The reason we split like that because communication time is 1 second between 2 people, the fastest method is to let the most people do this work, which is making the counting time lowest. From 256—>128, the counting time is 1 second, the commutation time is 1 second and so on. However, from 2->1, we have counting time, but do not have commutation time. Therefore, the time is 2 * 7 + 1 = 15 seconds. 
+
+6. 1 bag: For total 256 bags, we ignore the handing time first, each person takes 1 bag, so we have 256 groups. Same idea as problem 5, but a little bit different is 256 people should communicate first, it takes an extra 1 second. So the time without handing time is 16 seconds. Now for the handing time, from 256—>1, it takes 8 seconds, but we need 1 extra second to pass bags to cashier. Therefore, the total time will be 16 + 8 + 1 = 25 sec
+
+   2 bags: Same idea as problem 5, for the handing time, from 256—>1 which is cost 8 seconds. Therefore, the total time will be 15 + 8 = 23 seconds. 
+
+   Yes. There is a better strategy which is 4 bags. Same idea as above, the total time will be 15 + 7 = 22 seconds. Since 8 bags if one person do lone, it takes 7 seconds; If 8 bags spilt into 2 groups, it will take 3 (4 bags takes 3 seconds)+ 2 + 1 = 6 seconds. Therefore, 4 bags is the best strategy.      

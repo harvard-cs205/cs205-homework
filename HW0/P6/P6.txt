@@ -1,1 +1,9 @@
 # Your answers here
+
+Count to Ten:
+
+These results are random. If we program this in parallel, it will take much more time to run this program if the task is relatively small, since opening a processor costs much more time. But if the task is relatively large, using multiprocessor will make the whole process much faster. 
+
+How much faster? 
+
+Under the condition from 10^(-6)—>10^(-4), since the task is relatively small, serial version is faster than parallel version. However, under the condition from 10^(-3)->10^(0), the task is relatively large, parallel version will take shorter than serial version. 
