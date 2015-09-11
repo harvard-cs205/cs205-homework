@@ -30,3 +30,8 @@ so 8 seconds, given the problem statement, is the absolute minimum.
 infinite number of cashiers at our disposal. First use N/2 cashiers in 1 second
 to sum N numbers into N/2, then repeat, cutting the number of integers in half
 each second.
+
+5. Each step would take 2 seconds as opposed to 1, (a cashier sum two bags, and
+half of them must communicate the value to their neighbor before the process can
+continue). Using the same approach as (3), this gives 16 seconds as the total
+(15 if we assume the last cashier doesn't need to tell anyone the value).
