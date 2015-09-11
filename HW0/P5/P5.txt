@@ -1,1 +1,17 @@
 # Your answers here.
+1. The cashier needs to take number of bags - 1 time to count:
+   256 - 1 = 255 seconds
+
+2. Now the bookstore can add 16 numbers each time, but the count of next round needs to wait the previous round ended:
+   16 + 8 + 4 + 2 + 1 + 1 + 1 + 1 = 34
+
+3. Now each round only needs 1 second to count:
+   1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 = log2(256) = 8
+
+4. See P5.png. Single cashier takes N - 1 seconds. Infinite cashiers takes ceiling(log2(N)) seconds.
+   Plot number of bags from 2 to 1200
+
+5. The communicating time takes effect since the second round count. Each round increases 1 second.
+   1 + 2 + 2 + 2 + 2 + 2 + 2 + 2 = 15
+
+6. 
