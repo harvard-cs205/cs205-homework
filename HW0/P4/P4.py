@@ -77,13 +77,13 @@ if __name__ == '__main__':
     
     results = np.zeros([6, 0])
     results = np.asmatrix(results)
+    results = np.append(results, s0, axis=1)
     
     # Initial conditions for s0
     # Compute the rest of sk using Eq (1)
-    for k in range(0, K):
-        sk = A * s + a
-        results = np.append(results, sk, axis=1)
-        s = sk
+    for k in range(1, K):
+        s = A * s + a
+        results = np.append(results, s, axis=1)
 
     results = np.asarray(results)
     
@@ -119,22 +119,25 @@ if __name__ == '__main__':
     sig0[4,4] = .01
     sig0[5,5] = .01
     
+    s_measured = np.loadtxt('P4_measurements.txt', delimiter=',')
+    
     def predictS(sk):
         return A * sk + a
     
     def predictSig(sig):
-        return np.linalg.inv(A * sig * np.transpose(A) + B * np.transpose(B))
+        return np.linalg.inv(A * sig * A.T + B * B.T)
         
     def updateSig(sig):
-        return np.linalg.inv(predictSig(sig) + np.transpose(C) * C)
+        return np.linalg.inv(predictSig(sig) + C.T * C)
     
     def updateS(mk, sig, s):
-        return updateSig(sig) * (predictSig(sig) * predictS(s) + np.transpose(C) * mk)
+        return updateSig(sig) * (predictSig(sig) * predictS(s) + C.T * mk)
 
     # Initial conditions for s0 and Sigma0
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
     kalman_results = np.zeros([6, 0])
     kalman_results = np.asmatrix(kalman_results)
+    kalman_results = np.append(kalman_results, s0, axis=1)
     
     s = s0
     sig = sig0
@@ -142,13 +145,10 @@ if __name__ == '__main__':
     
     # Initial conditions for s0
     # Compute the rest of sk using Eq (1)
-    for k in range(0, K):
-        predict_s = predictS(sk)
-        predict_sig = predictSig(sig)
+    for k in range(1, K):
         sig = updateSig(sig)
-        sk = updateS(np.transpose(s_measured[k]), sig, s)
-        results = np.append(kalman_results, sk, axis=1)
-        s = sk
+        s = updateS(s_measured[k].T, sig, s)
+        kalman_results = np.append(kalman_results, s, axis=1)
 
     kalman_results = np.asarray(kalman_results)
     
