@@ -50,17 +50,21 @@ if __name__ == '__main__':
     # Read the observation array and plot it (Part 2)
     #####################
     s_measured = np.loadtxt("P4_measurements.txt", delimiter=',')
-    ax.plot((1/rx)*s_measured[:, 0], (1/ry)*s_measured[:,1], (1/rz)*s_measured[:,2], '.g', label='Observed trajectory')
+    ax.plot((1/rx)*s_measured[:, 0], (1/ry)*s_measured[:,1], 
+            (1/rz)*s_measured[:,2], '.g', label='Observed trajectory')
 
     #####################
     # Part 3:
     # Use the initial conditions and propagation matrix for prediction
     #####################
+    # Create each of the parts of the matrix
     top_left = np.diag(np.ones(3))
     top_right = np.diag(dt*np.ones(3))
     bottom_left= np.zeros((3,3))
     bottom_right = np.diag((1-c*dt)*np.ones(3))
-    A = np.hstack((np.vstack((top_left, bottom_left)), np.vstack((top_right, bottom_right))))
+    # Combine these into a single matrix
+    A = np.hstack((np.vstack((top_left, bottom_left)), 
+                   np.vstack((top_right, bottom_right))))
     a = np.vstack((np.matrix(np.zeros(5)).transpose(), np.array([g*dt])))
     s = np.matrix([0,0,2,15,3.5,4.0]).transpose()
     # Initial conditions for s0
@@ -93,7 +97,8 @@ if __name__ == '__main__':
         s_pred = predictS(A, s_current, a)
         sig_pred = predictSig(A, sigma_current, B)
         sig_next = updateSig(sig_pred, C)
-        s_next = updateS(sig_next, sig_pred, s_pred, C, np.matrix(m[i]).transpose())
+        s_next = updateS(sig_next, sig_pred, s_pred, C, 
+                np.matrix(m[i]).transpose())
         s = np.hstack((s, s_next))
         s_current = s_next
         sig_current = sig_next
