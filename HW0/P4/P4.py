@@ -2,6 +2,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
+# Problem constants.
+filename = "P4_trajectory.txt"
+columns = { 'x_pos': 0,
+            'y_pos': 1,
+            'z_pos': 2,
+            'x_vel': 3,
+            'y_vel': 4,
+            'z_vel': 5 }
 
 if __name__ == '__main__':
     # Model parameters
@@ -30,9 +38,13 @@ if __name__ == '__main__':
     # Load true trajectory and plot it
     # Normally, this data wouldn't be available in the real world
     #####################
+    s_true = np.loadtxt(filename, delimiter=",")
+    x_coords = s_true[:,columns['x_pos']]
+    y_coords = s_true[:,columns['y_pos']]
+    z_coords = s_true[:,columns['z_pos']]
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '--b', label='True trajectory')
+    ax.plot(x_coords, y_coords, z_coords,
+        '--b', label='True trajectory')
 
     #####################
     # Part 2:
