@@ -42,10 +42,6 @@ Depending on the scheduling of the tasks, the software may behave differently."
 This better explains the point that I wanted to make.
 
 2)
-The serial goes way faster than the paralell program for small waiting time.
-The parallel program is slowed down by communication and locks.
-For all tested time, serial was faster.
-But we can see that parallel program is only twice slower for 1s of waiting
-time. And the ratio is growing with an almost exponential trend.
-Most likely it will outperform serial program for longer waiting time.
-
+From the plot we can see that the ratio plateaus at 4.
+This is because there are only 4 processors in the pool.
+At small times, parallel performs poorly because communication costs.

@@ -17,7 +17,7 @@ if __name__ == '__main__':
 
     # Use a variety  f wait times
     ratio = []
-    wait_time = [10**(k) for k in range(-6,1,1)]
+    wait_time = [10**(k) for k in np.arange(-6,1,.5)]
 
     for t in wait_time:
         # Compute jobs serially 
@@ -27,10 +27,9 @@ if __name__ == '__main__':
         end=time.time()
         # Use time.time() to compute the elapsed time for each
         serialTime = begin-end 
-        print(serialTime)
         #and in parallel       
         begin=time.time()
-        pool.map(burnTime, range(16))
+        pool.map(burnTime, [t]*16)
         end=time.time()
         # Use time.time() to compute the elapsed time for each
         parallelTime = begin-end 
