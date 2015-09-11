@@ -19,7 +19,7 @@ if __name__ == '__main__':
     # Use a variety of wait times
     ratio = []
     # place points at 40 locations between 10^-7 and 10^0
-    wait_time = np.logspace(np.log10(pow(10,-7)), np.log10(pow(10,0)), 40)
+    wait_time = np.logspace(np.log10(pow(10,-6)), np.log10(pow(10,0)), 40)
     print wait_time
     for t in wait_time:
         #print wait_time
