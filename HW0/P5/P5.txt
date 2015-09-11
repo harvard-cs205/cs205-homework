@@ -1,1 +1,33 @@
-# Your answers here.
+1.	255 seconds 
+
+2.	34 seconds
+
+	Yes, all 8 working together can verify the total sum faster than the original cashier. 
+	Each of the 8 cashiers recieves 32 bags, which they can find the total sum of in 31 seconds.
+	We then need to combine the sums from the 8 cashiers, which takes 31 + log2(8) = 31 + 3 = 34 seconds.
+
+3. 	8 seconds
+
+	Generalizing the equation from above with w workers, the total time taken is [(256/w) - 1] seconds to sum each worker's bags and ceiling(log2(w)) to sum each workers' total. The reason for the ceiling function is that if log2(w) is not an integer, we will need the next integer number of rounds of collapsing to collapse all w workers.  t = (256/w) - 1 + ceiling(log2(w))
+
+	If we have 128 workers, we can sum 256 bags into 128 sums in one step, 128 sums into 64 sums in the next step, etc. It will take us 8 steps to get to 1 sum, so 8 seconds (this is bounded by the ceiling(log2(w)))
+
+4.	log2(N)
+
+	If we replace the 256 above with N total bags and w workers, we now take [(N/w) - 1] seconds to sum each worker's bag. The equation then becomes t = (N/w) - 1 + ceiling(log2(w)). The minimum value of t occurs when we combine bags as above, in groups of 2. It will take at least log2(N) rounds of summation to get to 1 sum, as above.
+
+5.	15 seconds
+	
+	In the equation above the term ceiling(log2(w)) represents the time for the number of rounds of collapsing each worker's total. Since each round of collapsing now takes an extra second, we can make this term 2 * ceiling(log2(w)). The equation then becomes t = (256/w) - 1 + 2 * ceiling(log2(w)). The minimum value of t occurs when we have 64 workers, and it takes 15 seconds.
+
+
+6.	1 bag: 272 seconds, 2 bags: 143 seconds; most efficient: 39 seconds
+
+	If it takes a second to hand any number of bags to the cashier and we hand the cashier b bags at a time, we will spend (256/b) giving each cashier their 256/w bags in groups of b. Our equation then becomes t = (256/b) + (256/w) - 1 + 2 * ceiling(log2(w)).
+
+	When b=1, each cashier will also have to hand their bag to another cashier for the initial sum, so we add an extra second. Our equation becomes t = 1 + (256/1) + (256/w) - 1 + 2 * ceiling(log2(w)) = 256 + (256/w) + 2 * ceiling(log2(w)) = 272 seconds.
+
+	When b=2, our equation is t = (256/2) + (256/w) - 1 + 2 * ceiling(log2(w)) = 128 + 4 - 1 + 2 * 6 = 143 seconds.
+
+	Our general equation is t = (256/b) + (256/w) - 1 + 2 * ceiling(log2(w)) when we give out b bags to w workers. The most efficient strategy will involve giving out all bags at once, so we know that b * w = 256. We can then rewrite this equation as t = (256 * w / 256) + (256/w) - 1 + 2 * ceiling(log2(w)) = w + (256/w) - 1 + 2 * ceiling(log2(w)). If we solve this, we see that the minimum time is 39 seconds when we have 16 workers receiving 16 bags each.
+

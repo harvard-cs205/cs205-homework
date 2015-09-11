@@ -1,1 +1,54 @@
-# Your answers here
+6A:
+
+	We see unexpected results in that sometimes, jobs 0-3 will finish executing before jobs 4-7 start, and other times, only certain jobs will finish executing. For example, in the second set of timings, job 4 begins before jobs 2 or 3 have returned. This could be a problem in several transaction-based scenarios (adding or deleting data to a list, changing bank balance, etc) where the order of jobs completing is important. This affects how we compute in parallel because we need to be conscious of transactions and know when the data is in a safe state.
+
+	This could be important when one set of jobs creates users in a database, and another set of jobs initializes random data for those users. We may need all users to be created before data for them can be created, so we would need to use locks to prevent threads from accessing the same row/resource.
+
+	Neels-MacBook-Pro:P6 neelpatel$ python P6A.py 
+	Hi Job 0
+	Hi Job 1
+	Hi Job 2
+	Hi Job 3
+	Bye Job 1
+	Bye Job 3
+	Bye Job 0
+	Bye Job 2
+	Hi Job 4
+	Hi Job 5
+	Hi Job 6
+	Hi Job 7
+	Bye Job 5
+	Bye Job 7
+	Bye Job 6
+	Bye Job 4
+	Hi Job 8
+	Hi Job 9
+	Bye Job 9
+	Bye Job 8
+	[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+	Neels-MacBook-Pro:HW0 neelpatel$ python P6A.py 
+	Hi Job 0
+	Hi Job 1
+	Hi Job 2
+	Hi Job 3
+	Bye Job 0
+	Bye Job 1
+	Hi Job 4
+	Bye Job 2
+	Bye Job 3
+	Hi Job 5
+	Hi Job 6
+	Hi Job 7
+	Bye Job 4
+	Bye Job 5
+	Bye Job 7
+	Bye Job 6
+	Hi Job 8
+	Hi Job 9
+	Bye Job 8
+	Bye Job 9
+	[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+6B: 
+	The trend we see is that for very short wait times (under 10e-4.5), the serial compute time is faster than the parallel compute time. It is possible that serial algorithms complete faster than parallel algorithms - this is because of the overhead required in parallel algorithms. There is communication overhead in parallel algorithms in order to distribute data to a pool of threads and recombine these results. If the wait time is very small, then this communication overhead is relatively large compared to the total computation time. This can lead the parallel algorithm to take longer than the serial algorithm for small wait times (and therefore small total compute times).
