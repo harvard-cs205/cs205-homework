@@ -1,1 +1,8 @@
 # Your answers here.
+
+1. 255
+2. 34
+3. 8
+4. $\ceil{\log_2{n}}$ (in latex notation, assuming a defined \ceil macro)
+5. 15
+6. Assuming we pass out 1 bag at a time, 
