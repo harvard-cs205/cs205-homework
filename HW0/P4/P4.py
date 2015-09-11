@@ -143,25 +143,13 @@ if __name__ == '__main__':
     sigma_ks.append(sig0)
 
     #still have s0 and k
-    #print observations
     obs_array = np.array(observations)
-    #print obs_array[0]
 
     for i in range(1, K):
       tmp_s = predictS(A, big_mat_k[:,i-1], a)
       tmp_sig = predictSig(A, sigma_ks[-1], B)
       new_sig = updateSig(tmp_sig, C)
       sigma_ks.append(new_sig)
-      # print "new_sig:"
-      # print new_sig
-      # print "tmp_sig:"
-      # print tmp_sig
-      # print "tmp_s:"
-      # print tmp_s
-      # print "c:"
-      # print C
-      # print "obs thing:"
-      # print obs_array[:,0]
 
       res = updateS(new_sig, tmp_sig, tmp_s, C, obs_array[i])
       for j in range(6):

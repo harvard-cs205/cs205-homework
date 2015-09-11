@@ -1,1 +1,19 @@
 # Your answers here
+
+"If you run the above code a number of times, you may see some unexpected
+results. Explain these results. How could this affect how we program in
+parallel? Describe a scenario where this would be important."
+
+In two consecutive runs, lines 4-8 were respectively:
+
+These differences happen because of the nondeterminism in how processes are
+scheduled on your computer, as well as other sources of nondeterminism in
+process execution.  This could be very important in how we program -- it
+means we cannot assume another process has finished, even if it started
+before us: we cannot assume sequentiality, so tasks which rely on this property
+must use excessive caution (we also must avoid straight-up race conditions if
+we're multithreading at a low level).  This might
+be important if we have a pipeline of data processing, for example if we have
+three processes who rely on each other's output, and we mistakenly think one
+process has finished, when it in fact hasn't -- we might accidentally read
+garbage.
