@@ -27,7 +27,7 @@ Bye Job 9
 [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 The job numbers are not printed out in a given order, since the order in which the parellel processes prints out ouput is not synchronized.
-This would be important if there is an inherent order in the program logic. For example, the output of one process might be needed as an input to another process.
+This would be important if the load is unbalanced among the processes such that some might finish before others and sit idle.
 
 B.
 As the wait time increases, the speedup with parallelism increases until it plateaus at around 4 times. It is possible that a parallel program could take longer than its serial version. As shown in P6.png, at wait times below 1e-3 seconds, the speedup is below 1. This happens when the tradeoff of the coordination and communication overhead outweighs the speedup from parallelism, i.e. when the computation time is short relative to communication time.
