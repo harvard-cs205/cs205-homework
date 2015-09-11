@@ -1,8 +1,27 @@
 # Your answers here.
 
-1. 255
-2. 34
-3. 8
-4. $\ceil{\log_2{n}}$ (in latex notation, assuming a defined \ceil macro)
-5. 15
-6. Assuming we pass out 1 bag at a time, 
+1. 255: the cashier must do this many additions to get to a single number.
+2. 34: We divide up the work as much as possible, so each each cashier
+	processes 128/8 = 16 additions at the first level, taking 16 seconds,
+	then 8 at the next level, etc., until we're down to 8 sums, which it takes
+	3 seconds to combine, so we spend a total of 31 + 3 = 34 seconds.
+3. 8 seconds: Dividing the work up as evenly as possible, we reduce the problem
+	by half at every iteration, so this works out to log_2 256
+4. $\ceil{\log_2{n}}$ (in latex notation, assuming a defined \ceil macro) --
+	this is because with infinitely many cashiers, we can divide up the work as
+	well as possible at every stage, just like in #3.
+5. 15: The initial computation, taking 256 bags and turning them into 128 sums, takes
+	1 second.  The rest of the rounds take 2 seconds -- 1 second to do the addition,
+	and 1 second to pass that number to someone else.
+6. Assuming we pass out 1 bag at a time, and that nobody can do work until
+	all the passing has been done, we have 256 seconds of handing, then
+	1 second of more handing (so that we end up with 128 people holding 2
+	bags), then the same 15 seconds as before, for a total of 272 seconds.
+	If we can hand out two at a time, we reduce the initial cost of handing
+	out bags to 128 seconds, and there is no extra second to pass the bags
+	to one person.  So the total time spent is 128 + 15 = 143 seconds.  We
+	can do better though -- if we pass all 256 bags to one person, who passes
+	128 to another person, then they each pass those 128 to two more people,
+	etc., distributing all the bags until there are 128 cashiers holding 2 bags
+	takes a total of 8 seconds.  At that point, we again just have the #5
+	situtation again, so our total time spent using this method is 23 seconds.
