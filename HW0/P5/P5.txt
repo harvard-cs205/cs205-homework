@@ -1,1 +1,13 @@
 # Your answers here.
+
+1. Since there are 256 bags and only one cashier, he/she must add 255 (N - 1) pairs of numbers, which will take 255 seconds.
+
+2. Yes, they can do it much faster with 8 people rather than 1. One way would be to divide up the bags into 8 groups: 256 / 8 = 32, which would take 31 (N - 1) seconds. They are then left with 8 subtotals, which can be reduced to 4 using 4 people (1 second), then to 2 using 2 people (1 second), and finally to grand total using 1 person (1 second). This totals to 31 + 1 + 1 + 1 = 36 seconds, compared to originally 255.
+
+3. With an infinite number of employees, every bag should be processed at each moment. In the first step, we take 128 people to reduce the total of 256 bags down to 128 bags (1 second). In the second step, we take 64 people to reduce the total of 128 bags down to 64. And so forth, each time halving the number of bags to process. This would mean log_2 (256) = 8 steps, which amounts to 8 seconds. 
+
+4. Following the logic of problem 3's answer, it would take an infinite number of employees log_2 (N) seconds to count the total. See P5.png for the plot of counting time vs bag count for 1 and infinite people.
+
+5. A communication cost of 1 second would add 3 extra seconds for the 3 communication steps executed in problem 2. This would mean adding 3 extra seconds to the 36 seconds we calculated, amounting to a grand total of 39 seconds.
+
+6. This would take much longer. If I can only pass 1 bag at a time, it would take at least 256 seconds for everything, since it would take that long just to pass all the bags out to be counted. Passing out only 1 bag at a time to a single person at a time means that it would take 256 seconds to pass the bags out to 2 people, 1 extra second to process the last bag I passed out. Then, those two people would need to communicate their subtotals (1 second) and finally add them (1 second). This would take a total of 256 + 1 + 1 + 1 = 259 seconds. If I passed out 2 bags at a time to each person, this would be faster. I would have a lower bound of 128 seconds to pass out the bags, and then the 3 extra steps mentioned above, to take a total of 131 seconds. 
