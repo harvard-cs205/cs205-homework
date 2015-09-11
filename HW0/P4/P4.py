@@ -104,31 +104,45 @@ if __name__ == '__main__':
     	[0, 0, 0, 0, bvy, 0],\
     	[0, 0, 0, 0, 0, bvz]])
 
-    sigma_approx = np.identity(6)*0.01
-
     C = np.matrix([[rx, 0, 0, 0, 0, 0], \
     	[0, ry, 0, 0, 0, 0], \
     	[0, 0, rz, 0, 0, 0]])
 
-    s_approx = np.transpose(np.matrix([0, 0, 2.0, 15.0, 3.5, 4.0]))
+    # Initial conditions for s0 and Sigma
+    sigma = np.identity(6)*0.01
+    s = np.transpose(np.matrix([0, 0, 2.0, 15.0, 3.5, 4.0]))
+
+    S = np.matrix([0, 0, 2.0, 15.0, 3.5, 4.0])
+
+    # Compute the rest of sk using Eqs (2), (3), (4), and (5)
+    def predictS(s):
+        s_approx = A*s+a
+        return s_approx
+
+    def predictSig(sigma):
+        sigma_approx = np.linalg.matrix_power(A*sigma*np.transpose(A)+B*np.transpose(B), -1)
+        return sigma_approx
+
+    def updateSig(sigma_approx):
+        sigma = np.linalg.matrix_power(sigma_approx + np.transpose(C)*C, -1)
+        return sigma
+
+    def updateS(s_approx, sigma_approx, sigma):
+        s = sigma*(sigma_approx*s_approx+np.transpose(C)*np.transpose(np.matrix(s_measure[i+1])))
+        return s
 
     x_coordsd = []
     y_coordsd = []
     z_coordsd = []
 
-    for i in range(K - 1):
-        sigma = np.linalg.matrix_power(sigma_approx + np.transpose(C)*C, -1)
-        s = sigma*(sigma_approx*s_approx+np.transpose(C)*np.transpose(np.matrix(s_measure[i+1])))
-    	s_approx = A*s_approx+a
-        sigma_approx = np.linalg.matrix_power(A*sigma_approx*np.transpose(A)+B*np.transpose(B), -1)
-    	x_coordsd.append(float(s[0]))
-    	y_coordsd.append(float(s[1]))
-    	z_coordsd.append(float(s[2]))
-
-    # Sigma_K+1 = updateSig(predictSig(Sigma_K)) 
-    # Initial conditions for s0 and Sigma
-
-    # Compute the rest of sk using Eqs (2), (3), (4), and (5)
+    for i in range(120):
+        s_approx = predictS(s)
+        sigma_approx = predictSig(sigma)
+        sigma = updateSig(sigma_approx)
+        s = updateS(s_approx, sigma_approx, sigma)
+        x_coordsd.append(float(s[0]))
+        y_coordsd.append(float(s[1]))
+        z_coordsd.append(float(s[2]))
 
     ax.plot(x_coordsd, y_coordsd, z_coordsd,
             '-r', label='Filtered trajectory')
