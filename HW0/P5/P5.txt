@@ -1,1 +1,11 @@
 # Your answers here.
+1) 255 seconds
+2) Yes, they can do it significantly faster together. Eight of them can together finish the counting in 34 seconds. 
+31s for each of them to count their pile of 32 bags. 1s to go from the resulting 8 to 4 piles, 1s to go from 4 to 2 and 1s to go from 2 to 1. 
+3) 8s. With infinite employees, we can sum 128 pairs (total 256) in one second and likewise keep divinding the pile in two every 1s. Thus, total time taken is log 256 base 2 = 8 seconds.
+4) For N bags, time taken by infinite employees = log N base 2 seconds; for one cashier, time taken = N-1 seconds.
+Plot uploaded separately - P5.png
+5) 2*log N base 2. It adds 1s to every step. Total number of "bags" to be counted still decreaes by half at every iteration, just that it takes 1s to add and 1s to communicate that to another counter post addition.
+6) Ultimately, there are atleast 511 operations that need to be performed - 256 initial handovers and 255 additions. For one cashier, it will take 256s to take the bags from me and another 255s to add them for a total of 511s. Even with infinite cashiers, it will still take 256s to hand out the bags but this time, some of the addition/communication can go on while I am still handing out bags to new cashiers (there will also be more operations due to increasing communication overhead). But it will still take more than 256s - an order of magnitude higher than the pure processing time estimates from earlier (16s).
+With two bags being handed out at the same time, the lower bound on number of total operations comes down to 128 initial hand overs + 255 additions = 383 operations. Irrespective of how many of those additions/communications/handovers can happen in parallel, it will still take more than 128s to get the total. But this is much better than the earlier case with "one bag handovers".
+Thus clearly, improving the I/O bandwidth is the way to bring down the processing time rather than throw more processors at the problem (we are already at infinite!) The better strategy would be to fix the initial handover bottleneck or in other words try to reduce the I/O bottleneck time by increasing the bandwidth by say placing the bags on a large table from which 32 cashiers could pick two bags each in 1s. That would bring down the total processing time to 17s, about as good as we can get.
