@@ -16,7 +16,9 @@ if __name__ == '__main__':
 
     # Use a variety of wait times
     ratio = []
-    wait_time = [pow(10,0.25 * x) * pow(10,-6) for x in range(0,25)]
+    # this is a trick to place 5 evenly spaced points 
+    # in each of 6 buckets between 10^-6 and 10^0
+    wait_time = [pow(10,0.2 * x) * pow(10,-6) for x in range(0,31)]
     for t in wait_time:
         #print wait_time
         # Compute jobs serially and in parallel
@@ -24,16 +26,17 @@ if __name__ == '__main__':
 
         startTime = time.time()
         #Serial computation
-        for i in range(16):
+        for i in range(N):
             burnTime(t)
         serialTime = time.time() - startTime
 
         startTime = time.time()
         #Parallel computation
-        result = pool.map(burnTime(t), range(16))
+        result = pool.map(burnTime, [t for x in range(N)])
         parallelTime = time.time() - startTime
 
-        # Compute the ratio of these times
+        # Compute the ratio of these times]
+        print str(t) + " serial: " + str(serialTime) + "      par: " + str(parallelTime)
         ratio.append(serialTime/parallelTime)
 
     # Plot the results
