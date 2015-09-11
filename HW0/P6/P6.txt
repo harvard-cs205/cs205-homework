@@ -1,1 +1,51 @@
-# Your answers here
+Output example 1:
+    Hi Job 0
+    Hi Job 1
+    Hi Job 2
+    Hi Job 3
+    Bye Job 1
+    Hi Job 4
+    Bye Job 2
+    Hi Job 5
+    Bye Job 0
+    Hi Job 6
+    Bye Job 3
+    Hi Job 7
+    Bye Job 4
+    Bye Job 6
+    Hi Job 8
+    Hi Job 9
+    Bye Job 5
+    Bye Job 7
+    Bye Job 9
+    Bye Job 8
+    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+Output example 2:
+    Hi Job 0
+    Hi Job 1
+    Hi Job 2
+    Hi Job 3
+    Bye Job 2
+    Bye Job 3
+    Bye Job 1
+    Hi Job 4
+    Bye Job 0
+    Hi Job 5
+    Hi Job 6
+    Hi Job 7
+    Bye Job 5
+    Bye Job 7
+    Hi Job 8
+    Bye Job 4
+    Hi Job 9
+    Bye Job 6
+    Bye Job 8
+    Bye Job 9
+    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+From these two examples, we can see that jobs don't end as the same order as they start. Also, it does not start as the order of it is assigned.
+If two jobs are sharing variables and job 5 is expecting use a variable modified by job 0, we have to wait for job 0 to finish. However, if we assume job 0 ends before job 5 starts, there is an error that job 0's varible could be anything.
+
+
+As the sleep time expands, parallel computing becomes more better than serial. However, the ratio between serial time and parallel time is limited by 4 because we only have 4 processes and we can only speed up by 4 times at most. It is possible that parallel program takes longer than serial version. When we use parallel program, it has to waste time on distributing jobs and this overhead makes parallel program slower than serial version when sleep time is very small.
