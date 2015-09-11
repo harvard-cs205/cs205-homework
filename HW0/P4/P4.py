@@ -151,4 +151,5 @@ if __name__ == '__main__':
 
     # Show the plot
     ax.legend()
+    plt.savefig('P4.png')
     plt.show()
