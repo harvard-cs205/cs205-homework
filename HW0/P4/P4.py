@@ -29,19 +29,32 @@ if __name__ == '__main__':
     #
     # Load true trajectory and plot it
     # Normally, this data wouldn't be available in the real world
+    s_true=np.loadtxt('P4_trajectory.txt',delimiter=',')
+    
+    # xt_coords,yt_coords,zt_coords=np.loadtxt('P4_trajectory.txt',delimiter=',',usecols=(0, 1, 2), unpack=True)
+    x1_coords=s_true[:,0]
+    y1_coords=s_true[:,1]
+    z1_coords=s_true[:,2]
+
     #####################
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '--b', label='True trajectory')
+    ax.plot(x1_coords, y1_coords, z1_coords, '--b', label='True trajectory')
 
     #####################
     # Part 2:
     #
     # Read the observation array and plot it (Part 2)
     #####################
+    s_m=np.loadtxt('P4_measurements.txt',delimiter=',')
+    s_m=np.array(s_m)
+     
+    #xo_coords,yo_coords,zo_coords=np.loadtxt('P4_measurements.txt',delimiter=',', usecols=(0, 1, 2), unpack=True)
+    s_obs=np.dot(s_m, np.diag([1/rx,1/ry,1/rz]))
+    x2_coords=s_obs[:,0]
+    y2_coords=s_obs[:,1]
+    z2_coords=s_obs[:,2]
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '.g', label='Observed trajectory')
+    ax.plot(x2_coords, y2_coords, z2_coords, '.g', label='Observed trajectory')
 
     #####################
     # Part 3:
@@ -49,28 +62,64 @@ if __name__ == '__main__':
     #####################
 
     # A = ?
-    # a = ?
-    # s = ?
+    A=np.eye(6)+dt*np.eye(6,k=3)+np.diag([0, 0, 0, -c*dt, -c*dt, -c*dt])
 
+    # a = ?
+    a =  np.array([[0, 0, 0, 0, 0, g*dt]])
+    
+    # s = ?
+    s = np.array([[0, 0, 2, 15, 3.5, 4.0]])
+   
     # Initial conditions for s0
     # Compute the rest of sk using Eq (1)
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '-k', label='Blind trajectory')
+    S3=np.zeros([6,K])
+    S3[:,0]=s
+
+    for i in xrange(1,K):
+        S3[:,i]=np.dot(A, S3[:,i-1])+a
+
+    x3_coords=S3[0]
+    y3_coords=S3[1]
+    z3_coords=S3[2]
+
+    ax.plot(x3_coords, y3_coords, z3_coords, '-k', label='Blind trajectory')
 
     #####################
     # Part 4:
     # Use the Kalman filter for prediction
     #####################
+    
+    # B= ?
+    B = np.diag([bx, by, bz, bvx, bvy, bvz])
 
-    # B = ?
     # C = ?
+    C1=np.diag([rx,ry,rz])
+    C2=np.zeros([3,3])
+    C=np.bmat([[C1, C2]])
 
     # Initial conditions for s0 and Sigma0
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '-r', label='Filtered trajectory')
+    S4=np.zeros([6,K])
+    S4[:,0]=s
+
+    sk=s
+    Sigmak=np.eye(6)
+
+    for i in xrange(1,K):
+        sk_tilde=np.dot(A,np.transpose(sk))+np.transpose(a)   
+        Sigma_tilde=np.linalg.inv(np.dot(np.dot(A, Sigmak), np.transpose(A))+np.dot(B, np.transpose(B)))
+        Sigmak=np.linalg.inv(Sigma_tilde+np.dot(np.transpose(C),C))
+        xx=np.dot(Sigma_tilde, sk_tilde)+np.transpose(np.dot(np.transpose(C),np.transpose(s_m[i,:]))) # error: array+list
+        sk=np.transpose(np.dot(Sigmak, xx))
+        S4[:,i]=sk #error
+   
+    x4_coords=S4[0]
+    y4_coords=S4[1]
+    z4_coords=S4[2]
+    
+    ax.plot(x4_coords, y4_coords, z4_coords, '-r', label='Filtered trajectory')
 
     # Show the plot
     ax.legend()
