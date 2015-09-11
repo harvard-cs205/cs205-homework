@@ -45,3 +45,4 @@ Bye Job 4
 Bye Job 9
 Bye Job 8
 
+After executing a range of wait times and comparing serial vs parallel execution times, we find that the efficiency of parallel increases as the individual jobs get longer. This is probably due to the overhead cost of communication between different workers. When the individual job time is much less than the time it takes to communicate, serial can actually be faster.
