@@ -18,4 +18,20 @@ We subtract 1 because the first additions do not require communication.
 Therefore, for N = 256, the total time required will be:
 2*8 - 1 = 15 seconds. 
 
-6- 
+6- If each cashier takes only 1 bag:
+		-If we assume that no calculations can begin until all bags have been given out, then it takes 256 seconds to distribute all bags, followed by 1 second for half the cashiers to communicate their numbers to the other half. At this point, we have reduced the problem to part 5 again, so from here it takes 15 seconds. Therefore, a total of 256+1+15 = 272
+		-If we assume that calculations can take place while bags are being handed out, then as we give bags to cashiers, the previous one can already be communicating among each other and adding up counts. To see how this works:
+		After 1 second, 1 cashier has one bag
+		After 2 seconds, 2 cashiers have one bag each
+		After 3 seconds, the second cashier has communicated the number to the first, and a third cashier gets a bag, so we have a cashier with 2 numbers, and another with one number
+		After 4 seconds, the first cashier adds his 2 numbers to get one number, and we get an additional cashier with a bag, so 3 cashiers with one bag each
+		After 5 seconds, the second cashier communicates a number to the first, and another cashier gets a bag, so we have one cashier with 2 numbers, another with one, and another with one.
+		After 6 seconds, the cashier with the 2 numbers adds them up to get one number, the other two communicate, and we get an additional cashier with a bag, so we have one cashier with a number, another with 2 numbers, and a third with one number. 
+		At this point, we can understand that after x seconds, we will always have this configuration of one cashier with 2 numbers to add, and two other cashiers with one number each. From here, the cashier with the two numbers will add them up and at the same time the other two cashiers will communicate. Then, the cashier that now has 2 numbers will add them up. Then the last two cashiers will communicate. Then the last cashier will add up 2 numbers. So it takes 4 seconds from this configuration, and it takes 256 seconds to distribute all the bags and get to this configuration, so it takes a total of 260 seconds.
+
+	If each cashier takes 2 bags:
+		-If we assume no calculation until all bags have been handed out, this would take 128 seconds, and then there would be 15 seconds because this is the same problem as part 5. So total of 143 seconds. 
+		-If we assume calculations can happen while bags are being distributed, then we can carry out a similar process as above, and we realize that after x seconds where x>= 6, we will always have the same configuration of two cashiers with one number each, and two cashiers with two numbers each. From here, the one-number cashiers can communicate while each of the other two cashiers add their own 2 numbers. Then these 2 cashiers communicate while the first cashier adds up his 2 numbers. Then a cashier adds up his 2 numbers. Then the two cashiers communicate. Then the last cashier adds up 2 numbers. So it takes 5 seconds from this configuration, and 128 seconds for all bags to be handed out. So a total of 128+5 = 133 seconds.
+
+	The better strategy would be to give all 256 bags to one cashier. That cashier can then give half his bags to another cashier that doesn't have any bags. We can repeat this process of all cashiers who have bags giving half their bags to a cashier that does not have any bags, until all cashiers have 2 bags. It will take 8 seconds total (including my giving the first 256 bags to a cashier). At this point, we are back to the problem in part 5, which takes 15 seconds. So the best strategy would take 23 seconds.  
+
