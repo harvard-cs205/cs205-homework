@@ -1,1 +1,19 @@
 # Your answers here.
+
+Number 1.
+255.
+
+Number 2.
+34
+
+Number 3.
+8
+
+Number 4.
+Ceiling of log base 2(N)
+
+Number 5.
+16.
+
+Number 6.
+Assume that each cashier comes and takes 1 bag. That takes 256 seconds, during which no one can do any combining or communicating because no one 
