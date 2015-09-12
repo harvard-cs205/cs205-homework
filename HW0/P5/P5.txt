@@ -20,7 +20,9 @@
 
     total of 31 + 1 + 1 + 1 seconds, or 34 seconds
 
-3)  A: log(#bags) / log(2)
+3)  A:  8 seconds
+
+        log(#bags) / log(2)
         so for 256 bags, 8 seconds
 
     General Equation:
