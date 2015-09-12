@@ -1,21 +1,40 @@
 # Your answers here.
 
-1. It would take him 256 seconds.
+1. It would take him 255 seconds.
 
-2. They can do it in 1/7th of the original time, plus a little overhead of 6 seconds to add up the different piles of
-    pennies.
+2. 8 persons add up 16 bags per second. Doing this 16 times they are left with 16 bags (256/16 = 16). This only needs to
+    be added up once more, to one great pile of cash. Therefore the operation costs 16 + 1 = 17 seconds.
 
-3. There is one cashier per bag. Therefore it would take 256 plus an overhead of 255 seconds to add up the
-    different bags.
+3. In the infinite case every two bags has one cashier assigned. Now all of them need to count the bags in pairs of
+    two. Every time the number of bags left halfs, 1 second is added to the time. For 256 bags this can be done 8 times.
+    Therefore this takes about 8 seconds.
 
-4. See png.
+4. In the single cashier case it takes him N - 1 seconds of time. In the infinite case N is divided by 2 until there is
+    only one pile of cash left. This costs log(N)/log(2) seconds.
 
-5. I already took that into account in my answers above
+5. In the infinite case, where every two bags have a cashier associated with it, the counting will take 8 seconds, like
+    earlier. However, every step leaves a value to be communicated. After every step, the half of the values need to be
+    communicated to another cashier. So after step 1, where 256 bags are reduced to 128 values, only 64 cashiers will be
+    required and the other 64 values need to be communicated to them. This costs 64 seconds. The second step, from 128
+    to 64,leaves 32 values to be communicated (32 seconds). This results in the sequence: 64, 32, 16, 8, 4 , 2, 1. This
+    sums to 127 seconds. 127 plus the 8 seconds required to count, makes a total time of 133 seconds.
 
-6. For 1 bag: 256 (hand to cashiers) + 256 / number of cashiers + 255 second communication time
-    For 2 bags: ( 128 (hand to cahsiers) + 128 / number of cashiers + 127 seconds communication time ) * 2 since we need
-    to count double the amount of bags.
+6. The bags only need to be fetched initially. If we assume that cashiers fetch their bags in line, the answer will be
+    as every cashier needs two bags to start adding, and some cashiers may start while others are in line. In the first
+    128 seconds nothing happens as all cashiers only have one bag. Then, as they start getting their second bag, they
+    can immediately add up the values while others still line up. Then cashier 1 can communicate their value to cashier
+    2, who can then add and communicate further to cashier 3, etc. Adding and communicating costs 2 seconds, but handing
+    out costs 1 second per bag. This means that because of the lag time several groups of cashiers can start adding and
+    communicating. The exact number should be elicited in simulation. Say there are N values resulting from those groups
+    when handing out is over (after 256 seconds). Then it takes 256 + log(N)/log(2) to complete, plus the communication
+    time as described in 5.
 
-    A better strategy would be to count bags in parallel to the point where the decrease in counting time plus the
-    overhead communication costs reach a minimum. Doing a quick calculation minimizing 256/n + (n - 1) brings the optimum
-    to 16 cashiers.
+    If every cashier fetches two bags at once they don't have to line up twice, so waiting time until the bags are
+    handed out goes to 128 seconds. In the 128 seconds of being handed out + 1, every cashier can add their bags.
+    128 values are left to be communicated and added, which will cost 133 seconds like earlier, but this maily happens
+    during handing out. So a minimum estimate of the time here would be 133 seconds. If like above, there are still a
+    number of N values left to be communicated, the total time becomes 128 + log(N)/log(2) > 133 seconds, plus the
+    communication time as described in 5.
+
+    The best strategy would be to leave the pile of bags in the middle of the room, and let the cashiers pick two each,
+    all at the same time. That way they get started more quickly on average.
