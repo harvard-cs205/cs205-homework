@@ -1,1 +1,49 @@
 # Your answers here
+
+1. Count to Ten :
+
+ (1) The unexpected results are like the following.
+ Even though each job started in ordered way, 0 to 9,
+ but they were finished not in ordered way.
+
+Bye Job 0
+Hi Job 4
+Bye Job 2
+Hi Job 5
+Bye Job 1
+Hi Job 6
+Bye Job 3
+Hi Job 7
+Bye Job 4Bye Job 6
+
+Bye Job 5
+Hi Job 8
+Hi Job 9
+Bye Job 7
+Bye Job 9Bye Job 8
+
+
+ (2) & (3) How could this affect how we program in parallel?
+  + Describe a scenario where this would be important :
+  There could be some cases that we want the work to be finished according to the order.
+  But we can't expect that this could be done in the ordered way.
+  In that case, race conditions arise, so then we have to use lock or semaphore
+  to ensure the coherency of cache, or certain global variable.
+  For example, in OS, page table should be coherent throughout whole process.
+  Then this unordered result would be critical to page table.
+
+
+2. How Much Faster
+  (1) Explain the trend you observed :
+   When the wait time is big enough, which is around 10^-4,
+   the serialized computation took more time compared to the parallel computation.
+   (As we see the graph, the ratio was greater than 1)
+   But when the wait time is too short, which is less thatn 10^-4,
+   the time for parallel computation took even more than serialization.
+   So the ratio become less than 1.
+
+  (2) Is it possible that a parallel program could take longer than it's serial version?
+  Yes, if the wait time for each process is too short,
+  then the OS will have to switch the context very frequently.
+  In that case, overhead required for context switch synchronization between tasks can take longer time
+  than the serialized computation.
