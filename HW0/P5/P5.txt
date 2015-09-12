@@ -1,1 +1,47 @@
 # Your answers here.
+1. 	First second - 2 bags
+	Second second - 3 bags
+	Third second - 4 bags
+	...
+	256 bags = 255 seconds
+
+2. 	They can verify the sum faster with the eight of them. First, dividing 
+	256 by 8 returns 32 bags to be counted per person.
+	This means in the first step, each cashier arrives at a sum of their 32 bags in a time of 31 seconds (31 seconds spent, 8 totals). Then four of the cashiers add the remaining four pairs (32 seconds spent, 4 totals). Next, two cashiers add the two pairs of bags (33 seconds spent, 2 totals). Finally, one cashier adds these last two bags (34 seconds spent, 1 total).
+
+3. 	n -> n/2^1 -> n/2^2 -> n/2^3 -> Much faster
+
+4. 	time = log(N) -> Code in P5.py and image P5.png
+
+5. 	With an infinite number of workers but 1 second overhead per 
+	communication between employees, the time would certainly be slower.
+	t = 0: 	256 numbers
+		1: 	128 
+		2: 	128 
+		3: 	64	
+		4: 	64	
+		5: 	32	
+		6: 	32	
+		7: 	16	
+		7: 	16	
+		8: 	8	
+		9: 	8	
+		10:	4	
+		11:	4	
+		12:	2	
+		13:	2	
+		14:	1	
+	14 Seconds - the repeated seconds are the results of communication between the employees
+
+6. 	If each cashier comes and takes 1 bag, that process takes 256 seconds (1 	 second per bag pass, with each of the 128 cashiers coming twice) + the 	amount of time spent counting (14 seconds based off problem 5), which 		equals a final time of 270 seconds.
+	If each cashier comes and take 2 bags, the process is 128 + 14 = 142 seconds, since each of the cashiers comes up once and then counting begins.
+	The best strategy must optimize the process to the point that each of the 128 workers has two bags.
+	If each cashier came to take 4 bags, the step from me to the cashiers having 4 bags each would consume 64 seconds. Then, if each of the 64 cashiers passed 2 bags to 64 other cashiers, this would take 1 additional second, and the final step takes 14 more seconds, resulting in a final time of 79 seconds. 
+	Based on this pattern, it appears that we should give all of the bags over to one cashier, have him give off half to the next cashier, then have each give off half over and over until every cashier has two bags. We could thus distribute the bags logarithmically and then also count them logarithmically.
+	t = 0:	I have all bags
+		1: 	1 cashier with 256 bags
+		2: 	2 cashiers with 128 bags
+		3: 	4 cashiers with 64 bags
+		.........
+		8:	128 cashiers with 2 bags
+	Final time would then be 8 + 14 = 22 seconds.
