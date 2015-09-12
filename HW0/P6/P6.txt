@@ -1,1 +1,22 @@
 # Your answers here
+
+We see different results for this output because each of the processors will
+be running at different speeds. In fact, we also need to consider the processes
+that are running concurrently with our program on each processor. This is a
+problem for us because sometimes we want the threads in a parallel program to
+run with some ordering constraint, especially if the threads will access some
+common memory or disk resource.
+For example, if we were to write a program to control the withdrawal and deposit
+system of a bank, we would need to be especially careful for accounts that more
+than one person is authorized to use. If person A and person B are checking the
+account at the same time and see that there is X amount of money in it, and they
+both try to withdraw X amount of money at the same time, this will start a race
+condition that depends on the processor and the network to decide whether
+person A or B will actually be able to withdraw the money.
+
+It seems that the performance of the parallel version relative to the series
+version increases as the length of the wait time increases. This is because for
+any run of the parallel version, the overhead in creating threads and joining
+them stays roughly the same, so it becomes more beneficial to parallelize as
+the times for each of the jobs increases, especially if they are much larger
+compared to the overhead.
