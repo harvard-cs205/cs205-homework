@@ -31,24 +31,27 @@ infinite : log2(N) sec
 
 5. Again, when we draw a tree, the height would be 8 in total.
 So between each steps, communication has to be made.
-Therefore, 8-1 = 7 seconds will take additionally because of communication in total.
+Therefore, 7 seconds will take additionally because of communication in total.
 So 8 sec (for calculation) + 7 sec (for communication) = 15 sec.
 
 Answer : 15 sec
 
 
-6. 1 bag at a time : In addition to the time we got from problem #5, which is 15 sec,
+6. 1 bag at a time : In addition to the time to communicate, which is 16 sec,
  256 seconds will take to hand in 256 bags one by one.
- Answer : 256 + 15 = 271 sec
+ Answer : 256 + 16 = 272 sec
 
  2 bags at a time : bags should be handed in 128 times (thus total 256 bags),
  128 sec will take additionally.
  Answer : 128 + 15 = 143 sec
 
- Better strategy : giving 16 bags to each person is better way to reduce the time.
- Then each person will take 15 seconds to sum up 16 given bags,
- and 256/16 = 16 seconds will take to hand in bags,
- and 3 seconds to communicate with each other,
- and 4 seconds to sum up through the level in each tree structure.
- Therefore, total 38 seconds.
+ Better strategy : Give N bags to the first cashier, and then N-1 bags to second cashier,
+  and N-2 to third cashier and so on. Then at the moment when I give the last one bag to the last cashier,
+  the other cashiers would have done their summation.
+  To get the N, N + (N-1) + ... + 1 = N(N-1)/2 should be 256.
+  Such N is around 23. So until now it takes 23 seconds.
+  Then, N people should communicate and sum up.
+  Communication will take log2(32) (since 32 is the nearest number of power of 2 to 23) seconds for communication
+  and log2(32) seconds for summing up.
+  Therefore, 5 + 5 + 23 = 33 seconds in total.
 
