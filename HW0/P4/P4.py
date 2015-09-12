@@ -45,11 +45,16 @@ if __name__ == '__main__':
     # Read the observation array and plot it (Part 2)
     #####################
     measured_coord = np.loadtxt('P4_measurements.txt', delimiter=',', dtype=float)
-    xm_coords = measured_coord.T[0]
-    ym_coords = measured_coord.T[1]
-    zm_coords = measured_coord.T[2]
+    
+    corr_matrix = np.zeros(shape=(3,3))
+    corr_matrix[0,0]=1/rx; corr_matrix[1,1]=1/ry; corr_matrix[2,2]=1/rz
+    measur_out = np.dot(corr_matrix, measured_coord.T)
 
-    #ax.plot(xm_coords, ym_coords, zm_coords, '.g', label='Observed trajectory')
+    xm_coords = measur_out[0]
+    ym_coords = measur_out[1]
+    zm_coords = measur_out[2]
+
+    ax.plot(xm_coords, ym_coords, zm_coords, '.g', label='Observed trajectory')
     
     #####################
     # Part 3:
@@ -100,7 +105,7 @@ if __name__ == '__main__':
     # Implements equation (4) and returns cov_mat_k+1
     def updateSig(sig_tilde):
         return np.linalg.inv(sig_tilde + np.dot(C.T, C))
-
+        
     # Implments equation (5) and returns s_k+1
     def updateS(sig_k_1, sig_tilde, s_tilde, m_k_1):
         return np.dot(sig_k_1, (np.dot(sig_tilde, s_tilde) + np.dot(C.T, m_k_1)))
