@@ -19,18 +19,45 @@
    Code for the plot is in P5.py.
 
 5. There needs to be one second of communication after each iteration of
-   calculation (except for the last), so counting 256 bags would take 15secs.
+   calculation (except for the last), so counting 256 bags would take 16secs.
 
-6. Let's first count the time it will take for employees to hand bags off to
-   each other, assuming that they already all have the bags from you. This is
-   the same as the communication time - it would add one second after each
-   round of calculation.
-   In the case that you have to initially hand bags to employees, you will
-   become the limiting factor. In the case of either 1 or 2 bags, you will take
-   a minimum of 256 or 128 seconds to hand all the bags out respectively,
-   by which time all the bags you've already handed out will have been summed,
-   except for the last single or pair of bags.
-   A much better and more realistic way to do it is to leave all the bags spread
+6. There are some assumptions we must make about the scenario, which will have
+   an effect on our final answer. In one scenario, the cashiers must wait for
+   all the bags to be distributed before doing calculations or communicating.
+   In the other, cashiers can do these actions once they receive a bag, even
+   though not all the cashiers have received bags yet. In both scenarios, we
+   assume that we cannot give a bag to a cashier who already has a bag.
+   For the former scenario,
+   we can easily count the time as 272 seconds: 256 seconds to hand out bags
+   and an additional 16 seconds to sum them (our answer from #5).
+   In the more realistic case that cashiers can start doing work any time after
+   they've received a bag, counting is a bit harder. We see that by the time
+   we've distributed the last bag, all of the bags from bag 1 to bag n-2 will
+   have been summed to one value, and we are left with that value, the n-1 bag,
+   and the nth bag. It will take 4 seconds to sum these three values, so we get
+   a total time of 256 + 4 = 260 seconds.
+   In the case that we are able to hand 2 bags at a time to a cashier, the
+   process becomes much faster. It will take 128 + 15 = 143 seconds to sum all
+   the bags, in the case that they are not allowed to do work until all the bags
+   have been distributed. If they are allowed to do work from the time they
+   receive a bag, they can employ a similar strategy as was used for the
+   previous case (handing out 1 bag at a time), and they will have an extra 1
+   second of overhead total to sum the bags they start out with, so the total
+   time is 128 + 4 + 1 = 133 seconds.
+   A perhaps better and more realistic way to do it is to leave all the bags spread
    out and ask the poor employees to take bags at will, which will still be
    faster than having you hand them out, even if we assume a 1 or 2 second
-   overhead for each time an employee picks up a pair of bags.
+   overhead for each time an employee picks up a bag. Problems arise
+   when two cashiers try to reach for the same bag, which analogous to a race
+   condition in a parallelized program.
+   To avoid this possibility, let's consider the case where anyone is allowed to
+   transfer any number of bags, with the constant overhead of 1 second. Under
+   these constraints, we will use a divide and conquer strategy to first
+   distribute all the bags: we first give all the bags to one cashier, and in
+   the following second, that cashier will then give half of those to another
+   cashier. Each cashier will repeat this process, giving half of his/her
+   current bags to a free cashier, until each cashier only has 2 bags. This part
+   of the process will take 8 seconds. From here, we use the same strategy as
+   in #5, except that we are ahead by one step because each cashier starts with
+   a pair of bags. This part thus takes 15 seconds, giving us a total of
+   8 + 15 = 23 seconds.
