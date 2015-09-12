@@ -56,18 +56,18 @@ if __name__ == '__main__':
     A = np.matrix(np.zeros([6,6]))
     A[0,0] = A[1,1] = A[2,2] = 1
     A[0,3] = A[1,4] = A[2,5] = dt
-    A[3,3] = A[4,4] = A[5,5] = 1- c*dt
+    A[3,3] = A[4,4] = A[5,5] = 1 - c*dt
     
-    predPosArray = np.matrix(np.zeros([6, K]))
+    pred = np.matrix(np.zeros([6, K]))
 
-    predPosArray[:, 0] = s0
+    pred[:, 0] = s0
     for i in np.arange(K):
-	if i == 0: predPosArray[:, 0] = s0
-	else: predPosArray[:, i] = (A * predPosArray[:, i-1]) + a
+	if i == 0: pred[:, 0] = s0
+	else: pred[:, i] = (A * pred[:, i-1]) + a
  
-    predPosArray = np.array(predPosArray)
+    pred = np.array(pred)
   
-    ax.plot(predPosArray[0], predPosArray[1], predPosArray[2], '-k', label='Blind trajectory')
+    ax.plot(pred[0], pred[1], pred[2], '-k', label='Blind trajectory')
 
     #####################
     # Part 4:
@@ -82,16 +82,16 @@ if __name__ == '__main__':
 
     # Initial conditions for s0 and Sigma0
     Sigma0 = 0.01*np.identity(6)
-    Sigmak = Sigma0, sk = s0, m = np.matrix(measurement)
+    
+    Sigmak, sk, m = Sigma0, s0, np.matrix(measurement)
 
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
     predictS = lambda A, sk, a: A*sk + a
     predictSig = lambda A, sigmak, B: (A*sigmak*A.T + B*B.T).I
     updateSig = lambda sigma, C: (sigma + C.T * C).I
-    updateS = lambda sigmak1, sigma, s, C, m: sigmak1 * (sigma * s + C.T * m)
+    updateS = lambda sigmakp1, sigma, s, C, m: sigmakp1 * (sigma * s + C.T * m)
 
     kalman = np.matrix(np.zeros([6,K]))
-    kalman[:,0] = sk
     for i in np.arange(K):
 	if i == 0: 
 	    kalman[:, i] = sk
