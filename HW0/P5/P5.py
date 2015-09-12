@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
-  bags = range(1,32)
+  bags = range(1,64)
   ptime = [np.ceil(np.log(b)) for b in bags]
   ntime = [b - 1 for b in bags]
   plt.scatter(bags, ntime, c="red")

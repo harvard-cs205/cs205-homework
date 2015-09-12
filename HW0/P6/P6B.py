@@ -7,9 +7,6 @@ import matplotlib.pyplot as plt
 def burnTime(t):
     time.sleep(t)
 
-def thread(id,t):
-    burnTime(t)
-
 # Main
 if __name__ == '__main__':
     N = 16  # The number of jobs
@@ -20,17 +17,19 @@ if __name__ == '__main__':
 
     # Use a variety of wait times
     ratio = []
-    wait_time = np.arange(0.000001, 1, 0.001)
-
+    wait_time = [1.0 / 10**(6-i) for i in xrange(7)]
+    print wait_time
     for t in wait_time:
         # Compute jobs serially and in parallel
         # Use time.time() to compute the elapsed time for each
         start = time.time()
-        pool.map(thread(, range(N))
-        parallelTime = time.time() - start
+        pool.map(burnTime, [t] * N)
+        done = time.time()
+        parallelTime = done - start
         start = time.time()
-        map(lambda id: burnTime(t), range(N))
-        serialTime = time.time() - start
+        map(burnTime, [t] * N)
+        done = time.time()
+        serialTime = done - start
 
         # Compute the ratio of these times
         ratio.append(serialTime/parallelTime)
