@@ -1,3 +1,4 @@
+6a.
 Here's an example result:
 Hi Job 0
 Hi Job 2
@@ -54,3 +55,16 @@ A more real world, often used example, is that of withdrawing from bank accounts
 If we do this in parallel, it might be possible for two people to both withdraw
 $100 dollars from a bank account with $500 dollars, but the bank account ends with
 $400 dolalrs (as opposed to $300).
+
+6b. The trend makes sense. We have that as the wait time is increased, the speed up
+that we get from running the process in parallel (up to a maxium of 4) increases.
+This is because the threads can wait at the same time.
+
+It would, theoretically, be possible that sequential wait times might be better.
+This is because of the overhead that is associated with creating a new thread
+might be too expensive compared to the speedup associated with parallelizing the
+code.
+
+The sum of the computations sequentially might be less than the time it takes
+to start each thread plus the cost of a single computation (if, it happens, that
+they can all be done in parallel).
