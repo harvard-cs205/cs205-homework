@@ -5,4 +5,9 @@
 
 3. Assuming we have infinite people to count. Each recursion level the number of groups halves. Since 2^8 = 32, it takes 8 seconds.
 
-4.
+4. Please take a look at P5.png. Nmax = 3000 in my case.
+
+5. From 3, we have calculated that there are 8 levels in total, and each level takes one second to complete. If communication time is taken into account, there will be one additional second when one level goes to another (e.g., 256 -> 128 takes one second to communicate since people can communicate simultaneously). There are in total 8-1 = 7 merging (communicating) operations. As a result, it takes 8 + 7 = 15 seconds in this case.
+
+6. 
+1 bag senario: We distribute 256 cashiers to do this work. Firstly, each casher approaches 
