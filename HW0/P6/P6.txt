@@ -1,1 +1,7 @@
 # Your answers here
+a.The order in which the actions are completed each time the code is run is never respected; hence the sequence is not consistent when using parallel programming.
+You can never count on the order on which the actions are completed, and in the case where an action provides an input for a function which follows for instance, then if the sequence used while using parallel programmin is not the right one, the code will break.
+
+
+b. On the plot, it can be seen that when the wait time is small (between 10ˆ5 and 10ˆ4), setting up the parallel programming might be longer than actually completing the code usinge a serial program. Indeed, the ratio in that part of the plot is smaller than 1, revealing that serial version is realized faster. However, the when the wait time increases, the parallel program becomes obviously more efficient as the processor run simultaneously. 
+(It might be worth noting that this issue has been discussed in part 5 of question 5: When the max numbre of employee is not the most rapid way when introducing the time of communication between the employees).
