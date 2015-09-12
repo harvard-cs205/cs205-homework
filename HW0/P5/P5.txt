@@ -19,7 +19,8 @@
    Code for the plot is in P5.py.
 
 5. There needs to be one second of communication after each iteration of
-   calculation (except for the last), so counting 256 bags would take 16secs.
+   calculation (except for the last), so counting 256 bags would take 15secs
+   because each cashier could start off with a pair of bags.
 
 6. There are some assumptions we must make about the scenario, which will have
    an effect on our final answer. In one scenario, the cashiers must wait for
@@ -29,7 +30,7 @@
    assume that we cannot give a bag to a cashier who already has a bag.
    For the former scenario,
    we can easily count the time as 272 seconds: 256 seconds to hand out bags
-   and an additional 16 seconds to sum them (our answer from #5).
+   and an additional 16 seconds to sum them (our answer from #5 plus 1).
    In the more realistic case that cashiers can start doing work any time after
    they've received a bag, counting is a bit harder. We see that by the time
    we've distributed the last bag, all of the bags from bag 1 to bag n-2 will
@@ -58,6 +59,5 @@
    cashier. Each cashier will repeat this process, giving half of his/her
    current bags to a free cashier, until each cashier only has 2 bags. This part
    of the process will take 8 seconds. From here, we use the same strategy as
-   in #5, except that we are ahead by one step because each cashier starts with
-   a pair of bags. This part thus takes 15 seconds, giving us a total of
+   in #5. This part thus takes 15 seconds, giving us a total of
    8 + 15 = 23 seconds.

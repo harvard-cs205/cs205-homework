@@ -16,20 +16,21 @@ if __name__ == '__main__':
 
     # Use a variety of wait times
     ratio = []
-    wait_time = [10**i for i in range(-6, 1)]
+    wait_time = [10**(-i) for i in xrange(7)]
 
     for t in wait_time:
         # Compute jobs serially and in parallel
         # Use time.time() to compute the elapsed time for each
 
         t1 = time.time()
-        for i in xrange(N):
-            burnTime(t)
+        # for i in xrange(N):
+        #     burnTime(t)
+        map(burnTime, [t]*N)
         t2 = time.time()
         serialTime = t2 - t1
 
         t3 = time.time()
-        pool.map(burnTime(t), xrange(N))
+        pool.map(burnTime, [t]*N)
         t4 = time.time()
         parallelTime = t4 - t3
 
