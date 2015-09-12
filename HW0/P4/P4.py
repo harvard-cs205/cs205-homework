@@ -2,6 +2,21 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
+# Equation 2 from the instructions
+def predictS(s_kal):
+    return ((A * s_kal) + a)
+
+# Equation 3 from the instructions
+def predictSig(sigma):
+    return np.linalg.inv(A * sigma * A.transpose() + B * B.transpose())
+
+# Equation 4 from the instructions
+def updateSig(sigma_pred):
+    return np.linalg.inv(sigma_pred + C.transpose() * C)
+
+# Equation 5 from instructions
+def updateS(s_kal, s_obs, sigma_pred, sigma):
+    return (sigma * (sigma_pred * s_kal + C.transpose() * s_obs))
 
 if __name__ == '__main__':
     # Model parameters
@@ -108,22 +123,6 @@ if __name__ == '__main__':
     # Use the Kalman filter for prediction
     #####################
     
-    # Equation 2 from the instructions
-    def predictS(s_kal):
-        return ((A * s_kal) + a)
-    
-    # Equation 3 from the instructions
-    def predictSig(sigma):
-        return np.linalg.inv(A * sigma * A.transpose() + B * B.transpose())
-    
-    # Equation 4 from the instructions
-    def updateSig(sigma_pred):
-        return np.linalg.inv(sigma_pred + C.transpose() * C)
-    
-    # Equation 5 from instructions
-    def updateS(s_kal, s_obs, sigma_pred, sigma):
-        return (sigma * (sigma_pred * s_kal + C.transpose() * s_obs))
-    
     # Initialize B matrix
     B = np.mat([
         [bx, 0, 0, 0, 0, 0],
@@ -155,6 +154,7 @@ if __name__ == '__main__':
     s_obs = np.mat(s_obs)
                                                   
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
+    # Functions defined above
     for k in range(1,K):
         s_kal[:,k] = predictS(s_kal[:,k-1])
         sigma_pred = predictSig(sigma)

@@ -1,1 +1,108 @@
-# Your answers here.
+1. 
+Bags = 256
+Cashiers = 1
+Time/addition = 1
+>> Steps: cashier adds bag #1 to bag #2, then adds that to bag #3, etc.
+>> Time to add = Bags - 1 = 255 seconds
+
+2.
+Bags = 256
+Cashiers = 8
+Time/addition = 1
+>> Steps: Each cashier receives 256/8 = 32 bags, which take 31 seconds to count. Each cashier then turns to another cashier and sums their totals, which takes 1 second and results in 4 new totals. This is repeated until there is only 1 total left.
+>> Time to add = 34 seconds (= 31 seconds for each cashier's initial calculation + 3 seconds to aggregate everything)
+
+3.
+Bags = 256
+Cashiers = Infinite
+Time/addition = 1
+>> Steps: Same as #2, but in the first step each cashier receives only 2 bags, which take 1 second to add up (ie. there are infinite cashiers, but only 128 are actually used). As in #2, each cashier turns to another cashier and sums their totals; this is repeated until there is only 1 total left.
+>> Time to add = log-2(256) = 8 seconds
+
+4.
+Bags = N
+Cashiers = Infinite
+Time/addition = 1
+>> Steps: Same as #3, with each initial cashier receiving N/2 bags.
+>> Time to add = log-2(N)
+(see P5.png)
+
+5.
+Bags = 256
+Cashiers = Infinite
+Time/addition = 1
+Time/communication = 1
+>> Steps: Same steps as #2. The time of the cashiers' first calculation is the same, but each subsequent aggregation takes 2 seconds (1 second communication + 1 second addition) instead of 1 second.
+>> Time to add = 2*log(256/2)+1 = 15 seconds
+
+6.
+Bags = 256
+Cashiers = Infinite
+Time/addition = 1
+Time/communication = 1
+Time/handing bag(s) = 1
+
+Scenario 1: Each cashier comes to you and takes 1 bag in turn. The cashiers start communicating/adding while the bags are still being handed out.
+Assume the following notations:
+d = distribution of 1 bag (1 second)
+c = communication across cashiers (1 second)
+s = summing of communicated numbers (1 second)
+At each second, the following transitions are possible:
+c -> s i.e. numbers that have been communicated are summed
+any pair of d and/or s (i.e. dd, ds, ss, sd) -> c i.e. numbers are communicated across cashiers
+
+The following pattern develops:
+1		2		3		4		5		6		7		8
+---		---		---		---		---		---		---		—
+d		d		c		s		s		s		s		s
+		d		d		d		c		c		c		c
+				d		d		d		d		d		d
+
+After second 5, a stationary set of operations develops.  Since all bags have to be distributed, at least 256 steps must be taken.  At the 256th second, the following occurs:
+
+256		257		258		259		260
+---		---		---		---		---
+s		c		s		c		s
+c		s		s
+d
+
+i.e. another 4 steps are necessary to sum all the outstanding balances before reaching the final sum.
+
+So, in the scenario where each cashier takes 1 bag, it takes 256+4=260 seconds in total.
+
+Scenario 2: Each cashier comes to you and takes 2 bags. Again, the cashiers start communicating/adding while the bags are still being handed out. The same notation as above applies. In addition, the notation (d,d) detonates two bags that have been handed over to the same cashier.  Efficiency dictates that (d,d) always transitions to s.
+
+The following pattern develops:
+
+1		2		3		4		5		6		7		8
+---		---		---		---		---		---		---		---
+(d,d)		s		s		c		s		c		c		c
+		(d,d)		s		s		s		s		s		s
+				(d,d)		(d,d)		s		s		s		s
+								(d,d)		(d,d)		(d,d)		(d,d)
+
+After second 6, a stationary set of operations develops. Since all bags have to be distributed, at least 256/2=128 steps must be taken. At the 128th second, the following occurs:
+
+128		129		130		131		132		133
+---		---		---		---		---		---	
+c		s		c		s		c		s	
+s		c		s		s
+s		s
+(d,d)
+
+i.e. another 5 steps are necessary to sum all the outstanding balances before reaching the final sum.
+
+So, in the scenario where each cashier takes 2 bags at a time, it takes 128+5=133 seconds in total.
+
+I highlight below a better strategy (although possibly not the best). Please note that I am interpreting this question to mean that only the number of bags handed out to each cashier can be altered, but all other constraints remain the same.
+
+Second 1: Distribute 128 bags to cashier #1.
+Second 2: Distribute 128 bags to cashier #2. Cashier #1 begins to sum up his bags.
+Second 3: Cashier #2 begins to sum up his bags.
+As per part 1, it will take each cashier 127 steps to sum up his bags.
+Second 128: Cashier #1 finishes summing his bags. He waits because no actions are available.
+Second 129: Cashier #2 finishes summing his bags.
+Second 130: Cashier #2 communicates his total to cashier #1.
+Second 131: Cashier #1 sums the two numbers.
+
+This strategy takes two seconds less than the strategy where each cashier picks up 2 bags.
