@@ -1,1 +1,30 @@
 # Your answers here
+
+We see that the 10 different burnTime function calls, or jobs, are executed at different times and not always in the same order. The first 4 burnTime 'Hi's are always in order because there are 4 processes in the pool, but subsequently the 'Hi's and 'Bye's appear in a seemingly random sequence. This is usually referred to as a race condition. A scenario in which this could be important is when we have dependencies - where event A has to happen before event B for the algorithm to work.
+
+Example output:
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 3
+Hi Job 4
+Bye Job 2
+Hi Job 5
+Bye Job 1
+Hi Job 6
+Bye Job 0
+Hi Job 7
+Bye Job 6
+Bye Job 4
+Hi Job 8
+Bye Job 7
+Hi Job 9
+Bye Job 5
+Bye Job 9
+Bye Job 8
+
+Describing the trend seen in P6.png, serialTime/parallelTime is strictly increasing as wait time increases from 10^(-6) to 10^(0). I.e. parallelism increases as wait time increases. There was a significant increase in parallelism between 10^(-3) and 10^(-2), and subsequently as wait time increases closer to 10^(0), the increase in parallelism levels off. It is possible for a parallel program to take longer than its serial version because there is overhead for making and joining threads is constant for every group of jobs. If the additional overhead outweighs the optimization obtained by parallelism (for example when the wait time is super short), the parallel version might be longer than serial.
+
+
+

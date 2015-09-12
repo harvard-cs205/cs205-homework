@@ -1,1 +1,15 @@
 # Your answers here.
+
+1. If one cashier were to add the totals of 256 bags, he would have to calculate 255 additions. This is because he can add separate pairs of the 256 numbers, taking 128 seconds. Subsequently, he can add separate pairs of the remaining 128 numbers, taking 64 seconds. He then adds separate pairs of the 64 numbers, taking 32 seconds...so on and so forth. Hence, he takes a total of 128+64+32+16+8+4+2+1 = 255 seconds.
+
+2. Together, the 7 cashier co-workers and the original cashier can verify the total sum faster. In the first round of counting, each one of the 8 cashiers can be separately in charge of 256/8=32 numbers, each reducing them to 16 numbers and taking 16 seconds in total. Subsequently, each cashier reduces their 16 numbers to 8 numbers, taking 8 seconds...so on and so forth. After 16+8+4+2+1 = 31 seconds, there will be 8 numbers left, which takes 3 more seconds. Hence, 34 seconds needed in total.
+
+3. The employees can verify the sum in 8 seconds. This is because the infinite number of employees would take 1 minute to half the number of bags to 128, another 1 minute to half those number of bags to 64, so on. Since 256 is 2 to the power of 8, it would take 8 seconds total.
+
+4. If there were N bags, it would take log_2(N) seconds for the infinite number of cashiers to count the bags. The graph is saved as P5.png in this directory.
+
+5. All cashiers would first take 1 second to add 2 numbers, reducing number of bags to 128. Then, half of the cashiers would take another second to communicate their number to the other half of the cashiers, and they would take 1 second to add their 2 numbers. Essentially, they would have to add, communicate, add, communicate, ..., communicate, add - with 8 additions in total. Hence, this would take 15 seconds in total.
+
+6. If each cashier comes to take only 1 bag at a time, I would take at least 256 seconds just to hand out all the bags. Under the assumption that each cashier cannot receive a bag and conduct a computation at the same time, it ends up that 260 seconds is needed to add up all 256 bags. At second 1, one bag is given out to cashier 1. At second 2, another bag is given out to cashier 2. At second 3, communication happens between the first two cashiers, and another bag is given out to cashier 3. At second 4, all that can be added for numbers held by cashiers 1-3 is added. For every subsequent second, this pattern continues - at all times, I hand out a bag to a new cashier; at odd time seconds, all communication possible occur; at even time seconds, all additions possible occur. At the end of 256 seconds, there are 4 numbers left. It takes 4 more seconds to communicate, add, communicate, add, hence taking 260 seconds in total.
+
+If each cashier comes to take only 2 bags at a time, it would take 128 + 5  = 133 seconds in total. The logic follows from the above as it would take 128 seconds for me to hand out all 256 bags to different cashiers, and 5 additional seconds to add the 4 numbers up.
