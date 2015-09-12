@@ -1,1 +1,17 @@
 # Your answers here.
+
+# The speed is: 1 [seconds/(add*person)]
+
+# 1. For a single cashier: 255 additions in series = 255 seconds.
+
+# 2. For 7 cashiers: They can split the 256 bags up in 3 piles of 36 and 4 piles of 37. This will take 36 seconds. Then they have 7 numbers, which in 1 second can be reduced to 4 by 3 of them, to 2 in another second by 2 of them, and to the result by one of them in one second. The total is then 36+3 = 39 seconds. 
+
+# 3. For infinite cashiers: 256 = 2**8, so 8 sequential additions of two numbers are necessary and so it takes 8 seconds. (First requiring 128, then 64, then 32,...then one employee)
+
+# 4. If there are N bags and infinite employees, then the time it will take is ln(N)/ln(2). For a single employee, the time is N-1.
+
+# 5. The number doubles. One second for the calculation, one second to pass the inforation on. This is assuing infinite employees.
+
+# 6. The bags only have to be distributed initially, after which only numbers are exchanged. However, the cost for exchanging numbers is the same as for bags, only that number exchange is parallel. There are three stages: distribution of N/P bags to P employees takes a time of P. These will take N/P - 1 seconds to count the bags. Then the numbers calculated by the emplyees need to be added, which will cost log(P)/log(2) seconds. The total time it takes is then T=P+N/P-1+log(P)/log(2). Taking the derivative to find the optimum number of processors to use: 0 = 1-N/P^2 + (1/P)(1/log(2)). The solution to this polynomial is 15.3, so my suggestion is to give 16 bags to 16 employees (16 seconds) who need 15 seconds to count them, and then 4 seconds to combine their numbers. Total is 35 seconds.
+
+# I will have to submit number 6 on Sunday. I will not get into details, but it is the US air force that is to blame - so cool.
