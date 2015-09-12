@@ -8,7 +8,7 @@
 
 4) log_2 (N) seconds. Generalizing the strategy in question 3, summing the totals using divide and conquer effectively takes log base 2 of N operations since we can have an infinite number of cashiers reduce the number of totals by half in each iteration. Since each operation takes 1 second, this takes log_2 (N) seconds.
 
-5) 16 seconds. In the first iteration, it takes 1 second to sum the 128 pairs, and 1 second to communicate the sum. In the second iteration, it takes 1 second to sum the 64 pairs, and 1 second to communicate. Following this pattern, it takes 16 seconds to sum the 256 totals. 
+5) 15 seconds. In the first iteration, it takes 1 second to sum the 128 pairs. In the second iteration, it takes 1 second to communicate the sums, and 1 second to sum the 64 pairs. We follow this pattern until there is a single sum. Therefore, it takes 15 seconds to sum the 256 totals. 
 
 6)
 Taking one bag at a time:
