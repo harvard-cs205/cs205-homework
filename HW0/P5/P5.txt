@@ -9,5 +9,10 @@
 
 5. From 3, we have calculated that there are 8 levels in total, and each level takes one second to complete. If communication time is taken into account, there will be one additional second when one level goes to another (e.g., 256 -> 128 takes one second to communicate since people can communicate simultaneously). There are in total 8-1 = 7 merging (communicating) operations. As a result, it takes 8 + 7 = 15 seconds in this case.
 
-6. 
-1 bag senario: We distribute 256 cashiers to do this work. Firstly, each casher approaches 
+6. This problem is a little ambiguous. Based on the piazza discussion, I assume that "you" in the problem is not a cashier.
+ 
+1 bag senario: In the divide step, we hand 256 bags to one cashier, and the cashier can further distributes 128 bags to another one. This happen recursively until each cashier has 1 bag. The time it takes in this step is 1 + log_2(256) = 9. Based on 5, communication time takes 7 seconds. However, in this case, since every cashier can only take 1 bag, there is one additional communication at the beginning. And counting time is 8 seconds. So the total time is 9 + 8 + 8 = 25 seconds.
+
+2 bags senario: Since each cashier can have 2 bags, the divide step takes 8 seconds. Everything else is the same as part 5. So it takes 8 + 15 = 23 seconds.
+
+Let M be the number of bags a cashier can have. Notice that if M = 4. The time it takes to count these bags is 3 seconds, which is less than the time it would take if the bags were further distributed (1 + 1 + 2 = 4) in this case. As a result, giving four bags to each cashier is a better strategy and the corresponding time is 23 - 1 = 22 seconds. If M = 8, the time it takes to count them is 7 seconds, which is more than the time it would take if the bags were further distributed (3 + 1 + 2 = 6). As a matter of fact, if M / 2 -1 + 1 + 2 < M - 1, we want to further distribute bags.  
