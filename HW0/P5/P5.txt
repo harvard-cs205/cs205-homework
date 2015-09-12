@@ -2,7 +2,7 @@
 
 1)  A: 255 seconds
 
-2)  A: 33 seconds
+2)  A: 34 seconds
     now 8 cashiers, 256 bags
     256/8 = 32 bags each
 
@@ -18,7 +18,7 @@
     1 cashier adds 2 numbers in 1 second
     done
 
-    total of 31 + 1 + 1 + 1 seconds, or 33 seconds
+    total of 31 + 1 + 1 + 1 seconds, or 34 seconds
 
 3)  A: log(#bags) / log(2)
         so for 256 bags, 8 seconds
