@@ -4,6 +4,26 @@ from mpl_toolkits.mplot3d import Axes3D
 from numpy.linalg import inv
 
 
+# Function to calculate predictS
+def predictS(s_p):
+    s_predicted = A * s_p + a;
+    return s_predicted;
+
+# Function to calculate predictSig
+def predictSig(sigma_p):
+    sigma_predicted = (A * sigma_p * A.transpose() + B * B.transpose());
+    return inv(sigma_predicted);
+
+# Function to calculate updateSig
+def updateSig(sigma_predicted):
+    return inv(sigma_predicted + C.transpose() * C);
+
+# Function to calculate updateS
+def updateS(sigma_next,sigma_predicted,s_predicted, MEA):
+    return sigma_next * (sigma_predicted * s_predicted + C.transpose()* MEA[:,x]);
+
+
+
 if __name__ == '__main__':
     # Model parameters
     K = 121    # Number of times steps
@@ -116,16 +136,13 @@ if __name__ == '__main__':
     MEA = np.asmatrix(M);
 
     for x in range(1,K):
-        s_predicted = A * s_p + a;
-        sigma_predicted = (A * sigma_p * A.transpose() + B * B.transpose())
-        sigma_predicted = inv(sigma_predicted);#inverse the matrix
-        sigma_next = sigma_predicted + C.transpose() * C;
-        sigma_next = inv(sigma_next);
-        s_next = sigma_next * (sigma_predicted * s_predicted + C.transpose()* MEA[:,x]);
+        s_predicted = predictS(s_p);
+        sigma_predicted = predictSig(sigma_p);
+        sigma_next = updateSig(sigma_predicted);
+        s_next = updateS(sigma_next,sigma_predicted,s_predicted,MEA);
         X[:,x] = s_next.transpose();
         s_p = s_next;
-        sigma_p = sigma_next;
-        print x
+        sigma_p = sigma_next;        
 
     x_coords = X[0,:];
     y_coords = X[1,:];

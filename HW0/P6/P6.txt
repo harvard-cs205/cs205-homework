@@ -1,1 +1,4 @@
-# Your answers here
+# Xingchi Dai
+Q1: One thing I noticed is the order of threads has been changed. The thread started first might not end first, although we have the same sleeping time. This will affect our parallel programming in a way we cannot predict the result, and will make one CPU idle. A very obvious scenario will be if multi-threads are related, since the order is not sure, one thread may wait for another or even the whole program will mess up. 
+
+Q2: It is possible that parallel program is slower than serial's. Parallel programming has to deal with communication etc. Thus, when the time is really short, the serial programming actually has more advantage.
