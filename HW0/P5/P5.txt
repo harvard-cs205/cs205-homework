@@ -1,1 +1,8 @@
 # Your answers here.
+1. 255 seconds. Because cashiers can only count 2 bags per second, they need to perform 255 operations, which amount to 255 seonds.
+
+2. Yes. There 8 cashiers. The idea is divide and conquor. Split 256 bags into 8 groups, each of which contains 32 bags. For each group, one can count them in 31 seconds. Then we merge the 8 counted groups and divide them into 4 groups, each of which contains 2 smaller counted groups. It would take 4 cashiers 1 second to finish counting them. Repeat this until we have 1 group in the end. The time it would take is 31 + 1 + 1 + 1 = 34 seconds.
+
+3. Assuming we have infinite people to count. Each recursion level the number of groups halves. Since 2^8 = 32, it takes 8 seconds.
+
+4.
