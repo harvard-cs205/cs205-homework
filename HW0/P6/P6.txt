@@ -87,10 +87,9 @@ This could affect how we program in parallel because there are three
 paths (more computers, multicore, GPU) with different strengths so we
 have to weigh the costs and benefits of each.  We might also want to
 set it up differently and change the pool size depending on what we are
-trying to compute and if it needs to be uniformly processed. We would
+trying to compute and if it needs to be synchronized processing. We would
 need it if one part running depended on the other parts running as well,
-in other words, if they were interdependent. Also, if you had too many
-jobs, it would take a long time to run.
+in other words, if they were interdependent.
 
 
 
