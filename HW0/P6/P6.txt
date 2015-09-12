@@ -2,7 +2,7 @@
 
 Part A:
 
-Below are two iterations of the program when I run it:
+Below	 are two iterations of the program when I run it:
 
 Iteration 1:
 
@@ -59,4 +59,4 @@ This could affect the way we program because there may problems that rely on som
 
 Part B: How Much Faster?
 
-From the graph, it seems that the general trend is that as the wait time increases, the ratio of serial time to parallel time also increases. However, it is possible that a parallel program could take longer than its serial version. This is due to the fact that there is a fixed amount of overhead cost that the multiprocessing library requires. When the wait time is minimal, the time that parallel programming saves (via the computations) does not justify the overhead cost.
+From the graph, it seems that the general trend is that as the wait time increases, the ratio of serial time to parallel time also increases. However, it is possible that a parallel program could take longer than its serial version. This is due to the fact that there is a fixed amount of overhead that the multiprocessing requires. When the wait time is minimal, the time that parallel programming saves (via the computations) does not justify the overhead.
