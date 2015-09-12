@@ -1,3 +1,26 @@
+Here's an example result:
+Hi Job 0
+Hi Job 2
+Hi Job 3
+Hi Job 1
+Bye Job 0
+Hi Job 4
+Bye Job 2
+Bye Job 3
+Hi Job 5
+Hi Job 6
+Bye Job 1
+Hi Job 7
+Bye Job 4
+Hi Job 8
+Bye Job 5
+Hi Job 9
+Bye Job 6
+Bye Job 7
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
 We see that the results are actually interleaved with each other. This occurs
 because we only have four processors, and we're running 10 threads. It would stand
 to reason that we are running four of the threads at parallel. While these four threads
@@ -8,8 +31,26 @@ Once this processor has been freed, the next thread can start processing. This c
 however, occur before the other three jobs have finished. This means that the results
 are not printed in the order we would expect.
 
+Additionally, the above example illustrates the idea of "race conditions" well.
+When do jobs 0-3 start? They all start "at the same time", which means any of them
+can actually print their "Hi" message, in any order.
+
 As we can see, this affects computations in parallel because we have to consider
 the fact that a computation might finish before the computation on another core.
 This can lead to what are called "race conditions" in parallel programming where
 computations that are supposed to occur one after the other actually occur out of
 sequence when we parallelize them.
+
+The above would be important in any algorithm that relies on sequential computations.
+One real world example would be having multiple threads that are keeping a "count"
+of the number of times a function is called. If the threads share this "count"
+variable, then they would all attempt to access it at the same time, reading an
+initial value, and then attempt to write that value. We could get any value
+in the set {1,...,N} where N is the actual number of times the function as called.
+
+This is not what we would want.
+
+A more real world, often used example, is that of withdrawing from bank accounts.
+If we do this in parallel, it might be possible for two people to both withdraw
+$100 dollars from a bank account with $500 dollars, but the bank account ends with
+$400 dolalrs (as opposed to $300).

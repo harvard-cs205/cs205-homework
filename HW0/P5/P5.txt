@@ -33,8 +33,10 @@ each second.
 
 5. Each step would take 2 seconds as opposed to 1, (a cashier sum two bags, and
 half of them must communicate the value to their neighbor before the process can
-continue). Using the same approach as (3), this gives 16 seconds as the total
-(15 if we assume the last cashier doesn't need to tell anyone the value).
+continue). Using the same approach as (3), this gives 16 seconds as the total.
+
+Another approach is to have the cashiers start with 2 bags each. This avoids
+the initial communication overhead, so we can get the count down to 15 seconds.
 
 Generalizing, it takes (c+b-1)log_2(N) = clog_b(N) + (b-1)log_b(N) to count N bags
 using the divide and conquer method discussed. We know we can optimze this with
@@ -44,7 +46,13 @@ when c > N-1/(log_2(N)) - 1, the linear method with a single cashier actually wo
 better.
 
 6. If we can only give 1 bag to a cashier at a time, it will take a total 260 seconds.
-This is using the idea that the optimal algorithm will keep all cashiers busy as much
+This is using the assumption that, while handing a bag to a cashier, the cashier
+can't also add two numbers or communicate with other cashiers. If the above assumption
+doesn't hold, then we can just continually hand a bag to the same cashier and have
+them add the values, giving us a total time of 257 seconds.
+
+Now we explain the 260 seconds time. This is using the idea that the optimal
+algorithm will keep all cashiers busy as much
 as possible. The reason behind this is that communication between cashiers occurs
 at odd values, and summation occurs at even values. This allows us to always maintain
 a total of 4 integers (counting the one for the bag just handed out). When we hand
@@ -61,8 +69,8 @@ formula of the form n/k + log_2(k) + 4 which approximates the number of seconds 
 takes if we can give k bags to each cashier.
 
 Finally, let us see if we can find a better algorithm. If we assume that it is
-possible for the cashier to distribute the numbers among themselves, with cost of
-1 second, then we can give 128 bags to two cashier, then those two cashier can
-split the work among two other cashiers, and so on. This will take a total of 16
-seconds to distribute the bags until each cashier has two bags. Then we can just
-repeat the process from part 5a above. The total time is 25 seconds.
+possible for the cashier to distribute the numbers among themselves, we first give
+256 bags to a single cashier. Then this cashier gives half to another cashier,
+reducing the total to 128. We continue this until we have 128 cashiers with each
+2 bags (total time is 8 seconds). Then we can repeat the process from above, which
+takes 15 seconds, giving a total time 23 seconds.
