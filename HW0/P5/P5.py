@@ -20,5 +20,5 @@ if __name__ == '__main__':
             '--r', label='Infinite Cashiers')
     # Show the plot
     legend()
-    savefig("P5.png")
+    savefig('P5.png')
     show()

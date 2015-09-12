@@ -1,1 +1,52 @@
-# Your answers here
+P6A
+
+Example output
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 2
+Bye Job 1
+Bye Job 0
+Hi Job 5
+Hi Job 4
+Hi Job 6
+Bye Job 3
+Hi Job 7
+Bye Job 5
+Bye Job 6
+Bye Job 4
+Bye Job 7
+Hi Job 8
+Hi Job 9
+Bye Job 9
+Bye Job 8
+
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 0
+Bye Job 2
+Bye Job 1
+Hi Job 5
+Hi Job 6
+Hi Job 4
+Bye Job 3
+Hi Job 7
+Bye Job 6
+Hi Job 8
+Bye Job 5
+Bye Job 4
+Hi Job 9
+Bye Job 7
+Bye Job 9
+Bye Job 8
+
+The relative timing of when jobs start and complete is not precise.  This affects how we program in parallel as we no longer have the guarantee that job 1 will end before job 2 even though job 1 started first.  This is important for conditions that require consistent data between processes, a critical section (e.g. bank account transactions), because we potentially have the ability to modify data with multiple thread and access it with more threads.  One bad exxample is when making a transaction from multiple atms, we add $1 to our bank account while withdrawing $100.  When adding $1, the system might read the value before the withdrawal, and then update the bank balance with the old value + 1 instead of the amount after the withdrawal value + 1.
+
+P6B
+
+The trend is upward, starting roughly around 1.5 and going up to 4.0.  The upper bound makes sense, as that is the theoretical best performance we can get using 4 processors vs 1.  The lower bound also makes sense if we account for the fact that scheduling is an invisible job that always occurs, and affects the runtime of parallel processes.
+
+It is possible for parallel threads to take longer than the serial executions. In this graph, we see that this happens around 10^(-5) (we were fortunate that it wasn't slow at even shorter wait times.)  If the time it takes for a serial process to finish a task is extremely fast, i.e. faster than time it takes for the scheduler assign tasks and for resources to be distributed, a serial process will finish each task before the schedule finishes even assigning tasks to parallel processors.
