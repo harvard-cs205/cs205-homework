@@ -1,0 +1,38 @@
+[33mcommit c56c8eb364fec71d50312e3780ed6d1191a613ee[m
+Author: Thouis (Ray) Jones <thouis@seas.harvard.edu>
+Date:   Mon Aug 24 15:15:15 2015 -0400
+
+    Make structure of P4 a little clearer
+
+[33mcommit edcf24ab1cdecdbd85def6e1d5674f65d7c7bbc1[m
+Merge: 40754ed 873585f
+Author: Thouis (Ray) Jones <thouis@gmail.com>
+Date:   Mon Aug 24 11:02:16 2015 -0400
+
+    Merge pull request #3 from thouis/master
+    
+    skeleton for HW0
+
+[33mcommit 873585f3ca7bd867bf86f94ef13de780929ec1f2[m
+Author: Thouis (Ray) Jones <thouis@seas.harvard.edu>
+Date:   Thu Aug 20 14:58:17 2015 -0400
+
+    Skeleton files for P4-P6
+
+[33mcommit 017da9dfd953737a7a6b6adfc13700cf9e9b11d2[m
+Author: Thouis (Ray) Jones <thouis@seas.harvard.edu>
+Date:   Thu Aug 20 14:57:36 2015 -0400
+
+    .gitignore
+
+[33mcommit 40754ed6ce188a9083b9ed14c6ec49a1c0df0e2d[m
+Author: Thouis (Ray) Jones <thouis@seas.harvard.edu>
+Date:   Mon Aug 17 14:44:04 2015 -0400
+
+    HW0 empty README
+
+[33mcommit 89fb0c7f6065ca7a098d1d6c047b4001b8544e0e[m
+Author: Thouis (Ray) Jones <thouis@seas.harvard.edu>
+Date:   Mon Aug 17 14:40:24 2015 -0400
+
+    readme

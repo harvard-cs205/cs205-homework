@@ -1,1 +1,22 @@
 # Your answers here.
+1) 
+It will take 255 seconds.
+
+2)
+Yes, it will be faster. Now there swill be 7+1=8 cashiers in total. Let each cashier takes 256/8=32 bags and add them up which will take 32-1=31 seconds. Now we have 8 numbers. Split them into pairs and get the own sum of each pair. Repeat the last step until we get the final sum. This will take log(8)/log(2) = 3 seconds. Thus, the total time is 31+3 = 34 seconds.
+
+3)
+It will take log(256)/log(2) = 8 seconds.
+
+4)
+It will take log(N)/log(2) seconds. The plot is showed in the P5.png.
+
+5)
+It can be easily noticed that if there were 4 bags, it would take at least 3 seconds (including communication time) no matter how many cashiers there are. And when there were more than 4 bags, multiple cashiers would work faster than single cashier. Thus, we can know that for 256 bags we need 256/4=64 cashiers to count. Now we will have 64 number and then it will take log(64)/log(2)*2 = 12 seconds. Totally, it will take 3+12 = 15 seconds.
+
+6) 
+6a) To distribute all bags to each cashier, it will take at least log(256)/log(2)+1 = 9 seconds. And then there will be an extra second that cashiers need to tell the number to their partner (communicating). Now it turns to be the same question as 5). Thus, the total time should be 9+1+15=25 seconds.
+
+6b) If each cashier takes 2 bag, the distribution time will be one seconds less than 6a). Besides, it will save the one extra second of communicating time. Therefore, the total time will be 8+15 = 23 seconds. 
+
+6c) From 5), we know that if there were 4 bags, it would take at least 3 seconds (including communication time) no matter how many cashiers there are. Thus, the fast way is to let each cashier takes care of 4 bags. So the distribution time should be 7 seconds. The total time should be 2*log(256/4)/log(2) +3+7 =22 seconds.

@@ -1,1 +1,6 @@
 # Your answers here
+6A) 
+We can notice that the starting order of jobs is sometimes different with their finishing order. I think the reason may be the efficiency of processes are different so they would cost different amount of time even they are executing identical jobs. It could be problematic when multiple processes are reading and writing on a same file or same memory area.
+
+6B) 
+From the plot, we can see that when the jobs’ runtimes are long enough, a parallel program is about 4 times faster than the serial version. However, when the runtimes are very short, a parallel program could take longer than it’s serial version (when the wait time is shorter than 10^-4, the ratio is smaller than 1). I guess it’s because of the extra communication or data transition time among different processes.
