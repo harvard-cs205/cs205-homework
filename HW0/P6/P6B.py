@@ -19,12 +19,13 @@ if __name__ == '__main__':
     wait_time = [10**(-i) for i in xrange(7)]
 
     for t in wait_time:
-        # Compute jobs serially and in parallel
-        # Use time.time() to compute the elapsed time for each
+
+        # Compute job in parallel
         start_parallelTime = time.time()
-        result = pool.map(burnTime(t), [t]*N)
+        result = pool.map(burnTime, [t]*N)
         stop_parallelTime = time.time()
 
+        # Compute job in serial
         start_serialTime = time.time()
         for i in xrange(N):
             burnTime(t)

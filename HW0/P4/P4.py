@@ -35,6 +35,7 @@ if __name__ == '__main__':
     x_coords = s_true[:, 0]
     y_coords = s_true[:, 1]
     z_coords = s_true[:, 2]
+
     ax.plot(x_coords, y_coords, z_coords,
             '--b', label='True trajectory')
 
@@ -48,8 +49,9 @@ if __name__ == '__main__':
     x_coords = (1/rx) * meas[:, 0]
     y_coords = (1/ry) * meas[:, 1]
     z_coords = (1/rz) * meas[:, 2]
+    
     ax.plot(x_coords, y_coords, z_coords,
-            '.g', label='measerved trajectory')
+            '.g', label='Measured trajectory')
 
     #####################
     # Part 3:
@@ -74,9 +76,11 @@ if __name__ == '__main__':
     a = np.matrix([0, 0, 0, 0, 0, g*dt]).transpose()
     s0 = np.matrix([0, 0, 2, 15, 3.5, 4.0]).transpose()
 
+    # Initialize matrix
     s_blind = np.asmatrix(np.zeros([6, K]))
     s_blind[:, 0] = s0
 
+    # Fill in matrix with formula
     for k in xrange(1, K):
         s_blind[:, k] = A * s_blind[:, k-1] + a
 
@@ -116,8 +120,9 @@ if __name__ == '__main__':
     s0 = np.matrix([0, 0, 2, 15, 3.5, 4.0]).transpose()
     sigma0 = np.asmatrix(0.1 * np.identity(6))
 
-    sk_matrix = np.asmatrix(np.zeros([6, K]))
-    sk_matrix[:, 0] = s0
+    # Initialize matrix
+    s_filter = np.asmatrix(np.zeros([6, K]))
+    s_filter[:, 0] = s0
 
     def predictS(sk):
         return A * sk + a
@@ -131,19 +136,20 @@ if __name__ == '__main__':
     def updateS(sigma, sigma_tilde, s_tilde, mk):
         return sigma * (sigma_tilde * s_tilde + C.transpose() * mk)
 
+    # Fill in matrix with values
     curr_sigma = sigma0
     for k in xrange(K-1):
-        s_tilde = predictS(sk_matrix[:, k])
+        s_tilde = predictS(s_filter[:, k])
         sigma_tilde = predictSig(curr_sigma)
         curr_sigma = updateSig(sigma_tilde)
         mk = np.asmatrix(meas[k+1]).transpose()
         curr_sk = updateS(curr_sigma, sigma_tilde, s_tilde, mk)
-        sk_matrix[:, k+1] = curr_sk
+        s_filter[:, k+1] = curr_sk
 
-    sk_matrix = np.array(sk_matrix)
-    x_coords = sk_matrix[0]
-    y_coords = sk_matrix[1]
-    z_coords = sk_matrix[2]
+    s_filter = np.array(s_filter)
+    x_coords = s_filter[0]
+    y_coords = s_filter[1]
+    z_coords = s_filter[2]
 
     ax.plot(x_coords, y_coords, z_coords,
             '-r', label='Filtered trajectory')
