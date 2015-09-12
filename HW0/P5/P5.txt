@@ -1,1 +1,48 @@
 # Your answers here.
+(let's say putting the first number in the calculator takes a second ie 0 + first number)
+
+1. 256 bags / 1 cashier = 256 calculations = 256 seconds
+
+2. 256 bags / 8 cashiers = 32 calculations / cashier = 32 seconds
+
+also: 8 results to consolidate but need to work with at least two numbers at a time, so:
+8 numbers / 4 cashiers = 1 seconds
+then 4 numbers / 2 cashiers = 1 seconds
+then 2 numbers / 1 cashier = 1 second
+( all are 1 second because cashiers have a number already in their calculator)
+32 + 1 + 1 + 1 = 35 seconds
+
+3. Each iteration, the max amount of cashiers will do one calculation, 
+so the first calculation would need 128 cashiers to add 2 numbers together,
+then 64 cashiers to add 2 numbers together, and so on,
+so the total time by following this pattern would be log_2 (256) =  8 seconds
+If I include the 1 second to get the first number into the calculator, it will be 9 seconds
+
+4. For N bags, it will be the value log_2(N) rounded up
+graph attached
+
+5. Adding a communication delay would add 1 second to each iteration, effectively doubling the time,
+so the time will be the ceiling of 2*log_2(N)
+
+6. It will take 256 seconds to had out all the bags. However, in the meantime, the cashiers
+can develop the strategy of having 2 counters who communicate for 1 second and add numbers
+in the next second. They will alternate counting and communicating so there is always one
+person ready to communicate with the cashier who just got a bag. In total, it will take 4 seconds 
+after passing out the last bag to finish counting: 1 for communcating, 1 for adding, and 1 more for
+communicating between the two separate counters, and finally adding the two sums together. 
+In total, can be done in 259 seconds.
+
+For passing out 2 bags at once, the same process as above can take place with an additional
+second for the person receiving the bags to add them together, then communicating to the counter,
+then the counter adding the two values. Therefore it will take 128 seconds to pass out the bags, then
+and additional 5 seconds to wrap up the counting: 1: the last person adding the two bags, 2: communicating
+to the counter, 3: the counter adding the numbers, 4: the two counters communicating, 5: adding the two
+sums. In total, it will take 133 seconds by handing out two bags at a time.
+
+The best strategy is to parallelize giving out the bags, so you give out half your bags,
+so you and the other person have 128, then you both give half of your bags, so 
+four people have 64 bags, and so on, so it takes log_2(N) time to hand out the bags,
+plus the 2*log_2(N) for communication and counting, so the result is the counting is done
+in 3*log_2(N) seconds. (plus 1 if you include handing the last 2 bags to a cashier, since you
+can't count them  yourself). This way, it will take 24 seconds to count 256 bags. 
+(25 with the technicality).
