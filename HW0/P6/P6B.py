@@ -1,11 +1,12 @@
 import multiprocessing as mp
 import time
 import matplotlib.pyplot as plt
+import numpy as np
 
 # Sleep for t seconds
 def burnTime(t):
     time.sleep(t)
-
+    print(t)
 # Main
 if __name__ == '__main__':
     N = 16  # The number of jobs
@@ -16,16 +17,27 @@ if __name__ == '__main__':
 
     # Use a variety of wait times
     ratio = []
-    wait_time = []
+    times = np.logspace(-6,1)
+    wait_time = np.ndarray.tolist(times)
+    parallelTime = []
+    serialTime = []
 
     for t in wait_time:
         # Compute jobs serially and in parallel
         # Use time.time() to compute the elapsed time for each
-        serialTime = 1
-        parallelTime = 1
+
+        start = time.time()
+        time.sleep(t)
+        end = time.time()
+        serialTime.append(end-start)
+        
+        start = time.time()
+        x = pool.map(burnTime,[t])
+        end = time.time()
+        parallelTime.append(end-start)
 
         # Compute the ratio of these times
-        # ratio.append(serialTime/parallelTime)
+        ratio.append(serialTime[-1]/parallelTime[-1])
 
     # Plot the results
     plt.plot(wait_time, ratio, '-ob')
