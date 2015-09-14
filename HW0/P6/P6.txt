@@ -1,1 +1,15 @@
 # Your answers here
+Problem 6
+   1. Sometimes, next job is finished before previous job is not done. 
+      if the two jobs have sequential dependencies, the result would be wrong.
+      So, a next job needs to be wait for a previous jobs which has a sequential      dependency to be done. 
+   2. Based on P6B execution, serial execution takes shorter than parallel one
+      for small wait times. It seems jobs are not running in parallel when wait
+      times are small and overheads of parallelism (scheduling on multiple cores
+      , communication, etc.) make jobs run longer. But, when wait times are
+      relatively larger, jobs are running in parallel. Since number of processes
+      is 4, performance benefits can be achieved about 4x compared to the case
+      where jobs are run in serial.
+   ==> As mentioned above, parallel execution could take longer than serial
+       one as communication between cores, scheduling on multiple cores, and 
+       dependencies. These factors could affect the benefit of performance. 

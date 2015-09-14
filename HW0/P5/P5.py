@@ -15,4 +15,4 @@ if __name__ == '__main__':
     plt.ylabel("Time (s)")
     plt.legend()
     plt.savefig('P5.png')
-    plt.show()
+    #plt.show()
