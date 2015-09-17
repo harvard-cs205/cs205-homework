@@ -1,1 +1,86 @@
 # Your answers here.
+
+(1) If we have n bags, one cashier needs to make n-1 summations to compute the total (we assume that if there is only one bag, no computation is needed). This means for n=256, that he needs 255 summations which will result in 255s
+
+(2) When we build a binary tree, we need d = ceil( ld (n) ) levels to compute the total. In this problem, we have a total of 8 employers who can work on this task. The first level consists of 256 bag, 8 employers can handle 16 bags in 1s, meaning they need 256 / 16 = 16s for the first level. On the second level we have now 128 positions to add => 128 / 16 = 8s , ... When we have < 16 positions at a tree level, it still needs 1s causing some employers to do nothing. Therefore, we can reduce with 8 employers using parallel processing the time from 255s to
+
+     Level:   1 |   2 |  3 |  4 |  5 |  6 |  7 |  8 |  9	
+#positions: 256 | 128 | 64 | 32 | 16 |  8 |  4 |  2 |  1 
+      Time: 16s |  8s | 4s | 2s | 1s | 1s | 1s | 1s |   
+
+      ==> total time: 16 + 8 + 4 + 2 + 4 = 34s
+      ==> with 8 cashiers we can compute the total in only 34s!
+
+ (3) If we have an infinite number of employersm there is still a lower bound how fast we can go when assuming 1s per summation. Given n bags, we need at least d = ceil ( ld (n) ) seconds (ld is the logarithmus dualis, i.e. ld(x) = log(x) / log (2) )
+ Given n = 256s we need at least d = 8s
+
+The reason for this is, that when we want to sum 256 positions we can only use 128 employees concurrently at the same time (as any of these needs 2 bags to perform a summation!). After 128 employees summed 256 positions to 128 positions, now half of them will become workless using the same argument. Thus, when progressing the binary tree at each level we can use less employees which will lead us to the stated lower bound.
+
+ (4)  see P5.png
+
+ (5) As long as we have more positions than employers at a level (or different stated more tasks than nodes) there is no need for communication as we can assign each employer a block of data. Let us therefore define b/2 as the number of employees (each employee can handle 2 bags!). Thus, each employee receives bsize = ceil(n / b) bags (If there aren't any bags left, some employers will take a break or add 0 to treat the special case). After each employee finished summing his block of data  in bsize -1 seconds, we need now to communicate results. Imagining the binary tree, we have now a tree of height d_b = ceil( ld (b) ). Thus in the first level of this tree we have floor(b/2) employers sending their number to floor(b/2) other employers (which will then sum them, if we have an odd number we need to take an extra layer into account which is incorparated in the ceiled height). This will result in (2^d_b - 1) * 1s time for communication on top of the time for computation with d_b = ceil( ld(b) ) the height of the combination tree (if we assume a bus / exclusive communication channel!). When we have a communication channel which allows concurrent communication, we do need only d_b additional seconds for communication.
+
+ In our example here, we have n = 256, b/2 = 8 ==> b = 16. an easy calculation shows bsize = 16, d_b = 4. 
+ Thus:
+
+ exclusive communication channel: 34s (from (2)) + (2^4 - 1) * 1s = 34s + 15s = 49s
+ concurrent communication: 34s (from (2)) + 4s = 38s
+
+ (6) The question of this problem is related to how to most efficiently transfer data to individual nodes before starting the actual computation (map-reduce). 
+
+
+1 bag to 1 cashier in 1s:
+If we can only transfer one bag to one cashier in one s, we will cause cashiers to wait till enough data/bags have arrived to perform the actual summation. This bottleneck actually causes, that some cashiers are not needed as we cannot provide enough cashiers bags for simultaneous computation.
+
+Thus, we can imagine the workflow as following:
+(Let c1 be cashier1, c2 cashier 2, ...)
+
+startphase:
+Give 1 bag to c1 | c2 idle | 1s
+Give 1 bag to c1 | c2 idle | 1s
+c1 sums | Give 1 bag to c2 | 1s
+c1 idle | Give 1 bag to c2 | 1s
+
+repeating part:
+Give 1 bag to c1 | c2 sums | 1s
+c1 sums | Give 1 bag to c2 | 1s
+....
+
+endpase:
+c1 idle | c2 tells c1 number | 1s
+c1 sums | c2 idle | 1s
+
+
+Having the capability to provide in one s only one cashier with bags will cause that we are able to use 2 cashiers only. Thus, we will need for 256 bags 256s+2s = 258s compared to 256 * 2s = 512s if we use 1 cashier only (we assume a cashier can only handle one action per time, i.e. it is not possible for him to concurrently sum & receive a bag, cashiers have no multitasking ability).
+
+
+2 bags to one person:
+In this case we can make better use of concurreny. The idea is to strip the data and provide nodes with enough data for computation.
+Using 3 cashiers we can avoid idle (except for start / end):
+
+start phase:
+Give 2 bags to c1 	| c2 idle 				| c3 idle 				| 1s
+c1 sums 			| Give 2 bags to c2 	| c3 idle 				| 1s
+Give 2 bags to c1 	| c2 sums 				| c3 idle 				| 1s
+c1 sums, 1 bag left | Give 2 bags to c2 	| c3 idle 				| 1s
+c1 sums 			| c2 sums, 1 bag left	| Give 2 bags to c3 	| 1s
+Give 2 bags to c1	| c2 sums 				| c3 sums 				| 1s
+c1 sums, 1 bag left | Give 2 bags to c2		| c3 idle				| 1s
+c1 sums 			| c2 sums, 1 bag left   | Give 2 bags to c3 	| 1s
+
+repeating phase:
+Give 2 bags to c1 	| c2 sums 				| c3 sums, 1 bag left 	| 1s
+c1 sums, 1 bag left	| Give 2 bags to c2		| c3 sums 				| 1s
+c1 sums 			| c2 sums, 1 bag left 	| Give 2 bags to c3 	| 1s
+...
+
+endphase:
+c1 send to c3		| c2 sums, 1 bag left 	| c3 receives		 	| 1s
+c1 idle				| c2 sums 				| c3 sums 				| 1s
+c1 idle 			| c2 send to c3 		| c3 receives 			| 1s
+c1 idle 			| c2 idle 				| c3 sums 				| 1s
+
+==> time needed to compute counter is now only 8s (16 bags processed) + 3s * 40 (40 * 6 bags = 240 bags = 256 bags - 16 bags) + 4s (combine) 
+==> 132s
+
+However, it is not possible to use (in a meaningful way) more than 3 nodes/employees. Why? We know that each node can process in 1s 2 numbers. But we are also only able to provide in 1s 2 bags. Thus our "bandwidth" of providing data is the same as the "bandwidth" of a node in terms of what he can process. In order to use more nodes and speedup the whole task, we will need the ability to give more than 2 bags to a cashier or in other terms a network/cluster cannot process more than the bandwidth of the data source. 
