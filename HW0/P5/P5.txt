@@ -1,1 +1,46 @@
-# Your answers here.
+# P5 Answers
+# Stephen Fang
+# shifang@g.harvard.edu / stephenshifang@gmail.com
+
+1. 
+255 seconds.
+
+2. 
+Split the bags evenly among 8 cashiers.
+Time needed = 256/8 - 1 = 31 seconds
+Split the 8 subtotals evenly between 4 cashiers.
+Time needed = 8/4 - 1 = 1 second
+Split the 4 subtotals evenly between 2 cashiers.
+Time needed = 4/2 - 1 = 1 second
+Finally, one cashier can add the 2 subtotals to get the total.
+Time needed = 1 second
+Total time spent = 31 + 1 + 1 + 1 = 34 seconds
+
+3.
+Split the bags evenly among 128 cashiers and generate 128 subtotals.
+Time needed = 1 second.
+Split the subtotals evenly among 64 cashiers and generate 64 subtotals.
+Time needed = 1 second.
+And recurse until we have 2 subtotals left.
+Total time needed = log2(256) = 8 seconds
+
+4.
+If we keep splitting the bags so that each cashier only needs to add 2 numbers during each iteration, total time needed = ceiling(log2(N)).
+
+5.
+Considering overhead associated with people communicating, 
+each split and count would need 1 second of adding and 1 second of communication overhead except for the final count.
+So total time needed = log2(256)*2-1 = 15 seconds
+
+6.
+If each cashier comes to me and takes 1 bag, then it will take 256 seconds to distribute the bags.
+Then, it takes 2 seconds to halve the number of bags.
+So total time needed = 256 + log2(256)*2 = 272 seconds
+
+Now, if each cashier comes and takes 2 bags, then it will take 128 seconds to distribute the bags and 1 second for each cashier to count the 2 bags.
+Then, it takes 2 seconds to halve the number of bags.
+So total time needed = 128 + 1 + log2(128)*2 = 143 seconds
+
+Finally, the optimal strategy is to distribute the bags to 2 cashiers at first and then recursively split evenly by 2 stopping when each cashier has 4 bags. Each split requires 1 second of passing the required number of bags to another cashier. Now each cashier will spend 3 seconds counting 4 bags to arrive at a sum. Finally, we can combine the 64 sums together by combining 2 cashiers at a time. Each count now requires 1 second of communicating and 1 second of summing.
+So total time needed = 2 + log2(256/4) + 3 + log2(64/4)*2 = 22 seconds
+

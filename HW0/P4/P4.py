@@ -30,47 +30,106 @@ if __name__ == '__main__':
     # Load true trajectory and plot it
     # Normally, this data wouldn't be available in the real world
     #####################
-
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '--b', label='True trajectory')
+    s_true = np.loadtxt('P4_trajectory.txt', delimiter=',')
+    ax.plot(s_true[:,0], s_true[:,1], s_true[:,2],
+            '--b', label='True trajectory')
 
     #####################
     # Part 2:
     #
     # Read the observation array and plot it (Part 2)
     #####################
-
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '.g', label='Observed trajectory')
+    m = np.loadtxt('P4_measurements.txt', delimiter=',')
+    s_obs = m * np.array([1./rx, 1./ry, 1./rz]) 
+    ax.plot(s_obs[:,0], s_obs[:,1], s_obs[:,2],
+            '.g', label='Observed trajectory')
 
     #####################
     # Part 3:
     # Use the initial conditions and propagation matrix for prediction
     #####################
 
-    # A = ?
-    # a = ?
-    # s = ?
+    # Construct matrix A from blocks
+    sub_a = np.eye(3)
+    sub_b = np.eye(3) * dt
+    sub_c = np.zeros((3,3))
+    sub_d = np.eye(3) * (1-c*dt)
+    A = np.bmat([[sub_a, sub_b], [sub_c, sub_d]])
+    A = np.array(A)
+    a = np.array([0.]*5 + [g*dt])
 
     # Initial conditions for s0
     # Compute the rest of sk using Eq (1)
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '-k', label='Blind trajectory')
+    # Initialize s0
+    s0 = s_true[0,:]
+    S_pred0 = np.zeros((6,K))
+    S_pred0[:,0] = s0
+    s = s0
+    for i in range(1,K):
+        s = np.dot(A,s) + a
+        S_pred0[:,i] = s
+
+    ax.plot(S_pred0[0,:], S_pred0[1,:], S_pred0[2,:],
+            '-k', label='Blind trajectory')
 
     #####################
     # Part 4:
     # Use the Kalman filter for prediction
     #####################
 
-    # B = ?
-    # C = ?
+    def predictS(A, s, a):
+        '''Use Eq(2) to compute intermediate s'''
+        return np.dot(A,s) + a
+
+    def predictSig(A, B, Sig):
+        '''
+        Use Eq(3) to compute cov mat.
+        Returns an array.
+        '''
+        # Make sure inputs are matrices
+        A = np.asmatrix(A)
+        B = np.asmatrix(B)
+        Sig = np.asmatrix(Sig)
+        return np.asarray((A*Sig*A.T + B*B.T).I)
+
+    def updateSig(SigInt, C):
+        '''
+        Use Eq(4) to update cov mat.
+        Returns an array
+        '''
+        # Make sure inputs are matrices
+        SigInt = np.asmatrix(SigInt)
+        C = np.asmatrix(C)
+        return np.asarray((SigInt + C.T*C).I)
+
+    def updateS(SigNext, SigInt, C, s, m):
+        '''
+        Use Eq(5) to update s.
+        Returns an array
+        '''
+        return np.dot(SigNext, np.dot(SigInt,s)+np.dot(C.T,m))
+
+    B = np.diag(np.array([bx,by,bz,bvx,bvy,bvz]))
+    C = np.hstack((np.diag(np.array([rx,ry,rz])), np.zeros((3,3))))
 
     # Initial conditions for s0 and Sigma0
     # Compute the rest of sk using Eqs (2), (3), (4), and (5)
+    
+    # Initialize s0 and Sig0
+    s = s_true[0,:]
+    Sig = np.eye(6)*0.001
+    S_pred1 = np.zeros((6,K))
+    S_pred1[:,0] = s
+    for i in range(1,K): 
+        s = predictS(A, s, a)
+        SigInt = predictSig(A, B, Sig)
+        Sig = updateSig(SigInt, C)
+        s = updateS(Sig, SigInt, C, s, m[i])
+        S_pred1[:,i] = s
 
-    # ax.plot(x_coords, y_coords, z_coords,
-    #         '-r', label='Filtered trajectory')
+    ax.plot(S_pred1[0,:], S_pred1[1,:], S_pred1[2,:],
+            '-r', label='Filtered trajectory')
 
     # Show the plot
     ax.legend()
