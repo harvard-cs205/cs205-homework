@@ -1,1 +1,52 @@
 # Your answers here
+Example output: 
+Run 1: 
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 2
+Bye Job 1
+Bye Job 3
+Bye Job 0
+Hi Job 4
+Hi Job 5
+Hi Job 6
+Hi Job 7
+Bye Job 5
+Bye Job 4
+Bye Job 6
+Hi Job 8
+Hi Job 9
+Bye Job 7
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+Run 2: 
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 1
+Bye Job 0
+Bye Job 2
+Hi Job 4
+Bye Job 3
+Hi Job 5
+Hi Job 6
+Hi Job 7
+Bye Job 4
+Bye Job 5
+Hi Job 8
+Hi Job 9
+Bye Job 6
+Bye Job 7
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+1. The processes start and end at different times. For example, sometimes we start Job 4 before we terminate the last of jobs 0-3, and some other times we see the opposite. This could be a problem in a number of scenarios when a process needs access to some data that it believes is up to date, but whose process hasn't returned yet. For example, if some withdraws all of the money in a bank account, and tries to transfer the money to another account at the same time, it might appear to the transfer process that the account is full because the withdraw process has not returned yet, resulting in a double payday.
+
+
+2. For very low wait times (< 10^-4 s) the serial algorithm works faster than the parallel algorithm. As we increase from there, the parallel algorithm does better, approaching (and even surpassing at 10^-2 s) the optimal speedup of 4x. It is possible for the parallel algorithm to be slower than the sequential because of the overhead of communicating between the processes and setting up the processes. I would expect the ratio to remain around 4 for larger values of the wait time. As the wait time begins to dwarf the startup and communication cost, the parallel approach does much better.  
