@@ -1,1 +1,9 @@
-# Your discussion here
+To divide the workload more evenly, I applied the default partitioning hash of .partitionBy() to each of the x and y axes prior to calculating their cartesian product. (I also tried several variations on log, exp, and pow as partitioning functions, but all of them were worse at dividing the work evenly than not calling .partitionBy() at all, so I used the simpler strategy.)
+
+Without calling partitionBy(), 85-90% of the partitions took less than 5,000,000 iterations total, but the remaining partitions took up to about 20,000,000 total. This means that the worst partitions took at least 4x the iterations of a typical partition, possibly significantly more because the histogram makes it impossible to distinguish between, e.g., 1,000,000 and 4,000,000 iterations.
+
+After calling partitionBy(), all partitions took between 2,020,000 and 2,045,000 iterations. This means that the worst partitions took less than 1.0124x the iterations of the best partitions. It is fair to say, therefore, that all partitions took roughly the same number of iterations.
+
+However, without calling partitionBy(), the work prior to drawing took 1.6 min total, almost all of it spent in executor computing time.
+
+On the other hand, with calling partitionBy(), the work prior to drawing can be divided into two parts. The partitionBy() call, which takes 4s, is almost entirely composed of executor computing time (4s) but includes 13.5KB of shuffle write. The rest of the computation takes 1.8 min, almost all executor computing time, and includes 947.5KB of shuffle read. Therefore, the better-parallelized version is about 0.2 to 0.3 minutes longer than the default. This time could be made up if multiple computations were run on the shuffled data.
