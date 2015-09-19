@@ -1,1 +1,2 @@
-# Your discussion here
+11
+[u'reast', u'stare', u'stear', u'teras', u'resat', u'aster', u'tares', u'tears', u'arets', u'rates', u'strae']
