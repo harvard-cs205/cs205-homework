@@ -11,7 +11,9 @@ if __name__ == '__main__':
 
   maxlen = 0
   anagram = None
-  for item in finalRdd.collect():
+  maxItems = finalRdd.takeOrdered(20, lambda x: -x[1])
+  # print maxItems
+  for item in maxItems:
     _, length, anag = item
     if length > maxlen:
       maxlen = length
@@ -20,5 +22,3 @@ if __name__ == '__main__':
   with open('P3.txt', 'w') as fh:
     fh.write(str(maxlen) + '\n')
     fh.write(str(anagram))
-  
-
