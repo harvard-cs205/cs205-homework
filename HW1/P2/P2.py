@@ -1,8 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt 
 import matplotlib.cm as cm
+import pdb
+import random
+
 
 def mandelbrot(x, y):
+    #pdb.set_trace()
     z = c = complex(x, y)
     iteration = 0
     max_iteration = 511  # arbitrary cutoff
@@ -29,3 +33,5 @@ def draw_image(rdd):
     im[I, J] = np.log(C + 1)  # log intensity makes it easier to see levels
     plt.imshow(im, cmap=cm.gray)
     plt.show()
+
+
