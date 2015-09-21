@@ -1,1 +1,8 @@
 # Your discussion here
+It would be optimal to have each part take the same amount of time to complete (= number of iterations). Therefore we
+want  to make the distribution of long and brief jobs uniform among partitions. To do so we need to partition by key,
+and in specific we need to bundle pixels from the white areas in the graph with pixels that are black. I chose to do
+this by hashing each key with a random number between 1 and 100 (uniformly disributed). Because a partition contains
+40,000 pixels, drawing from a uniform distribution will make every partition look very similar in ratio of black and
+white pixels. Because of the Central Limit Theorem, we should expect iteration times to be normally distributed among
+partition.
