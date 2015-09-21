@@ -1,1 +1,202 @@
-# Your answers here.
+1. If one cashier were to add the totals of 256 bags, how long would it take?
+
+Only two numbers can be added at a time. 
+Adding 2 numbers (1 operation) takes 1 second. 
+Adding a third number to the sum of the first two takes 2 seconds, and so on.
+With N items to add, there are N-1 addition operations performed.
+
+Let T = Time in seconds
+    O = Operations to be performed = 256-1 = 255
+    
+Then
+	T = 1*O = 255
+
+
+2. Seven of the cashier’s coworkers approach to see this ridiculous sight. The bright (and
+perhaps a bit opportunistic) cashier recruits them to help count. By working together,
+can they verify the total sum faster than the original cashier by herself? If so, how fast
+can they do this?
+
+8 people total
+If each person added two sums, they'd have 16 sums in play at once.  
+After they finished adding (1 second elapsed), there are 8 sums to add together.
+If four of them added two sums each (1 second elapsed), there are now 4 sums to be added.
+If two of them added two sums each (1 second elapsed), there are now 2 sums to be added.
+One person adds the final two sums (1 second elapsed), 16 sums have been added.
+Total elapsed time: 4 seconds
+Time for one adder: 15 seconds
+
+If the 8 people repeat this process 16 times by partitioning the 256 values into sets of 16, then afterwards they will have reduced all 265 values to 16 sums.
+Repeating this process once more leaves the single full total remaining.
+
+16 + 1 = 17 rounds at 4 seconds each --> 68 seconds (vs 255 seconds with one adder)
+
+
+3. Imagine the store is big...very big. As a matter of fact, the store has an infinite number of employees. How fast can the employees verify the sum?
+
+With 256 values, there are 256/2 = 128 pairs
+128 people can add 128 pairs (1 second), now 64 pairs
+64 people can add 64 pairs (1 second), now 32 pairs
+32 people can add 32 pairs (1 second), now 16 pairs
+16 people can add 16 pairs (1 second), now 8 pairs
+8 people can add 8 pairs (1 second), now 4 pairs
+4 people can add 4 pairs (1 second), now 2 pairs
+2 people can add 2 pairs (1 second), now 1 pair
+1 person adds the final pair (1 second), produces grand total
+
+This entire process takes 8 seconds.  It can't be sped up any faster than that.
+
+
+4. If you were feeling especially frustrated, perhaps you may use more than 256 bags.
+Instead, assume there are N bags. How long will it take the infinite number of employees
+to count the total? Using Python, plot the result with bag count on the horizontal and
+counting time on the vertical. On the same graph, plot the time it would take the lone
+cashier to do this by herself.
+
+17
+
+11 / 2 = 5 % 1 (1 second)
+5 / 2 = 2 % 1 (1 second)
+2 % 1 (1 second)
+2 /2 (1 second)
+
+5 5 1
+2 2 1 2 2 1 1
+s s 1 s s 2
+s s 1 s s s
+s s s s s s
+
+
+
+2 % 1 % 1
+
+19
+9 % 1
+4 % 1
+2
+
+5. We’ve been neglecting any overhead associated with people communicating. How does
+the answer for 256 bags change, if it takes one second to communicate a number
+between two employees?
+
+With 256 values, there are 256/2 = 128 pairs
+128 people can add 128 pairs (1 second), now 64 pairs
+In each pair, Adder A communicates A sum to Adder B so Adder B can add the two (1 second)
+64 people can add 64 pairs (1 second), now 32 pairs
+Communicate (1 second)
+32 people can add 32 pairs (1 second), now 16 pairs
+Communicate (1 second)
+16 people can add 16 pairs (1 second), now 8 pairs
+Communicate (1 second)
+8 people can add 8 pairs (1 second), now 4 pairs
+Communicate (1 second)
+4 people can add 4 pairs (1 second), now 2 pairs
+Communicate (1 second)
+2 people can add 2 pairs (1 second), now 1 pair
+Communicate (1 second)
+1 person adds the final pair (1 second), produces grand total
+
+There are 7 seconds of communication, and 8 seconds of adding.
+This entire process takes 15 seconds.
+
+
+6. Also assume it takes one second to hand a bag (or any number of bags) between two
+people (including from you to a cashier). How long will it take to verify 256 bags worth
+of coins if each cashier comes to you and takes 1 bag? What about 2 bags? Is there a
+better strategy? Assume you can’t be handing bags to more than one person at a time.
+
+** Scenario 1: Each Cashier takes 1 bag **
+
+Notation: 
+	c1<--m means "Cashier gets bag #1 from Me"
+	
+	c1<-->c2 means "Bag #1 value is communicated to the Cashier holding Bag #2"
+	
+	c1+c2=s1 means "Bag values #1, #2 are added to form a new sum, labeled 's1'"
+	
+	c3<-->s1 means "Bag value #3 is communicated to Cashier holding sum 's1'
+		NOTE: If one line reads "c1+c2=s1, c3<-->s1", both of these operations happen at 
+		the same second.  It's a bit unclear, as s1 is only assigned as the conclusion of 
+		the first statement - it's just meant to indicate "the Cashier who was holding bag 
+		#2, and who, by the end of this second, will be holding the sum of bags #1 and #2, 
+		will also have been given bag #3's value by that point in time"
+		
+	s1+c3=s2 means "Sums 's1' and bag value #3 are summed to a new sum, 's2'"
+	
+c1<--m (1s)
+c2<--m (1s)
+								ASSUME 2 BAGS TOTAL
+								c1<-->c2 (1s)
+								c1+c2=s12 (1s) = TOTAL (4s)
+
+c3<--m, c1<-->c2 (1s)
+c4<--m, c1+c2 = s1, c3<-->s1 (1s)
+								ASSUME 4 BAGS TOTAL
+								s1+c3 = s2, c4<-->s2 (1s)
+								s2+c4 = s3 (1s) = TOTAL (6s)
+									
+c5<--m, s12+c3=s123, c4<-->s123 (1s)
+c6<--m, s123+c4 = s1234, c5<-->s...4 (1s)
+
+c7<--m, s...4+c5=s...5, c6<-->s...5 (1s)
+c8<--m, s...5+c6=s...6, c7<-->s...6 (1s)
+
+								ASSUME 8 BAGS TOTAL
+								s...6+c7 = s...7, c8<-->s...7 (1s)
+								s...7+c8 = s...8 (1s) = TOTAL (10s)
+									
+								
+2 bags = 2^1 bags --> 4 seconds 
+4 bags = 2^2 bags --> 6 seconds
+8 bags = 2^3 bags --> 10 seconds
+
+Conclusion:
+With powers of 2, handing out 1 bag at a time, it takes 2^x+2 seconds to find the total.
+With 256 = 2^8 bags, it takes 258 seconds to find the total sum.
+
+** Scenario 2: Each Cashier takes 2 bags **
+
+Notation: 
+	c12<--m means "Cashier gets bag #1 and bag #2 from Me"
+	c12-->s1 means "Cashier adds bag #1 + bag #2 to get sum #1"
+	s1<-->s2 means "Sum #1 is communicated to the Cashier holding Sum #2"
+	s1+s2=s12 means "Sums #1, #2 are added together to form a new sum, labeled 's12'"
+	
+c12<--m (1s)
+								 ASSUME 2 BAGS TOTAL	
+								 c12-->s1 (1s) = TOTAL (2s)
+c34<--m, c12-->s1 (1s)
+								 ASSUME 4 BAGS TOTAL	
+								 c34-->s2, s1<-->s2 (1s)
+								 s1+s2=s12 (1s) = TOTAL (4s)
+								 
+c56<--m, c34-->s2, s1<-->s2 (1s)
+c78<--m, c56-->s3, s1+s2=s12 (1s)
+
+								 ASSUME 8 BAGS TOTAL	
+								 c78-->s4, s3<-->s12 (1s)
+								 s12+s3=s123, s4<-->s123 (1s)
+								 s123+s4=s1234 (1s) = TOTAL (7s)
+				 
+c910<--m, c78-->s4, s1+s2=s12, s3<-->s12  (1s)
+c1112<--m, c910-->s5, s12+s3=s123, s4<-->s123 (1s)
+c1314<--m, c1112-->s6, s123+s4=s1234, s5<-->s1234 (1s)
+c1516<--m, c1314-->s7, s1234+s5=s12345, s6<-->s12345 (1s)
+
+								 ASSUME 16 BAGS TOTAL	
+								 c71516-->s8, s12345+s6=s...6, s7<-->s...6 (1s)
+										 	  s...6+s7=s...7,  s8<-->s...7 (1s)
+										 	  s...7+s8=s...8 (1s) = TOTAL (11s)
+										 
+Conclusion:
+It looks like N=2 and N=4 are base cases, after which, for powers of 2, N=2^x bags takes N/2 + 3 seconds to compute a total sum.  (Another way to say this is that it's the number of pairs, plus 3.)
+For N=256, N/2+3 = 131 seconds
+
+** Scenario 3: Optimal solution **
+We know from 5.5 that if 128 employees each have 2 bags in hand, it takes 15 seconds to compute the total sum.  So we can try a branching hand-out structure to get to this scenario as quickly as possible:
+
+I give 128 bags to C1 (1s)
+While I give my second set of 128 bags to C2, C1 gives 64 bags to C1a
+While C1 gives his second set of 64 bags to C1b, C2 gives 64 bags to C2a...and so on
+
+This is the fastest way to get 128 cashiers holding two bags each.  From there on we can implement the solution in 5.5. 
