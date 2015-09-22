@@ -8,7 +8,17 @@ sns.set_context('poster', font_scale=1.25)
 import findspark as fs
 fs.init()
 import pyspark as ps
-sc = ps.SparkContext(appName='P2a')
+import multiprocessing as mp
+import numpy as np
+
+# Setup cluster, number of threads = 2x cores
+config = ps.SparkConf()
+config = config.setMaster('local[' + str(2*mp.cpu_count()) + ']')
+config = config.setAppName('P2a')
+
+sc = ps.SparkContext(conf=config)
+
+# Do the computation
 
 num_pixels = 2000
 rows = sc.range(num_pixels, numSlices=10)
@@ -32,4 +42,20 @@ plt.grid(False)
 # implementation annoyed me...I did not want to collect in a draw function!
 P2.draw_image(data=mandelbrot_result)
 
-plt.savefig('P2a.png', dpi=200, bbox_inches='tight')
+plt.savefig('P2a_mandelbrot.png', dpi=200, bbox_inches='tight')
+
+plt.clf()
+
+# Now create the histogram...I recognize that mandelbrot is computed twice
+# but it is for my sanity
+summed_rdd = P2.sum_values_for_partitions(mandelbrot_rdd)
+summed_result = summed_rdd.collect()
+
+plt.hist(summed_result, bins=np.logspace(3, 8, 20))
+sns.rugplot(summed_result, color='red')
+plt.gca().set_xscale('log')
+plt.xlabel('Total Number of Iterations on Partition')
+plt.ylabel('Partition Count')
+plt.title('Number of Iterations on each Partition')
+
+plt.savefig('P2a_hist.png', dpi=200, bbox_inches='tight')
