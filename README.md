@@ -2,6 +2,6 @@
 
 Reinier Maat
 
-maat[AT]g.harvard.edu
+maat[at]g.harvard.edu
 
 10985439
