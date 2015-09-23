@@ -35,6 +35,7 @@ def mandelbrot_wrapper(row, col):
     return ((row, col), P2.mandelbrot(x, y))
 
 ########### Different from part A: load balancing! ########
+num_partitions=100
 
 # We create a mask of the most expensive computations. These are computations
 # that take about 3 orders of magnitude longer to run than the fastest points!
@@ -56,25 +57,29 @@ broadcast_expensive = sc.broadcast(expensive_mask)
 # Determine if the index pair is expensive
 indices_vs_expensive = indices.map(lambda a: (a, broadcast_expensive.value[a[0], a[1]]))
 
-mandelbrot_rdd = indices.map(lambda a: mandelbrot_wrapper(*a))
+# Get expensive tasks ready to process
+expensive_tasks = indices_vs_expensive.filter(lambda x: x[1] == 1)
+expensive_tasks = expensive_tasks.map(lambda x: x[0])
+labeled_expensive_tasks = expensive_tasks.zipWithIndex()
+partition_vs_expensive_task = labeled_expensive_tasks.map(lambda x: (x[1] % num_partitions, x[0]))
 
-# Now collect the data & plot
-mandelbrot_result = mandelbrot_rdd.collect()
+# Get cheap tasks ready to process
+cheap_tasks = indices_vs_expensive.filter(lambda x: x[1] == 0)
+cheap_tasks = cheap_tasks.map(lambda x: x[0])
+labeled_cheap_tasks = cheap_tasks.zipWithIndex()
+partition_vs_cheap_task = labeled_cheap_tasks.map(lambda x: (x[1] % num_partitions, x[0]))
 
-plt.grid(False)
-# I slightly redefined the draw image function as the original
-# implementation annoyed me...I did not want to collect in a draw function!
-P2.draw_image(data=mandelbrot_result)
+# Combine cheap & expensive tasks, now designated to an appropriate partition
+partition_vs_ij = partition_vs_expensive_task.union(partition_vs_cheap_task)
+# Sort data into the correct partition...sorted by key!
+sorted_by_partition = partition_vs_ij.sortByKey(numPartitions=100)
 
-plt.savefig('P2a_mandelbrot.png', dpi=200, bbox_inches='tight')
+mandelbrot_load_balanced = sorted_by_partition.map(lambda a: mandelbrot_wrapper(*a[1]))
 
-plt.clf()
-
-# Now create the histogram...I recognize that mandelbrot is computed twice
-# but it is for my sanity
-summed_rdd = P2.sum_values_for_partitions(mandelbrot_rdd)
+summed_rdd = P2.sum_values_for_partitions(mandelbrot_load_balanced)
 summed_result = summed_rdd.collect()
 
+# Now collect the data & plot
 plt.hist(summed_result, bins=np.logspace(3, 8, 20))
 sns.rugplot(summed_result, color='red')
 plt.gca().set_xscale('log')
@@ -82,4 +87,4 @@ plt.xlabel('Total Number of Iterations on Partition')
 plt.ylabel('Partition Count')
 plt.title('Number of Iterations on each Partition')
 
-plt.savefig('P2a_hist.png', dpi=200, bbox_inches='tight')
+plt.savefig('P2b_hist.png', dpi=200, bbox_inches='tight')
