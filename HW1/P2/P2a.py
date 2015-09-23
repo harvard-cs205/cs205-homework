@@ -1,3 +1,6 @@
-from P2 import *
+execfile('P2.py')
 
-# Your code here
+x = np.array([(i/500.0)-2 for i in range(1,2000)])
+y = np.array([(i/500.0)-2 for i in range(1,2000)])
+
+print x
