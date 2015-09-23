@@ -1,1 +1,54 @@
-# Your discussion here
+
+#### Top hit...weird character snuck in ####
+
+(u'aerst\xea',
+  12,
+  [u'ar\xeates',
+   u'arets',
+   u'aster',
+   u'rates',
+   u'reast',
+   u'resat',
+   u'stare',
+   u'stear',
+   u'strae',
+   u'tares',
+   u'tears',
+   u'teras'])
+
+#### 2nd max hit #####
+Maybe you were looking for this one.
+
+(u'aeprs',
+  11,
+  [u'asper',
+   u'pares',
+   u'parse',
+   u'pears',
+   u'prase',
+   u'presa',
+   u'rapes',
+   u'reaps',
+   u'spaer',
+   u'spare',
+   u'spear'])
+
+##### 3d max hit #####
+I found a third anagram with 11 hits. They are
+
+(u'aelst',
+  11,
+  [u'least',
+   u'leats',
+   u'salet',
+   u'slate',
+   u'stale',
+   u'steal',
+   u'stela',
+   u'taels',
+   u'tales',
+   u'teals',
+   u'tesla'])
+
+#### Other results ####
+These were the only anagrams with 11 or more hits! Very cool.
