@@ -1,1 +1,6 @@
 # Your discussion here
+"CAPTAIN AMERICA": 6408
+"MISS THING/MARY": 7
+"ORWELL": 9
+
+This means that the network consists of diconnected sub-networks.
