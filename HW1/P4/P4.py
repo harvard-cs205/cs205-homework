@@ -18,9 +18,6 @@ if __name__ == "__main__":
     graph = edges_rdd.groupByKey(numPartitions=N).mapValues(list).sortByKey(numPartitions=N)
     graph.cache()
 
-    #print graph.lookup('CAPTAIN AMERICA')
-    rdd = distance_to_all_nodes_from("CAPTAIN AMERICA", graph)
-
-    print rdd.take(20)
-
-
+    # Distance to nodes in network
+    distance_to_character = distance_to_all_nodes_from("CAPTAIN AMERICA", graph).sortBy(lambda (k, v): v, False)
+    print distance_to_character.take(20)

@@ -16,5 +16,5 @@ def distance_to_all_nodes_from(root_node, graph_rdd):
         current_nodes = neighbors
     print len(result)  # number of nodes touched on
     result_rdd = graph_rdd.keys().map(lambda key: (key, -1) if key not in result else (key, result[key]), True)
-    return result_rdd.sortBy(lambda (k, v): v, False)  # -1 means no connection (within 10 steps)
+    return result_rdd  # -1 means no connection (within 10 steps)
 
