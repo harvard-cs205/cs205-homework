@@ -16,5 +16,5 @@ origins = ['"CAPTAIN AMERICA"', '"MISS THING/MARY"', '"ORWELL"']
 results = {}
 for origin in origins:
     result = bfs(character_characters, origin)
-    results[origin] =  (result.count(), result.take(10))
+    results[origin] =  result.count()
 print results

@@ -1,4 +1,5 @@
 My graph is represented as an RDD of key-value pairs. The key is the name of the comic book character as found in the input file and the value is a set of the names of all other comic book characters who share at least one issue with that character, as the names appear in the input file.
+I use the bfs function arguments indicated, but I retrieve the context from the graph inside of the bfs function to create both an accumulator and an empty RDD.
 
 "Recall that, for a node v in a graph G, the radius r(v) is the distance between v and a reachable node farthest away from v. The diameter d(G) of a graph G is the maximum radius of nodes v ∈ G. That is, d(G) = max_v r(v)" - http://www.math.cmu.edu/~ctsourak/tkdd10.pdf
 If the diameter of a graph is 10, then the maximum distance between any two connected nodes on the graph is 10. If we consider a step to be all operations performed at distance d from the starting point, which must all be contiguous from the structure of the BFS algorithm, then the search is executed at most 10 steps.
