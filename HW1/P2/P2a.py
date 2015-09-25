@@ -26,12 +26,13 @@ def createPixels(row,column):
     return (row,column),result
 
 # this creates an RDD that constains values in the range of 0 to 2000 stepping 
-# in increments of 1
-row = sc.range(0,2000)
-column = sc.range(0,2000)
+# in increments of 1 each divided into 10 partitions so that 10*10=100 partitions
+row = sc.parallelize(range(0,2000),10)
+column = sc.parallelize(range(0,2000),10)
 
 # this creates all possible combinations of rows and columns
 joined = row.cartesian(column)
+
 
 # this maps the joined RDD into the function createPixels
 mandlebrot = joined.map(lambda rr: createPixels(rr[0],rr[1]))
@@ -49,3 +50,5 @@ sum_values=sum_values_for_partitions(mandlebrot).collect()
 plt.hist(sum_values, bins=np.logspace(3, 8))
 plt.gca().set_xscale('log')
 plt.savefig('P2a_hist.png', bbox_inches='tight')
+
+print "the number of workers are: ", len(sum_values)
