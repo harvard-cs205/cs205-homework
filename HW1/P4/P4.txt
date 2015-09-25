@@ -4,5 +4,5 @@ I use the bfs function arguments indicated, but I retrieve the context from the 
 "Recall that, for a node v in a graph G, the radius r(v) is the distance between v and a reachable node farthest away from v. The diameter d(G) of a graph G is the maximum radius of nodes v ∈ G. That is, d(G) = max_v r(v)" - http://www.math.cmu.edu/~ctsourak/tkdd10.pdf
 If the diameter of a graph is 10, then the maximum distance between any two connected nodes on the graph is 10. If we consider a step to be all operations performed at distance d from the starting point, which must all be contiguous from the structure of the BFS algorithm, then the search is executed at most 10 steps.
 
-Including the origin, the number of nodes touched from each start is: "CAPTAIN AMERICA"': 4217, '"ORWELL"': 4, '"MISS THING/MARY"': 6
+Including the origin, the number of nodes touched from each start is: 'MISS THING/MARY': 7, 'ORWELL': 9, 'CAPTAIN AMERICA': 6408
 If a character does not have a defined distance from a given origin, then that character is not reachable from that origin. This means that there is no chain of mutual appearances in a comic book that connects the two characters - their universes are disjoint.
