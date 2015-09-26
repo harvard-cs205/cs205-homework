@@ -34,6 +34,11 @@ def reduceFun2(tup):
 	else:
 		return max(tup[0],tup[1])
 
+#######
+# Implements Breadth First Search
+# Arguments:
+# 	adj (KV RDD): Edge list. For example: [(1,2), (1, 3), (2,3), (3, 2)] is the graph where there is a directed edge from 1 to 2 and 1 to 3, edges in both directions between 2 and 3.
+# 	start (string): Where the breadth first search will start
 def bfs(adj, start):
 	#global accum
 	#return
@@ -72,6 +77,7 @@ def bfs(adj, start):
 	#print final_vals.take(100)
 	print "Distance Distribution for ", start 
 	print final_vals.values().countByValue(), '\n'
+	return final_vals, final_vals.filter(lambda (node, dist): dist < 0)
 	
 	#print "The ones that were unreachable:"
 	#print final_vals.filter(lambda (name, dist): dist < 0).keys().collect()

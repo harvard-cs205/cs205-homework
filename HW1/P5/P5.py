@@ -16,6 +16,6 @@ linklist = sc.textFile('links-simple-sorted.txt')
 split_list = linklist.map(lambda x: x.split(':'))
 print split_list.take(10)
 
-edges = split_list.flatMapValues(lambda x: x)
+edges = split_list.flatMapValues(lambda x: x.split()).map(lambda (n1, n2): (int(n1), int(n2)))
 
 print edges.take(10)
