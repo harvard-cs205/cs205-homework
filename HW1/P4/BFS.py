@@ -1,7 +1,6 @@
 '''Assumes that you have a variable called sc that is your spark context! Won't work otherwise.
 The issue is that the context cannot be passed in, weirdly...'''
 
-
 def get_smaller_value(a, b):
     if a < b:
         return a
@@ -14,6 +13,7 @@ class BFS(object):
     due to serialization. So we have to do some serious shennanigans...TERRIBLE'''
 
     def __init__(self, sc, start_node, network_rdd):
+
         self.sc = sc
         self.start_node = start_node
         self.network_rdd = network_rdd
@@ -23,7 +23,8 @@ class BFS(object):
 
 
     def initialize_distances(self):
-        self.collected_distance_rdd = BFS.initialize_distances_static(self.start_node,
+        self.collected_distance_rdd = BFS.initialize_distances_static(self.sc,
+                                                                      self.start_node,
                                                                       self.network_rdd,
                                                                       self.cur_iteration)
         self.cur_iteration += 1
@@ -37,7 +38,7 @@ class BFS(object):
 
     #### STATIC METHODS TO INTERACT WITH SPARK ####
     @staticmethod
-    def initialize_distances_static(start_node, network_rdd, cur_iteration):
+    def initialize_distances_static(sc, start_node, network_rdd, cur_iteration):
         network_to_touch = network_rdd.filter(lambda x: x[0] == start_node)
         distance_rdd = network_to_touch.map(lambda x: (x[0], cur_iteration))
         collected_distance_rdd = distance_rdd.collect()
@@ -51,9 +52,9 @@ class BFS(object):
         already_touched_set = set(already_touched)
         broadcasted_touched = sc.broadcast(already_touched_set)
         network_to_touch = network_rdd.filter(lambda x: x[0] in broadcasted_touched.value)
-        broadcasted_touched.unpersist()
 
         old_distance_rdd = sc.parallelize(collected_distance_rdd)
+
 
         # Now do the iteration!
         nodes_to_touch = network_to_touch.flatMap(lambda x: x[1])
@@ -63,4 +64,7 @@ class BFS(object):
         corrected_distance_rdd = updated_distance_rdd.reduceByKey(get_smaller_value)
 
         collected_distance_rdd = corrected_distance_rdd.collect()
+
+        broadcasted_touched.unpersist() # If you don't put this at the end, terrible things happen
+
         return collected_distance_rdd
