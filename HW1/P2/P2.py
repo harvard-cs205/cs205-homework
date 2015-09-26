@@ -41,5 +41,3 @@ if __name__ == "__main__":
     draw_image(z)
     
     partition_counts=sum_values_for_partitions(z).collect()
-    
-    

@@ -37,7 +37,7 @@ if __name__ == "__main__":
   #  sc = SparkContext(appName="Mandelbrot")
     Nmax=2000
     lst=np.arange(1,Nmax+1).reshape((10,200)).flatten('F').tolist()
-    #lst_ordered=range(1,Nmax+1)
+    #lst=range(1,Nmax+1)
     Ntot=np.power(Nmax,2)
     idx=sc.parallelize(lst,10) #desired number of partitions is 100, 
     order=np.arange(1,np.power(Nmax,2)+1).reshape(100,-1).flatten('F').tolist()
@@ -45,9 +45,9 @@ if __name__ == "__main__":
     # for the parallelization scheme chosen, let us look at how the partitions are divided
     xylist=xy.collect()
     psize=Ntot/100
-    plt.scatter(*zip(*xylist[0*psize:1*psize]),c='g')
-    #plt.scatter(*zip(*xylist[1*psize:2*psize]),c='g')
-    #plt.scatter(*zip(*xylist[2*psize:3*psize]),c='b')
+    plt.plot(*zip(*xylist[0*psize:1*psize]),c='g',linestyle='None',marker='.')
+    plt.plot(*zip(*xylist[1*psize:2*psize]),c='r',linestyle='None',marker='.')
+    plt.plot(*zip(*xylist[2*psize:3*psize]),c='b',linestyle='None',marker='.')
     plt.show()   
     
     #,(i[1]/500.0-2,i[0]/500.0-2)))
