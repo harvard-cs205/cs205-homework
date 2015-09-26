@@ -1,1 +1,18 @@
 # Your discussion here
+
+The entry with the most anagrams.
+
+key:  aerst
+number of anagrams:  11
+word:  arets
+word:  aster
+word:  rates
+word:  reast
+word:  resat
+word:  stare
+word:  stear
+word:  strae
+word:  tares
+word:  tears
+word:  teras
+
