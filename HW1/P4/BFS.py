@@ -15,7 +15,11 @@ class BFS(object):
 
         self.sc = sc
         self.start_node = start_node
+
         self.network_rdd = network_rdd
+        # Cache the network rdd so we don't have to keep recomputing it!
+        self.network_rdd.cache()
+
         self.cur_iteration = 0
         self.collected_distance_rdd = None
         self.initialize_distances()
@@ -63,7 +67,6 @@ class BFS(object):
         network_to_touch = network_rdd.filter(lambda x: x[0] in broadcasted_touched.value)
 
         old_distance_rdd = sc.parallelize(collected_distance_rdd)
-
 
         # Now do the iteration!
         nodes_to_touch = network_to_touch.flatMap(lambda x: x[1])
