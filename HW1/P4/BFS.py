@@ -16,9 +16,8 @@ class BFS(object):
         self.sc = sc
         self.start_node = start_node
 
-        self.network_rdd = network_rdd
-        # Cache the network rdd so we don't have to keep recomputing it!
-        self.network_rdd.cache()
+        # Cache the network rdd so we don't have to keep recomputing it! It's not changing!
+        self.network_rdd = network_rdd.cache()
 
         self.cur_iteration = 0
         self.collected_distance_rdd = None
