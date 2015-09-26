@@ -1,1 +1,1 @@
-# Your discussion here
+('aerst', 11, ['reast', 'stare', 'stear', 'tares', 'resat', 'aster', 'teras', 'tears', 'arets', 'rates', 'strae'])
