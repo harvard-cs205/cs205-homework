@@ -1,5 +1,4 @@
-'''Assumes that you have a variable called sc that is your spark context! Won't work otherwise.
-The issue is that the context cannot be passed in, weirdly...'''
+
 
 def get_smaller_value(a, b):
     if a < b:
@@ -35,6 +34,16 @@ class BFS(object):
                                                               self.collected_distance_rdd,
                                                               self.cur_iteration)
         self.cur_iteration += 1
+
+    def run_until_converged(self):
+        go = True
+        while go:
+            before_update = dict(self.collected_distance_rdd)
+            self.do_iteration()
+            after_update = dict(self.collected_distance_rdd)
+            if before_update == after_update:
+                go = False
+        print 'Finished at end of iteration' , self.cur_iteration - 1 , '!'
 
     #### STATIC METHODS TO INTERACT WITH SPARK ####
     @staticmethod
