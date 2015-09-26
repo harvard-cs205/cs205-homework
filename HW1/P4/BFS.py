@@ -1,3 +1,6 @@
+'''Assumes that you have a variable called sc that is your spark context! Won't work otherwise.
+The issue is that the context cannot be passed in, weirdly...'''
+
 
 def get_smaller_value(a, b):
     if a < b:
@@ -7,7 +10,8 @@ def get_smaller_value(a, b):
 
 class BFS(object):
     '''Life is complicated by spark's lazy evaluation. We have to collect at the end of
-    every iteration, or progress will be lost!'''
+    every iteration, or progress will be lost! Also, dealing with classes in spark is awful
+    due to serialization. So we have to do some serious shennanigans...TERRIBLE'''
 
     def __init__(self, sc, start_node, network_rdd):
         self.sc = sc
@@ -16,14 +20,19 @@ class BFS(object):
         self.cur_iteration = 0
         self.collected_distance_rdd = None
 
-        self.initialize_distances()
-
-    def initialize_distances(self):
-        network_to_touch = self.network_rdd.filter(lambda x: x[0] == self.start_node)
-        distance_rdd = network_to_touch.map(lambda x: (x[0], self.cur_iteration))
-        self.collected_distance_rdd = distance_rdd.collect()
+        # Finish initialization
+        self.collected_distance_rdd = BFS.initialize_distances(self.start_node, self.network_rdd, 0)
         self.cur_iteration = 1
 
+    @staticmethod
+    def initialize_distances(start_node, network_rdd, cur_iteration):
+        network_to_touch = network_rdd.filter(lambda x: x[0] == start_node)
+        distance_rdd = network_to_touch.map(lambda x: (x[0], cur_iteration))
+        collected_distance_rdd = distance_rdd.collect()
+
+        return collected_distance_rdd
+
+    @staticmethod
     def do_iteration(self):
         # Pull the needed info out of the network
         already_touched = [z[0] for z in self.collected_distance_rdd]
