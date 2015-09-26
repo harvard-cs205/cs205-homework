@@ -1,4 +1,5 @@
 from P2 import *
+import random
 
 
 def compute_image_balanced(s, p):
