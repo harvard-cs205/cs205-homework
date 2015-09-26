@@ -39,7 +39,7 @@ mandlebrot = joined.map(lambda rr: createPixels(rr[0],rr[1]))
 
 # here I pass the RDD in the format ((I,J),V) to the pre-defined draw function
 draw_image(mandlebrot)
-plt.show()
+plt.savefig('P2a_Mandelbrot')
 
 # here I pass the same RDD in the same format to find how many times it was 
 # iterated upon
