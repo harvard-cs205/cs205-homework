@@ -59,6 +59,7 @@ class BFS(object):
 
     @staticmethod
     def do_iteration_static(sc, network_rdd, collected_distance_rdd, cur_iteration):
+        #TODO: Figure out where to use accumulators...
         # Pull the needed info out of the network
         already_touched = [z[0] for z in collected_distance_rdd]
         already_touched_set = set(already_touched)
