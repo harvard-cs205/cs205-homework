@@ -46,7 +46,7 @@ plt.savefig('P2a_Mandelbrot')
 sum_values=sum_values_for_partitions(mandlebrot).collect()
 
 # this section gives me the histogram in a pretty fashion. This was done with
-# the help from Bryan Weinsteing
+# the help from Bryan Weinstein
 plt.hist(sum_values, bins=np.logspace(3, 8))
 plt.gca().set_xscale('log')
 plt.savefig('P2a_hist.png', bbox_inches='tight')

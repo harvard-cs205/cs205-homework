@@ -1,1 +1,5 @@
-# Your discussion here
+
+************ New Letter Sequence ****************
+Sorted Letter Sequence: aerst
+Number of Valid Anagrams: 11
+Words: arets, aster, rates, reast, resat, stare, stear, strae, tares, tears, teras, 

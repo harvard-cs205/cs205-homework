@@ -31,7 +31,9 @@ def createPixels(row,column):
 row = sc.range(0,2000)
 column = sc.range(0,2000)
 
-# this creates all possible combinations of rows and columns
+# this creates all possible combinations of rows and columns in a radom fashion. 
+# furthermore distributes each partition around the entire domain equally instead
+# of distributing the partition in order accross each pixel
 joined = row.cartesian(column).partitionBy(100, lambda p: randint(1, 101) )
 
 
@@ -47,7 +49,7 @@ plt.savefig('P2b_Mandelbrot')
 sum_values=sum_values_for_partitions(mandlebrot).collect()
 
 # this section gives me the histogram in a pretty fashion. This was done with
-# the help from Bryan Weinsteing
+# the help from Bryan Weinstein
 plt.hist(sum_values, bins=np.logspace(0, 8))
 plt.gca().set_xscale('log')
 plt.savefig('P2b_hist.png', bbox_inches='tight')
