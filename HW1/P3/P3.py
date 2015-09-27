@@ -25,10 +25,15 @@ allWords=sc.textFile('EOWL_words.txt', use_unicode=True)
 # anagrams are joined together if they are of the same key
 wordMap = allWords.map(lambda (x): (''.join(sorted(x)), x)).groupByKey()
 
+# this adds the number of words there exists for a given letter sequence
 anagramRDD= wordMap.map(lambda x: (x[0], len(x[1]), x[1]))
 
-result=anagramRDD.takeOrdered(1,lambda x: -x[1])
+numDisp=1 # change this to change the number of Sorted letter sequence
 
+# this takes in an ordered fashion the values for each key letter sequence
+result=anagramRDD.takeOrdered(numDisp,lambda x: -x[1])
+
+# this is adding all of the results into P3.txt
 textFile=open('P3.txt','w')
 for SortedLetterSequence, NumberOfValidAnagrams, Words in result:
 	textFile.write("\n************ New Letter Sequence ****************\n")
@@ -37,8 +42,8 @@ for SortedLetterSequence, NumberOfValidAnagrams, Words in result:
 	textFile.write("Words: ")
 	for Word in Words:
 		textFile.write(Word+", ")
-
 textFile.close()
 
+# printing the line from the text file that matches the values from the RDD
 textFile=open('P3.txt','r')
 print textFile.read()
