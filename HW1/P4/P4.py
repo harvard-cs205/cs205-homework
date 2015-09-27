@@ -3,7 +3,7 @@ findspark.init('/home/shenjeffrey/spark/')
 import pyspark
 import matplotlib.pyplot as plt
 import seaborn as sns
-import P4_bfs.py
+from P4_bfs import shortest_path
 
 # initiate spark
 sc = pyspark.SparkContext()
@@ -37,10 +37,6 @@ edges.take(10)
 # Create graph from edges
 # GroupbyKey with Comic Book Character
 graph = edges.groupByKey().mapValues(list)
-
-# Since b/c of lazy evaluation make the graph sort
-graph = graph.sortByKey()
-results = graph.collect()
 
 # Final results
 orwell = shortest_path(graph, "ORWELL", 10)
