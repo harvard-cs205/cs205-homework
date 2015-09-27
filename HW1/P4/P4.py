@@ -52,7 +52,7 @@ network_rdd = character_and_links_rdd.map(cleanup_links) # Completed network rep
 # representation, but we initialize the network in such a way that the links are bi-directional.
 
 # We now do the breadth-first search, BFS
-from BFS import BFS
+from HW1.network_commands import BFS
 
 #### Captain America ####
 searcher = BFS(sc, 'CAPTAIN AMERICA', network_rdd)
