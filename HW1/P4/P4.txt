@@ -1,1 +1,4 @@
-# Your discussion here
+Number of nodes touched excluding root note
+Orwell: 8
+Miss Thing/Mary: 10
+Captain America: 6407
