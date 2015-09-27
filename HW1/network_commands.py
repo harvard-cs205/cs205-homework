@@ -1,10 +1,5 @@
 
 
-def get_smaller_value(a, b):
-    if a < b:
-        return a
-    else:
-        return b
 
 class BFS(object):
     '''Life is complicated by spark's lazy evaluation. We have to collect at the end of
@@ -58,7 +53,15 @@ class BFS(object):
         return collected_distance_rdd
 
     @staticmethod
-    def do_iteration_static(sc, network_rdd, collected_distance_rdd, cur_iteration, record_parents=False):
+    def get_smaller_value(a, b):
+        if a < b:
+            return a
+        else:
+            return b
+
+
+    @staticmethod
+    def do_iteration_static(sc, network_rdd, collected_distance_rdd, cur_iteration):
         #TODO: Figure out where to use accumulators...
         # Pull the needed info out of the network
         already_touched = [z[0] for z in collected_distance_rdd]
@@ -73,7 +76,7 @@ class BFS(object):
         unique_nodes_to_touch = nodes_to_touch.distinct()
         updated_touched_nodes = unique_nodes_to_touch.map(lambda x: (x, cur_iteration))
         updated_distance_rdd = old_distance_rdd.union(updated_touched_nodes)
-        corrected_distance_rdd = updated_distance_rdd.reduceByKey(get_smaller_value)
+        corrected_distance_rdd = updated_distance_rdd.reduceByKey(BFS.get_smaller_value)
 
         collected_distance_rdd = corrected_distance_rdd.collect()
 
@@ -82,14 +85,10 @@ class BFS(object):
         return collected_distance_rdd
 
 class Path_Finder(object):
-    '''Life is complicated by spark's lazy evaluation. We have to collect at the end of
-    every iteration, or progress will be lost! Also, dealing with classes in spark is awful
-    due to serialization. So we have to do some serious shennanigans...TERRIBLE'''
 
-    def __init__(self, sc, start_node, network_rdd):
+    def __init__(self, sc, network_rdd, start_node, end_node):
 
         self.sc = sc
-        self.start_node = start_node
 
         # Cache the network rdd so we don't have to keep recomputing it! It's not changing!
         self.network_rdd = network_rdd.cache()
@@ -97,6 +96,9 @@ class Path_Finder(object):
         self.cur_iteration = 0
         self.collected_distance_rdd = None
         self.initialize_distances()
+
+        self.start_node = start_node
+        self.end_node = end_node
 
 
     def initialize_distances(self):
@@ -115,25 +117,34 @@ class Path_Finder(object):
 
     def run_until_converged(self):
         go = True
+        are_connected = None
         while go:
             before_update = dict(self.collected_distance_rdd)
             self.do_iteration()
             after_update = dict(self.collected_distance_rdd)
-            if before_update == after_update:
+            if self.end_node in after_update:
                 go = False
+                are_connected = True
+            elif before_update == after_update:
+                go = False
+                are_connected = False
+        if are_connected:
+            print 'Nodes are connected!'
+        else:
+            print 'Nodes do not seem to be connected... :('
         print 'Finished at end of iteration' , self.cur_iteration - 1 , '!'
 
     #### STATIC METHODS TO INTERACT WITH SPARK ####
     @staticmethod
     def initialize_distances_static(sc, start_node, network_rdd, cur_iteration):
         network_to_touch = network_rdd.filter(lambda x: x[0] == start_node)
-        distance_rdd = network_to_touch.map(lambda x: (x[0], cur_iteration))
+        distance_rdd = network_to_touch.map(lambda x: (x[0], cur_iteration, ()))
         collected_distance_rdd = distance_rdd.collect()
 
         return collected_distance_rdd
 
     @staticmethod
-    def do_iteration_static(sc, network_rdd, collected_distance_rdd, cur_iteration, record_parents=False):
+    def do_iteration_static(sc, network_rdd, collected_distance_rdd, cur_iteration):
         #TODO: Figure out where to use accumulators...
         # Pull the needed info out of the network
         already_touched = [z[0] for z in collected_distance_rdd]
@@ -144,10 +155,26 @@ class Path_Finder(object):
         old_distance_rdd = sc.parallelize(collected_distance_rdd)
 
         # Now do the iteration!
-        nodes_to_touch = network_to_touch.flatMap(lambda x: x[1])
-        unique_nodes_to_touch = nodes_to_touch.distinct()
-        updated_touched_nodes = unique_nodes_to_touch.map(lambda x: (x, cur_iteration))
+        def get_nodes_to_touch_and_parents(x):
+            parent = x[0]
+            nodes_to_touch = x[1]
+            return [(z, parent) for z in nodes_to_touch]
+
+        nodes_to_touch_and_parents = network_to_touch.flatMap(get_nodes_to_touch_and_parents)
+        # We now groupby individual
+        grouped_by_node = nodes_to_touch_and_parents.groupByKey()
+
+        updated_touched_nodes = grouped_by_node.map(lambda x: (x[0], cur_iteration, x[1]))
         updated_distance_rdd = old_distance_rdd.union(updated_touched_nodes)
+
+        def get_smaller_value(a, b):
+            '''There are all sorts of subtleties here...but since we don't care about the exact
+            path it doesn't matter. Take the parents that are from an earlier iteration.'''
+            if a[0] < b[0]:
+                return a
+            else:
+                return b
+
         corrected_distance_rdd = updated_distance_rdd.reduceByKey(get_smaller_value)
 
         collected_distance_rdd = corrected_distance_rdd.collect()
