@@ -89,16 +89,18 @@ class Path_Finder(object):
     def __init__(self, sc, network_rdd, start_node, end_node):
 
         self.sc = sc
-
         # Cache the network rdd so we don't have to keep recomputing it! It's not changing!
         self.network_rdd = network_rdd.cache()
-
-        self.cur_iteration = 0
-        self.collected_distance_rdd = None
-        self.initialize_distances()
-
         self.start_node = start_node
         self.end_node = end_node
+
+        # Other helper variables
+        self.cur_iteration = 0
+        self.collected_distance_rdd = None
+
+        # Run this at the end!
+        self.initialize_distances()
+
 
 
     def initialize_distances(self):
