@@ -89,8 +89,8 @@ class Path_Finder(object):
     def __init__(self, sc, network_rdd, start_node, end_node):
 
         self.sc = sc
-        # Cache the network rdd so we don't have to keep recomputing it! It's not changing!
-        self.network_rdd = network_rdd.cache()
+        # User will define the cache if they want...otherwise computer will melt
+        self.network_rdd = network_rdd
         self.start_node = start_node
         self.end_node = end_node
 
