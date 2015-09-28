@@ -1,1 +1,15 @@
 # Your discussion here
+
+
+
+There are different strategies to better balance the work.
+
+1/
+
+One that is not implemented there is to 
+(1) sort the rdd as a function of the distance to the point that requires the most iteration. It is a good proxy to the number of calculations since the picture looks like concentric circles around this point.
+(2) distribute in each partition some (I,J) that requires a lot of iteration and some that does not require iterations.
+
+Because this is complicated since I could not find indexes of a RDD, I decided to assign randomly the (I,J) into partitions. It is still better than the initial strategy of part (a) where some partitions had only (I,J) at the corners and hence were not computing a lot of iterations while the ones in the middle did all the work.
+
+2/ Since we are not trying to group() or intersect() by keys or values but are just distributing randomly, the shuffle cost is low with this method.
