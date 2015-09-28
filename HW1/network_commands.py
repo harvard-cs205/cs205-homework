@@ -144,7 +144,7 @@ class Path_Finder(object):
     @staticmethod
     def do_iteration_static(sc, network_rdd, collected_distance_rdd, cur_iteration):
         #TODO: Figure out where to use accumulators...
-        # Pull the needed info out of the network
+        # The broadcast variable is too big here. Don't use it.
         already_touched = [z[0] for z in collected_distance_rdd]
         already_touched_set = set(already_touched)
         broadcasted_touched = sc.broadcast(already_touched_set)
