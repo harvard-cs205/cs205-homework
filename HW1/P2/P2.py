@@ -29,3 +29,15 @@ def draw_image(rdd):
     im[I, J] = np.log(C + 1)  # log intensity makes it easier to see levels
     plt.imshow(im, cmap=cm.gray)
     plt.show()
+
+    
+    
+ran = np.linspace(-2,2,2000)
+# spacing of x,y values to plot
+
+z = [(a,b) for a in ran for b in ran]
+# a list of the pairs of x,y values to plot
+
+distr_z = sc.parallelize(z, 100)
+# split z up into 100 partitions
+
