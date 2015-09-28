@@ -23,7 +23,7 @@ allWords=sc.textFile('EOWL_words.txt', use_unicode=True)
 # taking the allWords RDD and sorting them into an array of keys and their respective words. 
 # making sure there all of the sorted letters are unitque, by making sure all of the 
 # anagrams are joined together if they are of the same key
-wordMap = allWords.map(lambda (x): (''.join(sorted(x)), x)).groupByKey()
+wordMap = allWords.map(lambda (x): (''.join(sorted(x)), x)).groupByKey().sortByKey()
 
 # this adds the number of words there exists for a given letter sequence
 anagramRDD= wordMap.map(lambda x: (x[0], len(x[1]), x[1]))
@@ -47,3 +47,4 @@ textFile.close()
 # printing the line from the text file that matches the values from the RDD
 textFile=open('P3.txt','r')
 print textFile.read()
+textFile.close()
