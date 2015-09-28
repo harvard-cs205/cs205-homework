@@ -68,7 +68,7 @@ def get_path_forwards():
         path_back.append(chosen_parent)
         if chosen_parent == start_node:
             go = False
-        path_forwards = list(reversed(path_back))
+    path_forwards = list(reversed(path_back))
     return path_forwards
 
 print
