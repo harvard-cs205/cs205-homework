@@ -139,11 +139,7 @@ class Path_Finder(object):
     #### STATIC METHODS TO INTERACT WITH SPARK ####
     @staticmethod
     def initialize_distances_static(sc, start_node, network_rdd, cur_iteration):
-        network_to_touch = network_rdd.filter(lambda x: x[0] == start_node)
-        distance_rdd = network_to_touch.map(lambda x: (x[0], cur_iteration, ()))
-        collected_distance_rdd = distance_rdd.collect()
-
-        return collected_distance_rdd
+        return (start_node, cur_iteration, ())
 
     @staticmethod
     def do_iteration_static(sc, network_rdd, collected_distance_rdd, cur_iteration):
@@ -163,10 +159,14 @@ class Path_Finder(object):
             return [(z, parent) for z in nodes_to_touch]
 
         nodes_to_touch_and_parents = network_to_touch.flatMap(get_nodes_to_touch_and_parents)
+
         # We now groupby individual
         grouped_by_node = nodes_to_touch_and_parents.groupByKey()
+        grouped_by_node_list = grouped_by_node.map(lambda x: (x[0], list(x[1])))
 
-        updated_touched_nodes = grouped_by_node.map(lambda x: (x[0], cur_iteration, x[1]))
+        print grouped_by_node_list.take(10)
+
+        updated_touched_nodes = grouped_by_node_list.map(lambda x: (x[0], cur_iteration, x[1]))
         updated_distance_rdd = old_distance_rdd.union(updated_touched_nodes)
 
         def get_smaller_value(a, b):
