@@ -1,13 +1,6 @@
-import findspark
-findspark.init()
-
-import pyspark
-sc = pyspark.SparkContext()
-
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
-
 
 def mandelbrot(x, y):
     z = c = complex(x, y)
@@ -35,14 +28,3 @@ def draw_image(rdd):
     im[I, J] = np.log(C + 1)  # log intensity makes it easier to see levels
     plt.imshow(im, cmap=cm.gray)
     plt.show()
-
-a = np.arange(2000)
-b = np.arange(2000)
-c = sc.parallelize(a, 10).cartesian(sc.parallelize(b, 10))
-d = c.map(lambda x: (x, mandelbrot(x[0] / 500.  - 2, x[1] / 500. - 2)))
-draw_image(d)
-
-e = sum_values_for_partitions(d)
-f = e.collect()
-plt.hist(f)
-plt.show()
