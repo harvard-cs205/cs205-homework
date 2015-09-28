@@ -71,6 +71,10 @@ def get_path_forwards():
         path_forwards = list(reversed(path_back))
     return path_forwards
 
+print
+print
 print [index_then_title.lookup(z)[0] for z in get_path_forwards()]
 print [index_then_title.lookup(z)[0] for z in get_path_forwards()]
 print [index_then_title.lookup(z)[0] for z in get_path_forwards()]
+print
+print
