@@ -151,7 +151,7 @@ class Path_Finder(object):
         old_distance_rdd = sc.parallelize(collected_distance_rdd)
         old_distance_rdd = old_distance_rdd.sortByKey(numPartitions=Path_Finder.num_partitions)
         network_to_touch_unfiltered = network_rdd.join(old_distance_rdd, numPartitions=Path_Finder.num_partitions)
-        network_to_touch = network_to_touch_unfiltered.map(lambda x: (x[0], x[1][0]), preserves_partitioning=True)
+        network_to_touch = network_to_touch_unfiltered.map(lambda x: (x[0], x[1][0]), preservesPartitioning=True)
 
         # Now do the iteration!
         def get_nodes_to_touch_and_parents(x):
@@ -159,14 +159,14 @@ class Path_Finder(object):
             nodes_to_touch = x[1]
             return [(z, parent) for z in nodes_to_touch]
 
-        nodes_to_touch_and_parents = network_to_touch.flatMap(get_nodes_to_touch_and_parents, preserves_partitioning=True)
+        nodes_to_touch_and_parents = network_to_touch.flatMap(get_nodes_to_touch_and_parents, preservesPartitioning=True)
 
         # We now groupby individual
         grouped_by_node = nodes_to_touch_and_parents.groupByKey(numPartitions=Path_Finder.num_partitions)
         grouped_by_node = grouped_by_node.sortByKey(numPartitions=Path_Finder.num_partitions)
-        grouped_by_node_list = grouped_by_node.map(lambda x: (x[0], list(x[1])), preserves_partitioning=True)
+        grouped_by_node_list = grouped_by_node.map(lambda x: (x[0], list(x[1])), preservesPartitioning=True)
 
-        updated_touched_nodes = grouped_by_node_list.map(lambda x: (x[0], (cur_iteration, x[1])), preserves_partitioning=True)
+        updated_touched_nodes = grouped_by_node_list.map(lambda x: (x[0], (cur_iteration, x[1])), preservesPartitioning=True)
 
         updated_distance_rdd = old_distance_rdd.union(updated_touched_nodes)
         updated_distance_rdd = updated_distance_rdd.sortByKey(numPartitions=Path_Finder.num_partitions)
