@@ -15,3 +15,6 @@ surprisingly short distance of 3 between the two. One such path is
  u'South_Park:_Bigger,_Longer_&_Uncut',
  u'Satan']
 
+which makes intuitive sense to me.
+
+##### Connected Components #####
