@@ -86,6 +86,8 @@ class BFS(object):
 
 class Path_Finder(object):
 
+    num_partitions = 50
+
     def __init__(self, sc, network_rdd, start_node, end_node):
 
         self.sc = sc
@@ -144,13 +146,12 @@ class Path_Finder(object):
     @staticmethod
     def do_iteration_static(sc, network_rdd, collected_distance_rdd, cur_iteration):
         #TODO: Figure out where to use accumulators...
-        # The broadcast variable is too big here. Don't use it.
-        already_touched = [z[0] for z in collected_distance_rdd]
-        already_touched_set = set(already_touched)
-        broadcasted_touched = sc.broadcast(already_touched_set)
-        network_to_touch = network_rdd.filter(lambda x: x[0] in broadcasted_touched.value)
+        # The broadcast variable is too big here. Don't use it. It was ok for marvel.
 
         old_distance_rdd = sc.parallelize(collected_distance_rdd)
+        old_distance_rdd = old_distance_rdd.sortByKey(numPartitions=Path_Finder.num_partitions)
+        network_to_touch_unfiltered = network_rdd.join(old_distance_rdd, numPartitions=Path_Finder.num_partitions)
+        network_to_touch = network_to_touch_unfiltered.map(lambda x: (x[0], x[1][0]), preserves_partitioning=True)
 
         # Now do the iteration!
         def get_nodes_to_touch_and_parents(x):
@@ -158,15 +159,17 @@ class Path_Finder(object):
             nodes_to_touch = x[1]
             return [(z, parent) for z in nodes_to_touch]
 
-        nodes_to_touch_and_parents = network_to_touch.flatMap(get_nodes_to_touch_and_parents)
+        nodes_to_touch_and_parents = network_to_touch.flatMap(get_nodes_to_touch_and_parents, preserves_partitioning=True)
 
         # We now groupby individual
-        grouped_by_node = nodes_to_touch_and_parents.groupByKey()
-        grouped_by_node_list = grouped_by_node.map(lambda x: (x[0], list(x[1])))
+        grouped_by_node = nodes_to_touch_and_parents.groupByKey(numPartitions=Path_Finder.num_partitions)
+        grouped_by_node = grouped_by_node.sortByKey(numPartitions=Path_Finder.num_partitions)
+        grouped_by_node_list = grouped_by_node.map(lambda x: (x[0], list(x[1])), preserves_partitioning=True)
 
-        updated_touched_nodes = grouped_by_node_list.map(lambda x: (x[0], (cur_iteration, x[1])))
+        updated_touched_nodes = grouped_by_node_list.map(lambda x: (x[0], (cur_iteration, x[1])), preserves_partitioning=True)
 
         updated_distance_rdd = old_distance_rdd.union(updated_touched_nodes)
+        updated_distance_rdd = updated_distance_rdd.sortByKey(numPartitions=Path_Finder.num_partitions)
 
         def get_smaller_value(a, b):
             '''There are all sorts of subtleties here...but since we don't care about the exact
@@ -176,10 +179,8 @@ class Path_Finder(object):
             else:
                 return b
 
-        corrected_distance_rdd = updated_distance_rdd.reduceByKey(get_smaller_value)
+        corrected_distance_rdd = updated_distance_rdd.reduceByKey(get_smaller_value, numPartitions=Path_Finder.num_partitions)
 
         collected_distance_rdd = corrected_distance_rdd.collect()
-
-        broadcasted_touched.unpersist() # If you don't put this at the end, terrible things happen
 
         return collected_distance_rdd
