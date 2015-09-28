@@ -1,1 +1,17 @@
-# Your discussion here
+###### Shortest path #######
+
+The shortest path between 'Harvard_University' and 'Kevin_Bacon' is of length 3.
+One example is
+
+[u'Harvard_University', u'Tommy_Lee_Jones', u'JFK_(film)', u'Kevin_Bacon']
+
+There are a ton of choices to use for the path, of course.
+
+For fun, I found the shortest path between 'Bob_Saget' and 'Satan'. There is a
+surprisingly short distance of 3 between the two. One such path is
+
+[u'Bob_Saget',
+ u'Musical_theatre',
+ u'South_Park:_Bigger,_Longer_&_Uncut',
+ u'Satan']
+
