@@ -92,7 +92,7 @@ class Path_Finder(object):
 
         self.sc = sc
         # User will define the cache if they want...otherwise computer will melt
-        self.network_rdd = network_rdd.cache()
+        self.network_rdd = network_rdd
         self.start_node = start_node
         self.end_node = end_node
 
@@ -123,6 +123,7 @@ class Path_Finder(object):
         go = True
         are_connected = None
         while go:
+            print self.cur_iteration
             before_update = dict(self.collected_distance_rdd)
             self.do_iteration()
             after_update = dict(self.collected_distance_rdd)
