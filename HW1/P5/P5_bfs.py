@@ -4,13 +4,13 @@ def bfs_parents(graph, start):
     data = context.emptyRDD()
     toVisit = graph.filter(lambda KV: KV[0] == start).map(lambda KV: (KV[0], (KV[1], '')))
     toVisitList = {}
-    while toVisit.count() != 0:
+    while not toVisit.isEmpty():
         distance = iteration.value
         new_data = toVisit.map(lambda KV: (KV[0], (distance, KV[1][1])))
         data = data.union(new_data).reduceByKey(lambda x, y: min(x, y))
         pairs = toVisit.map(lambda KV: [(x, KV[0]) for x in KV[1][0]])
         neighbors = pairs.flatMap(lambda KV: KV)
-        toVisit = graph.join(neighbors).subtractByKey(data)
+        toVisit = graph.join(neighbors).subtractByKey(data, 8)
         iteration.add(1)
     return data
     

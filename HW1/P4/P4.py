@@ -14,10 +14,11 @@ def cleanup(line):
     splitted = line.split('"')
     return (splitted[3], splitted[1])
 
-issue_character = source.map(cleanup)
+issue_character = source.map(cleanup).partitionBy(8)
 character_characters_mutable = issue_character.join(issue_character).map(lambda KV: (KV[1][0], {KV[1][1]} - {KV[1][0]})).reduceByKey(lambda x, y: x.union(y))
 #Need hashability later
 character_characters = character_characters_mutable.mapValues(lambda v: frozenset(v))
+character_characters.cache()
 #BFS
 origins = ['CAPTAIN AMERICA', 'MISS THING/MARY', 'ORWELL']
 results = {}

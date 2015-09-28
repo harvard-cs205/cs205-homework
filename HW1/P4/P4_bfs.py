@@ -8,7 +8,7 @@ def bfs(graph, start):
     distances = context.emptyRDD()
     #toVisit is the set of neighbor nodes that have not yet been visited
     toVisit = graph.filter(lambda KV: KV[0] == start)
-    while toVisit.count() != 0:
+    while not toVisit.isEmpty():
         toVisit.foreach(lambda _: touched.add(1))
         #Accumulator value must be retrieved outside of a task
         distance = iteration.value
@@ -17,6 +17,6 @@ def bfs(graph, start):
         distances = distances.union(new_distances).reduceByKey(lambda x, y: min(x, y))
         #Update record of nodes to visit
         neighbors = toVisit.flatMap(lambda KV: KV[1]).collect()
-        toVisit = graph.filter(lambda KV: KV[0] in neighbors).subtractByKey(distances)
+        toVisit = graph.filter(lambda KV: KV[0] in neighbors).subtractByKey(distances, 8)
         iteration.add(1)
     return touched.value
