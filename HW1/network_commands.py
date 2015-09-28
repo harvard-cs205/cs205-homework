@@ -92,7 +92,7 @@ class Path_Finder(object):
 
         self.sc = sc
         # User will define the cache if they want...otherwise computer will melt
-        self.network_rdd = network_rdd
+        self.network_rdd = network_rdd #Sort by key & use num_partitions beforehand in network_rdd & cache to improve performance
         self.start_node = start_node
         self.end_node = end_node
 
@@ -149,10 +149,12 @@ class Path_Finder(object):
         #TODO: Figure out where to use accumulators...
         # The broadcast variable is too big here. Don't use it. It was ok for marvel.
 
-        old_distance_rdd = sc.parallelize(collected_distance_rdd)
-        old_distance_rdd = old_distance_rdd.sortByKey(numPartitions=Path_Finder.num_partitions)
-        network_to_touch_unfiltered = network_rdd.join(old_distance_rdd, numPartitions=Path_Finder.num_partitions)
-        network_to_touch = network_to_touch_unfiltered.map(lambda x: (x[0], x[1][0]), preservesPartitioning=True)
+        already_touched = [z[0] for z in collected_distance_rdd]
+        already_touched_set = set(already_touched)
+        broadcasted_touched = sc.broadcast(already_touched_set)
+        network_to_touch = network_rdd.filter(lambda x: x[0] in broadcasted_touched.value)
+
+        old_distance_rdd = sc.parallelize(collected_distance_rdd, Path_Finder.num_partitions)
 
         # Now do the iteration!
         def get_nodes_to_touch_and_parents(x):
@@ -164,13 +166,10 @@ class Path_Finder(object):
 
         # We now groupby individual
         grouped_by_node = nodes_to_touch_and_parents.groupByKey(numPartitions=Path_Finder.num_partitions)
-        grouped_by_node = grouped_by_node.sortByKey(numPartitions=Path_Finder.num_partitions)
         grouped_by_node_list = grouped_by_node.map(lambda x: (x[0], list(x[1])), preservesPartitioning=True)
-
         updated_touched_nodes = grouped_by_node_list.map(lambda x: (x[0], (cur_iteration, x[1])), preservesPartitioning=True)
 
         updated_distance_rdd = old_distance_rdd.union(updated_touched_nodes)
-        updated_distance_rdd = updated_distance_rdd.sortByKey(numPartitions=Path_Finder.num_partitions)
 
         def get_smaller_value(a, b):
             '''There are all sorts of subtleties here...but since we don't care about the exact
