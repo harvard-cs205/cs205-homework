@@ -90,7 +90,7 @@ class Path_Finder(object):
 
         self.sc = sc
         # User will define the cache if they want...otherwise computer will melt
-        self.network_rdd = network_rdd
+        self.network_rdd = network_rdd.cache()
         self.start_node = start_node
         self.end_node = end_node
 
@@ -104,14 +104,14 @@ class Path_Finder(object):
 
 
     def initialize_distances(self):
-        self.collected_distance_rdd = BFS.initialize_distances_static(self.sc,
+        self.collected_distance_rdd = Path_Finder.initialize_distances_static(self.sc,
                                                                       self.start_node,
                                                                       self.network_rdd,
                                                                       self.cur_iteration)
         self.cur_iteration += 1
 
     def do_iteration(self):
-        self.collected_distance_rdd = BFS.do_iteration_static(self.sc,
+        self.collected_distance_rdd = Path_Finder.do_iteration_static(self.sc,
                                                               self.network_rdd,
                                                               self.collected_distance_rdd,
                                                               self.cur_iteration)
