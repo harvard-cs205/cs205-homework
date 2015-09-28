@@ -183,4 +183,6 @@ class Path_Finder(object):
 
         collected_distance_rdd = corrected_distance_rdd.collect()
 
+        broadcasted_touched.unpersist()
+
         return collected_distance_rdd
