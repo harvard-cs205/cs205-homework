@@ -18,8 +18,9 @@ xv, yv = np.meshgrid(x, y)
 # compute coordinate list
 coords = zip(list(xv.ravel()), list(yv.ravel()))
 
-# create rdd 
-rdd = sc.parallelize(coords)
+# create rdd with 100 partitions
+num_partitions = 100
+rdd = sc.parallelize(coords, num_partitions)
 
 # now map using mandelbrot
 mb = lambda c: mandelbrot(c[0], c[1])
