@@ -42,7 +42,7 @@ class BFS(object):
     #### STATIC METHODS TO INTERACT WITH SPARK ####
     @staticmethod
     def initialize_distances_static(sc, start_node, network_rdd, cur_iteration):
-        return sc.parallelize([(start_node, cur_iteration)])
+        return sc.parallelize([(start_node, cur_iteration)], BFS.num_partitions)
 
     @staticmethod
     def get_smaller_value(a, b):
@@ -57,7 +57,7 @@ class BFS(object):
         #TODO: Figure out where to use accumulators...
         # Pull the needed info out of the network
 
-        joined_network = network_rdd.join(distance_rdd, numPartitions=BFS.num_partitions)
+        joined_network = network_rdd.join(distance_rdd, numPartitions=BFS.num_partitions).coalesce(BFS.num_partitions)
         network_to_touch = joined_network.map(lambda x: (x[0], x[1][0]), preservesPartitioning=True)
 
         # Now do the iteration!
