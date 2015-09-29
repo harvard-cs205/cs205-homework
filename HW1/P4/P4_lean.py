@@ -11,6 +11,7 @@ sc = pyspark.SparkContext(appName="spark1")
 
 partition_size = 100
 default_distance = 99
+sum_distance = sc.accumulator(0)
 
 
 def create_graph(fileName):
@@ -43,45 +44,14 @@ def create_graph(fileName):
     return nodes, edges
 
 
-def p_reduce_min(part):
-    for k, g in groupby(part, key=itemgetter(0)):
-        lis = [y for x in g for y in x[1:]]
-        yield (k, min(lis))
-
-
-def p_get_keys(part):
-    for kv in part:
-        yield kv[0]
-
-
-def p_get_partition_keys_with_index(index, part):
-    for kv in part:
-        yield (index, kv[0])
-
-
-def p_get_unique_keys(part):
-    keys = []
-    for kv in part:
-        keys.append(kv[0])
-    keys = list(set(keys))
-    return keys
-
-
-def p_get_unique_keys_with_distance(part, d):
-    kd_pairs = []
-    for kv in part:
-        kd_pairs.append((kv[0], d))
-    kd_pairs = list(set(kd_pairs))
-    return kd_pairs
-
-
-def p_distinct(part):
-    return list(set(part))
-
-
 def l_add_distance(list, d):
     for kv in list:
         yield (kv, d)
+
+
+def update_accumulator(d):
+    global sum_distance
+    sum_distance += d
 
 
 def bfs_search(nodes, edges, hero, diameter):
@@ -93,49 +63,32 @@ def bfs_search(nodes, edges, hero, diameter):
     # but will grow to contain more nodes at each iteration
     root = nodes.filter(lambda kv: kv[0] == hero)
 
-    # iteratively find distances for other nodes
-    for i in range(1, diameter + 1):
+    i = 1
+    previous_sum_distance = 0
+    while (True):
+        begin_sum_distance = sum_distance.value
+
         # get neighbors and make sure they are copartitioned with edges & nodes
         # since each partition may contain duplicate keys, we use mapPartitions
         # to eliminate these without causing a shuffle.
-
-        # neighbors = edges.join(
-        #   root).flatMap(lambda kv: l_add_distance(kv[1][0], i)).partitionBy(
-        #     partition_size).mapPartitions(
-        #     lambda part: p_distinct(part))
         neighbors = edges.join(root).flatMap(
             lambda kv: l_add_distance(kv[1][0], i)).distinct().partitionBy(
               partition_size)
 
         nodes = neighbors.union(nodes).reduceByKey(min)
-        # nodes = neighbors.union(nodes).mapPartitions(
-        #     lambda part: p_reduce_min(part))
+
+        # check for convergence using accumulator
+        nodes.foreach(lambda kv: update_accumulator(kv[1]))
+
+        if sum_distance.value - begin_sum_distance == previous_sum_distance:
+            print 'Converged after ' + repr(i) + ' iterations'
+            break
 
         root = neighbors
+        i += 1
+        previous_sum_distance = sum_distance.value - begin_sum_distance
 
     return nodes, edges
-
-
-# def bfs_search_iteration(i, nodes, edges, root):
-#     """
-#     Perform breadth-first search at iteration i.
-#     :param i: The iteration.
-#     :param nodes: list of nodes (hero, distance).
-#     :param edges: list of edges (hero_i, hero_j).
-#     :param root: list of nodes (hero_i) whose neighbors will be updated.
-#     """
-#     print 'i = ' + repr(i)
-
-#     neighbors = root.map(lambda n: (n, 0)).join(edges).flatMap(
-#         lambda kv: kv[1][1]).distinct()
-
-#     updated_nodes = neighbors.map(lambda n: (n, i)).join(nodes).map(
-#         lambda kv: (kv[0], kv[1][0]) if kv[1][0] != -1 else (
-#             kv[0], kv[1][1]))
-
-#     nodes = updated_nodes.union(nodes).reduceByKey(lambda d1, d2: max(d1, d2))
-
-#     return nodes, edges, neighbors
 
 
 def main():
