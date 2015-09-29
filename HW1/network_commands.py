@@ -206,8 +206,6 @@ class Connected_Components(object):
         # Run this at the end!
         self.initialize_groups()
 
-
-
     def initialize_groups(self):
         self.connected_collected_rdd = Connected_Components.initialize_groups_static(self.sc, self.network_rdd)
         self.cur_iteration += 1
@@ -216,25 +214,25 @@ class Connected_Components(object):
         self.connected_collected_rdd = Connected_Components.do_iteration_static(self.sc, self.connected_collected_rdd)
         self.cur_iteration += 1
 
+    def get_num_unique_groups(self):
+        list_of_indices = map(lambda x: x[1][1], self.connected_collected_rdd)
+        return len(set(list_of_indices))
+
     def run_until_converged(self):
         go = True
-        are_connected = None
+        groups_before_update = None
+        groups_after_update = None
         while go:
-            print self.cur_iteration
-            before_update = dict(self.collected_distance_rdd)
+            print 'Beginning of Iteration', self.cur_iteration
+            groups_before_update = self.get_num_unique_groups()
+            print 'Before update:' , groups_before_update, 'groups'
             self.do_iteration()
-            after_update = dict(self.collected_distance_rdd)
-            if self.end_node in after_update:
+            groups_after_update = self.get_num_unique_groups()
+            print 'After update:' , groups_after_update , 'groups'
+            if groups_before_update == groups_after_update:
                 go = False
-                are_connected = True
-            elif before_update == after_update:
-                go = False
-                are_connected = False
-        if are_connected:
-            print 'Nodes are connected!'
-        else:
-            print 'Nodes do not seem to be connected... :('
         print 'Finished at end of iteration' , self.cur_iteration - 1 , '!'
+        print 'There are ', groups_after_update, ' groups in the network.'
 
     #### STATIC METHODS TO INTERACT WITH SPARK ####
     @staticmethod
