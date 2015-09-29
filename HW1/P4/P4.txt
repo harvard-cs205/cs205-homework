@@ -1,1 +1,9 @@
-# Your discussion here
+CAPTAIN AMERICA has 6408 connected nodes.
+36 of the characters are not connected. 
+
+MISS THING/MARY has 7 connected nodes.
+6437 of the characters are not connected. 
+
+ORWELL has 9 connected nodes.
+6435 of the characters are not connected. 
+

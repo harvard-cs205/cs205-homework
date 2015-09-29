@@ -34,7 +34,6 @@ def draw_image(rdd):
 
 
 if __name__ == "__main__":
-  #  sc = SparkContext(appName="Mandelbrot")
     Nmax=2000
     lst=np.arange(1,Nmax+1).reshape((10,200)).flatten('F').tolist()
     #lst=range(1,Nmax+1)
