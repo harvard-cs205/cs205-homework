@@ -1,5 +1,6 @@
 import pyspark
 import re
+import random
 
 def splitLine(line):
     return line.split()
@@ -29,8 +30,13 @@ def reduce_tuples(x, y):
     update_hash(word_hash, y)
     return word_hash.items()
 
-def find_max(list):
-    return max(list, key = lambda x: x[1])[0]
+def find_next(words):
+    choice = random.randint(1, sum(map(lambda x: x[1], words)))
+    count = 0
+    for word in words:
+        count += word[1]
+        if count >= choice:
+            return word[0]
 
 def generate_phrase(num_words, rdd):
     phrase = []
@@ -40,7 +46,7 @@ def generate_phrase(num_words, rdd):
     while len(phrase) < num_words:
         lookup = rdd.map(lambda x: x).lookup((phrase[-2], phrase[-1]))
         if len(lookup) > 0:
-            phrase.append(find_max(lookup[0]))
+            phrase.append(find_next(lookup[0]))
         else:
             return " ".join(phrase)
     return " ".join(phrase)
