@@ -82,7 +82,7 @@ class Path_Finder(object):
 
         # Other helper variables
         self.cur_iteration = 0
-        self.collected_distance_rdd = None
+        self.distance_rdd = None
 
         # Run this at the end!
         self.initialize_distances()
@@ -90,16 +90,16 @@ class Path_Finder(object):
 
 
     def initialize_distances(self):
-        self.collected_distance_rdd = Path_Finder.initialize_distances_static(self.sc,
+        self.distance_rdd = Path_Finder.initialize_distances_static(self.sc,
                                                                       self.start_node,
                                                                       self.network_rdd,
                                                                       self.cur_iteration)
         self.cur_iteration += 1
 
     def do_iteration(self):
-        self.collected_distance_rdd = Path_Finder.do_iteration_static(self.sc,
+        self.distance_rdd = Path_Finder.do_iteration_static(self.sc,
                                                               self.network_rdd,
-                                                              self.collected_distance_rdd,
+                                                              self.distance_rdd,
                                                               self.cur_iteration)
         self.cur_iteration += 1
 
@@ -108,9 +108,9 @@ class Path_Finder(object):
         are_connected = None
         while go:
             print self.cur_iteration
-            before_update = dict(self.collected_distance_rdd)
+            before_update = dict(self.distance_rdd)
             self.do_iteration()
-            after_update = dict(self.collected_distance_rdd)
+            after_update = dict(self.distance_rdd)
             if self.end_node in after_update:
                 go = False
                 are_connected = True
@@ -126,7 +126,7 @@ class Path_Finder(object):
     #### STATIC METHODS TO INTERACT WITH SPARK ####
     @staticmethod
     def initialize_distances_static(sc, start_node, network_rdd, cur_iteration):
-        return [(start_node, (cur_iteration, []))]
+        return sc.parallelize([(start_node, (cur_iteration, []))], Path_Finder.num_partitions)
 
     @staticmethod
     def do_iteration_static(sc, network_rdd, collected_distance_rdd, cur_iteration):

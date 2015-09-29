@@ -52,7 +52,7 @@ finder.run_until_converged()
 
 # Look at the path and print a couple of paths
 
-path = finder.collected_distance_rdd
+path = finder.distance_rdd
 path_rdd = sc.parallelize(path, num_partitions_to_use)
 
 def get_path_forwards():
