@@ -57,19 +57,19 @@ from HW1.network_commands import BFS
 #### Captain America ####
 searcher = BFS(sc, 'CAPTAIN AMERICA', network_rdd)
 searcher.run_until_converged() # I could run 10 iterations, but the solution converges faster than that
-result = searcher.collected_distance_rdd
+result = searcher.distance_rdd
 america_connections= dict(result)
 
 #### Miss Thing/Mary #####
 searcher = BFS(sc, 'MISS THING/MARY', network_rdd)
 searcher.run_until_converged()
-result = searcher.collected_distance_rdd
+result = searcher.distance_rdd
 mary_connections= dict(result)
 
 #### Orwell ####
 searcher = BFS(sc, 'ORWELL', network_rdd)
 searcher.run_until_converged()
-result = searcher.collected_distance_rdd
+result = searcher.distance_rdd
 orwell_connections= dict(result)
 
 #Print everything at the end
