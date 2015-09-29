@@ -258,35 +258,7 @@ class Connected_Components(object):
 
         parent_indexes = connected_rdd.flatMap(get_parent_index, preservesPartitioning=True)
         parent_with_smallest_index = parent_indexes.reduceByKey(get_smaller_index, numPartitions=Connected_Components.num_partitions)
-        # We now have to join the connected_rdd
-
-        # Now do the iteration!
-        def get_nodes_to_touch_and_parents(x):
-            parent = x[0]
-            nodes_to_touch = x[1]
-            return [(z, parent) for z in nodes_to_touch]
-
-        nodes_to_touch_and_parents = network_to_touch.flatMap(get_nodes_to_touch_and_parents, preservesPartitioning=True)
-
-        # We now groupby individual
-        grouped_by_node = nodes_to_touch_and_parents.groupByKey(numPartitions=Connected_Components.num_partitions)
-        grouped_by_node_list = grouped_by_node.map(lambda x: (x[0], list(x[1])), preservesPartitioning=True)
-        updated_touched_nodes = grouped_by_node_list.map(lambda x: (x[0], (cur_iteration, x[1])), preservesPartitioning=True)
-
-        updated_distance_rdd = old_distance_rdd.union(updated_touched_nodes)
-
-        def get_smaller_value(a, b):
-            '''There are all sorts of subtleties here...but since we don't care about the exact
-            path it doesn't matter. Take the parents that are from an earlier iteration.'''
-            if a[0] < b[0]:
-                return a
-            else:
-                return b
-
-        corrected_distance_rdd = updated_distance_rdd.reduceByKey(get_smaller_value, numPartitions=Connected_Components.num_partitions)
-
-        collected_distance_rdd = corrected_distance_rdd.collect()
-
-        broadcasted_touched.unpersist()
-
-        return collected_distance_rdd
+        # We now have to join to the connected_rdd...not sure if a join or a broadcast variable is faster here.
+        new_connected_rdd = connected_rdd.join(parent_with_smallest_index, numPartitions=Connected_Components.num_partitions)
+        connected_rdd = new_connected_rdd.map(lambda x: (x[0], (x[1][0][0], x[1][1])))
+        return connected_rdd.collect()
