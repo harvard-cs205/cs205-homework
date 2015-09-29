@@ -2,9 +2,8 @@
 
 
 class BFS(object):
-    '''Life is complicated by spark's lazy evaluation. We have to collect at the end of
-    every iteration, or progress will be lost! Also, dealing with classes in spark is awful
-    due to serialization. So we have to do some serious shennanigans...TERRIBLE'''
+    '''I figured out how to avoid collecting every iteration...thankfully.'''
+
     num_partitions = 50
 
     def __init__(self, sc, start_node, network_rdd):
@@ -32,9 +31,9 @@ class BFS(object):
     def run_until_converged(self):
         go = True
         while go:
-            before_update = dict(self.distance_rdd)
+            before_update = self.distance_rdd.count()
             self.do_iteration()
-            after_update = dict(self.distance_rdd)
+            after_update = self.distance_rdd.count()
             if before_update == after_update:
                 go = False
         print 'Finished at end of iteration' , self.cur_iteration - 1 , '!'
