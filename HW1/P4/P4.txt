@@ -1,1 +1,14 @@
 # Your discussion here
+For ”CAPTAIN AMERICA” I got distance of 3.
+For ”MISS THING/MARY” I got distance of 1.
+For ”ORWELL I got distance of 1.
+
+Distance of 3 means the furthest node from Captain America was 3 nodes away.
+
+Q1.What does this diameter imply about the maximum number of steps in which your
+search must be executed?
+A1.Given diameter d, then the maximum number of steps is d. For example, if we had a linear tree of 11 nodes, then the diameter is 10.
+
+Q2.What does it mean if a character does not have a defined distance during the
+search?
+A2.For my program, all nodes are first assigned a distance of -1, so each character WILL have a defined distance. The starting node is assigned distance 0. So if the starting node has no neighbors, then bfs function will return 0. Else it will return the distance of the furthest child from it. 

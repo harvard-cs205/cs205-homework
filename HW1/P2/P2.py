@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import pdb
 import random
+from pyspark import SparkContext
 
 
 def mandelbrot(x, y):
