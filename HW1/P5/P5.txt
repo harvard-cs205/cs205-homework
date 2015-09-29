@@ -19,6 +19,8 @@ which makes intuitive sense to me.
 
 ##### Connected Components #####
 
+### Directed Graph ###
+
 When we have a directed graph, my algorithm finds that we have 52
 connected components. It converges in a logarithmic manner, specifically:
 
@@ -54,3 +56,5 @@ Before update: 52 groups
 After update: 52 groups
 Finished at end of iteration 10 !
 There are  52  groups in the network.
+
+See the plot "directed_graph_components_vs_iteration.png" to see the logarithmic convergence of my algorithm.
