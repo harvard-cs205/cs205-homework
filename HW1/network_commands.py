@@ -213,10 +213,7 @@ class Connected_Components(object):
         self.cur_iteration += 1
 
     def do_iteration(self):
-        self.collected_distance_rdd = Connected_Components.do_iteration_static(self.sc,
-                                                              self.network_rdd,
-                                                              self.collected_distance_rdd,
-                                                              self.cur_iteration)
+        self.connected_collected_rdd = Connected_Components.do_iteration_static(self.sc, self.connected_collected_rdd)
         self.cur_iteration += 1
 
     def run_until_converged(self):
@@ -242,20 +239,26 @@ class Connected_Components(object):
     #### STATIC METHODS TO INTERACT WITH SPARK ####
     @staticmethod
     def initialize_groups_static(sc, network_rdd):
-        return network_rdd.zipWithUniqueId().collect()
+        return network_rdd.zipWithIndex().map(lambda x: (x[0][0], (x[0][1], x[1])), preservesPartitioning=True).collect()
 
 
     @staticmethod
-    def do_iteration_static(sc, network_rdd, collected_distance_rdd, cur_iteration):
-        #TODO: Figure out where to use accumulators...
-        # The broadcast variable is too big here. Don't use it. It was ok for marvel.
+    def do_iteration_static(sc, connected_collected_rdd):
+        connected_rdd = sc.parallelize(connected_collected_rdd, Connected_Components.num_partitions)
 
-        already_touched = [z[0] for z in collected_distance_rdd]
-        already_touched_set = set(already_touched)
-        broadcasted_touched = sc.broadcast(already_touched_set)
-        network_to_touch = network_rdd.filter(lambda x: x[0] in broadcasted_touched.value)
+        def get_parent_index(x):
+            parents = x[1][0]
+            index = x[1][1]
+            return [(z, index) for z in parents]
 
-        old_distance_rdd = sc.parallelize(collected_distance_rdd, Connected_Components.num_partitions)
+        def get_smaller_index(a, b):
+            if a < b:
+                return a
+            return b
+
+        parent_indexes = connected_rdd.flatMap(get_parent_index, preservesPartitioning=True)
+        parent_with_smallest_index = parent_indexes.reduceByKey(get_smaller_index, numPartitions=Connected_Components.num_partitions)
+        # We now have to join the connected_rdd
 
         # Now do the iteration!
         def get_nodes_to_touch_and_parents(x):
