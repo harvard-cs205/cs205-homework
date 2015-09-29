@@ -1,1 +1,2 @@
 # Your discussion here
+The histograms show a significant improvement of work balance among partitions. The computation completed faster because of the work balance, but we also need extra efforts to partition the tasks evenly. The trade off is this overhead computation for different partition strategy for faster computation time.
