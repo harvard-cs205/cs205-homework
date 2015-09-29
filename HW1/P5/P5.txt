@@ -58,3 +58,5 @@ Finished at end of iteration 10 !
 There are  52  groups in the network.
 
 See the plot "directed_graph_components_vs_iteration.png" to see the logarithmic convergence of my algorithm.
+
+### Undirected Graph ###
