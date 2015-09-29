@@ -30,3 +30,5 @@ def draw_image(rdd):
     plt.imshow(im, cmap=cm.gray)
     plt.savefig('mandelbrot.png')
     plt.show()
+
+    return im
