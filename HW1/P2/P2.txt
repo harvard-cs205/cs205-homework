@@ -1,1 +1,8 @@
 # Your discussion here
+In this problem, since locations close to one another tend to have similar
+final iteration counts.Therefore, with the default partitions, some workers
+have much high compute loads if they have to be around the high iteration 
+region. To optimize, I partitioned the image RDD by a hash function that 
+randomly assign to 100 partitions. This way, the total compute is
+distributed evenly among the partitions and we're likely to see a histogram
+that shows a normal distribution due to the Central Limit Theorem.
