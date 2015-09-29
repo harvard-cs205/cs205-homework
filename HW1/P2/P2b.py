@@ -23,7 +23,6 @@ results = coordinates.map(lambda (x,y) : ((x,y), mandelbrot((x/500.0) - 2., (y/5
 draw_image(results)
 
 computeData = sum_values_for_partitions(results)
-print computeData.take(20)
 
 data = computeData.collect()
 effort = np.array([d for d in data])
