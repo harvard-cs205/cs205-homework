@@ -57,17 +57,21 @@ class BFS(object):
         #TODO: Figure out where to use accumulators...
         # Pull the needed info out of the network
 
-        joined_network = network_rdd.join(distance_rdd, numPartitions=BFS.num_partitions)
-        network_to_touch = joined_network.map(lambda x: (x[0], x[1][0]), preservesPartitioning=True)
+        # Filtering step...need to pull out members of network that I need
+        joined_network = distance_rdd.join(network_rdd, numPartitions=BFS.num_partitions)
+        network_to_touch = joined_network.map(lambda x: (x[0], x[1][1]), preservesPartitioning=True)
 
-        # Now do the iteration!
+        # Check which new individuals we need to update...not sure how to use accumulators.
         nodes_to_touch = network_to_touch.flatMap(lambda x: x[1], preservesPartitioning=True)
         unique_nodes_to_touch = nodes_to_touch.distinct(BFS.num_partitions)
-        updated_touched_nodes = unique_nodes_to_touch.map(lambda x: (x, cur_iteration), preservesPartitioning=True)
-        updated_distance_rdd = distance_rdd.union(updated_touched_nodes)
-        corrected_distance_rdd = updated_distance_rdd.reduceByKey(BFS.get_smaller_value, BFS.num_partitions)
 
-        return corrected_distance_rdd
+        # Get new individuals
+        untouched_nodes = unique_nodes_to_touch.subtractByKey(distance_rdd, BFS.num_partitions)
+
+        updated_touched_nodes = untouched_nodes.map(lambda x: (x, cur_iteration), preservesPartitioning=True)
+        updated_distance_rdd = distance_rdd.union(updated_touched_nodes).coalesce(BFS.num_partitions)
+
+        return updated_distance_rdd
 
 class Path_Finder(object):
 
