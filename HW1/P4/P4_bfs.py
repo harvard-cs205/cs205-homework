@@ -1,4 +1,6 @@
-def BFS(graph, source_node, max_iters):
+from functools import partial
+
+def BFS(graph, source_node, sc):
     """ Runs a parallel BFS on graph.
     Graph is assumed to in the adjacency list representation of (node, (distance, [neighbors])).
     Distances are initilized to infinite in this function for assurance.
@@ -7,15 +9,29 @@ def BFS(graph, source_node, max_iters):
     # First initialize all of the distances
     dist_graph = graph.map(lambda (x, y): (x, (0, y)) if (x == source_node) else (x, (10**8, y)))
     
+    # Tell us when to stop... definitely don't want to stop before we begin
+    keep_searching = True
+
+    # Zero off our accumulator
+    accum = sc.accumulator(0)
+
     # Now map over the group, exploring one level each time
-    for ii in range(max_iters):
+    while (keep_searching):
 
         # Explore one level from each node
         dist_graph = dist_graph.flatMap(explore_level_from_node)
 
-
         # Combine results to get shortest distances and reconstruct adjacency lists
-        dist_graph = dist_graph.reduceByKey(find_actual_distances)
+        dist_graph = dist_graph.reduceByKey(partial(find_actual_distances, accum=accum))
+
+        # Now find out how many we newly discovered
+        # Note that, in this formalism, if we newly discover a node
+        # we have ALREADY found the best way to get there!
+        if (accum.value == 0):
+            keep_searching = False
+        else:
+            # Start the counter over
+            accum = sc.accumulator(0)
 
     return dist_graph
 
@@ -37,17 +53,22 @@ def explore_level_from_node(node):
     results = []
 
     # Iterate over all other nodes, update their distances, and return the parent.
+    # Only do this if we have been to the node already - i.e., its current distance is not infinity
+    # This is my equivalent of the rdd.filter() optimizations
     if (d < 10**8):
         for other_node in adj_list:
             # Append our tentative new distance
             results.append((other_node, (d+1, [curr_node])))
+    #else:
+        # Otherwise we have an unexplored node...
+    #    accum.add(1)
 
     # And lets not lose any nodes now...
     results.append(node)
 
     return tuple(results)
 
-def find_actual_distances(d1_par1, d2_par2):
+def find_actual_distances(d1_par1, d2_par2, accum):
     """ Reduce function for a graph RDD of the form (node, (distance_to_source, [parents])).
     We assume the graph RDD just came out of explore_level_from_node, and thus has many duplicate
     nodes and distances - most of which are not optimal. We reduce by taking only the shortest distance
@@ -68,6 +89,10 @@ def find_actual_distances(d1_par1, d2_par2):
         d = d1 
     else:
         d = d2
+
+    # Are we newly discovering a node?
+    if (d1 == 10**8 or d2 == 10**8):
+        accum.add(1)
 
     # Reconstruct the adjacency list by combining parents
     # Remove any duplicates that may appear

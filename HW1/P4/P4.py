@@ -62,19 +62,20 @@ if __name__ == "__main__":
     marvel_graph.cache()
 
     # Now run the first BFS
-    ca_graph = BFS(marvel_graph,'CAPTAIN AMERICA', 10)
+    # We wil use an accumulator to keep track of how many nodes have been discovered each round
+    ca_graph = BFS(marvel_graph,'CAPTAIN AMERICA', sc)
 
     # Filter out all nodes who never got their distances updated
     num_touched_ca = ca_graph.filter(lambda (x, y): True if y[0] < 10**8 else False).count()
 
     # Now run the second BFS
-    mtm_graph = BFS(marvel_graph,'MISS THING/MARY', 10)
+    mtm_graph = BFS(marvel_graph,'MISS THING/MARY', sc)
 
     # Filter out all nodes who never got their distances updated
     num_touched_mtm = mtm_graph.filter(lambda (x, y): True if y[0] < 10**8 else False).count()
 
     # Now run the last BFS
-    o_graph = BFS(marvel_graph,'ORWELL', 10)
+    o_graph = BFS(marvel_graph,'ORWELL', sc)
 
     # Filter out all graphs who never got their distances updated
     num_touched_o = o_graph.filter(lambda (x, y): True if y[0] < 10**8 else False).count()
