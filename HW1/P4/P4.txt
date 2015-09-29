@@ -1,6 +1,14 @@
 # Your discussion here
-"CAPTAIN AMERICA": 6408
-"MISS THING/MARY": 7
-"ORWELL": 9
+
+My graph is available in two versions: edges_rdd and graph.
+edges_rdd contains all the connections between characters as tuples, without duplicates and links to self.
+graph is a grouped version of this, containing a character as key and a list of characters as connections.
+
+A diameter of 10 imlplies that all nodes can be reached within 10 steps from any node, since the longest 'shortest path'
+is 10 steps (given all nodes are conected in one graph).
+
+"CAPTAIN AMERICA": 6408 nodes visited
+"MISS THING/MARY": 7 nodes visited
+"ORWELL": 9 nodes visited
 
 This means that the network consists of diconnected sub-networks.
