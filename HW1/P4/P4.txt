@@ -5,13 +5,13 @@ My graph is available in two versions: edges_rdd and graph.
 - graph is a grouped version of this, containing a character as key and a list of characters as connections.
 
 I have written three BFS methods, each with a different approach. My preffered BFS method is called
-'distance_to_all_nodes_spark', and it is the fastest of the three. Feel free to play around with the others.
+*distance_to_all_nodes_edge(...)*. Feel free to play around with the others.
 
 The diameter of 10 imlplies that all nodes can be reached within 10 steps from any node, since the longest 'shortest path'
 is 10 steps (given all nodes are conected in one graph).
 
-"CAPTAIN AMERICA": 12814 nodes visited
-"MISS THING/MARY": 13 nodes visited
-"ORWELL": 17 nodes visited
+"CAPTAIN AMERICA": 6407 nodes visited
+"MISS THING/MARY": 7 nodes visited
+"ORWELL": 9 nodes visited
 
 The findings above imply that the network consists of diconnected sub-networks.
