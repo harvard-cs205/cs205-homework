@@ -169,6 +169,7 @@ class Path_Finder(object):
         return corrected_distance_rdd
 
 class Connected_Components(object):
+    '''The network rdd *has* to be reversed now! i.e. The structure must be (node, [parents]), not (node, [children])'''
     num_partitions = 50
 
     def __init__(self, sc, network_rdd):
@@ -176,51 +177,59 @@ class Connected_Components(object):
         self.sc = sc
         # User will define the cache if they want...otherwise computer will melt
         self.network_rdd = network_rdd #Sort by key & use num_partitions beforehand in network_rdd & cache to improve performance
-        self.connected_collected_rdd = None
+        self.connected_rdd = None
 
         # Other helper variables
         self.cur_iteration = 0
+
+        self.num_unique_vs_iteration = None
 
         # Run this at the end!
         self.initialize_groups()
 
     def initialize_groups(self):
-        self.connected_collected_rdd = Connected_Components.initialize_groups_static(self.sc, self.network_rdd)
+        self.connected_rdd = Connected_Components.initialize_groups_static(self.sc, self.network_rdd)
         self.cur_iteration += 1
 
     def do_iteration(self):
-        self.connected_collected_rdd = Connected_Components.do_iteration_static(self.sc, self.connected_collected_rdd)
+        self.connected_rdd = Connected_Components.do_iteration_static(self.sc, self.connected_rdd)
         self.cur_iteration += 1
 
     def get_num_unique_groups(self):
-        list_of_indices = map(lambda x: x[1][1], self.connected_collected_rdd)
-        return len(set(list_of_indices))
+        list_of_indices = self.connected_rdd.map(lambda x: x[1][1], preservesPartitioning=True)
+        num_distinct_indices = list_of_indices.distinct(Connected_Components.num_partitions).count()
+        return num_distinct_indices
 
     def run_until_converged(self):
         go = True
         groups_before_update = None
         groups_after_update = None
+
+        self.num_unique_vs_iteration = []
+
+        previous_num_groups = self.get_num_unique_groups()
+        groups_before_update = previous_num_groups
         while go:
             print 'Beginning of Iteration', self.cur_iteration
-            groups_before_update = self.get_num_unique_groups()
             print 'Before update:' , groups_before_update, 'groups'
             self.do_iteration()
-            groups_after_update = self.get_num_unique_groups()
-            print 'After update:' , groups_after_update , 'groups'
-            if groups_before_update == groups_after_update:
+            groups_before_update = self.get_num_unique_groups()
+
+            if groups_before_update == previous_num_groups:
                 go = False
+            else:
+                previous_num_groups = groups_before_update
         print 'Finished at end of iteration' , self.cur_iteration - 1 , '!'
         print 'There are ', groups_after_update, ' groups in the network.'
 
     #### STATIC METHODS TO INTERACT WITH SPARK ####
     @staticmethod
     def initialize_groups_static(sc, network_rdd):
-        return network_rdd.zipWithIndex().map(lambda x: (x[0][0], (x[0][1], x[1])), preservesPartitioning=True).collect()
+        return network_rdd.zipWithIndex().map(lambda x: (x[0][0], (x[0][1], x[1])), preservesPartitioning=True)
 
 
     @staticmethod
-    def do_iteration_static(sc, connected_collected_rdd):
-        connected_rdd = sc.parallelize(connected_collected_rdd, Connected_Components.num_partitions)
+    def do_iteration_static(sc, connected_rdd):
 
         def get_parent_index(x):
             parents = x[1][0]
@@ -237,4 +246,4 @@ class Connected_Components(object):
         # We now have to join to the connected_rdd...not sure if a join or a broadcast variable is faster here.
         new_connected_rdd = connected_rdd.join(parent_with_smallest_index, numPartitions=Connected_Components.num_partitions)
         connected_rdd = new_connected_rdd.map(lambda x: (x[0], (x[1][0][0], x[1][1])))
-        return connected_rdd.collect()
+        return connected_rdd
