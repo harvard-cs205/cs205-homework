@@ -3,42 +3,46 @@ findspark.init()
 import pyspark
 
 
-# parallel implementation
 def distance_to_all_nodes_spark(root_node, graph_rdd):
-    graph = graph_rdd.map(lambda (k, v): (k, -1, v))  # set all distances to -1
-    neighbors = {root_node}  # initial node
-    for iteration in range(11):
-        graph = graph.map(lambda (k, n, v): (k, n, v) if (n > -1 or k not in neighbors) else (k, iteration, v))
-        visited = graph.filter(lambda (k, n, v): n == iteration)
-        neigbors = set(visited.map(lambda (k, n, v): v).reduce(lambda a, b: a + b if b else a))
-        if not len(neighbors) == 0:
-            visited = visited.map(lambda (k, n, v): (k, n, []))
-            graph = graph.subtract(visited)
-            graph = graph.union(visited)
-        else:
-            break  # No neighbors left, done with search
-    graph = graph.map(lambda (k, n, v): (k, n))
-    return graph
-
-
-def new(root_node, graph_rdd):
-    graph = graph_rdd.map(lambda (k, v): (k, -1, v))  # set all distances to -1
-    graph.cache()
-    neighbors = graph.context.parallelize(graph_rdd.lookup(root_node))  # initial node
-    iteration = graph_rdd.context.accumulator(0)
-    while not neighbors.isEmpty():
-        checklist = neighbors.collect()[0]
-        graph = graph.map(lambda (k, n, v): (k, n, v) if (n > -1 or k not in checklist) else (k, iteration, v))
-        visited = graph.filter(lambda (k, n, v): n == iteration)
-        neighbors = visited.map(lambda (k, n, v): v).reduce(lambda l1, l2: l1 + l2)
-        graph = graph.filter(lambda (k, n, v): n == iteration).map(lambda (k, n, v): (k, n, []))
+    """A fast parallel implementation of the search algorithm (does leave RDD for neighbors, for performace reasons)"""
+    result = graph_rdd.context.parallelize([(root_node, 0)])
+    visited = {root_node}  # set initial node
+    neighbors = set(graph_rdd.lookup(root_node)[0])   # set initial neighbors
+    nodes = graph_rdd.context.accumulator(1)
+    iteration = 1
+    while neighbors:  # we are done when neigbors is empty
+        current = graph_rdd.filter(lambda (k, v): k in neighbors)
+        next_neighbors = set(current.map(lambda (k, v): v).flatMap(lambda x: x).collect()) - visited
+        visited = visited.union(neighbors)
+        nodes += len(neighbors)
+        current = current.map(lambda (k, v): (k, iteration))
+        result = result.union(current)
+        neighbors = next_neighbors
         iteration += 1
-    graph = graph.map(lambda (k, n, v): (k, n))
-    return graph
+    print "Number of nodes: " + str(nodes.value)
+    return result
 
 
-# serial implementation
+def distance_to_all_nodes_edge(root_node, edges_rdd, N):
+    """Using edge tuples to determine distances to all nodes, without leaving the Spark"""
+    result = edges_rdd.context.parallelize([(root_node, 0)])
+    rdd = edges_rdd.filter(lambda (k, v): k == root_node)
+    rdd = rdd.map(lambda (k, v): (v, 0))
+    while not rdd.isEmpty():
+        rdd = rdd.mapValues(lambda v: v + 1)
+        result = result.union(rdd)
+        rdd = edges_rdd.join(rdd, N).map(lambda (k, (v1, v2)): (v1, v2))
+        done = result.join(rdd).map(lambda (k, (v1, v2)): (k, v2))
+        rdd = rdd.subtract(done, N)  # don't repeat work
+        rdd.repartition(N)
+    result.cache()
+    result.repartition(N)
+    result = result.reduceByKey(lambda n1, n2: min(n1, n2))
+    return result
+
+
 def distance_to_all_nodes_serial(root_node, graph_rdd):
+    """Serial implementation that is still pretty fast"""
     result = {}
     current_nodes = [root_node]
     for iteration in xrange(11):  # max 10 iterations

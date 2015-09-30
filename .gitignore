@@ -5,6 +5,7 @@
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio
 
 *.iml
+/HW1/P4/.ipynb_checkpoints
 
 ## Directory-based project format:
 .idea/
