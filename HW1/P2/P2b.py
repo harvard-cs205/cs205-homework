@@ -1,9 +1,9 @@
 from P2 import *
-import numpy as np
-import matplotlib.pyplot as plt 
-import matplotlib.cm as cm
-
-import numpy as np
+import findspark
+findspark.init()
+import os
+import pyspark
+sc = pyspark.SparkContext()
 
 # define shuffled axis: to ensure randomness, the axes are defined separately
 axis1 = range(2000)
