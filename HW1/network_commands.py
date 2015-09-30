@@ -126,16 +126,10 @@ class Path_Finder(object):
         return sc.parallelize([(start_node, (cur_iteration, []))], Path_Finder.num_partitions)
 
     @staticmethod
-    def do_iteration_static(sc, network_rdd, collected_distance_rdd, cur_iteration):
-        #TODO: Figure out where to use accumulators...
-        # The broadcast variable is too big here. Don't use it. It was ok for marvel.
+    def do_iteration_static(sc, network_rdd, distance_rdd, cur_iteration):
 
-        already_touched = [z[0] for z in collected_distance_rdd]
-        already_touched_set = set(already_touched)
-        broadcasted_touched = sc.broadcast(already_touched_set)
-        network_to_touch = network_rdd.filter(lambda x: x[0] in broadcasted_touched.value)
-
-        old_distance_rdd = sc.parallelize(collected_distance_rdd, Path_Finder.num_partitions)
+        joined_network = network_rdd.join(distance_rdd, numPartitions=BFS.num_partitions).coalesce(BFS.num_partitions)
+        network_to_touch = joined_network.map(lambda x: (x[0], x[1][0]), preservesPartitioning=True)
 
         # Now do the iteration!
         def get_nodes_to_touch_and_parents(x):
@@ -150,7 +144,7 @@ class Path_Finder(object):
         grouped_by_node_list = grouped_by_node.map(lambda x: (x[0], list(x[1])), preservesPartitioning=True)
         updated_touched_nodes = grouped_by_node_list.map(lambda x: (x[0], (cur_iteration, x[1])), preservesPartitioning=True)
 
-        updated_distance_rdd = old_distance_rdd.union(updated_touched_nodes)
+        updated_distance_rdd = distance_rdd.union(updated_touched_nodes).coalesce(Path_Finder.num_partitions)
 
         def get_smaller_value(a, b):
             '''There are all sorts of subtleties here...but since we don't care about the exact
@@ -162,11 +156,7 @@ class Path_Finder(object):
 
         corrected_distance_rdd = updated_distance_rdd.reduceByKey(get_smaller_value, numPartitions=Path_Finder.num_partitions)
 
-        collected_distance_rdd = corrected_distance_rdd.collect()
-
-        broadcasted_touched.unpersist()
-
-        return collected_distance_rdd
+        return corrected_distance_rdd
 
 
 
