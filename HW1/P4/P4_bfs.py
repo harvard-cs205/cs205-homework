@@ -1,26 +1,18 @@
 import numpy as np
 from itertools import chain
 
-def P4_bfs(grph,source):
+def P4_bfs(grph,source,sc):
 	
-	nodesEdges = [source]
-	searchedDict = {}
-	[searchedDict.setdefault(hero, []).append(0) for hero in nodesEdges]
-	for i_dist in xrange(1,10):
+	nodes = sc.parallelize([(source,0)])
+	visitedNodes = sc.parallelize([(source,0)])
+	i_dist = 0
+	while not nodes.isEmpty():
+		nodes = grph.join(nodes).values().distinct().mapValues(lambda v: v+1).partitionBy(20)
+		nodes = nodes.subtractByKey(visitedNodes)
+		visitedNodes = visitedNodes.union(nodes).partitionBy(20).cache()
+		i_dist+=1
 		
-		if len(nodesEdges) == 0:
-			break
-		
-		exaNodeSet = grph.filter(lambda KV: KV[0] in nodesEdges).flatMap(lambda x: x[1]).collect()
-		nodesEdges = list(set(exaNodeSet).difference(set([key for key in searchedDict.keys()])))
-		[searchedDict.setdefault(hero, []).append(i_dist) for hero in nodesEdges]    	
-		
-
-		
-	
 	print "Exhausted graph at a distance of:", i_dist
-	print "With "+source+" as your source, you touched "+ str(len(searchedDict)) + " nodes."
+	print "With "+source+" as your source, you touched "+ str(visitedNodes.count()) + " nodes."
 	
-	return len(searchedDict), searchedDict
-		
-
+	return visitedNodes.count(), visitedNodes

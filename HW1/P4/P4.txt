@@ -1,1 +1,12 @@
 # Your discussion here
+
+A description of your graph representation, and the number of touched nodes in each of the searches above. Also, discuss the two questions above (re. graph diameter, and untouched nodes).
+
+Count the number of nodes touched in each of the above searches and place these counts in your writeup. What does it mean if a character does not have a defined distance during the search?
+
+Exhausted graph at a distance of: 5
+With "CAPTAIN AMERICA" as your source, you touched 6408 nodes.
+Exhausted graph at a distance of: 3
+With "MISS THING/MARY" as your source, you touched 7 nodes.
+Exhausted graph at a distance of: 3
+With "ORWELL" as your source, you touched 9 nodes.
