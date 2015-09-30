@@ -24,39 +24,18 @@ def distance_to_all_nodes_spark(root_node, graph_rdd):
 
 
 def distance_to_all_nodes_edge(root_node, edges_rdd, N):
-    """Using edge tuples to determine distances to all nodes, without leaving Spark"""
-    edges_rdd = edges_rdd.partitionBy(N)
-    edges_rdd = edges_rdd.cache()
+    """Using edge tuples to determine distances to all nodes, without leaving the Spark"""
+    edges_rdd.cache()
     result = edges_rdd.context.parallelize([(root_node, 0)])
     rdd = edges_rdd.filter(lambda (k, v): k == root_node)
     rdd = rdd.map(lambda (k, v): (v, 0))
     while not rdd.isEmpty():
-        rdd = edges_rdd.join(rdd).values().partitionBy(N)
-        rdd = rdd.distinct()
-        rdd = rdd.subtractByKey(result)  # don't repeat work
+        rdd = edges_rdd.join(rdd, N).values()
+        rdd = rdd.subtractByKey(result, N)  # don't repeat work
         rdd = rdd.mapValues(lambda v: v + 1)
         result = result.union(rdd)
-        rdd = rdd.cache()
+        rdd = rdd.partitionBy(N).cache()
     return result
 
-
-def distance_to_all_nodes_serial(root_node, graph_rdd):
-    """Serial implementation that is still pretty fast"""
-    result = {}
-    current_nodes = [root_node]
-    for iteration in xrange(11):  # max 10 iterations
-        neighbors = []
-        for node in current_nodes:
-            if node not in result:
-                result[node] = iteration
-                neighbors += graph_rdd.lookup(node)[0]
-        current_nodes = neighbors
-    print len(result)  # number of nodes touched on
-    result_rdd = graph_rdd.keys().map(lambda key: (key, -1) if key not in result else (key, result[key]), True)
-    return result_rdd  # -1 means no connection (within 10 steps)
-
-
-
-
-
-
+if __name__ == '__main__':
+    pass
