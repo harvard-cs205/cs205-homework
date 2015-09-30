@@ -73,7 +73,7 @@ class Path_Finder(object):
         self.sc = sc
         # User will define the cache if they want...otherwise computer will melt
         #Sort by key & use num_partitions beforehand in network_rdd & cache to improve performance
-        self.network_rdd = network_rdd.sortByKey(numPartitions=num_partitions).cache()
+        self.network_rdd = network_rdd.partitionBy(num_partitions).cache()
         self.start_node = start_node
         self.end_node = end_node
 
@@ -131,12 +131,11 @@ class Path_Finder(object):
     #### STATIC METHODS TO INTERACT WITH SPARK ####
     @staticmethod
     def initialize_distances_static(sc, start_node, network_rdd, cur_iteration):
-        return sc.parallelize([(start_node, (cur_iteration, []))], num_partitions)
+        return sc.parallelize([(start_node, (cur_iteration, []))]).partitionBy(num_partitions)
 
     @staticmethod
     def do_iteration_static(sc, network_rdd, distance_rdd, cur_iteration):
-        distance_rdd = distance_rdd.sortByKey(numPartitions=num_partitions) #copartition?
-        joined_network = distance_rdd.join(network_rdd, numPartitions=num_partitions).coalesce(num_partitions)
+        joined_network = distance_rdd.join(network_rdd)
         network_to_touch = joined_network.map(lambda x: (x[0], x[1][1]), preservesPartitioning=True)
 
         # Now do the iteration!
@@ -145,14 +144,14 @@ class Path_Finder(object):
             nodes_to_touch = x[1]
             return [(z, parent) for z in nodes_to_touch]
 
-        nodes_to_touch_and_parents = network_to_touch.flatMap(get_nodes_to_touch_and_parents, preservesPartitioning=True)
+        nodes_to_touch_and_parents = network_to_touch.flatMap(get_nodes_to_touch_and_parents)
 
         # We now groupby individual
-        grouped_by_node = nodes_to_touch_and_parents.groupByKey(numPartitions=num_partitions)
+        grouped_by_node = nodes_to_touch_and_parents.groupByKey()
         grouped_by_node_list = grouped_by_node.map(lambda x: (x[0], list(x[1])), preservesPartitioning=True)
         updated_touched_nodes = grouped_by_node_list.map(lambda x: (x[0], (cur_iteration, x[1])), preservesPartitioning=True)
 
-        updated_distance_rdd = distance_rdd.union(updated_touched_nodes).coalesce(num_partitions)
+        updated_distance_rdd = distance_rdd.union(updated_touched_nodes)
 
         def get_smaller_value(a, b):
             '''There are all sorts of subtleties here...but since we don't care about the exact
@@ -162,9 +161,9 @@ class Path_Finder(object):
             else:
                 return b
 
-        corrected_distance_rdd = updated_distance_rdd.reduceByKey(get_smaller_value, numPartitions=num_partitions)
+        corrected_distance_rdd = updated_distance_rdd.reduceByKey(get_smaller_value, num_partitions) # This does partitioning for us!
 
-        return corrected_distance_rdd
+        return corrected_distance_rdd.cache()
 
 class Connected_Components(object):
     '''The network rdd *has* to be reversed now! i.e. The structure must be (node, [parents]), not (node, [children])'''
