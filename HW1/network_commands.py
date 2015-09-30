@@ -10,7 +10,7 @@ class BFS(object):
         self.start_node = start_node
 
         # Cache the network rdd so we don't have to keep recomputing it! It's not changing!
-        self.network_rdd = network_rdd.sortByKey(numPartitions=num_partitions)
+        self.network_rdd = network_rdd.partitionBy(num_partitions).cache()
 
         self.cur_iteration = 0
         self.distance_rdd = None
@@ -39,7 +39,7 @@ class BFS(object):
     #### STATIC METHODS TO INTERACT WITH SPARK ####
     @staticmethod
     def initialize_distances_static(sc, start_node, network_rdd, cur_iteration):
-        return sc.parallelize([(start_node, cur_iteration)], num_partitions)
+        return sc.parallelize([(start_node, cur_iteration)], num_partitions).partitionBy(num_partitions)
 
     @staticmethod
     def get_smaller_value(a, b):
@@ -54,17 +54,17 @@ class BFS(object):
         #TODO: Figure out where to use accumulators...
         # Pull the needed info out of the network
 
-        joined_network = network_rdd.join(distance_rdd, numPartitions=num_partitions).coalesce(num_partitions)
+        joined_network = network_rdd.join(distance_rdd)
         network_to_touch = joined_network.map(lambda x: (x[0], x[1][0]), preservesPartitioning=True)
 
         # Now do the iteration!
-        nodes_to_touch = network_to_touch.flatMap(lambda x: x[1], preservesPartitioning=True)
+        nodes_to_touch = network_to_touch.flatMap(lambda x: x[1])
         unique_nodes_to_touch = nodes_to_touch.distinct(num_partitions)
         updated_touched_nodes = unique_nodes_to_touch.map(lambda x: (x, cur_iteration), preservesPartitioning=True)
         updated_distance_rdd = distance_rdd.union(updated_touched_nodes)
-        corrected_distance_rdd = updated_distance_rdd.reduceByKey(BFS.get_smaller_value, num_partitions)
+        corrected_distance_rdd = updated_distance_rdd.reduceByKey(BFS.get_smaller_value)
 
-        return corrected_distance_rdd
+        return corrected_distance_rdd.partitionBy(num_partitions).cache()
 
 class Path_Finder(object):
 
