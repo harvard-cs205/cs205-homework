@@ -1,3 +1,5 @@
+import numpy as np
+
 class BFS(object):
     '''I figured out how to avoid collecting every iteration...thankfully.'''
 
@@ -84,20 +86,12 @@ class Path_Finder(object):
         # Run this at the end!
         self.initialize_distances()
 
-
-
     def initialize_distances(self):
-        self.distance_rdd = Path_Finder.initialize_distances_static(self.sc,
-                                                                      self.start_node,
-                                                                      self.network_rdd,
-                                                                      self.cur_iteration)
+        self.distance_rdd = Path_Finder.initialize_distances_static(self.sc, self.start_node, self.network_rdd, self.cur_iteration)
         self.cur_iteration += 1
 
     def do_iteration(self):
-        self.distance_rdd = Path_Finder.do_iteration_static(self.sc,
-                                                              self.network_rdd,
-                                                              self.distance_rdd,
-                                                              self.cur_iteration)
+        self.distance_rdd = Path_Finder.do_iteration_static(self.sc, self.network_rdd, self.distance_rdd, self.cur_iteration)
         self.cur_iteration += 1
 
     def run_until_converged(self):
@@ -105,10 +99,10 @@ class Path_Finder(object):
         are_connected = None
         while go:
             print self.cur_iteration
-            before_update = dict(self.distance_rdd)
+            before_update = self.distance_rdd.count()
             self.do_iteration()
-            after_update = dict(self.distance_rdd)
-            if self.end_node in after_update:
+            after_update = self.distance_rdd.count()
+            if len(self.distance_rdd.lookup(self.end_node)) != 0:
                 go = False
                 are_connected = True
             elif before_update == after_update:
@@ -119,6 +113,22 @@ class Path_Finder(object):
         else:
             print 'Nodes do not seem to be connected... :('
         print 'Finished at end of iteration' , self.cur_iteration - 1 , '!'
+
+    def get_random_path(self):
+        '''Once the solution has converged, get a random path from start to finish.'''
+        chosen_parent = self.end_node
+        path_back = [self.end_node]
+
+        go = True
+        while go:
+            potential_parents = self.distance_rdd.lookup(chosen_parent)[0][1]
+            # Let's make the parent choice random to get variability
+            chosen_parent = np.random.choice(potential_parents)
+            path_back.append(chosen_parent)
+            if chosen_parent == self.start_node:
+                go = False
+        path_forwards = list(reversed(path_back))
+        return path_forwards
 
     #### STATIC METHODS TO INTERACT WITH SPARK ####
     @staticmethod
@@ -157,9 +167,6 @@ class Path_Finder(object):
         corrected_distance_rdd = updated_distance_rdd.reduceByKey(get_smaller_value, numPartitions=Path_Finder.num_partitions)
 
         return corrected_distance_rdd
-
-
-
 
 class Connected_Components(object):
     num_partitions = 50
