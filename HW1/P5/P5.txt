@@ -53,7 +53,7 @@ See the plot "directed_graph_components_vs_iteration.png" to see the logarithmic
 ### Undirected Graph ###
 
 We get a result that makes truly no sense; there are more unconnected components
-than in the directed case. I must have messed up.
+than in the directed case. I must have messed up somewhere...
 
 Beginning of Iteration 1
 Before update: 5710993 groups
