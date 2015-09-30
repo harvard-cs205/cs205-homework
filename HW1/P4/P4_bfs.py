@@ -6,12 +6,15 @@ import pyspark
 # parallel implementation
 def distance_to_all_nodes_spark(root_node, graph_rdd):
     graph = graph_rdd.map(lambda (k, v): (k, -1, v))  # set all distances to -1
-    checklist = {root_node}  # initial node
-    for iteration in xrange(11):
-        graph = graph.map(lambda (k, n, v): (k, n, v) if (n > -1 or k not in checklist) else (k, iteration, []))
-        neighbors = graph.filter(lambda (k, n, v): n == iteration)
-        if not neighbors.isEmpty():
-            checklist = set(neighbors.map(lambda (k, n, v): v).reduce(lambda a, b: a + b if b else a))
+    neighbors = {root_node}  # initial node
+    for iteration in range(11):
+        graph = graph.map(lambda (k, n, v): (k, n, v) if (n > -1 or k not in neighbors) else (k, iteration, v))
+        visited = graph.filter(lambda (k, n, v): n == iteration)
+        neigbors = set(visited.map(lambda (k, n, v): v).reduce(lambda a, b: a + b if b else a))
+        if not len(neighbors) == 0:
+            visited = visited.map(lambda (k, n, v): (k, n, []))
+            graph = graph.subtract(visited)
+            graph = graph.union(visited)
         else:
             break  # No neighbors left, done with search
     graph = graph.map(lambda (k, n, v): (k, n))
@@ -25,10 +28,10 @@ def new(root_node, graph_rdd):
     iteration = graph_rdd.context.accumulator(0)
     while not neighbors.isEmpty():
         checklist = neighbors.collect()[0]
-        graph = graph.map(lambda (k, n, v): (k, n, v) if (n > -1 or k not in checklist) else (k, iteration, []))
-        print graph.count
-        neighbors = graph.filter(lambda (k, n, v): n == iteration).map(lambda (k, n, v): v)
-        print neighbors.count
+        graph = graph.map(lambda (k, n, v): (k, n, v) if (n > -1 or k not in checklist) else (k, iteration, v))
+        visited = graph.filter(lambda (k, n, v): n == iteration)
+        neighbors = visited.map(lambda (k, n, v): v).reduce(lambda l1, l2: l1 + l2)
+        graph = graph.filter(lambda (k, n, v): n == iteration).map(lambda (k, n, v): (k, n, []))
         iteration += 1
     graph = graph.map(lambda (k, n, v): (k, n))
     return graph
