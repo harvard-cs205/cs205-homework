@@ -172,7 +172,7 @@ class Connected_Components(object):
 
         self.sc = sc
         # User will define the cache if they want...otherwise computer will melt
-        self.network_rdd = network_rdd.sortByKey(numPartitions=num_partitions).cache()
+        self.network_rdd = network_rdd # ironically we only need this once
         self.connected_rdd = None
 
         # Other helper variables
@@ -192,8 +192,8 @@ class Connected_Components(object):
         self.cur_iteration += 1
 
     def get_num_unique_groups(self):
-        list_of_indices = self.connected_rdd.map(lambda x: x[1][1], preservesPartitioning=True)
-        num_distinct_indices = list_of_indices.distinct(num_partitions).count()
+        list_of_indices = self.connected_rdd.map(lambda x: x[1][1])
+        num_distinct_indices = list_of_indices.distinct().count()
         return num_distinct_indices
 
     def run_until_converged(self):
@@ -223,7 +223,8 @@ class Connected_Components(object):
     #### STATIC METHODS TO INTERACT WITH SPARK ####
     @staticmethod
     def initialize_groups_static(sc, network_rdd):
-        return network_rdd.zipWithIndex().map(lambda x: (x[0][0], (x[0][1], x[1])), preservesPartitioning=True)
+        labeled_network = network_rdd.zipWithIndex().map(lambda x: (x[0][0], (x[0][1], x[1])))
+        return labeled_network.partitionBy(num_partitions).cache()
 
 
     @staticmethod
@@ -239,9 +240,8 @@ class Connected_Components(object):
                 return a
             return b
 
-        parent_indexes = connected_rdd.flatMap(get_parent_index, preservesPartitioning=True)
-        parent_with_smallest_index = parent_indexes.reduceByKey(get_smaller_index, numPartitions=num_partitions)
-        # We now have to join to the connected_rdd...not sure if a join or a broadcast variable is faster here.
-        new_connected_rdd = connected_rdd.join(parent_with_smallest_index, numPartitions=num_partitions)
-        connected_rdd = new_connected_rdd.map(lambda x: (x[0], (x[1][0][0], x[1][1])))
-        return connected_rdd
+        parent_indexes = connected_rdd.flatMap(get_parent_index)
+        parent_with_smallest_index = parent_indexes.reduceByKey(get_smaller_index, num_partitions) # This is partitioned
+        joined_rdd= connected_rdd.join(parent_with_smallest_index)
+        connected_rdd = joined_rdd.map(lambda x: (x[0], (x[1][0][0], x[1][1])), preservesPartitioning=True) # Should preserve partitioning...
+        return connected_rdd.cache()
