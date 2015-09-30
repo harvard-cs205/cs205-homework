@@ -26,34 +26,24 @@ connected components. It converges in a logarithmic manner, specifically:
 
 Beginning of Iteration 1
 Before update: 3773865 groups
-After update: 906540 groups
 Beginning of Iteration 2
 Before update: 906540 groups
-After update: 118836 groups
 Beginning of Iteration 3
 Before update: 118836 groups
-After update: 9839 groups
 Beginning of Iteration 4
 Before update: 9839 groups
-After update: 1657 groups
 Beginning of Iteration 5
 Before update: 1657 groups
-After update: 331 groups
 Beginning of Iteration 6
 Before update: 331 groups
-After update: 96 groups
 Beginning of Iteration 7
 Before update: 96 groups
-After update: 58 groups
 Beginning of Iteration 8
 Before update: 58 groups
-After update: 53 groups
 Beginning of Iteration 9
 Before update: 53 groups
-After update: 52 groups
 Beginning of Iteration 10
 Before update: 52 groups
-After update: 52 groups
 Finished at end of iteration 10 !
 There are  52  groups in the network.
 

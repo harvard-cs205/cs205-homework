@@ -177,7 +177,7 @@ class Connected_Components(object):
 
         self.sc = sc
         # User will define the cache if they want...otherwise computer will melt
-        self.network_rdd = network_rdd #Sort by key & use num_partitions beforehand in network_rdd & cache to improve performance
+        self.network_rdd = network_rdd.sortByKey(numPartitions=Path_Finder.num_partitions).cache()
         self.connected_rdd = None
 
         # Other helper variables
