@@ -6,10 +6,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 sc = SparkContext("local", "HW1-2a Default Partioning")
-
+sc.setLogLevel("ERROR")
 
 #set up 2000x2000 array and transform array into [-2,2]x[-2,2] grid... 
-rdd = sc.parallelize(xrange(0,2001),100)#.map(lambda x: (x/500.0)-2)
+rdd = sc.parallelize(xrange(0,2001),10)
 grid = rdd.cartesian(rdd) #Creates ordered pairs...
 
 #pass grid values to mandelbrot.py and append output of mandelbrot.py to tuple --> (i,j,iter)

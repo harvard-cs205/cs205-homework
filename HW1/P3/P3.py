@@ -1,7 +1,8 @@
 from pyspark import SparkContext
 import numpy as np
 
-sc = SparkContext("local", "HW1-3 Anagrams")
+sc = SparkContext("local[4]", "HW1-3 Anagrams")
+sc.setLogLevel("ERROR")
 
 #Reading in words from locally saved version of the online list
 wList = sc.textFile('words.txt')
@@ -16,6 +17,7 @@ orgJumble = letteredWords.map(lambda w: (''.join(w[0]),[w[1]]))
 combJumble = orgJumble.reduceByKey(lambda x, y: x+y)
 
 #Sort based on length of valid word list
-sortedCombJumble = combJumble.sortBy(lambda KV: len(KV[1]), ascend=False)
+sortedCombJumble = combJumble.sortBy(lambda KV: len(KV[1]), ascending=False)
+sortedCombJumbleFINAL = sortedCombJumble.map(lambda x: (x[0],len(x[1]),x[1]))
 
-print sortedCombJumble.take(1)
+print sortedCombJumbleFINAL.take(1)
