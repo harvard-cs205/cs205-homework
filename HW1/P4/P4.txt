@@ -1,1 +1,25 @@
-# Your discussion here
+Graph representation:
+
+The graph representation I used was a list of tuples, each of the format:
+( <character_name>, [<list_of_connected_characters>] ), where "connected characters" are characters that appeared in a comic along with <character_name>.  
+
+I experimented with different partitioning schema, with 2,3,4,6,8,10, and 20 partitions. 
+I was rather surprised to find that on my local machine (4 cores), a 3-partition setup was the fastest (best time: 17.78s).  The Spark documentation recommends assigning 2-4 partitions for each available core.  On my 4-core machine that should see optimal results at between 8-12 partitions...but many fewer turned out to be best.
+
+Test case reports:
+
+Root node: CAPTAIN AMERICA
+Touched nodes*: 6403
+
+Root node: MISS THING/MARY
+Touched nodes*: 7
+
+Root node: ORWELL
+Touched nodes*: 9
+
+*Touched node count includes root node
+
+
+Re: distance = Undefined:
+
+If nodes are undefined in SS-BFS, it means they are unconnected to other nodes in the subgraph formed by the search.
