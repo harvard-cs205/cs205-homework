@@ -1,6 +1,3 @@
-
-
-
 class BFS(object):
     '''I figured out how to avoid collecting every iteration...thankfully.'''
 
