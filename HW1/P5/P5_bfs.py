@@ -43,38 +43,24 @@ end_node = title_then_index.lookup('Kevin_Bacon')[0]
 # Optimize rdd's for use in code, use same # of partitions across code
 title_then_index = title_then_index.sortByKey(numPartitions=num_partitions_to_use).cache()
 index_then_title = index_then_title.sortByKey(numPartitions=num_partitions_to_use).cache()
-network_rdd = network_rdd.sortByKey(numPartitions=num_partitions_to_use).cache()
-Path_Finder.num_partitions = num_partitions_to_use
 
+Path_Finder.num_partitions = num_partitions_to_use
 # Create Path_Finder and find the path!
-finder = Path_Finder(sc, network_rdd, start_node, end_node)
+finder = Path_Finder(sc, network_rdd, start_node, end_node) #network_rdd is cached inside
 finder.run_until_converged()
 
 # Look at the path and print a couple of paths
 
-path = finder.distance_rdd
-path_rdd = sc.parallelize(path, num_partitions_to_use)
-
 def get_path_forwards():
-    chosen_parent = end_node
-    path_back = [end_node]
-
-    go = True
-    path_forwards = None
-    while go:
-        potential_parents = path_rdd.lookup(chosen_parent)[0][1]
-        # Let's make the parent choice random to get variability
-        chosen_parent = np.random.choice(potential_parents)
-        path_back.append(chosen_parent)
-        if chosen_parent == start_node:
-            go = False
-    path_forwards = list(reversed(path_back))
-    return path_forwards
+    return [index_then_title.lookup(z)[0] for z in finder.get_random_path()]
 
 print
 print
-print [index_then_title.lookup(z)[0] for z in get_path_forwards()]
-print [index_then_title.lookup(z)[0] for z in get_path_forwards()]
-print [index_then_title.lookup(z)[0] for z in get_path_forwards()]
+print get_path_forwards()
+print get_path_forwards()
+print get_path_forwards()
 print
 print
+
+import time
+time.sleep(3)

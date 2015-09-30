@@ -75,7 +75,8 @@ class Path_Finder(object):
 
         self.sc = sc
         # User will define the cache if they want...otherwise computer will melt
-        self.network_rdd = network_rdd #Sort by key & use num_partitions beforehand in network_rdd & cache to improve performance
+        #Sort by key & use num_partitions beforehand in network_rdd & cache to improve performance
+        self.network_rdd = network_rdd.sortByKey(numPartitions=Path_Finder.num_partitions).cache()
         self.start_node = start_node
         self.end_node = end_node
 
@@ -137,9 +138,9 @@ class Path_Finder(object):
 
     @staticmethod
     def do_iteration_static(sc, network_rdd, distance_rdd, cur_iteration):
-
-        joined_network = network_rdd.join(distance_rdd, numPartitions=BFS.num_partitions).coalesce(BFS.num_partitions)
-        network_to_touch = joined_network.map(lambda x: (x[0], x[1][0]), preservesPartitioning=True)
+        distance_rdd = distance_rdd.sortByKey(numPartitions=BFS.num_partitions) #copartition?
+        joined_network = distance_rdd.join(network_rdd, numPartitions=BFS.num_partitions).coalesce(BFS.num_partitions)
+        network_to_touch = joined_network.map(lambda x: (x[0], x[1][1]), preservesPartitioning=True)
 
         # Now do the iteration!
         def get_nodes_to_touch_and_parents(x):
