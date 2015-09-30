@@ -51,3 +51,31 @@ There are  53  groups in the network.
 See the plot "directed_graph_components_vs_iteration.png" to see the logarithmic convergence of my algorithm.
 
 ### Undirected Graph ###
+
+We get a result that makes truly no sense; there are more unconnected components
+than in the directed case. I must have messed up.
+
+Beginning of Iteration 1
+Before update: 5710993 groups
+Beginning of Iteration 2
+Before update: 1343504 groups
+Beginning of Iteration 3
+Before update: 217823 groups
+Beginning of Iteration 4
+Before update: 10718 groups
+Beginning of Iteration 5
+Before update: 1674 groups
+Beginning of Iteration 6
+Before update: 1160 groups
+Beginning of Iteration 7
+Before update: 1124 groups
+Beginning of Iteration 8
+Before update: 1117 groups
+Beginning of Iteration 9
+Before update: 1115 groups
+Beginning of Iteration 10
+Before update: 1114 groups
+Beginning of Iteration 11
+Before update: 1113 groups
+Finished at end of iteration 11 !
+There are  1113  groups in the network.
