@@ -202,25 +202,27 @@ class Connected_Components(object):
 
     def run_until_converged(self):
         go = True
-        groups_before_update = None
-        groups_after_update = None
 
         self.num_unique_vs_iteration = []
 
         previous_num_groups = self.get_num_unique_groups()
         groups_before_update = previous_num_groups
+
+        self.num_unique_vs_iteration.append(groups_before_update)
+
         while go:
             print 'Beginning of Iteration', self.cur_iteration
             print 'Before update:' , groups_before_update, 'groups'
             self.do_iteration()
             groups_before_update = self.get_num_unique_groups()
+            self.num_unique_vs_iteration.append(groups_before_update)
 
             if groups_before_update == previous_num_groups:
                 go = False
             else:
                 previous_num_groups = groups_before_update
         print 'Finished at end of iteration' , self.cur_iteration - 1 , '!'
-        print 'There are ', groups_after_update, ' groups in the network.'
+        print 'There are ', groups_before_update, ' groups in the network.'
 
     #### STATIC METHODS TO INTERACT WITH SPARK ####
     @staticmethod
