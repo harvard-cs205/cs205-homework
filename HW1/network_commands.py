@@ -1,17 +1,16 @@
 import numpy as np
 
+num_partitions = 50
+
 class BFS(object):
     '''I figured out how to avoid collecting every iteration...thankfully.'''
-
-    num_partitions = 50
-
     def __init__(self, sc, start_node, network_rdd):
 
         self.sc = sc
         self.start_node = start_node
 
         # Cache the network rdd so we don't have to keep recomputing it! It's not changing!
-        self.network_rdd = network_rdd.sortByKey(numPartitions=BFS.num_partitions)
+        self.network_rdd = network_rdd.sortByKey(numPartitions=num_partitions)
 
         self.cur_iteration = 0
         self.distance_rdd = None
@@ -40,7 +39,7 @@ class BFS(object):
     #### STATIC METHODS TO INTERACT WITH SPARK ####
     @staticmethod
     def initialize_distances_static(sc, start_node, network_rdd, cur_iteration):
-        return sc.parallelize([(start_node, cur_iteration)], BFS.num_partitions)
+        return sc.parallelize([(start_node, cur_iteration)], num_partitions)
 
     @staticmethod
     def get_smaller_value(a, b):
@@ -55,28 +54,26 @@ class BFS(object):
         #TODO: Figure out where to use accumulators...
         # Pull the needed info out of the network
 
-        joined_network = network_rdd.join(distance_rdd, numPartitions=BFS.num_partitions).coalesce(BFS.num_partitions)
+        joined_network = network_rdd.join(distance_rdd, numPartitions=num_partitions).coalesce(num_partitions)
         network_to_touch = joined_network.map(lambda x: (x[0], x[1][0]), preservesPartitioning=True)
 
         # Now do the iteration!
         nodes_to_touch = network_to_touch.flatMap(lambda x: x[1], preservesPartitioning=True)
-        unique_nodes_to_touch = nodes_to_touch.distinct(BFS.num_partitions)
+        unique_nodes_to_touch = nodes_to_touch.distinct(num_partitions)
         updated_touched_nodes = unique_nodes_to_touch.map(lambda x: (x, cur_iteration), preservesPartitioning=True)
         updated_distance_rdd = distance_rdd.union(updated_touched_nodes)
-        corrected_distance_rdd = updated_distance_rdd.reduceByKey(BFS.get_smaller_value, BFS.num_partitions)
+        corrected_distance_rdd = updated_distance_rdd.reduceByKey(BFS.get_smaller_value, num_partitions)
 
         return corrected_distance_rdd
 
 class Path_Finder(object):
-
-    num_partitions = 50
 
     def __init__(self, sc, network_rdd, start_node, end_node):
 
         self.sc = sc
         # User will define the cache if they want...otherwise computer will melt
         #Sort by key & use num_partitions beforehand in network_rdd & cache to improve performance
-        self.network_rdd = network_rdd.sortByKey(numPartitions=Path_Finder.num_partitions).cache()
+        self.network_rdd = network_rdd.sortByKey(numPartitions=num_partitions).cache()
         self.start_node = start_node
         self.end_node = end_node
 
@@ -134,12 +131,12 @@ class Path_Finder(object):
     #### STATIC METHODS TO INTERACT WITH SPARK ####
     @staticmethod
     def initialize_distances_static(sc, start_node, network_rdd, cur_iteration):
-        return sc.parallelize([(start_node, (cur_iteration, []))], Path_Finder.num_partitions)
+        return sc.parallelize([(start_node, (cur_iteration, []))], num_partitions)
 
     @staticmethod
     def do_iteration_static(sc, network_rdd, distance_rdd, cur_iteration):
-        distance_rdd = distance_rdd.sortByKey(numPartitions=BFS.num_partitions) #copartition?
-        joined_network = distance_rdd.join(network_rdd, numPartitions=BFS.num_partitions).coalesce(BFS.num_partitions)
+        distance_rdd = distance_rdd.sortByKey(numPartitions=num_partitions) #copartition?
+        joined_network = distance_rdd.join(network_rdd, numPartitions=num_partitions).coalesce(num_partitions)
         network_to_touch = joined_network.map(lambda x: (x[0], x[1][1]), preservesPartitioning=True)
 
         # Now do the iteration!
@@ -151,11 +148,11 @@ class Path_Finder(object):
         nodes_to_touch_and_parents = network_to_touch.flatMap(get_nodes_to_touch_and_parents, preservesPartitioning=True)
 
         # We now groupby individual
-        grouped_by_node = nodes_to_touch_and_parents.groupByKey(numPartitions=Path_Finder.num_partitions)
+        grouped_by_node = nodes_to_touch_and_parents.groupByKey(numPartitions=num_partitions)
         grouped_by_node_list = grouped_by_node.map(lambda x: (x[0], list(x[1])), preservesPartitioning=True)
         updated_touched_nodes = grouped_by_node_list.map(lambda x: (x[0], (cur_iteration, x[1])), preservesPartitioning=True)
 
-        updated_distance_rdd = distance_rdd.union(updated_touched_nodes).coalesce(Path_Finder.num_partitions)
+        updated_distance_rdd = distance_rdd.union(updated_touched_nodes).coalesce(num_partitions)
 
         def get_smaller_value(a, b):
             '''There are all sorts of subtleties here...but since we don't care about the exact
@@ -165,19 +162,18 @@ class Path_Finder(object):
             else:
                 return b
 
-        corrected_distance_rdd = updated_distance_rdd.reduceByKey(get_smaller_value, numPartitions=Path_Finder.num_partitions)
+        corrected_distance_rdd = updated_distance_rdd.reduceByKey(get_smaller_value, numPartitions=num_partitions)
 
         return corrected_distance_rdd
 
 class Connected_Components(object):
     '''The network rdd *has* to be reversed now! i.e. The structure must be (node, [parents]), not (node, [children])'''
-    num_partitions = 50
 
     def __init__(self, sc, network_rdd):
 
         self.sc = sc
         # User will define the cache if they want...otherwise computer will melt
-        self.network_rdd = network_rdd.sortByKey(numPartitions=Path_Finder.num_partitions).cache()
+        self.network_rdd = network_rdd.sortByKey(numPartitions=num_partitions).cache()
         self.connected_rdd = None
 
         # Other helper variables
@@ -198,7 +194,7 @@ class Connected_Components(object):
 
     def get_num_unique_groups(self):
         list_of_indices = self.connected_rdd.map(lambda x: x[1][1], preservesPartitioning=True)
-        num_distinct_indices = list_of_indices.distinct(Connected_Components.num_partitions).count()
+        num_distinct_indices = list_of_indices.distinct(num_partitions).count()
         return num_distinct_indices
 
     def run_until_converged(self):
@@ -245,8 +241,8 @@ class Connected_Components(object):
             return b
 
         parent_indexes = connected_rdd.flatMap(get_parent_index, preservesPartitioning=True)
-        parent_with_smallest_index = parent_indexes.reduceByKey(get_smaller_index, numPartitions=Connected_Components.num_partitions)
+        parent_with_smallest_index = parent_indexes.reduceByKey(get_smaller_index, numPartitions=num_partitions)
         # We now have to join to the connected_rdd...not sure if a join or a broadcast variable is faster here.
-        new_connected_rdd = connected_rdd.join(parent_with_smallest_index, numPartitions=Connected_Components.num_partitions)
+        new_connected_rdd = connected_rdd.join(parent_with_smallest_index, numPartitions=num_partitions)
         connected_rdd = new_connected_rdd.map(lambda x: (x[0], (x[1][0][0], x[1][1])))
         return connected_rdd
