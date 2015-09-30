@@ -1,1 +1,5 @@
-# Your discussion here
+My strategy is to shuffle both x- and y-coordinates before partitioning, so that each partitian created by rdd.cartesian() will contain a random set of 40,000 pixels. In this case, the "high-iteration" pixels should be randomly distributed across 100 partitions, and therefore even out the workload when plotting or summing.
+
+(a) I think this strategy balances the work pretty well, returning a bell-shaped distribution of number of partitions for different levels of work. Comparing to the range of iteration sums in P2a, the range is much concentrated, with almost 90% of the partitions between 18,000 and 24,000 total iterations.
+
+(b) The cost of this strategy is mainly caused by the two shuffles done on the axes. I think this cost is minimal comparing to the benefit of getting more balanced workload and the time we saved (from 33.50s in P2a to 31.25s in P2b: I doubt this saving is purely achieved by better balancing the workload).
