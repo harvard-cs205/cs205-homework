@@ -1,6 +1,6 @@
 import numpy as np
 
-num_partitions = 50
+num_partitions = 40
 
 class BFS(object):
     '''I figured out how to avoid collecting every iteration...thankfully.'''
