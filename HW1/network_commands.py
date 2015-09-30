@@ -62,9 +62,9 @@ class BFS(object):
         unique_nodes_to_touch = nodes_to_touch.distinct(num_partitions)
         updated_touched_nodes = unique_nodes_to_touch.map(lambda x: (x, cur_iteration), preservesPartitioning=True)
         updated_distance_rdd = distance_rdd.union(updated_touched_nodes)
-        corrected_distance_rdd = updated_distance_rdd.reduceByKey(BFS.get_smaller_value)
+        corrected_distance_rdd = updated_distance_rdd.reduceByKey(BFS.get_smaller_value, num_partitions) # Does the partitioning for us
 
-        return corrected_distance_rdd.partitionBy(num_partitions).cache()
+        return corrected_distance_rdd.cache()
 
 class Path_Finder(object):
 
