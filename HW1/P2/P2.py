@@ -1,6 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt 
 import matplotlib.cm as cm
+import findspark
+findspark.init()
+import pyspark
+#sc = pyspark.SparkContext(appName="myAppName")
+
 
 def mandelbrot(x, y):
     z = c = complex(x, y)
@@ -29,3 +34,16 @@ def draw_image(rdd):
     im[I, J] = np.log(C + 1)  # log intensity makes it easier to see levels
     plt.imshow(im, cmap=cm.gray)
     plt.show()
+
+def main():
+    #image is 2000 pixels x 2000 pixels
+    data_matrix = np.zeros((2000,2000),dtype=('float,float'))
+    for i in range(2000):
+        for j in range(2000):
+            x = j / 500.0 - 2
+            y = i / 500.0 - 2
+            data_matrix[i][j] = x, y
+    rdd = sc.parallelize(data_matrix)
+    rdd.map(mandelbrot)
+main()
+
