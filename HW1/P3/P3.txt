@@ -1,6 +1,2 @@
 word: aelst --> anagrams : least , leats , salet , slate , stale , steal , stela , taels , tales , teals , tesla , 
 
-word: aeprs --> anagrams : asper , pares , parse , pears , prase , presa , rapes , reaps , spaer , spare , spear , 
-
-word: aerst --> anagrams : arets , aster , rates , reast , resat , stare , stear , strae , tares , tears , teras , 
-

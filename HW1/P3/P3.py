@@ -1,4 +1,3 @@
-%matplotlib inline
 import findspark
 findspark.init()
 import pyspark
@@ -14,6 +13,8 @@ import time
 import pandas as pd
 import itertools
 
+start = time.time()
+
 # Load dictionary
 
 wlist = sc.textFile('EOWL_words.txt',  use_unicode=True)
@@ -27,30 +28,20 @@ anagram = wlist.map(lambda r: ( ''.join( sorted(r) ), r)).groupByKey().sortByKey
 # create the requested structure
 myrdd = anagram.map(lambda r: (r[0], len(r[1]), r[1] ))
 
-# Collect
-p = myrdd.collect()
-
-# Identify the words that have the maximum anagrams
-tom = [s[1] for s in p]
-m = max(tom)
-l_max = [i for i,j in enumerate(tom) if j == m ]
-
-# Get the words
-myanagrams = [p[l] for l in l_max]
-myanagrams
-
+# Get the largest valid number of anagrams
+myanagrams = myrdd.takeOrdered(1 ,key=lambda x: -x[1] )
 
 # Copy them and their anagrams in a text file
 p3 = open('P3.txt', 'w')
 
-for i in range(0,3):
-    p3.write('word: ')
-    p3.write( myanagrams[i][0]+' --> ')
-    p3.write('anagrams : ')
-    for words in myanagrams[i][2]:
-        p3.write(words+ ' , ')
-    p3.write('\n\n')
 
-
-
+p3.write('word: ')
+p3.write( myanagrams[0][0]+' --> ')
+p3.write('anagrams : ')
+for words in myanagrams[0][2]:
+    p3.write(words+ ' , ')
+p3.write('\n\n')
 p3.close()
+stop = time.time()
+elapse = stop - start
+print elapse
