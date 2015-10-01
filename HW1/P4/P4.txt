@@ -1,3 +1,22 @@
+Note that my code for the BFS is in the "network_commands" module in the directory above. I wanted to put all of my
+network code in the same place (and multiple problems deal with networks).
+
+My graph is represented by (superhero, [superheroes linked to]). I guess it could be thought of as
+(A, [B, C, D...]). It is symmetric (as desired!).
+
+>> What does the diameter imply about the maximum number of steps in which your search
+>> must be executed?
+
+Well, if the maximum diameter is 10, the BFS must be finished by step 10. This can be thought
+of the maximum number of steps someone walking between nodes can take to span the graph.
+
+>>What does it mean if a character does not have a defined distance during the search?
+
+It means that they were not touched during the updates; they are not connected to the
+original node. 
+
+### Results ###
+
 * Captain America is connected to 6407 other characters within 10 iterations.
 * Miss Thing/Mary is connected to 6 other characters within 10 iterations.
 * Orwell is connected to 8 other characters within 10 iterations.

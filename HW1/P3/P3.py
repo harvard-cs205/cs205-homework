@@ -8,7 +8,6 @@ import string
 
 ### Setup ###
 config = ps.SparkConf()
-config = config.setMaster('local[' + str(2*mp.cpu_count()) + ']')
 config = config.setAppName('anagram_solver')
 sc = ps.SparkContext(conf=config)
 
