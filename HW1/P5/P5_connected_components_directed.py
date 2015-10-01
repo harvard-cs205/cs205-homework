@@ -29,7 +29,7 @@ def get_links(x):
 
     return (parent, children)
 
-parent_child_links = links_raw_data.map(get_links).partitionBy(num_partitions)
+parent_child_links = links_raw_data.map(get_links).partitionBy(num_partitions) #partitioned
 
 def get_reversed_links(x):
     parent = x[0]
@@ -38,12 +38,13 @@ def get_reversed_links(x):
 
 all_reversed_links = parent_child_links.flatMap(get_reversed_links)
 
-child_then_parents = all_reversed_links.groupByKey(num_partitions)
+child_then_parents = all_reversed_links.groupByKey(num_partitions) # partitioned
 child_then_parents_expanded = child_then_parents.map(lambda x: (x[0], list(x[1])), preservesPartitioning=True)
 
-joined_links = parent_child_links.join(child_then_parents_expanded)
+joined_links = parent_child_links.join(child_then_parents_expanded) # join copartitioned data!
 
 def get_acceptable_links(x):
+    # Return links that are symmetric.
     parent = x[0]
     list1 = x[1][0]
     list2 = x[1][1]
@@ -57,12 +58,12 @@ symmetric_links = joined_links.map(get_acceptable_links, preservesPartitioning=T
 
 network_rdd = symmetric_links
 
-# Analyze the links using my connected components class
+### Analyze the links using my connected components class ###
 
 from HW1.network_commands import Connected_Components
 
 connector = Connected_Components(sc, network_rdd)
-connector.run_until_converged()
+connector.run_until_converged() # This prints the number of connected components at the end
 
 # Get the biggest group
 num_rdd = connector.get_number_of_nodes_per_index()
