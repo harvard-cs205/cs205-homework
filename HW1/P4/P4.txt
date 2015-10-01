@@ -1,1 +1,18 @@
 # Your discussion here
+
+My graph representation was:
+character -> [characters in the same comic books]
+
+Touched nodes (including root):
+CAPTAIN AMERICA: 6408
+MISS THING/MARY: 7
+ORWELL: 9
+
+The diameter for a connected graph represents the maximum 
+distance between any two nodes in the graph, which means 
+in a bfs it should take at most that many iterations to 
+reach any node in the graph.
+
+If a node is untouched it indicates that the graph is
+disconnected or that it has a higher diameter.
+
