@@ -8,7 +8,7 @@ import multiprocessing as mp
 
 ### Setup ###
 config = ps.SparkConf()
-config = config.setMaster('local[' + str(2*mp.cpu_count()) + ']')
+# Assumes setup is in spark.conf
 config = config.setAppName('marvel_solver')
 sc = ps.SparkContext(conf=config)
 
@@ -46,7 +46,7 @@ def cleanup_links(x):
     unique_links = tuple(set(linked_to))
     return (x[0], unique_links)
 
-network_rdd = character_and_links_rdd.map(cleanup_links) # Completed network representation
+network_rdd = character_and_links_rdd.map(cleanup_links).cache() # Completed network representation
 # Our network has the form (Name, (All individuals that the node links to)). Note that
 # in this representation (A, (B)) does not imply (B, (A)), i.e. this is an innately directed
 # representation, but we initialize the network in such a way that the links are bi-directional.
@@ -58,21 +58,19 @@ from HW1.network_commands import BFS
 searcher = BFS(sc, 'CAPTAIN AMERICA', network_rdd)
 searcher.run_until_converged() # I could run 10 iterations, but the solution converges faster than that
 result = searcher.distance_rdd
-america_connections= dict(result)
+america_connections= searcher.distance_rdd.count() - 1
 
 #### Miss Thing/Mary #####
 searcher = BFS(sc, 'MISS THING/MARY', network_rdd)
 searcher.run_until_converged()
-result = searcher.distance_rdd
-mary_connections= dict(result)
+mary_connections= searcher.distance_rdd.count() - 1
 
 #### Orwell ####
 searcher = BFS(sc, 'ORWELL', network_rdd)
 searcher.run_until_converged()
-result = searcher.distance_rdd
-orwell_connections= dict(result)
+orwell_connections= searcher.distance_rdd.count() - 1
 
 #Print everything at the end
-print 'Captain america is connected to' , len(america_connections) - 1 , 'other characters.'
-print 'MISS THING/MARY is connected to' , len(mary_connections) - 1 , 'other characters.'
-print 'ORWELL is connected to' , len(orwell_connections) - 1 , 'other characters.'
+print 'Captain america is connected to' , america_connections, 'other characters.'
+print 'MISS THING/MARY is connected to' , mary_connections, 'other characters.'
+print 'ORWELL is connected to' , orwell_connections, 'other characters.'

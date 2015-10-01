@@ -226,7 +226,6 @@ class Connected_Components(object):
         labeled_network = network_rdd.zipWithIndex().map(lambda x: (x[0][0], (x[0][1], x[1])))
         return labeled_network.partitionBy(num_partitions).cache()
 
-
     @staticmethod
     def do_iteration_static(sc, connected_rdd):
 
