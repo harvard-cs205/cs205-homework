@@ -5,7 +5,7 @@ from pyspark import SparkContext
 import matplotlib.pyplot as plt
 import numpy as np
 
-sc = SparkContext("local", "HW1-2a Default Partioning")
+sc = SparkContext("local[4]", "HW1-2a Default Partioning")
 sc.setLogLevel("ERROR")
 
 #set up 2000x2000 array and transform array into [-2,2]x[-2,2] grid... 
