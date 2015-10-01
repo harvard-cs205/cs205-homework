@@ -3,7 +3,7 @@
 import pyspark
 
 
-def build_edges_rdd(initial_rdd):
+def build_edges_rdd(initial_rdd, N):
     """Builds the link-link graph """
     start_rdd = initial_rdd.map(lambda entry: tuple(entry.split(': '))).mapValues(lambda v: v.split(' '))
     start_rdd = start_rdd.map(lambda (k, v): (int(k), v))
@@ -30,23 +30,3 @@ def distance_between(root_node, end_node, edges_rdd, lookup_table, N):
         result = result.union(rdd).partitionBy(N)
         rdd = rdd.cache()
     return result.filter(lambda (k, v): k == end).map(lambda (k, v): (end_node, v))
-
-if __name__ == '__main__':
-
-    N = 40  # Number of partitions
-    sc = pyspark.SparkContext()  # "local[24]"
-    sc.setLogLevel("ERROR")
-
-    # Get files
-    links = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt', N, use_unicode=False)
-    page_names = sc.textFile('s3://Harvard-CS205/wikipedia/titles-sorted.txt', N, use_unicode=False)
-
-    # Build RDDs
-    edge_rdd = build_edges_rdd(links)
-    print edge_rdd.take(10)
-    lookup_table = page_names.zipWithIndex().mapValues(lambda v: v + 1)  # 1-indexed
-    print lookup_table.lookup("Kevin_Bacon")
-
-    # Distance between nodes in network
-    distance = distance_between("Kevin_Bacon", "Harvard_University", edge_rdd, lookup_table, N).collect()
-    print distance
