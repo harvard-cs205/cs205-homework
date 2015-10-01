@@ -1,3 +1,6 @@
+Note that helper functions are stored in the "network_commands" python module in the directory above this one.
+I wanted to place all of my network code in the same place.
+
 ###### Shortest path #######
 
 The shortest path between 'Harvard_University' and 'Kevin_Bacon' is of length 3. One example is
@@ -155,4 +158,3 @@ We also find that the largest group has 1977524 nodes in it. This is a significa
 symmetric case. We also find that smaller groups of connected components occur frequently; a histogram
 of the number of nodes per group can be seen in "directed_num_nodes_per_component.png". Overall, this is what we
 would expect. The second largest connected component consists of 157 nodes.
-
