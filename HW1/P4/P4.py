@@ -26,16 +26,16 @@ nodes = newcom.map(lambda v :  (v[0],[i for i in v[1]]   ) )
 nodesi, nodesf, distance = mybfs(nodes,'CAPTAIN AMERICA')
 print 'SS-BFS for CAPTAIN AMERICA'
 print 'distance: ', distance
-print 'number of unconnected characters: ', nodesi-nodesf
+print 'number of connected characters: ', nodesi-nodesf
 
 # Call the BFS algorithm for MISS THING/MARY
 nodesi, nodesf, distance = mybfs(nodes,'MISS THING/MARY')
 print 'SS-BFS for MISS THING/MARY'
 print 'distance: ', distance
-print 'number of unconnected characters: ', nodesi-nodesf
+print 'number of connected characters: ', nodesi-nodesf
 
 # Call the BFS algorithm
 nodesi, nodesf, distance = mybfs(nodes,'ORWELL' )
 print 'SS-BFS for ORWELL'
 print 'distance: ', distance
-print 'number of unconnected characters: ', nodesi-nodesf
+print 'number of connected characters: ', nodesi-nodesf
