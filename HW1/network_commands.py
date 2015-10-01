@@ -171,8 +171,7 @@ class Connected_Components(object):
     def __init__(self, sc, network_rdd):
 
         self.sc = sc
-        # User will define the cache if they want...otherwise computer will melt
-        self.network_rdd = network_rdd # ironically we only need this once
+        self.network_rdd = network_rdd # ironically we only need this once...partition later
         self.connected_rdd = None
 
         # Other helper variables
