@@ -9,8 +9,7 @@ import numpy as np
 
 ### Setup ###
 config = ps.SparkConf()
-config = config.setMaster('local[' + str(2*mp.cpu_count()) + ']')
-config = config.setAppName('marvel_solver')
+config = config.setAppName('shakespeare_solver')
 sc = ps.SparkContext(conf=config)
 
 # Read in the data
@@ -72,7 +71,7 @@ shake_phrases_iterable = new_key_vs_wordcount.groupByKey()
 
 # We now get our final data!
 shake_phrases = shake_phrases_iterable.map(lambda x: (x[0], list(x[1])))
-# We sort the phrases for fast lookup
+# We sort the phrases for fast lookup according to the documentation
 shake_phrases_sorted = shake_phrases.sortByKey().cache()
 
 # We now generate and print our phrases
