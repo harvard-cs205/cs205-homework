@@ -1,6 +1,6 @@
 
 #NOTE: File P5.py should be used to call this function below to find
-#shortest path between two nodes
+#connected components
 
 
 import numpy as np
