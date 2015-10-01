@@ -1,5 +1,5 @@
 # Your discussion here
-
+Harvard -> Kevin Bacon
 [[u'Harvard_University',
   u'Dartmouth_College',
   u"National_Lampoon's_Animal_House",
@@ -264,3 +264,10 @@
   u'Erd\u0151s\u2013Bacon_number',
   u'Kevin_Bacon'],
  [u'Harvard_University', u'Jack_Lemmon', u'Rod_Steiger', u'Kevin_Bacon']]
+
+Kevin Bacon -> Harvard
+[[u'Kevin_Bacon', u'Time_(magazine)', u'Harvard_University'],
+ [u'Kevin_Bacon', u'Six_degrees_of_separation', u'Harvard_University'],
+ [u'Kevin_Bacon', u'John_Lithgow', u'Harvard_University'],
+ [u'Kevin_Bacon', u'Marisa_Silver', u'Harvard_University'],
+ [u'Kevin_Bacon', u'College_Bowl', u'Harvard_University']]

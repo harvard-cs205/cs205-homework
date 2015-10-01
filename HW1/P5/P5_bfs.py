@@ -45,5 +45,5 @@ if __name__ == '__main__':
     links_kv = links.map(split_link).cache()
     harvard_index, bacon_index = title_index('Harvard_University', 'Kevin_Bacon', index_titles)
     print get_names_path(shortest_path(harvard_index, bacon_index, links_kv), index_titles)
-
+    print get_names_path(shortest_path(bacon_index, harvard_index, links_kv), index_titles)
 
