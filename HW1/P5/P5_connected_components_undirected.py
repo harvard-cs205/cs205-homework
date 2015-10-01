@@ -13,7 +13,7 @@ sc = ps.SparkContext(conf=config)
 #### Create the network ####
 num_partitions = 40
 
-# Assumes all links are **symmetric**
+# Forces all links to be symmetric
 links_raw_data = sc.textFile('links-simple-sorted.txt', minPartitions=num_partitions)
 titles_raw_data = sc.textFile('titles-sorted.txt', minPartitions=num_partitions)
 

@@ -10,7 +10,7 @@ imply (B, [A]), but the network is initialized so that it is symmetric.
 
 Well, if the maximum diameter is 10, the BFS must be finished by step 10. The diameter is the greatest
 distance between any pair of nodes on a graph (taking the shortest path possible between them), and the BFS
-takes the shortest path between all nodes.
+takes the shortest path between all nodes starting from a seed node.
 
 >>What does it mean if a character does not have a defined distance during the search?
 
