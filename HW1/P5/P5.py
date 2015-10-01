@@ -40,7 +40,8 @@ def l_add_distance(kv, d):
 
 def update_accumulator(d):
     global sum_distance
-    sum_distance += d[0]
+    if d[0] < default_distance:
+        sum_distance += 1
 
 
 def l_min_distance(v1, v2):
@@ -50,7 +51,7 @@ def l_min_distance(v1, v2):
         return v2
 
 
-def bfs_search(nodes, edges, hero, diameter):
+def bfs_search(nodes, edges, hero):
     """
     Perform breadth-first search to find shortest path from hero.
     :param hero: The root node to find paths from.
@@ -90,17 +91,19 @@ def bfs_search(nodes, edges, hero, diameter):
 def main():
     nodes, edges = create_graph('links.smp')
 
-    diameter = 10
     num_display_neighbors = 10
 
     root = ['1', '2', '5']
 
-    for hero in root:
-        nodes_bfs, _ = bfs_search(nodes, edges, hero, diameter)
+    global sum_distance
+    for r in root:
+        sum_distance += -sum_distance.value
+
+        nodes_bfs, _ = bfs_search(nodes, edges, r)
 
         start = time.time()
         print '---------------------'
-        print hero
+        print r
 
         for i in range(5):
             print 'Showing ' + repr(num_display_neighbors) + ' D-' + repr(

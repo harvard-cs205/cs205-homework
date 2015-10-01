@@ -51,7 +51,8 @@ def l_add_distance(list, d):
 
 def update_accumulator(d):
     global sum_distance
-    sum_distance += d
+    if d < default_distance:
+        sum_distance += 1
 
 
 def bfs_search(nodes, edges, hero, diameter):
