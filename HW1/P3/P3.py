@@ -21,7 +21,7 @@ if __name__ == '__main__':
     
     flatresult = result.map(flatten) #tail the format
     
-    collectresult = flatresult.collect()
+    collectresult = flatresult.collect() #this is the required RDD
     
     maxentry = max(collectresult, key=lambda x:x[1])
     print maxentry   
