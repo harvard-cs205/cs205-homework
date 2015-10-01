@@ -37,16 +37,11 @@ def get_names_path(paths, rdd):
 
 if __name__ == '__main__':
 	sc = SparkContext(appName="P5")
-	#links_list = ['2: 5 7 4', '1: 5 1 7', '10: 6 9 7', '4: 8 10 4', '7: 3 7 4', '3: 3 7 2', '6: 6 2 4', '5: 3 2 1', '1: 2 6 9', '10: 9 1 7']
-	#titles_list = ['AKG', 'MOB', 'INJ', 'HLB', 'DCE', 'COL', 'GKI', 'GKN', 'FJI', 'JKA']
 	links = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt')
 	titles = sc.textFile('s3://Harvard-CS205/wikipedia/titles-sorted.txt')
-	#links = sc.parallelize(range(0, 10)).map(lambda x: links_list[x])
-	#titles = sc.parallelize(range(0, 10)).map(lambda x: titles_list[x])
 	index_titles = titles.zipWithIndex().map(lambda x: (x[1] + 1, x[0]))
 	links_kv = links.map(split_link)
 	harvard_index, bacon_index = title_index('Harvard_University', 'Kevin_Bacon', index_titles)
-	#harvard_index, bacon_index = title_index(titles_list[1], titles_list[5], index_titles)
 	print get_names_path(shortest_path(harvard_index, bacon_index, links_kv), index_titles)
 
 
