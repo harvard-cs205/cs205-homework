@@ -19,37 +19,6 @@ which makes intuitive sense to me.
 
 ##### Connected Components #####
 
-### Directed Graph ###
-
-When we have a directed graph, my algorithm finds that we have 52
-connected components. It converges in a logarithmic manner, specifically:
-
-
-Beginning of Iteration 1
-Before update: 3773865 groups
-Beginning of Iteration 2
-Before update: 931367 groups
-Beginning of Iteration 3
-Before update: 141195 groups
-Beginning of Iteration 4
-Before update: 10466 groups
-Beginning of Iteration 5
-Before update: 1107 groups
-Beginning of Iteration 6
-Before update: 177 groups
-Beginning of Iteration 7
-Before update: 71 groups
-Beginning of Iteration 8
-Before update: 60 groups
-Beginning of Iteration 9
-Before update: 56 groups
-Beginning of Iteration 10
-Before update: 53 groups
-Finished at end of iteration 10 !
-There are  53  groups in the network.
-
-See the plot "directed_graph_components_vs_iteration.png" to see the logarithmic convergence of my algorithm.
-
 ### Undirected Graph ###
 
 We get a result that makes truly no sense; there are more unconnected components
@@ -79,3 +48,84 @@ Beginning of Iteration 11
 Before update: 1113 groups
 Finished at end of iteration 11 !
 There are  1113  groups in the network.
+
+See undirected_graph_components_vs_iteration.png
+
+### Directed Graph ###
+
+When we have a directed graph, my algorithm finds that we have 52
+connected components. It converges in a logarithmic manner, specifically:
+
+
+Beginning of Iteration 1
+Before update: 3768942 groups
+Beginning of Iteration 2
+Before update: 684749 groups
+Beginning of Iteration 3
+Before update: 283770 groups
+Beginning of Iteration 4
+Before update: 146466 groups
+Beginning of Iteration 5
+Before update: 102362 groups
+Beginning of Iteration 6
+Before update: 87096 groups
+Beginning of Iteration 7
+Before update: 81483 groups
+Beginning of Iteration 8
+Before update: 79314 groups
+Beginning of Iteration 9
+Before update: 78404 groups
+Beginning of Iteration 10
+Before update: 78036 groups
+Beginning of Iteration 11
+Before update: 77838 groups
+Beginning of Iteration 12
+Before update: 77731 groups
+Beginning of Iteration 13
+Before update: 77653 groups
+Beginning of Iteration 14
+Before update: 77582 groups
+Beginning of Iteration 15
+Before update: 77512 groups
+Beginning of Iteration 16
+Before update: 77448 groups
+Beginning of Iteration 17
+Before update: 77396 groups
+Beginning of Iteration 18
+Before update: 77377 groups
+Beginning of Iteration 19
+Before update: 77361 groups
+Beginning of Iteration 20
+Before update: 77353 groups
+Beginning of Iteration 21
+Before update: 77346 groups
+Beginning of Iteration 22
+Before update: 77340 groups
+Beginning of Iteration 23
+Before update: 77332 groups
+Beginning of Iteration 24
+Before update: 77316 groups
+Beginning of Iteration 25
+Before update: 77292 groups
+Beginning of Iteration 26
+Before update: 77289 groups
+Beginning of Iteration 27
+Before update: 77281 groups
+Beginning of Iteration 28
+Before update: 77277 groups
+Beginning of Iteration 29
+Before update: 77271 groups
+Beginning of Iteration 30
+Before update: 77269 groups
+Beginning of Iteration 31
+Before update: 77266 groups
+Beginning of Iteration 32
+Before update: 77259 groups
+Beginning of Iteration 33
+Before update: 77255 groups
+Beginning of Iteration 34
+Before update: 77249 groups
+Finished at end of iteration 34 !
+There are  77249  groups in the network.
+
+See the plot "directed_graph_components_vs_iteration.png" to see the logarithmic convergence of my algorithm.
