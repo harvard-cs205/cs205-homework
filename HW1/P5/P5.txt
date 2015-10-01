@@ -60,9 +60,12 @@ Before update: 1113 groups
 Finished at end of iteration 11 !
 There are  1113  groups in the network.
 
+Within this graph, the largest connected component consists of 5709800 individuals. The next largest connected component
+only has 5 individuals! So basically, all nodes on wikipedia are connected if connections are symmetric! A histogram of
+the number of nodes per connected component can be seen in "undirected_num_nodes_per_component.png."
+
 Our algorithm converges in 11 iterations, implying that the diameter of the graph is D ~ 11. To see the convergence
-of our algorithm vs. iteration, see "undirected_graph_components_vs_iteration.png." This is a surprisingly large number
-in my opinion; I would have expected something more O(1). Hopefully it is correct!
+of our algorithm vs. iteration, see "undirected_graph_components_vs_iteration.png."
 
 ### Directed Graph ###
 
