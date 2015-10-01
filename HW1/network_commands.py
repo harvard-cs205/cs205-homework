@@ -195,6 +195,11 @@ class Connected_Components(object):
         num_distinct_indices = list_of_indices.distinct().count()
         return num_distinct_indices
 
+    def get_number_of_nodes_per_index(self):
+        list_of_indices = self.connected_rdd.map(lambda x: x[1][1])
+        list_of_indices_count = list_of_indices.map(lambda x: (x, 1))
+        return list_of_indices_count.reduceByKey(lambda a, b: a + b, num_partitions)
+
     def run_until_converged(self):
         go = True
 
