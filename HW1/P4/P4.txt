@@ -1,1 +1,65 @@
-# Your discussion here
+# Running the script
+$SPARK_HOME/bin/spark-submit P4.py
+
+# Results
+From CAPTAIN AMERICA we can touch 6403 nodes
+From MISS THING/MARY we can touch 7 nodes
+From ORWELL we can touch 9 nodes
+
+Using iPython notebook, the total running time is ~2 seconds on my laptop.
+
+# Graph diameter
+Graph diameter represents the largest distance between any two nodes in the graph. This means that we should never
+have to search more steps than the diameter in order to find the shortest paths to each node from the source
+node (or to conclude that no path exists.)
+
+# Undefined distance
+If a node has an undefined distance after our search completes, this means it was not reachable from the start node.
+In my implementation, this meant that the distance was equal to some constant, large number.
+
+# Graph representation
+We can complete the BFS computation using 1 RDD. Each element in the RDD consists of a key-value pair
+such that the index of the node (an integer) is the key, and the value is a tuple that contains the current
+distance to the source node (or "INFINITY" if it is not reachable,) the adjacency list for that node, and the
+color of the node. Color is either {WHITE = 0, GRAY = 1, BLACK = 2} corresponding to whether the node is not yet
+seen, about to be processed, or processed (respectively.)
+
+( node_index, ( current_dist, adj_list, color ) )
+
+# Initial state
+The RDD is created with every node in the graph represented as a single entry. The current distance is "INFINITY"
+for every node except the source node, which has current distance equal to 0, and color equal to "GRAY."
+
+# Two stages to this iterative computation
+During the map step, the BFS expands all nodes that are "GRAY" and simply returns the nodes that are "WHITE" or
+"BLACK." The "GRAY" nodes are expanded by using a flatMap() and setting their distances to the current distance
+plus 1. To save on memory, we omit the adjacency matrix as there must already exist some other copy of it due to
+the way we initialize the RDD; this information is recovered in the reduce step and saves on memory shuffling.
+
+In the reduce step, we can combine all elements with the same key using reduceByKey(), noting that we can take the
+minimum distance,
+the darkest color, and the longest adjacency list (it would either be empty, or the full adjacency list.) After
+combining, we should return to the same number of nodes as we had in the beginning: the total number of nodes in the
+graph.
+
+# The end state
+Using this strategy, it is difficult to incorporate accumulators efficiently as reduceByKey() is actually a
+transformation rather than an action. This means Spark does not guarantee its behaviour in the case of having to replay
+a transformation, and the lazy evaluation means it cannot be used inside the loop in order to exit the loop.
+
+The compromise was to use an accumulator in addition to the foreach() function. While not the most efficient, it does
+not seem to cause a significant slowdown. This makes sense since we are incrementing an accumulator and not doing
+any expensive operations like shuffling memory. By checking whether there are any more "GRAY" state remaining, we
+can know when to exit the loop.
+
+# Caching, partitioning strategy, and optimisation
+Explicitly requesting RDDs to be cached actually slowed things down in this example. Perhaps it was already doing
+so and this just ended up adding more operations unnecessarily.
+
+Increasing partitions above 2 also surprisingly seems to slow down the program, with 2 partitions being optimal
+(dual-core system.)
+
+The filter() transformation was not really relevant for this implementation since all nodes are required when
+performing the reduce step in order to combine information and save on bandwidth. As a rough bound, we will never
+increase by more than N*N nodes in a given step, and the reduce step always reduces to N nodes. So total states
+being considered will always be between N and N*(N+1).
