@@ -3,9 +3,7 @@ sns.set_context('poster', font_scale=1.25)
 import findspark as fs
 fs.init()
 import pyspark as ps
-import multiprocessing as mp
 import numpy as np
-import re
 
 # Assumes local options are already set in conf file...or else this explodes
 config = ps.SparkConf()
