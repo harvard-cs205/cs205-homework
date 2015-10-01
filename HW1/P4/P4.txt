@@ -10,7 +10,7 @@ I have written three BFS methods, each with a different approach. My preffered B
 The diameter of 10 imlplies that all nodes can be reached within 10 steps from any node, since the longest 'shortest path'
 is 10 steps (given all nodes are conected in one graph).
 
-"CAPTAIN AMERICA": 6407 nodes visited
+"CAPTAIN AMERICA": 6408 nodes visited
 "MISS THING/MARY": 7 nodes visited
 "ORWELL": 9 nodes visited
 

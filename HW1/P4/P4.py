@@ -2,9 +2,11 @@ from P4_bfs import *
 
 
 if __name__ == "__main__":
-    N = 20  # Number of partitions
-
+    N = 32  # Number of partitions
     sc = pyspark.SparkContext("local[8]")
+    sc.setLogLevel("ERROR")
+
+    # Take source
     source_rdd = sc.textFile('source.csv', N, False)
 
     # Getting our data into shape:
@@ -22,9 +24,9 @@ if __name__ == "__main__":
 
     print "DONE BUILDING GRAPH. STARTING BFS..."
 
-    # Distance to nodes in network
+    # Distance to nodes in network (Choose...)
     # one = distance_to_all_nodes_serial("ORWELL", graph).collect()  # SERIAL VERSION
-    two = distance_to_all_nodes_edge("ORWELL", edges_rdd, N).collect()  # EDGE TUPLE VERSION
-    # three = distance_to_all_nodes_spark("ORWELL", graph).collect()  # FAST VERSION
+    two = distance_to_all_nodes_edge("CAPTAIN AMERICA", edges_rdd, N).collect()  # EDGE TUPLE VERSION (preferred)
+    # three = distance_to_all_nodes_spark("ORWELL", graph).collect()  # GRAPH-LIST VERSION
     print two
     print "Nodes: ", len(two)
