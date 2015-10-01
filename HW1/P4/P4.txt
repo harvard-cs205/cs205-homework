@@ -1,1 +1,20 @@
 # Your discussion here
+
+
+1/ Here we explain our algorithm
+
+We load the data and then create a rdd with key = character
+and the associated values are all its neighbors at a distance 1. (see lines 1 to 23 of the code)
+
+We pass this to the P4_bfs function along with the name of the node at a distance 0.
+
+Now we explain how the SS-BFS algorithm work.
+
+We have an rdd with all the characters as keys called "allchar". At every search we find the characters at a distance +1 and create an rdd with these characters as keys. We substract the keys of this rdd to the big rdd "allchar". We do this until the number of characters in "allchar" does not change anymore. Therefore we have both the distance and the nodes that are not connected to node 0.
+
+
+For Captain America:
+
+There are in total 6426 characters initially. At a distance 4 there are 6408 characters that have been touched by the algorithm. 18 characters are unconnected. The algorithm finds that we can't connect them anymore.
+
+For MISS THING/MARY:
