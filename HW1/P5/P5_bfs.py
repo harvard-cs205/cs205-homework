@@ -29,19 +29,19 @@ def shortest_path(index1, index2, links_rdd):
 
 def get_names_path(paths, rdd):
     path_ret = []
+    set_path = set([vertex for path in paths for vertex in path])
+    filtered_entries = dict(rdd.filter(lambda x: x[0] in set_path).collect())
     for path in paths:
-        set_path = set(path)
-        filtered_entries = dict(rdd.filter(lambda x: x[0] in set_path).collect())
         path_ret.append(map(lambda x: filtered_entries[x], path))
     return path_ret
 
 if __name__ == '__main__':
-	sc = SparkContext(appName="P5")
-	links = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt')
-	titles = sc.textFile('s3://Harvard-CS205/wikipedia/titles-sorted.txt')
-	index_titles = titles.zipWithIndex().map(lambda x: (x[1] + 1, x[0]))
-	links_kv = links.map(split_link)
-	harvard_index, bacon_index = title_index('Harvard_University', 'Kevin_Bacon', index_titles)
-	print get_names_path(shortest_path(harvard_index, bacon_index, links_kv), index_titles)
+    sc = SparkContext(appName="P5")
+    links = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt')
+    titles = sc.textFile('s3://Harvard-CS205/wikipedia/titles-sorted.txt')
+    index_titles = titles.zipWithIndex().map(lambda x: (x[1] + 1, x[0])).cache()
+    links_kv = links.map(split_link).cache()
+    harvard_index, bacon_index = title_index('Harvard_University', 'Kevin_Bacon', index_titles)
+    print get_names_path(shortest_path(harvard_index, bacon_index, links_kv), index_titles)
 
 
