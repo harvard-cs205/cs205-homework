@@ -44,24 +44,27 @@ with open('source.csv', 'r') as infile:
 
 adjacency_list = characters.map(lambda x: (x[1], [x[0]])).reduceByKey(lambda x, y: x + y).flatMap(get_edges).map(lambda x: (x[0], [x[1]])).reduceByKey(lambda x, y: x + y)
 
-source = 'QUESADA, JOE'
-vertices_dist = sc.parallelize([(source, 0)])
-dist = 1
-current_level_size = -1
-accum = sc.accumulator(0)
 
-# stop if the current level size is the same as the number of intersections
-# (stored in accumulator)
-while current_level_size != accum.value:
-    accum, resolve_collisions = create_resolve_collisions()
+def bfs(source):
+    vertices_dist = sc.parallelize([(source, 0)])
+    dist = 1
+    current_level_size = -1
+    accum = sc.accumulator(0)
 
-    # get list of current-level vertices
-    current_vertices = set(vertices_dist.filter(lambda x: x[1] == dist - 1).map(lambda x: x[0]).collect())
+    # stop if the current level size is the same as the number of intersections
+    # (stored in accumulator)
+    while current_level_size != accum.value:
+        accum, resolve_collisions = create_resolve_collisions()
 
-    # get the neighbors of all current-level vertices
-    neighbors = adjacency_list.filter(lambda x: x[0] in current_vertices).flatMap(lambda x: [(n, dist) for n in x[1]])
-    current_level_size = neighbors.count()
+        # get list of current-level vertices
+        current_vertices = set(vertices_dist.filter(lambda x: x[1] == dist - 1).map(lambda x: x[0]).collect())
 
-    vertices_dist = vertices_dist.union(neighbors).map(lambda x: (x[0], [x[1]])).reduceByKey(lambda x, y: x + y).map(resolve_collisions)
+        # get the neighbors of all current-level vertices
+        neighbors = adjacency_list.filter(lambda x: x[0] in current_vertices).flatMap(lambda x: [(n, dist) for n in x[1]])
+        current_level_size = neighbors.count()
 
-    dist += 1
+        vertices_dist = vertices_dist.union(neighbors).map(lambda x: (x[0], [x[1]])).reduceByKey(lambda x, y: x + y).map(resolve_collisions)
+
+        dist += 1
+
+    return vertices_dist
