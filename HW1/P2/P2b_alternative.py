@@ -34,7 +34,7 @@ def mandelbrot_wrapper(row, col):
     return ((row, col), P2.mandelbrot(x, y))
 
 ########### Different from part A: load balancing! ########
-new_indices = indices.repartition(100)
+new_indices = indices.repartition(100) # Randomly throw jobs between partitions
 
 mandelbrot_load_balanced = new_indices.map(lambda a: mandelbrot_wrapper(*a))
 

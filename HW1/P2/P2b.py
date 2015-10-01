@@ -51,7 +51,8 @@ expensive_mask[e_top:750, e_left:650]=0
 expensive_mask[990:1010, 0:e_left]=1
 
 # We broadcast the expensive mask to avoid communication overhead
-# not sure if this is technically necessary
+# not sure if this is technically necessary. We could use a join instead, but broadcast is faster,
+# and I use join in later problems when datasets are large.
 broadcast_expensive = sc.broadcast(expensive_mask)
 
 # Determine if the index pair is expensive
