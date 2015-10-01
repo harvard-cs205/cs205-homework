@@ -19,11 +19,13 @@ def add_to_path(node, acc, index1, index2):
 
 def shortest_path(index1, index2, links_rdd):
     solutions_found = links_rdd.context.accumulator(0)
-    path_rdd = links_rdd.map(lambda x: (x[0], [x[0]]))
+    nodes_to_search = set([index1])
+    path_rdd = links_rdd.filter(lambda x: x[0] in nodes_to_search).map(lambda x: (x[0], [x[0]]))
     solution_rdd = path_rdd
     while solutions_found.value == 0:
-        join_rdd = links_rdd.join(path_rdd)
+        join_rdd = links_rdd.filter(lambda x: x[0] in nodes_to_search).join(path_rdd)
         path_rdd = join_rdd.flatMap(lambda x: add_to_path(x, solutions_found, index1, index2))
+        nodes_to_search = set(path_rdd.map(lambda x: x[0]).collect())
         solution_rdd = path_rdd.filter(lambda x: x[0] == index2 and x[1][0] == index1).map(lambda x: x[1]).collect()
     return solution_rdd
 
@@ -37,8 +39,8 @@ def get_names_path(paths, rdd):
 
 if __name__ == '__main__':
     sc = SparkContext(appName="P5")
-    links = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt')
-    titles = sc.textFile('s3://Harvard-CS205/wikipedia/titles-sorted.txt')
+    links = sc.textFile('links-simple-sorted.txt')
+    titles = sc.textFile('titles-sorted.txt')
     index_titles = titles.zipWithIndex().map(lambda x: (x[1] + 1, x[0])).cache()
     links_kv = links.map(split_link).cache()
     harvard_index, bacon_index = title_index('Harvard_University', 'Kevin_Bacon', index_titles)
