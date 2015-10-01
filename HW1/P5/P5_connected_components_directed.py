@@ -44,7 +44,7 @@ child_then_parents_expanded = child_then_parents.map(lambda x: (x[0], list(x[1])
 joined_links = parent_child_links.join(child_then_parents_expanded) # join copartitioned data!
 
 def get_acceptable_links(x):
-    # Return links that are symmetric.
+    '''Return links that are symmetric.'''
     parent = x[0]
     list1 = x[1][0]
     list2 = x[1][1]
@@ -64,6 +64,8 @@ from HW1.network_commands import Connected_Components
 
 connector = Connected_Components(sc, network_rdd)
 connector.run_until_converged() # This prints the number of connected components at the end
+# Print number of connected components at the end
+print 'Number of unique groups:' , connector.get_num_unique_groups()
 
 # Get the biggest group
 num_rdd = connector.get_number_of_nodes_per_index()
