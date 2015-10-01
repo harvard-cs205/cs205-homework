@@ -28,8 +28,7 @@ def distance_to_all_nodes_edge(root_node, edges_rdd, N):
     edges_rdd = edges_rdd.partitionBy(N)
     edges_rdd = edges_rdd.cache()
     result = edges_rdd.context.parallelize([(root_node, 0)])
-    rdd = edges_rdd.filter(lambda (k, v): k == root_node)
-    rdd = rdd.map(lambda (k, v): (v, 0))
+    rdd = result
     while not rdd.isEmpty():
         rdd = edges_rdd.join(rdd).values().partitionBy(N)
         rdd = rdd.distinct()
