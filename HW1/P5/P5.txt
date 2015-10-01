@@ -31,7 +31,7 @@ algorithm works in a couple of steps:
 4. Goto 2, repeat until the number of unique ID's converges to a constant value.
 
 The maximum amount of time it will take for one node to see the effect of another node is O(D) as the maximum
-number of nodes between two nodes is D, and information propagates along one node at a time.
+number of nodes between two nodes is D and information propagates along one node per iteration.
 
 ### Undirected Graph ###
 
