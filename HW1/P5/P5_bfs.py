@@ -15,7 +15,7 @@ def build_edges_rdd(initial_rdd):
 
 
 def distance_between(root_node, end_node, edges_rdd, lookup_table, N):
-    """Using edge tuples to determine distances to a nodes, without leaving Spark"""
+    """Using edge tuples to determine distances to a node, without leaving Spark"""
     root = lookup_table.lookup(root_node)[0]
     end = lookup_table.lookup(end_node)[0]
     edges_rdd = edges_rdd.partitionBy(N)
@@ -23,11 +23,11 @@ def distance_between(root_node, end_node, edges_rdd, lookup_table, N):
     result = edges_rdd.context.parallelize([(root, 0)])
     rdd = result
     while result.filter(lambda (k, v): k == end).isEmpty():
-        rdd = edges_rdd.join(rdd).values().partitionBy(N)
+        rdd = edges_rdd.join(rdd).partitionBy(N).values()
         rdd = rdd.distinct()
         rdd = rdd.subtractByKey(result)  # don't repeat work
         rdd = rdd.mapValues(lambda v: v + 1)
-        result = result.union(rdd)
+        result = result.union(rdd).partitionBy(N)
         rdd = rdd.cache()
     return result.filter(lambda (k, v): k == end).map(lambda (k, v): (end_node, v))
 
