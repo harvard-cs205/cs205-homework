@@ -1,1 +1,7 @@
+There are several possible partitioning strategies to achieve this goal, with different tradeoffs.
+Produce a histogram of compute effort for each partition for your partitioning choice. Discuss
+your choice in terms of (a) how well it balances work, and (b) its costs, particularly shuffle
+costs.
+
 # Your discussion here
+
