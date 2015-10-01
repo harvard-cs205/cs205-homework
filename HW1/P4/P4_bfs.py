@@ -59,9 +59,6 @@ def explore_level_from_node(node):
         for other_node in adj_list:
             # Append our tentative new distance
             results.append((other_node, (d+1, [curr_node])))
-    #else:
-        # Otherwise we have an unexplored node...
-    #    accum.add(1)
 
     # And lets not lose any nodes now...
     results.append(node)
