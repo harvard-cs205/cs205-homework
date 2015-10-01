@@ -1,3 +1,9 @@
 # Your discussion here
 
+The distance from Kevin Bacon to Harvard is 2 steps:
 ('Harvard_University', 2)
+
+The distance from Harvard to Kevin Bacon is 5 steps:
+('Kevin_Bacon', 3)
+
+The number of connected components is .., and the largest components is .. nodes.
