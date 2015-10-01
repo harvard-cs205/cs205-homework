@@ -1,19 +1,21 @@
 Note that my code for the BFS is in the "network_commands" module in the directory above. I wanted to put all of my
-network code in the same place (and multiple problems deal with networks).
+network code in the same place (multiple problems deal with networks).
 
-My graph is represented by (superhero, [superheroes linked to]). I guess it could be thought of as
-(A, [B, C, D...]). It is symmetric (as desired!).
+My graph is represented by (superhero, [superheroes linked to]). It can be thought of as
+(A, [B, C, D...]). Note that this representation is inherently directional, i.e. (A, [B]) does not
+imply (B, [A]), but the network is initialized so that it is symmetric.
 
 >> What does the diameter imply about the maximum number of steps in which your search
 >> must be executed?
 
-Well, if the maximum diameter is 10, the BFS must be finished by step 10. This can be thought
-of the maximum number of steps someone walking between nodes can take to span the graph.
+Well, if the maximum diameter is 10, the BFS must be finished by step 10. The diameter is the greatest
+distance between any pair of nodes on a graph (taking the shortest path possible between them), and the BFS
+takes the shortest path between all nodes.
 
 >>What does it mean if a character does not have a defined distance during the search?
 
 It means that they were not touched during the updates; they are not connected to the
-original node. 
+original node.
 
 ### Results ###
 

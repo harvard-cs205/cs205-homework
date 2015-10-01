@@ -47,8 +47,8 @@ def cleanup_links(x):
     return (x[0], unique_links)
 
 network_rdd = character_and_links_rdd.map(cleanup_links).cache() # Completed network representation
-# Our network has the form (Name, (All individuals that the node links to)). Note that
-# in this representation (A, (B)) does not imply (B, (A)), i.e. this is an innately directed
+# Our network has the form (Name, [All individuals that the node links to]). Note that
+# in this representation (A, [B]) does not imply (B, [A]), i.e. this is an innately directed
 # representation, but we initialize the network in such a way that the links are bi-directional.
 
 # We now do the breadth-first search, BFS
