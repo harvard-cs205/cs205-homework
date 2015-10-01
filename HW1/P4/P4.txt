@@ -1,1 +1,26 @@
 # Your discussion here
+For this question, I collaborated with Reinier Maat and Taylor Killian. 
+
+I initially created a Graph in the form of an adjacency matrix where the matrix was of the form:
+
+(Superhero1, [list of all neighbors])
+(Superhero2, [list of all neighbors])
+
+However, i found this type of graph structure (one that is short and wide) to not be ideal for BFS. Specifically, I instead decided to use a graph structure in the form of just an edge list where the matrix is of the form:
+
+(Superhero1, Neighbor 1)
+(Superhero1, Neighbor 2)
+(Superhero1, Neighbor 3)
+(Superhero2, Neighbor 1)
+
+This new graph is tall and skinny, which is much easier to manipulate in spark. 
+
+My BFS algorithm works as follows: it first inputs an origin node and sets that origin to 0, i then join that origin node with my graph to find all of my origin’s neighbors. those neighbors are assigned to a distance of 1 and saved in a new node RDD. I then join that RDD with the original graph to get the neighbors of the distance-1 neighbors. This process repeats for 10 iterations. However, during each iteration, to avoid duplicative calculations, I have included a line of code that a checks to see if a superhero has already been searched. I also took advantage of .cache() to reduce wasted time recalculating RDDs during each iteration. 
+
+Note that accumulators were not used here due to the inclusion of the line of code that checks to see for duplicative neighbors. 
+
+ORWELL - 9
+MISS THING/MARY - 7
+CAPTAIN AMERICA - 6408
+
+If a character does not have a defined distance, then that means that character is disconnected from my source node. With respect to this problem, that would mean that that character does not share a comic with the source node nor does any of his/her neighbors. there is no connection between that character and my source node. 
