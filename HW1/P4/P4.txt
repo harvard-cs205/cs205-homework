@@ -19,6 +19,6 @@ original node.
 
 ### Results ###
 
-* Captain America is connected to 6407 other characters within 10 iterations.
-* Miss Thing/Mary is connected to 6 other characters within 10 iterations.
-* Orwell is connected to 8 other characters within 10 iterations.
+* Captain America is connected to 6407 other characters; 6408 nodes touched total (including Captain America).
+* Miss Thing/Mary is connected to 6 other characters; 7 nodes touched total.
+* Orwell is connected to 8 other characters; 9 nodes touched total.

@@ -13,7 +13,7 @@ config = config.setAppName('wiki_solver')
 sc = ps.SparkContext(conf=config)
 
 # Create the network
-num_partitions_to_use=50
+num_partitions_to_use=40
 
 links_raw_data = sc.textFile('links-simple-sorted.txt', minPartitions=num_partitions_to_use)
 titles_raw_data = sc.textFile('titles-sorted.txt', minPartitions=num_partitions_to_use)
@@ -40,11 +40,10 @@ from HW1.network_commands import Path_Finder
 start_node = title_then_index.lookup('Harvard_University')[0]
 end_node = title_then_index.lookup('Kevin_Bacon')[0]
 
-# Optimize rdd's for use in code, use same # of partitions across code
+# Optimize rdd's for lookups, according to documentation
 title_then_index = title_then_index.sortByKey(numPartitions=num_partitions_to_use).cache()
 index_then_title = index_then_title.sortByKey(numPartitions=num_partitions_to_use).cache()
 
-Path_Finder.num_partitions = num_partitions_to_use
 # Create Path_Finder and find the path!
 finder = Path_Finder(sc, network_rdd, start_node, end_node) #network_rdd is cached inside
 finder.run_until_converged()
@@ -54,13 +53,11 @@ finder.run_until_converged()
 def get_path_forwards():
     return [index_then_title.lookup(z)[0] for z in finder.get_random_path()]
 
-print
-print
-print get_path_forwards()
-print get_path_forwards()
-print get_path_forwards()
-print
-print
 
-import time
-time.sleep(3)
+print
+print
+print get_path_forwards()
+print get_path_forwards()
+print get_path_forwards()
+print
+print

@@ -57,7 +57,7 @@ class BFS(object):
         #TODO: Figure out where to use accumulators...or if I need them.
         # Pull the needed info out of the network
 
-        joined_network = network_rdd.join(distance_rdd)
+        joined_network = network_rdd.join(distance_rdd) # copartitioned!
         network_to_touch = joined_network.map(lambda x: (x[0], x[1][0]), preservesPartitioning=True)
 
         # Now do the iteration!
@@ -138,7 +138,7 @@ class Path_Finder(object):
 
     @staticmethod
     def do_iteration_static(sc, network_rdd, distance_rdd, cur_iteration):
-        joined_network = distance_rdd.join(network_rdd)
+        joined_network = distance_rdd.join(network_rdd) # copartitioned!
         network_to_touch = joined_network.map(lambda x: (x[0], x[1][1]), preservesPartitioning=True)
 
         # Now do the iteration!
@@ -248,6 +248,6 @@ class Connected_Components(object):
 
         children_indices = connected_rdd.flatMap(get_children_index)
         child_with_smallest_index = children_indices.reduceByKey(get_smaller_index, num_partitions) # This is partitioned
-        joined_rdd= connected_rdd.join(child_with_smallest_index)
+        joined_rdd= connected_rdd.join(child_with_smallest_index) # copartitioned!
         connected_rdd = joined_rdd.map(lambda x: (x[0], (x[1][0][0], x[1][1])), preservesPartitioning=True) # Should preserve partitioning...
         return connected_rdd.cache()
