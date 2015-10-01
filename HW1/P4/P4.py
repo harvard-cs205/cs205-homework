@@ -2,6 +2,7 @@ from P4_bfs import *
 
 
 if __name__ == "__main__":
+
     N = 32  # Number of partitions
     sc = pyspark.SparkContext("local[8]")
     sc.setLogLevel("ERROR")
