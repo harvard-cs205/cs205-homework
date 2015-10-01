@@ -1,7 +1,6 @@
 ###### Shortest path #######
 
-The shortest path between 'Harvard_University' and 'Kevin_Bacon' is of length 3.
-One example is
+The shortest path between 'Harvard_University' and 'Kevin_Bacon' is of length 3. One example is
 
 [u'Harvard_University', u'Tommy_Lee_Jones', u'JFK_(film)', u'Kevin_Bacon']
 
@@ -19,10 +18,22 @@ which makes intuitive sense to me.
 
 ##### Connected Components #####
 
+I have implemented an algorithm that will compute the number of connected components
+in O(D) iterations; I don't think it converges in O(log(D)), but maybe I somehow got O(log(D)) unknowingly. The
+algorithm works in a couple of steps:
+
+1. Assign each node in the graph a unique integer ID
+2. Pass the ID of each parent to their children
+3. If the ID passed to the child is smaller than the child's current ID, the child adopts the new ID
+4. Goto 2, repeat until the number of unique ID's converges to a constant value.
+
+The maximum amount of time it will take for one node to see the effect of another node is O(D) as the maximum
+number of nodes between two nodes is D, and information propagates along one node at a time.
+
 ### Undirected Graph ###
 
-We get a result that makes truly no sense; there are more unconnected components
-than in the directed case. I must have messed up somewhere...
+In the undirected graph, we assume every connection is symmetric, i.e. if a node points to another, they are connected.
+When we run our code, we find the following output:
 
 Beginning of Iteration 1
 Before update: 5710993 groups
@@ -49,13 +60,19 @@ Before update: 1113 groups
 Finished at end of iteration 11 !
 There are  1113  groups in the network.
 
-See undirected_graph_components_vs_iteration.png
+Our algorithm converges in 11 iterations, implying that the diameter of the graph is D ~ 11. To see the convergence
+of our algorithm vs. iteration, see "undirected_graph_components_vs_iteration.png." This is a surprisingly large number
+in my opinion; I would have expected something more O(1). Hopefully it is correct!
 
 ### Directed Graph ###
 
-When we have a directed graph, my algorithm finds that we have 52
-connected components. It converges in a logarithmic manner, specifically:
+The directed graph is slightly more tricky; nodes are only connected if they both point to each other. Now, if a
+parent node points to only one child and the child does not point back, the parent node is connected to no other nodes!
+We consequently expect the number of connected components in the directed graph to be larger. We also expect that
+the diameter of the path D should be larger as nodes will have to take a more convoluted path to communicate with
+each other.
 
+We find:
 
 Beginning of Iteration 1
 Before update: 3768942 groups
@@ -128,4 +145,5 @@ Before update: 77249 groups
 Finished at end of iteration 34 !
 There are  77249  groups in the network.
 
-See the plot "directed_graph_components_vs_iteration.png" to see the logarithmic convergence of my algorithm.
+See the plot "directed_graph_components_vs_iteration.png" to see the convergence of my algorithm. Ultimately, we find
+77249 connected components.

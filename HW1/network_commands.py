@@ -228,18 +228,18 @@ class Connected_Components(object):
     @staticmethod
     def do_iteration_static(sc, connected_rdd):
 
-        def get_parent_index(x):
-            parents = x[1][0]
+        def get_children_index(x):
+            children = x[1][0]
             index = x[1][1]
-            return [(z, index) for z in parents]
+            return [(z, index) for z in children]
 
         def get_smaller_index(a, b):
             if a < b:
                 return a
             return b
 
-        parent_indexes = connected_rdd.flatMap(get_parent_index)
-        parent_with_smallest_index = parent_indexes.reduceByKey(get_smaller_index, num_partitions) # This is partitioned
-        joined_rdd= connected_rdd.join(parent_with_smallest_index)
+        children_indices = connected_rdd.flatMap(get_children_index)
+        child_with_smallest_index = children_indices.reduceByKey(get_smaller_index, num_partitions) # This is partitioned
+        joined_rdd= connected_rdd.join(child_with_smallest_index)
         connected_rdd = joined_rdd.map(lambda x: (x[0], (x[1][0][0], x[1][1])), preservesPartitioning=True) # Should preserve partitioning...
         return connected_rdd.cache()
