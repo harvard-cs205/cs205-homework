@@ -41,7 +41,7 @@ def directed_links(rdd):
 
 if __name__ == '__main__':
     sc = SparkContext(appName="P5")
-	links = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt')
+    links = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt')
 	
     #links_list = ["1: 2 3", "2: 1 3", "3: 1 2", "4: 1 5 6", "5: 4 6", "6: 4 5", "7: 8 9 10", "8: 7 9 10", "9: 7 8 10", "10: 7 8 9"]
     #links = sc.parallelize(range(0, 10)).map(lambda x: links_list[x])
