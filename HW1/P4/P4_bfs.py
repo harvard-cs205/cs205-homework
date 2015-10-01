@@ -30,11 +30,11 @@ def distance_to_all_nodes_edge(root_node, edges_rdd, N):
     result = edges_rdd.context.parallelize([(root_node, 0)])
     rdd = result
     while not rdd.isEmpty():
-        rdd = edges_rdd.join(rdd).values().partitionBy(N)
+        rdd = edges_rdd.join(rdd).partitionBy(N).values()
         rdd = rdd.distinct()
         rdd = rdd.subtractByKey(result)  # don't repeat work
         rdd = rdd.mapValues(lambda v: v + 1)
-        result = result.union(rdd)
+        result = result.union(rdd).partitionBy(N)
         rdd = rdd.cache()
     return result
 

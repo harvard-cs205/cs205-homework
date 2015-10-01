@@ -18,7 +18,11 @@ if __name__ == '__main__':
     print lookup_table.lookup("Kevin_Bacon")
 
     # Distance between nodes in network
-    distance = distance_between("Kevin_Bacon", "Harvard_University", edge_rdd, lookup_table, N).collect()
-    print distance
+    distance_to = distance_between("Kevin_Bacon", "Harvard_University", edge_rdd, lookup_table, N).collect()
+    print distance_to
+    distance_from = distance_between("Harvard_University", "Kevin_Bacon", edge_rdd, lookup_table, N).collect()
+    print distance_from
 
     # Connected components
+    components = connected_components(edge_rdd, N)
+    print components

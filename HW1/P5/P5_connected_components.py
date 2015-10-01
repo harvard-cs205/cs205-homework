@@ -10,7 +10,7 @@ def distance_to_all_nodes_edge(root_node, edges_rdd, N):
     result = edges_rdd.context.parallelize([(root_node, 0)])
     rdd = result
     while not rdd.isEmpty():
-        rdd = edges_rdd.join(rdd).values().partitionBy(N)
+        rdd = edges_rdd.join(rdd).partitionBy(N).values()
         rdd = rdd.distinct()
         rdd = rdd.subtractByKey(result)  # don't repeat work
         rdd = rdd.mapValues(lambda v: v + 1)
@@ -25,6 +25,6 @@ def connected_components(edges_rdd, N):
     while not edges_rdd.isEmpty():
         node = edges_rdd.takeSample(False, 1)[0]
         component = distance_to_all_nodes_edge(node, edges_rdd, N)
-        edges_rdd = edges_rdd.subtractByKey()
+        edges_rdd = edges_rdd.subtractByKey(component).partitionBy(N)
         component_sizes += [component.count()]
     return component_sizes
