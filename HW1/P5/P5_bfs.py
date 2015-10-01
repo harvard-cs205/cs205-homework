@@ -39,8 +39,8 @@ def get_names_path(paths, rdd):
 
 if __name__ == '__main__':
     sc = SparkContext(appName="P5")
-    links = sc.textFile('links-simple-sorted.txt')
-    titles = sc.textFile('titles-sorted.txt')
+    links = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt')
+    titles = sc.textFile('s3://Harvard-CS205/wikipedia/titles-sorted.txt')
     index_titles = titles.zipWithIndex().map(lambda x: (x[1] + 1, x[0])).cache()
     links_kv = links.map(split_link).cache()
     harvard_index, bacon_index = title_index('Harvard_University', 'Kevin_Bacon', index_titles)
