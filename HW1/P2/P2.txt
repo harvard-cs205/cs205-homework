@@ -1,1 +1,14 @@
 # Your discussion here
+
+The total amount of work done by all 100 partitions (if we sum over all of them) is 202,898,863 iterations. 
+
+If we wanted to maximize parallelism and divided the load evenly, each partition would have 202,898,863/100 which is around 2,025,000
+
+In P2a, as we can tell when we draw the image and look at the histogram plot, all the work is being done by a few partitions.
+
+In P2b however, we repartitioned the RDD randomly using a uniform distribution for each RDD key into a partition from 0 to 100. The idea is that on average, all partitions would get an average amount on work. 
+In fact, when we look at the histogram plot for P2b, it looks a lot like a normal distribution centered around mean 2,025,000. This is because of the central limit theorem, whereby we have 100 random variables (one for each partition) that can take any histogram bin value, but are expected to get the bin around 2,025,000.
+
+I had initially tried the standard pyspark repartition, which just hashes the RDD key (rdd.partition(100)). However, although the results were similar to a uniform distribution, the histogram looked less centered around the average value, and the computational cost was actually higher than that of the uniform distribution (37seconds vs 35seconds). Both of them however were more computationally costly than not repartitioning at all, which took 27seconds, even with the reduced parallelism.
+ 
+This is because the shuffling costs in this case outweigh the benefits of increased parallelism.

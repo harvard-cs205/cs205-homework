@@ -1,1 +1,2 @@
 # Your discussion here
+(u'aeprs', (11, [u'asper', u'pares', u'parse', u'pears', u'prase', u'presa', u'rapes', u'reaps', u'spaer', u'spare', u'spear']))

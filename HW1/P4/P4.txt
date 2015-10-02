@@ -1,1 +1,11 @@
 # Your discussion here
+My graph representation was an rdd of edge tuples: (nodeA, nodeB)
+I first had an adjacency list but I found it hard to manipulate list values in spark so I switched to the edge tuple representation and it’s much faster.
+
+for “CAPTAIN AMERICA”, the number of touched nodes was 6408 (if you include the source)
+for “MISS THING/MARY”, the number of touched nodes was 7 (if you include the source)
+for “ORWELL”, the number of touched nodes was 9 (if you include the source)
+
+The diameter implies that the maximum number of steps in which my search has to be executed is at most the diameter, because there is no path longer than the diameter, so if I start at the source and put the neighbors of elements in the queue and never revisit them, then I will repeat this at most diameter times.
+
+If a character doesn’t have a defined distance during the search, then there is no path from the source character to this character.
