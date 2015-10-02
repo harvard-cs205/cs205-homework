@@ -9,8 +9,8 @@ findspark.init('/home/lhoang/spark')
 import pyspark
 sc = pyspark.SparkContext(appName="spark1")
 
-partition_size = 100
-default_distance = 99
+partition_size = 20
+default_distance = 99999
 sum_distance = sc.accumulator(0)
 
 
@@ -124,17 +124,23 @@ def find_components():
     global sum_distance
 
     num_components = 0
+    num_total_elements = nodes.count()
+    num_total_component_elements = 0
     while True:
         sum_distance += -sum_distance.value
         nodes_bfs, _ = bfs_search(nodes, edges, root)
 
         num_components += 1
-        print '------------- COMPONENT = ' + repr(num_components)
+        print '------------- COMPONENT ' + repr(num_components)
         print '------------- ROOT = ' + repr(root)
 
         num_elements = nodes_bfs.filter(
             lambda kv: kv[1] < default_distance).count()
         print '# of connected elements = ' + repr(num_elements)
+
+        num_total_component_elements += num_elements
+        if num_total_component_elements >= num_total_elements:
+            break
 
         untouched_nodes = nodes_bfs.filter(
             lambda kv: kv[1] == default_distance)

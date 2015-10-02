@@ -1,20 +1,21 @@
-from operator import add
-from operator import itemgetter
-from itertools import groupby
 import time
-
-import findspark
-findspark.init('/home/lhoang/spark')
 
 import pyspark
 sc = pyspark.SparkContext(appName="spark1")
 
-partition_size = 100
-default_distance = 99
+partition_size = 20
+default_distance = 99999
 sum_distance = sc.accumulator(0)
 
 
-def create_graph(fileName):
+def quiet_logs(sc):
+    logger = sc._jvm.org.apache.log4j
+    logger.LogManager.getLogger("org").setLevel(logger.Level.WARN)
+    logger.LogManager.getLogger("akka").setLevel(logger.Level.WARN)
+    logger.LogManager.getLogger("amazonaws").setLevel(logger.Level.WARN)
+
+
+def create_graph(fileName, nameFile):
     """
     Create a graph of character relationship given a file.
     :param fileName: The csv file to load where each line = (hero, comic).
@@ -24,18 +25,22 @@ def create_graph(fileName):
     # make links symmetric by mapping (hero_i, hero_j) to (hero_j, hero_i)
     # then reduce to give a list of (hero_i, [neighbors of hero_i])
     edges = src.map(lambda x: x.split(':')).map(
-        lambda kv: (kv[0], kv[1].split())).partitionBy(
+        lambda kv: (int(kv[0]), [int(v) for v in kv[1].split()])).partitionBy(
         partition_size).cache()
 
     # create list of nodes with initial distance = 99
     nodes = edges.mapValues(lambda v: (default_distance, ''))
 
-    return nodes, edges
+    names = sc.textFile(nameFile).zipWithIndex().map(
+        lambda kv: (kv[1] + 1, kv[0])).partitionBy(
+            partition_size).cache()
+
+    return nodes, edges, names
 
 
 def l_add_distance(kv, d):
     for v in kv[1][0]:
-        yield (v, (d, kv[1][1][1] + ' ' + kv[0]))
+        yield (v, (d, kv[1][1][1] + ' ' + repr(kv[0])))
 
 
 def update_accumulator(d):
@@ -51,14 +56,17 @@ def l_min_distance(v1, v2):
         return v2
 
 
-def bfs_search(nodes, edges, hero):
+def bfs_search(nodes, edges, names, source, target):
     """
-    Perform breadth-first search to find shortest path from hero.
-    :param hero: The root node to find paths from.
+    Perform breadth-first search to find shortest path from source.
+    :param source: The root node to find paths from.
     """
     # initially root nodes only contains the source node
     # but will grow to contain more nodes at each iteration
-    root = nodes.filter(lambda kv: kv[0] == hero)
+    root = names.filter(lambda kv: kv[1] == source).join(
+        nodes).mapValues(lambda kv: kv[1])
+
+    end = names.filter(lambda kv: kv[1] == target).cache()
 
     i = 1
     previous_sum_distance = 0
@@ -74,6 +82,12 @@ def bfs_search(nodes, edges, hero):
 
         nodes = neighbors.union(nodes).reduceByKey(l_min_distance)
 
+        # stop if target has been found
+        if end.join(nodes).filter(
+                lambda kv: kv[1][0] < default_distance).isEmpty() == False:
+            print 'Found target'
+            break
+
         # check for convergence using accumulator
         nodes.foreach(lambda kv: update_accumulator(kv[1]))
 
@@ -85,36 +99,33 @@ def bfs_search(nodes, edges, hero):
         i += 1
         previous_sum_distance = sum_distance.value - begin_sum_distance
 
-    return nodes, edges
+    root_end_path = end.join(nodes)
+
+    return nodes, edges, root_end_path
 
 
-def main():
-    nodes, edges = create_graph('links.smp')
+def bfs(links_file, titles_file, root, target):
+    start = time.time()
 
-    num_display_neighbors = 10
+    nodes, edges, names = create_graph(links_file, titles_file)
+    _, _, root_end_path = bfs_search(nodes, edges, names, root, target)
 
-    root = ['1', '2', '5']
+    path = root_end_path.flatMap(lambda kv: kv[1][1][1].split()).map(
+        lambda v: (int(v), 0)).join(names).map(lambda kv: kv[1][1]).collect()
 
-    global sum_distance
-    for r in root:
-        sum_distance += -sum_distance.value
+    print '-------- FOUND PATH --------'
+    print path
 
-        nodes_bfs, _ = bfs_search(nodes, edges, r)
+    print 'TIME ' + repr(time.time() - start)
 
-        start = time.time()
-        print '---------------------'
-        print r
+quiet_logs(sc)
 
-        for i in range(5):
-            print 'Showing ' + repr(num_display_neighbors) + ' D-' + repr(
-                i + 1) + ' neighbors:'
-            print nodes_bfs.filter(
-                lambda kv: kv[1][0] == i + 1).take(num_display_neighbors)
+bfs('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt',
+    's3://Harvard-CS205/wikipedia/titles-sorted.txt',
+    'Kevin_Bacon',
+    'Harvard_University')
 
-        print 'Number of touched nodes:'
-        print nodes_bfs.filter(lambda kv: kv[1][0] != default_distance).count()
-
-        print 'Running time: '
-        print (time.time() - start)
-
-    sc.stop()
+bfs('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt',
+    's3://Harvard-CS205/wikipedia/titles-sorted.txt',
+    'Harvard_University',
+    'Kevin_Bacon')
