@@ -5,6 +5,7 @@ import pyspark
 # shut down the previous spark context
 #sc.stop() 
 sc = pyspark.SparkContext(appName="myAppName")
+sc.setLogLevel('WARN')
 import pdb
 from P4_bfs import mybfs
 import itertools as it
