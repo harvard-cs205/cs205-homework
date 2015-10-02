@@ -1,10 +1,21 @@
 Graph representation:
 
 The graph representation I used was a list of tuples, each of the format:
-( <character_name>, [<list_of_connected_characters>] ), where "connected characters" are characters that appeared in a comic along with <character_name>.  
+( <character_name>, [<all_coappearing_characters>] ), where "connected characters" are characters that appeared in a comic along with <character_name>.  I achieved this format by making a series of RDDs from the original source data:
+
+	- name_issue: (<character_name>,<issue>)
+	- issue_name: (<issue>,<character_name>)
+	- linked_names: (<issue>,[<all_appearing_characters>])
+	
+	- name_assoc: (<character_name>,[<all_coappearing_characters>])
+	
+This final RDD, name_assoc, is the graph representation I used. I did not use a separate RDD to keep track of (name,distance) (although I did start with that approach).
 
 I experimented with different partitioning schema, with 2,3,4,6,8,10, and 20 partitions. 
-I was rather surprised to find that on my local machine (4 cores), a 3-partition setup was the fastest (best time: 17.78s).  The Spark documentation recommends assigning 2-4 partitions for each available core.  On my 4-core machine that should see optimal results at between 8-12 partitions...but many fewer turned out to be best.
+I was rather surprised to find that on my local machine (4 cores), a 3-partition setup was the fastest (best time: 17.78s)*.  The Spark documentation recommends assigning 2-4 partitions for each available core.  On my 4-core machine that should see optimal results at between 8-12 partitions...but many fewer turned out to be best.
+
+* Note: When running P4_bfs.py as an import it takes about 6-9 seconds longer than when it's all in one script.
+
 
 Test case reports:
 
