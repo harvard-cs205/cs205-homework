@@ -27,3 +27,33 @@ def shortest_path(graph, root_node, iteration):
     num_nodes = len(traversed_nodes) - 1 # -1 for excluding the root node
     print "Num of nodes touched: ", num_nodes
     return num_nodes, result
+
+def shortest_path_parallel(graph, root_node):
+    depth = 0
+    queue = set([root_node]) # set to store nodes that will be need to be visited
+#     print queue
+#     print len(queue)
+    traversed_nodes = set() # set to store traversed nodes and its distance from root_node
+    
+    while(len(queue) > 0): # while there are more nodes in queue to be visisted
+#         print depth
+        depth += 1 # increment the depth
+        # filter on only the nodes in the queue
+        # grab out their children
+        filtered_graph = graph.filter(lambda (Node, V): Node in queue).collect()
+        # update the traversed nodes with the nodes in the queue
+        traversed_nodes.update(queue)
+        # to store the children of traversed nodes from the queue
+        traversed_nodes_children = set()
+        
+        # Loop through each node in the filtered_graph to add on children
+        for node in filtered_graph:
+            # children of each node
+            children = set(node[1])
+            # update the children to the traversed nodes
+            traversed_nodes_children.update(children)
+        # update queue by taking
+        queue = traversed_nodes_children - traversed_nodes
+    return len(traversed_nodes) - 1, depth
+            
+        

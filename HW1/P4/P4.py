@@ -3,10 +3,11 @@ findspark.init('/home/shenjeffrey/spark/')
 import pyspark
 import matplotlib.pyplot as plt
 import seaborn as sns
-from P4_bfs import shortest_path
+from P4_bfs import shortest_path_parallel
 
 # initiate spark
 sc = pyspark.SparkContext()
+sc.setLogLevel('WARN')
 
 # Read in data
 data = sc.textFile("source.csv")
@@ -37,11 +38,14 @@ edges.take(10)
 # Create graph from edges
 # GroupbyKey with Comic Book Character
 graph = edges.groupByKey().mapValues(list)
+graph = graph.repartition(16).cache()
 
 # Final results
-orwell = shortest_path(graph, "ORWELL", 10)
-miss_thing = shortest_path(graph, "MISS THING/MARY", 10)
+#orwell = shortest_path(graph, "ORWELL", 10)
+#miss_thing = shortest_path(graph, "MISS THING/MARY", 10)
 #captain_america = shortest_path(graph, "CAPTAIN AMERICA", 10)
 
-
+print shortest_path_parallel(graph, "ORWELL")
+print shortest_path_parallel(graph, "MISS THING/MARY")
+print shortest_path_parallel(graph, "CAPTAIN AMERICA")
 
