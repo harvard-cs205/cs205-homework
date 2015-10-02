@@ -1,1 +1,40 @@
-# Your discussion here
+Graph Representation:
+---------------------
+I represent my graph as char_pairs, an RDD of pairs (char1, char2) where (char1, char2) is in char_pairs iff (char1, char2) appear in an issue together. This means that “(char1, char2) in char_pairs” implies “(char2, char1) in char_pairs”. This list does not change during a search.
+
+I also make use of some RDDs that change every iteration:
+
+I stored distances in dist, an RDD of (char, distance) pairs where dist=-1 if the character has not yet been encountered, with dist>-1 representing the character’s distance from the starting node.
+
+I used connected, an RDD of (char, char) pairs to store a list of characters to be updated on the current iteration. At each iteration, I join it with char_pairs and get the values of the result to find the nodes to update at the next iteration. Unfortunately, calling values() breaks copartitioning and I have to repartition, but it’s not too costly.
+
+I stored (char, new_distance) pairs in the RDD new_dists. I join this with dist after each iteration to update the distance counts. When generating new_dists, I join with dist filtered to remove already visited nodes in order to limit the size of the join. Updating a distance also increments an accumulator, and if no distances are updated, the search is done. I call new_dists.count() at each iteration to force computation and update the accumulator.
+
+Note: Instead of using count() to force computation, I could have used:
+
+    try:
+        new_dists.first() # Force computation to update accumulator
+    except:
+        break
+
+since new_dists is empty when there are no new nodes found, and calling first() on an empty RDD throws an error. I think first() is marginally faster than count(), so this would marginally improve the speed of my algorithm. However, this would make the accumulator unnecessary, and the problem requires the use of an accumulator, so I use count().
+
+
+Shuffle
+-------
+Unfortunately, my implementation makes a huge shuffle when I call distinct() on connected. This distinct() is essential to remove duplicates (for example, if ‘FLATMAN’ and ‘KRAKEN’ appeared in the old connected, the new connected would include ‘CAPTAIN AMERICA’ at least twice). It is a huge shuffle, but removing it, or replacing it with a reduceByKey(), slows the algorithm down, so it’s not too harmful.
+
+Search			# of Nodes Touched
+--------------------------------------------
+‘CAPTAIN AMERICA’	6408
+‘ORWELL’		9
+‘MISS THING/MARY’	7
+
+
+Graph Diameter:
+---------------
+If the graph diameter is n, then a BFS will finish in at most n iterations. It would finish in exactly n iterations if it started from a node that was separated from another node by a shortest path of length n.
+
+Untouched Nodes:
+----------------
+If a node does not have a defined distance (-1 in my implementation), then that node was not reached during the search.
