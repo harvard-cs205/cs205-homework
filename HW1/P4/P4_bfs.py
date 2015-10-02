@@ -7,9 +7,9 @@ def P4_bfs(grph,source,sc):
 	visitedNodes = sc.parallelize([(source,0)])
 	i_dist = 0
 	while not nodes.isEmpty():
-		nodes = grph.join(nodes).values().distinct().mapValues(lambda v: v+1).partitionBy(20)
-		nodes = nodes.subtractByKey(visitedNodes)
-		visitedNodes = visitedNodes.union(nodes).partitionBy(20).cache()
+		nodes = grph.join(nodes).values().distinct().partitionBy(8)
+		nodes = nodes.mapValues(lambda v: v+1).subtractByKey(visitedNodes)
+		visitedNodes = visitedNodes.union(nodes).cache()
 		i_dist+=1
 		
 	print "Exhausted graph at a distance of:", i_dist
