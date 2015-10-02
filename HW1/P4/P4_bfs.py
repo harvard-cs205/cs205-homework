@@ -11,11 +11,10 @@ class setAccPar(AccumulatorParam):
 
 
 def rdd_bfs(sc, char_adjacent, root):
-    touched = sc.accumulator( {root}, setAccPar() )
+    touched = {root}
     this_level = {root}
     i = 0 # distance
     while(True):
-        i += 1
         next_level = sc.accumulator( set(), setAccPar() )    
         next_level_rdd = char_adjacent.filter(lambda p: p[0] in this_level) #select the nodes in this level
 
@@ -24,12 +23,14 @@ def rdd_bfs(sc, char_adjacent, root):
 ##        print next_level.value
 ##        print touched.value
 ##        print next_level.value - touched.value
-        this_level = next_level.value - touched.value #remove visited nodes
-        next_level_rdd.values().foreach(lambda x: touched.add(x)) #add in touched nodes
+##        print i,"==============================================================================================================================================================="
+        this_level = next_level.value - touched #remove visited nodes
+        touched |= next_level.value #add in touched nodes
         #touched = touched | next_level #include the nodes in next level in touched set
         if len(this_level) == 0: #if all neighbors were visited, end this loop
             print "no new node!"
             print root, "diameter:", i
             break
-    print root, "reachable characters:", len(touched.value)
+        i += 1
+    print root, "reachable characters:", len(touched)
 

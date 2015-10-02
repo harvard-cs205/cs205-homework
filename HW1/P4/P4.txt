@@ -2,11 +2,11 @@
 I represent my graph similar as adjacent list, with RDD (key, value) pair that the key is a node(characters name), and the value is a set of its neighbors. I use three sets to perform BFS search. The this_level set filters in the nodes we will explore in each level. The next_level set collects the nodes we explored from the neighbors of the nodes in this_level. The touched set stores the nodes we visited. In each iteration, the next_level set will eliminate the nodes in touched set and become the new this_level set in the next iteration. The iteration will terminate when all the next_level nodes are already in touched set.
 
 The outputs:
-CAPTAIN AMERICA diameter: 2
-CAPTAIN AMERICA reachable characters: 6369
-MISS THING/MARY diameter: 2
+CAPTAIN AMERICA diameter: 3
+CAPTAIN AMERICA reachable characters: 6408
+MISS THING/MARY diameter: 1
 MISS THING/MARY reachable characters: 7
-ORWELL diameter: 2
+ORWELL diameter: 1
 ORWELL reachable characters: 9
 
 We relax the diameter constraint by exploring until no neighbors are new nodes, so we no longer need to keep iteration until diameter is ten. If the nodes are untouched in the end of BFS, it means these nodes are not connected with the source vertex we specified in the beginning.
