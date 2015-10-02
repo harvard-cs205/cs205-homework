@@ -56,7 +56,7 @@ for pair in pairings.values():
     
     print "Find path:",source,"-->",target
     
-    target_node = titles.filter(lambda x: x[1]==target).map( lambda x: (x[0], 0) ).cache()
+    target_node = titles.filter(lambda x: x[1]==target).map( lambda x: (x[0], 0) ).partitionBy(n_parts).cache()
     
     root_list   = (titles.filter(lambda x: x[1]==source)
                          .map( lambda x: (x[0], 0) )
@@ -68,7 +68,7 @@ for pair in pairings.values():
     master_chains    = root_list.map(lambda x: (x[0], None)).partitionBy(n_parts).cache()
     
     while finder.value == 0:
-        graph2 = graph.join( root_list ).cache()
+        graph2 = graph.join( root_list, numPartitions=n_parts ).cache()
         master_chains = (master_chains.union(graph2.flatMap(lambda x: [(int(node),x[0]) for node in x[1][0][0]]))
                                      .distinct()
                                      .partitionBy(n_parts)
@@ -92,7 +92,7 @@ for pair in pairings.values():
     path = target_node.map(lambda x: (x[0],distance))
     
     while countback > 0:
-        link_node = master_chains.join(link_node).map(lambda x: (x[1][0],0))
+        link_node = master_chains.join(link_node, numPartitions=n_parts).map(lambda x: (x[1][0],0))
         path = path.union(link_node.map(lambda x: (x[0],countback-1)))
         countback -= 1
 
