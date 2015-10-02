@@ -1,2 +1,8 @@
 *~
 *.pyc
+*.ipynb
+**/.ipynb_checkpoints
+
+# data files are ignored by default
+*.txt
+*.csv
