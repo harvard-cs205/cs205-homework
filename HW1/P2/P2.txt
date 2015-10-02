@@ -1,1 +1,3 @@
 # Your discussion here
+**** FIX HISTOGRAMS
+As shown by the histogram from P2a, some partitions were doing far more work.  Though most partitions were 
