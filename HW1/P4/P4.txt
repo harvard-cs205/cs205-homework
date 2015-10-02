@@ -15,6 +15,24 @@ We have an rdd with all the characters as keys called "allchar". At every search
 
 For Captain America:
 
-There are in total 6426 characters initially. At a distance 4 there are 6408 characters that have been touched by the algorithm. 18 characters are unconnected. The algorithm finds that we can't connect them anymore.
+There are in total 6426 characters initially. At a distance 3 there are 6408 characters that have been touched by the algorithm. 18 characters are unconnected. The algorithm finds that we can't connect them anymore.
 
 For MISS THING/MARY:
+
+At a distance 1 the algorithm touches 7 characters (this includes the node 0 MISS THING/MARY) and then the algorithms stops. The other characters are not connected. There are 6427-7=6419 characters that are not connected to MISS THING/MARY.
+
+For ORWELL:
+
+At a distance 1 the algorithm touches 9 characters (this includes ORWELL) and stops. There are 6427-9= 6418 characters that are not connected to ORWELL.
+
+
+
+What does this diameter imply about the maximum number of steps in which your search must be executed?
+
+
+The maximum number of steps is 10. However we don't need 10 steps in all the 3 considered cases.
+
+
+What does it mean if a character does not have a defined distance during the search?
+
+This means that the considered character is not connected to all the other characters connected to node 0.
