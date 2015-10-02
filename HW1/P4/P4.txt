@@ -1,1 +1,8 @@
-# Your discussion here
+Number of touched nodes at each iteration: (distance, # of heroes)
+
+CAPTAIN AMERICA:[(0, 1), (1, 1906), (2, 54399), (3, 1144)]
+
+MISS THING/MARY:[(0, 1), (1, 6)]
+
+ORWELL:[(0, 1), (1, 8)]
+
