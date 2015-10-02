@@ -1,1 +1,6 @@
 # Your discussion here
+
+
+# Best results so far with 1 executor/worker-node (--num-executors)
+# 4-8 cores/executor (--executor-cores)
+# 5+ GB/executors (--executor-memory)
