@@ -3,19 +3,20 @@ def bfs_parents(graph, start):
     iteration = context.accumulator(0)
     data = context.emptyRDD()
     toVisit = graph.filter(lambda KV: KV[0] == start).map(lambda KV: (KV[0], (KV[1], '')))
-    toVisitList = {}
     while not toVisit.isEmpty():
         distance = iteration.value
-        new_data = toVisit.map(lambda KV: (KV[0], (distance, KV[1][1])))
-        data = data.union(new_data).reduceByKey(lambda x, y: min(x, y))
+        new_data = toVisit.mapValues(lambda v: (distance, v[1]))
+        data = data.union(new_data).reduceByKey(lambda x, y: min(x, y)).partitionBy(24)
         pairs = toVisit.map(lambda KV: [(x, KV[0]) for x in KV[1][0]])
-        neighbors = pairs.flatMap(lambda KV: KV)
-        toVisit = graph.join(neighbors).subtractByKey(data, 8)
+        neighbors = pairs.flatMap(lambda KV: KV).partitionBy(24)
+        toVisit = graph.join(neighbors).subtractByKey(data)
+        toVisit.cache()
         iteration.add(1)
     return data
     
 def shortest_path(data, end):
     sorted_data = data.sortByKey()
+    sorted_data.cache()
     path = []
     next = end
     while next != '':
