@@ -100,7 +100,9 @@ def bfs_search(nodes, edges, names, source, target):
             l_min_distance).cache()
 
         assert copartitioned(end, nodes)
+
         # stop if target has been found
+        # the joined RDD is of form [ ( id, (name, (distance, 'path')) )]
         if end.join(nodes).filter(
                 lambda kv: kv[1][1][0] < default_distance).isEmpty() == False:
             print 'Found target'
@@ -129,14 +131,14 @@ def bfs(links_file, titles_file, root, target):
     nodes, edges, names = create_graph(links_file, titles_file)
     _, _, root_end_path = bfs_search(nodes, edges, names, root, target)
 
-    # get the path containing page ids
-    # [ (id, 0) ]
+    # get the path containing page ids, zip with index to keep order
+    # [ (id, index) ]
     path_page_ids = root_end_path.values().flatMap(
-        lambda kv: kv[1][1].split()).map(
-        lambda v: (int(v), 0)).partitionBy(names.getNumPartitions())
+        lambda kv: [int(v) for v in kv[1][1].split()]).zipWithIndex(
+        ).partitionBy(names.getNumPartitions())
 
-    assert copartitioned(path_page_ids, names)
-    path = path_page_ids.join(names).map(lambda kv: kv[1][1]).collect()
+    # get final answer
+    path = path_page_ids.join(names).collect()
 
     print '-------- FOUND PATH --------'
     print path
@@ -144,8 +146,6 @@ def bfs(links_file, titles_file, root, target):
     print 'TIME ' + repr(time.time() - start)
 
 quiet_logs(sc)
-
-# bfs('links.smp', 'titles.smp', 'stress', 'united_states')
 
 bfs('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt',
     's3://Harvard-CS205/wikipedia/titles-sorted.txt',

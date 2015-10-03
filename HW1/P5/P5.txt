@@ -1,1 +1,32 @@
-# Your discussion here
+Below is the output of running P5_bfs.py on AWS cluster with 4 executors and 256 partitions using the command:
+
+spark-submit --master yarn-client --num-executors 4 --executor-cores 4 --executor-memory 5g P5_bfs.py
+
+For the first run, the shortest path from Kevin_Bacon to Harvard_University is:
+
+[(3229511, (1, u'Marisa_Silver')), (2729536, (0, u'Kevin_Bacon')), (2152782, (2, u'Harvard_University'))]
+TIME 143.24584562110047
+
+Which is a list whose elements are of format (page index, (distance, page name)) for easy verification by looking up page indices in the links file. The above can be translated to the path:
+
+[u'Kevin_Bacon', u'Marisa_Silver', u'Harvard_University']
+
+Running the algorithm again for Kevin_Bacon, we get a different result, which is due to the parallel nature of Spark, but that can also be easily verified to be correct:
+
+[(1124925, (1, u'College_Bowl')), (2729536, (0, u'Kevin_Bacon')), (2152782, (2, u'Harvard_University'))]
+TIME 138.96086883544922
+
+Again, the above translates to:
+
+[u'Kevin_Bacon', u'College_Bowl', u'Harvard_University']
+
+Next, the result from Harvard_University to Kevin_Bacon is:
+
+[(3850259, (2, u"Paris,_je_t'aime")), (2729536, (3, u'Kevin_Bacon')), (2152782, (0, u'Harvard_University')), (3546472, (1, u'Natalie_Portman'))]
+TIME 157.24309706687927
+
+Or:
+
+[u'Harvard_University', u'Natalie_Portman', u'Paris,_je_t'aime', u'Kevin_Bacon']
+
+Finally, for some interesting paths:
