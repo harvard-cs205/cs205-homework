@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 from P2 import *
 import pyspark
 
@@ -22,5 +23,12 @@ if __name__ == '__main__':
     sc = pyspark.SparkContext(appName='YK-P2a')
     data = sc.parallelize(imageIJ, 100)
     rdd = data.map(lambda ij: (ij, mandelbrot(calcX(ij), calcY(ij))))
+    rdd.cache()
+
+    histRdd = sum_values_for_partitions(rdd)
+    histData = histRdd.collect()
+    plt.hist(histData)
+    plt.savefig('P2a_hist.png')
+    #print histData
     
     draw_image(rdd)

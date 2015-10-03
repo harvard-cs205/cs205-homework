@@ -40,11 +40,11 @@ if __name__ == '__main__':
     graph = _buildGraph(filename)
     graph = sc.parallelize(graph)
     
-    #name = 'CAPTAIN AMERICA'
-    name = 'MISS THING/MARY'
+    name = 'CAPTAIN AMERICA'
+    #name = 'MISS THING/MARY'
     #name = 'ORWELL'
-    result = bfs(graph, name, sc)
+    result = bfs(graph, name)
     # time.sleep(5)
-    print result.count()
+    print '{0}: {1}'.format(name, result.count())
     #_writeDistDict(distDict, 'CAA') 
 
