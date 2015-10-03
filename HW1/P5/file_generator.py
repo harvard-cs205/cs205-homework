@@ -1,5 +1,5 @@
 import random
-total_nodes = 1000
+total_nodes = 2000000
 max_out = 50
 start_nodes = range(1, total_nodes)
 

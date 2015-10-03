@@ -8,7 +8,7 @@ sc = pyspark.SparkContext(appName="Spark1")
 
 import numpy as np 
 import itertools
-from P5_bfs_new2 import *
+from P5_bfs_new3 import *
 
 # make spark shut the hell up
 logger = sc._jvm.org.apache.log4j
@@ -58,11 +58,11 @@ start_node = numerical_titles.lookup(start)[0]
 end_node = numerical_titles.lookup(end)[0]
 print start_node, end_node
 
-dist, unreachables = bfs(split_list, start_node, sc, num_Partitions, distances=None, stopNode=end_node)
+dist = bfs(split_list, start_node, sc, num_Partitions, end_node)
 #print distances.values().countByValue(), '\n'
 print dist.take(100)
-print "Distance to end node:", dist.map(lambda x: x).lookup(end_node)[0]
+#print "Distance to end node:", dist.map(lambda x: x).lookup(end_node)[0]
 
-print '\n\n\n\n\n\n\n\n\n\n\nCalculating connected components....\n\n'
-num_conn = count_connected_components(split_list, num_Partitions, sc)
-print '\n\n\n\n\n\nNumber connected components: ', num_conn
+#print '\n\n\n\n\n\n\n\n\n\n\nCalculating connected components....\n\n'
+#num_conn = count_connected_components(split_list, num_Partitions, sc)
+#print '\n\n\n\n\n\nNumber connected components: ', num_conn
