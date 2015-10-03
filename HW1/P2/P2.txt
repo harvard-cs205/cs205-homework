@@ -1,1 +1,5 @@
 # Your discussion here
+From P2a_hist.png we notice that for different jobs, the workloads vary much. That is to say, some of our nodes have little work while some have too much, which increases the total time we finish the algorithm in parallel.
+From P2b_hist.png we find all numbers fall into the same bin in histogram, which means we successfully balance the work over all partitions.
+The partitioning strategy is quite simple and intuitive. We just assign points in order to 100 partitions. Since the value of each point is similar to its neighbors and all those neighbors are distributed fairly to all partitions, based on the law of large number, the sums tend to be the same.
+The trade off is that we takes time to repartition, which is mostly due to shuffling across partitions. Therefore if the default partition does not.
