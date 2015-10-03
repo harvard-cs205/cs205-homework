@@ -1,4 +1,6 @@
-# Your discussion here
+# On this problem, I collaborated with the following:
+Andrew Petscheck and Jonathan Friedman
+
 The following are randomized lines of text output by Shakespeare_generator.py
 
 shalt muster up my subjects, And I'll go brave it at your car and beseech your honor. Fear not slander,
