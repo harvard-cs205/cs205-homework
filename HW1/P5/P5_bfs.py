@@ -26,18 +26,18 @@ if __name__ == '__main__':
     sc = SparkContext("local", appName="Spark1")
     sc.setLogLevel('WARN')
     
-    #txtfile = sc.textFile('number.txt', 32) #load text
+    #txtfile = sc.textFile('number.txt', 32) #test case
     txtfile = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt', 32)
     page_names = sc.textFile('s3://Harvard-CS205/wikipedia/titles-sorted.txt', 32)
     
     adjacent_graph = txtfile.map(link_string_to_KV).cache() #transform to graph
     nameindex = page_names.zipWithIndex().map(lambda p: (p[0], p[1]+1)) #build index table
     
-    root = nameindex.lookup('Kevin Bacon')[0]
+    root = nameindex.lookup('Kevin_Bacon')[0]
     dest = nameindex.lookup('Harvard_University')[0]
     
-    touched = {root}
-    this_level = {root}
+    touched = set([root])
+    this_level = set([root])
     parentrdd = sc.parallelize( [(root, -1)] ) #parent child pair, root has no parent
     i = 0 # distance
     while(True):
@@ -62,11 +62,13 @@ if __name__ == '__main__':
             print "not found!"
             print root, "diameter:", i
             break
+        i += 1
         if dest in touched:
             print "reach destination!"
             print root, "diameter:", i
             break
-        i += 1
+        print "explored nodes in distance", i
+        
     parentrdd = parentrdd.sortByKey()
     #print parentrdd.collect()
     
