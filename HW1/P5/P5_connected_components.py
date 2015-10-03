@@ -14,6 +14,11 @@ default_distance = 99999
 sum_distance = sc.accumulator(0)
 
 
+def copartitioned(RDD1, RDD2):
+    "check if two RDDs are copartitioned"
+    return RDD1.partitioner == RDD2.partitioner
+
+
 def l_get_symmetric_pairs(kv):
     neighbors = kv[1].split()
     for nb in neighbors:
@@ -25,6 +30,13 @@ def l_get_pairs(kv):
     neighbors = kv[1].split()
     for nb in neighbors:
         yield (kv[0], nb)
+
+
+def quiet_logs(sc):
+    logger = sc._jvm.org.apache.log4j
+    logger.LogManager.getLogger("org").setLevel(logger.Level.WARN)
+    logger.LogManager.getLogger("akka").setLevel(logger.Level.WARN)
+    logger.LogManager.getLogger("amazonaws").setLevel(logger.Level.WARN)
 
 
 def create_symmetric_graph(fileName):

@@ -1,10 +1,11 @@
 import time
+import sys
 
 import pyspark
 sc = pyspark.SparkContext(appName="spark1")
 
 partition_size = 20
-default_distance = 99999
+default_distance = sys.maxint
 sum_distance = sc.accumulator(0)
 
 
@@ -101,7 +102,7 @@ def bfs_search(nodes, edges, names, source, target):
         assert copartitioned(end, nodes)
         # stop if target has been found
         if end.join(nodes).filter(
-                lambda kv: kv[1][0] < default_distance).isEmpty() == False:
+                lambda kv: kv[1][1][0] < default_distance).isEmpty() == False:
             print 'Found target'
             break
 
@@ -144,7 +145,7 @@ def bfs(links_file, titles_file, root, target):
 
 quiet_logs(sc)
 
-# bfs('links.smp', 'titles.smp', 'stress', 'harvard')
+# bfs('links.smp', 'titles.smp', 'stress', 'united_states')
 
 bfs('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt',
     's3://Harvard-CS205/wikipedia/titles-sorted.txt',
