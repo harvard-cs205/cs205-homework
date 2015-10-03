@@ -56,4 +56,4 @@ def mybfs(nodes, name):
          	# Stop the search
          	break
 
-	return num_char_ini, num_char_new, d
+	return num_char_ini, num_char_new, d-1
