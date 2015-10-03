@@ -45,7 +45,7 @@ graph = graph.repartition(16).cache()
 #miss_thing = shortest_path(graph, "MISS THING/MARY", 10)
 #captain_america = shortest_path(graph, "CAPTAIN AMERICA", 10)
 
-print shortest_path_parallel(graph, "ORWELL")
-print shortest_path_parallel(graph, "MISS THING/MARY")
-print shortest_path_parallel(graph, "CAPTAIN AMERICA")
+print shortest_path_parallel(sc, graph, "ORWELL")
+print shortest_path_parallel(sc, graph, "MISS THING/MARY")
+print shortest_path_parallel(sc, graph, "CAPTAIN AMERICA")
 

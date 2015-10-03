@@ -2,6 +2,7 @@ import findspark; findspark.init()
 import pyspark
 import matplotlib.pyplot as plt
 import seaborn as sns
+from pyspark import AccumulatorParam
 
 def shortest_path(graph, root_node, iteration):
     queue = [root_node]
@@ -28,7 +29,15 @@ def shortest_path(graph, root_node, iteration):
     print "Num of nodes touched: ", num_nodes
     return num_nodes, result
 
-def shortest_path_parallel(graph, root_node):
+class AccumParam_Set(AccumulatorParam):
+    def zero(self, value):
+        return value
+
+    def addInPlace(self, value1, value2):
+        value1 |= value2
+        return value1
+            
+def shortest_path_parallel(sc, graph, root_node):
     depth = 0
     queue = set([root_node]) # set to store nodes that will be need to be visited
 #     print queue
@@ -40,20 +49,19 @@ def shortest_path_parallel(graph, root_node):
         depth += 1 # increment the depth
         # filter on only the nodes in the queue
         # grab out their children
-        filtered_graph = graph.filter(lambda (Node, V): Node in queue).collect()
+        filtered_graph = graph.filter(lambda (Node, V): Node in queue)
+        #print "filtered_graph:", filtered_graph.values().collect()
         # update the traversed nodes with the nodes in the queue
         traversed_nodes.update(queue)
         # to store the children of traversed nodes from the queue
-        traversed_nodes_children = set()
+        traversed_nodes_children = sc.accumulator(set(), AccumParam_Set()) 
+	
+	# Loop through each node in the filtered_graph to add on children
+        filtered_graph.values().foreach(lambda x: traversed_nodes_children.add(set(x)))
         
-        # Loop through each node in the filtered_graph to add on children
-        for node in filtered_graph:
-            # children of each node
-            children = set(node[1])
-            # update the children to the traversed nodes
-            traversed_nodes_children.update(children)
-        # update queue by taking
-        queue = traversed_nodes_children - traversed_nodes
-    return len(traversed_nodes) - 1, depth
-            
-        
+        #print "traversed_nodes_children value:", traversed_nodes_children.value
+        #print "traversed_nodes: ", traversed_nodes
+	# update queue
+        queue = traversed_nodes_children.value - traversed_nodes
+        #print "queue: ", queue
+    return len(traversed_nodes) - 1, depth        
