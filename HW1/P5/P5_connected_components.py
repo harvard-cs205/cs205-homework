@@ -22,6 +22,12 @@ def continue_iter(node, accum):
     if vertex > min(edges):
         accum.add(1)
 
+def reverse_edges(node):
+    edges = []
+    for neighbor in node[1]:
+        edges.append((neighbor, set([node[0]])))
+    return edges
+
 def symmetric(rdd):
     rdd = rdd.map(lambda x: (x[0], set([x[0]]) | set(x[1])))
     stop_accum = rdd.context.accumulator(1)
@@ -31,10 +37,15 @@ def symmetric(rdd):
         rdd.foreach(lambda x: continue_iter(x, stop_accum))
     return {"components": rdd.count(), "max": len(rdd.takeOrdered(1, lambda x: -len(x[1]))[0][1])}
 
+def asymmetric(rdd):
+    rdd_reverse = rdd.flatMap(reverse_edges).reduceByKey(lambda x,y: x|y).partitionBy(64)
+    rdd_symmetric = rdd.join(rdd_reverse).map(lambda x: (x[0], set(x[1][0]).intersection(x[1][1])))
+    return symmetric(rdd_symmetric)
+
 if __name__ == '__main__':
     sc = SparkContext(appName="P5")
     links = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt')
     links_kv = links.map(split_link).partitionBy(64).cache()
     print "Symmetric Links:" + str(symmetric(links_kv))
-    #print "Asymmetric Links:" + str(directed_links(links_kv, reduce_links))
+    print "Asymmetric Links:" + str(asymmetric(links_kv))
     
