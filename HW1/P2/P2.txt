@@ -1,1 +1,15 @@
 # Your discussion here
+
+Discuss your choice in terms of 
+(a) how well it balances work, and 
+(b) its costs, particularly shuffle costs.
+
+For P2a.py, the default partitioning strategy is used. 
+This partitioning strategy is fast with respect to partition time.
+But it does not balance the work because light pixels are concentrated in certian partitions, 
+causing the processing time for those partitions to be very slow.
+
+For P2b.py, the randomization partitioning strategy is used.
+This partitioning strategy  has shuffle costs because of calling random.shuffle().
+But it balances the work because light pixels are dispersed to different partitions,
+causing the processiong time for all partiontions to be balanced and fast.
