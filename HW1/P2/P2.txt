@@ -1,1 +1,10 @@
 # Your discussion here
+For this problem 2, I generated bar plots with partitions for X axis and corresonding efforts for Y axis instead of histograms mentioned in the HW1 manual so that I can easily see how much each effort is distributed roughly the same on each partition. 
+
+I named them P2a_bar.png and P2b_bar.png. 
+
+[Discussions]
+  As you can see P2a_bar, each effort for partitions are not equally distributed because of the intrinsic property of mandelbrot function. This function does more computations only for when the absolute value of z (= norm of z) is smaller than 2 (See conditions for the while loop). So, for partitions which have pixels whose norms are less than 2, much more efforts need to be made, but not for others. 
+  After the RDD repartitioned (See P2b_bar.png), each effort of each partition is roughly the same, which means this system is load balanced. The reason is that repartitioning helps distributing "stragglers", or pixels whose norms are smaller than 2, roughly equally over the entire partitions. So, when computation times compared, the repartitioned one takes much faster than the original one.
+ But, in order to repartition the task, tasks need to be reshuffled, which is quite a bit cost. For this problem, the cost is not noticable, but if we deal with much bigger data, the shuffling could be a bottleneck for performance.
+ 
