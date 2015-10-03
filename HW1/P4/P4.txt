@@ -1,1 +1,23 @@
-# Your discussion here
+BY: MATHEUS C. FERNANDES
+
+
+
+
+CODE OUTPUT:
+Character's Name:  CAPTAIN AMERICA
+Iteration:  3
+New Number of Characters:  19
+First Character Numbers:  6426
+Number of Characters Not Touched:  6407
+
+Character's Name:  MISS THING/MARY
+Iteration:  2
+New Number of Characters:  6419
+First Character Numbers:  6426
+Number of Characters Not Touched:  7
+
+Character's Name:  ORWELL
+Iteration:  2
+New Number of Characters:  6417
+First Character Numbers:  6426
+Number of Characters Not Touched:  9

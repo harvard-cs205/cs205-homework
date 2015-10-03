@@ -15,6 +15,8 @@ config = config.setMaster('local[' + str(2*mp.cpu_count()) + ']')
 config = config.setAppName('P4')
 
 sc = ps.SparkContext(conf=config)
+# REMOVE ALL OF THE DIFFERENT SPARK WARNINGS
+sc.setLogLevel('WARN')
 
 # importing the data set from the .csv file and removing the superfulous commas and quotations
 # furthermore, this orders the dataSet RDD such that commic issue is the key and the character name is the value
@@ -47,31 +49,34 @@ for x,y in connections.take(numCharacters):
 characterName="CAPTAIN AMERICA"
 iteration,charsListNumNew,charsListNumFirst=SSBFS(connections,characterName)
 
+print "#################"
 print "Character's Name: ", characterName
 print "Iteration: ",iteration
 print "New Number of Characters: ",charsListNumNew
 print "First Character Numbers: ", charsListNumFirst
-print "Number of Characters Not Touched: ", charsListNumFirst-charsListNumOld
+print "Number of Characters Not Touched: ", charsListNumFirst-charsListNumNew
 
 
 ############ DO THE ANALYSIS FOR MISS THING/MARRY#########
 characterName="MISS THING/MARY"
 iteration,charsListNumNew,charsListNumFirst=SSBFS(connections,characterName)
 
+print "#################"
 print "Character's Name: ", characterName
 print "Iteration: ",iteration
 print "New Number of Characters: ",charsListNumNew
 print "First Character Numbers: ", charsListNumFirst
-print "Number of Characters Not Touched: ", charsListNumFirst-charsListNumOld
+print "Number of Characters Not Touched: ", charsListNumFirst-charsListNumNew
 
 
 ############ DO THE ANALYSIS FOR ORWELL#########
 characterName="ORWELL"
 iteration,charsListNumNew,charsListNumFirst=SSBFS(connections,characterName)
 
+print "#################"
 print "Character's Name: ", characterName
 print "Iteration: ",iteration
 print "New Number of Characters: ",charsListNumNew
 print "First Character Numbers: ", charsListNumFirst
-print "Number of Characters Not Touched: ", charsListNumFirst-charsListNumOld
+print "Number of Characters Not Touched: ", charsListNumFirst-charsListNumNew
 
