@@ -1,1 +1,21 @@
-# Your discussion here
+Here are the 10 entries with the most anagrams:
+
+u'aerst', (11, [u'arets', u'aster', u'rates', u'reast', u'resat', u'stare', u'stear', u'strae', u'tares', u'tears', u'teras'])
+
+u'aelst', (11, [u'least', u'leats', u'salet', u'slate', u'stale', u'steal', u'stela', u'taels', u'tales', u'teals', u'tesla'])
+
+u'aeprs', (11, [u'asper', u'pares', u'parse', u'pears', u'prase', u'presa', u'rapes', u'reaps', u'spaer', u'spare', u'spear'])
+
+u'aelpst', (10, [u'palest', u'palets', u'pastel', u'peltas', u'petals', u'plaste', u'plates', u'pleats', u'septal', u'staple'])
+
+u'aelrst', (10, [u'alerts', u'alters', u'artels', u'laster', u'ratels', u'salter', u'slater', u'staler', u'stelar', u'talers'])
+
+u'eerst', (9, [u'ester', u'reest', u'reset', u'retes', u'steer', u'stere', u'teers', u'terse', u'trees'])
+
+u'aelps', (9, [u'lapse', u'leaps', u'pales', u'peals', u'pleas', u'salep', u'sepal', u'spale', u'speal'])
+
+u'aeinrst', (9, [u'nastier', u'ratines', u'resiant', u'retains', u'retinas', u'retsina', u'stainer', u'starnie', u'stearin'])
+
+u'aeginst', (8, [u'easting', u'eatings', u'genista', u'ingates', u'ingesta', u'seating', u'tangies', u'teasing'])
+
+u'abest', (8, [u'abets', u'baste', u'bates', u'beast', u'beats', u'besat', u'betas', u'tabes'])
