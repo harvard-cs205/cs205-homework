@@ -2,41 +2,24 @@
 import csv
 sourcefile = 'source.csv'
 
+from P4_bfs import ssbfs
+
 from pyspark import SparkConf, SparkContext
 conf = SparkConf().setAppName('KaiSquare')
 sc = SparkContext(conf = conf)
 
-def findtouch(charname, charadjlist):
-    result = sc.parallelize([(charname, 0)])
-    accum = sc.accumulator(0)
-    while True:
-        curvalue = accum.value
-        waiting = result.filter(lambda kv: kv[1] == curvalue)
-        if waiting.count() == 0:
-            break
-        coming = waiting.join(charadjlist)
-        coming = coming.flatMap(lambda kv: [(v, curvalue+1) for v in kv[1][1]])
-        result = result.union(coming.distinct())
-        result = result.reduceByKey(lambda a,b: min(a,b))
-        accum.add(1)
-    return result
-
 if __name__  == '__main__':
-    comiclist = []
-    with open(sourcefile, 'rb') as csvfile:
-        comicdata = csv.reader(csvfile, delimiter=',', quotechar='"')
-        for character, issue in comicdata:
-            comiclist.append((issue, character))
-    comiclist = sc.parallelize(comiclist)
-    issuelist = comiclist.groupByKey().mapValues(list)
+    comiclist = sc.textFile(sourcefile)  # take in the csv
+    comiclist = comiclist.map(lambda line: tuple(line[1:-1].split('","')[::-1]))  # manipulate with the line
+    issuelist = comiclist.groupByKey().mapValues(list)  # group by issue, put the values in a list
 
-    charlist = issuelist.map(lambda i: i[1])
-    geteach = lambda seq: [(seq[i], seq[:i] + seq[i+1:]) for i in range(len(seq))]
-    charcharlist = charlist.flatMap(geteach)
+    charlist = issuelist.map(lambda i: i[1])  # for each issue, get the character list
+    geteach = lambda seq: [(seq[i], seq[:i] + seq[i+1:]) for i in range(len(seq))]  # map from a character list to one character out of it to the rest of characters
+    charcharlist = charlist.flatMap(geteach) # it is now adjacent list
 
-    charadjlist = charcharlist.reduceByKey(lambda a,b: a+b)
-    charadjlist = charadjlist.map(lambda c: (c[0], list(set(c[1]))))
+    charadjlist = charcharlist.reduceByKey(lambda a,b: a+b) # combine adjacent list
+    charadjlist = charadjlist.map(lambda c: (c[0], list(set(c[1]))))  # get unique values
     
     for charname in ["CAPTAIN AMERICA", "MISS THING/MARY", "ORWELL"]:
-        reachlist = findtouch(charname, charadjlist)
+        reachlist = ssbfs(charname, charadjlist)
         print charname, reachlist.count()

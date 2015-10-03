@@ -1,1 +1,12 @@
 # Your discussion here
+We use adjacent list for the graph representation. In RDD format, it looks like
+
+(node, [adj_1, adj_2, ..., adj_n])
+
+Our result for this question is
+CAPTAIN AMERICA 6408
+MISS THING/MARY 7
+ORWELL 9
+
+The original algorithm only works for a graph with diameter no more than 10. However with a variable keeping track with visited nodes, we do not have such restriction anymore.
+The refined algorithm stops when all nodes in a connected component are traversed. And the rest nodes are untouched.
