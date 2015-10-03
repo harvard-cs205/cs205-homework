@@ -1,12 +1,12 @@
 from pyspark import SparkContext
-import urllib2
+from urllib2 import urlopen
 
 # initialize spark
 sc = SparkContext()
 
 # load text file
 url = 'http://s3.amazonaws.com/Harvard-CS205/wordlist/EOWL_words.txt'
-words = urllib2.urlopen(url).read().splitlines()
+words = urlopen(url).read().splitlines()
 data = sc.parallelize(words)
 
 # use sorted word as key and save count and list of words as values
