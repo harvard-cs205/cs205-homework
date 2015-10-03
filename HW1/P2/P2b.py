@@ -12,6 +12,7 @@ def pixel2cord(p):
 
 if __name__ == '__main__':
     sc = SparkContext("local", appName="Spark1")
+    sc.setLogLevel('WARN')
     
     sidePart = 10
     numPart = sidePart*sidePart

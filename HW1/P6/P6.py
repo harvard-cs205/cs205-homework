@@ -16,8 +16,9 @@ def parsefilter(word):
 
 if __name__ == '__main__':
     sc = SparkContext("local", appName="Spark1")
+    sc.setLogLevel('WARN')
     
-    txtfile = sc.textFile('pg100.txt', use_unicode=False) #load text
+    txtfile = sc.textFile('pg100.txt', 32, use_unicode=False) #load text
     #txtfile = sc.textFile('test.txt', use_unicode=False) #load text
     words = txtfile.flatMap(lambda line: line.split(" ")).filter(parsefilter)
     
