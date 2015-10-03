@@ -13,14 +13,14 @@ if __name__ == '__main__':
 
     pixel = 2000
     
-    I = sc.parallelize(range(pixel + 1), 10)
+    I = sc.parallelize(range(pixel + 1), 10)  # 10 partitions for 1 dimension
     J = sc.parallelize(range(pixel + 1), 10)
 
-    IJ = I.cartesian(J)
+    IJ = I.cartesian(J)  # cartesian and get 100 partitions
     
-    IJK = IJ.map(lambda ij: (ij, mandelbrot(* IJtoXY(ij[0], ij[1], pixel))))
-    numpart = sum_values_for_partitions(IJK)
-    plt.hist(np.log10(np.array(numpart.collect()) + 1), bins=np.linspace(0, 8, 17))
+    IJK = IJ.map(lambda ij: (ij, mandelbrot(* IJtoXY(ij[0], ij[1], pixel))))  # map it by mandelbrot
+    numpart = sum_values_for_partitions(IJK)  # get the partition workload
+    plt.hist(np.log10(np.array(numpart.collect()) + 1), bins=np.linspace(0, 8, 17))  # and plot for this line and below
     plt.xlabel('log10(Number) of Works')
     plt.ylabel('Number of Partitions')
     plt.title('Works per Partition')
