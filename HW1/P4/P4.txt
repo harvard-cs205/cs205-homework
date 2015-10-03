@@ -6,3 +6,11 @@ MISS THING/MARY:[(0, 1), (1, 6)]
 
 ORWELL:[(0, 1), (1, 8)]
 
+
+I represented the hero graph as a dictionary of keys and values, where each key is a different node, paired with a list of distinct nodes that are neighbors of the key. 
+
+Short answer part 1:
+The graph diameter of 10 indicates that the maximum shortest distance between any two nodes is less than or equal to 10. This ensures that 10 steps will be enough to reach any node in the graph from any other node in the graph, as long as the path does not loop into itself. BFS finds the shortest path to each node, so 10 iterations should be enough to find all shortest paths.
+
+Short answer part 2:
+If a character does not have a defined distance during the search, it means that the character could not be reached during the search, i.e. is in a part of the graph that is not connected to our source through any path. 
