@@ -1,3 +1,7 @@
 96655 rows
 6444 characters
 12849 books
+
+		# distances = visited_this_iteration.map(lambda (n, (adj, distance)): (n, distance)).union(distances).reduceByKey(min)
+		# distances = visited_this_iteration.map(lambda (n, (adj, distance)): (n, distance))
+		#full outer join and then have (n (d1, d2)). map to take d1 unless null then take d2
