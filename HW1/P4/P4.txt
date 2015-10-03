@@ -1,5 +1,9 @@
 # Your discussion here
+Basically, this graph has 6444 nodes.
+Using Characters-Comic data, I generated RDD for graph with the form of RDD (node, [a list of neighbors])
+In BFS function, the RDD needs to be updated with distances from a root node. So, I changed the form to RDD (node, (distance, [a list of neighbors]))
 
+Here are the results for the three cases
 1) Root Node : CAPTAIN AMERICA
 The number of touched nodes : 6407
 The number of untouched nodes : 37
@@ -14,3 +18,10 @@ Diameter : 1
 The number of touched nodes : 8
 The number of untouched nodes : 6436
 Diameter : 1
+
+Questions
+Q1. For the purposes of this problem, you may assume that the diameter of this graph is ten (10). What does this diameter imply about the maximum number of steps in which your search must be executed?
+Answer : diameter is the maximum distance from a root node. As diameter gets larger, the time that needs to track leaf nodes is more increased. In other words, the complexity of the graph computations is increased. 
+
+Q2. What does it mean if a character does not have a defined distance during the search?
+Answer : That means a character is not connected to a root node through all nodes. it cannot search the character from root node. 
