@@ -9,3 +9,9 @@ Harvard to Kevin Bacon:  3  connections away through the following path
 Kevin Bacon to Harvard:  2  connections away through the following path
 
 [(Kevin_Bacon, [0]), (2008, [1]), (Harvard_University, [2])]
+
+———————————————————————————————————
+
+Started the connected components code at 1:41 PM 3 Oct. 2015
+broken pipe… restarted at 2:55 PM
+broken pipe… restarted on smaller (bidirectional) graph at 3:56 PM

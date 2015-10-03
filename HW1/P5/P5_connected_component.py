@@ -2,7 +2,7 @@ import numpy as np
 from P5_bfs import *
 
 
-def connected_component(link_edges,sc):
+def P5_connected_component(link_edges,sc):
 	component_sizes = []
 	while not link_edges.isEmpty():
 		
@@ -12,7 +12,7 @@ def connected_component(link_edges,sc):
 		compOFpage, COUNTcompOFpage = P5_bfs(link_edges, page, sc)
 		
 		#Remove component from graph
-		link_edges = link_edges.subtractByKey(compOFpage).partitionBy(8).cache() 
+		link_edges = link_edges.subtractByKey(compOFpage).partitionBy(32).cache() 
 		
 		#Record component size
 		component_sizes.append(COUNTcompOFpage)

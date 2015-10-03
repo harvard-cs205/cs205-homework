@@ -2,9 +2,9 @@ from pyspark import SparkContext
 import numpy as np
 from itertools import chain
 from P5_bfs import *
-from connected_component import *
+from P5_connected_component import *
 
-sc = SparkContext("local[4]",appName="ConnComp Testing")
+sc = SparkContext()
 sc.setLogLevel("ERROR")
 
 #Read in the data
@@ -25,11 +25,16 @@ symLinks = linksFlat.union(revLinks).map(lambda x: (x[0],[x[1]])).reduceByKey(la
 bidirLinks = linksFlat.intersection(revLinks).map(lambda x: (x[0],[x[1]])).reduceByKey(lambda x,y: x+y).partitionBy(32).cache()
 
 
-connCOMPS_sym = connected_component(symLinks, sc)
-connCOMPS_biDir = connected_component(bidirLinks, sc)
+#Run connComp on both derived graphs
+connCOMPS_biDir = P5_connected_component(bidirLinks, sc)
+
+print "Number of components in Bidirectional Graph: "+ len(connCOMPS_biDir)
+print "Maximum component in Bidirectional Graph: "+ len(connCOMPS_biDir) + '\n\n'
+
+
+connCOMPS_sym = P5_connected_component(symLinks, sc)
 
 print "Number of components in Symmetric Graph: "+ len(connCOMPS_sym)
 print "Maximum component in Symmetric Graph: " + max(connCOMPS_sym) + '\n\n'
 
-print "Number of components in Bidirectional Graph: "+ len(connCOMPS_biDir)
-print "Maximum component in Bidirectional Graph: "+ len(connCOMPS_biDir) + '\n\n'
+
