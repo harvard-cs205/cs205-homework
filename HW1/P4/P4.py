@@ -3,48 +3,37 @@ import csv
 from P4_bfs import *
 import time
 
-def _buildGraph(filename):
-    issueNameDict = {}
-    with open(filename, 'r') as fh:
-        reader = csv.reader(fh, delimiter=',')
-        for row in reader:
-            name, issue = row
-            if issue not in issueNameDict:
-                issueNameDict[issue] = set()
-            issueNameDict[issue].add(name)
+def _buildGraph(filename, sc):
+    csvRdd = sc.textFile(filename)
 
-    graph = {}
-    for _, names in issueNameDict.iteritems():
-        names = list(names)
-        for i in xrange(len(names)):
-            name = names[i]
-            if name not in graph:
-                graph[name] = []
-            graph[name] += names[:i] + names[i+1:]
+    def comicCharMap(line):
+        char, comic = line[1:-1].split('","')
+        return (comic, char)
 
-    for name, adjlist in graph.iteritems():
-        graph[name] = list(set(adjlist))
+    # (comic, character)
+    comicCharRdd = csvRdd.map(comicCharMap)
+    # (charFrom, set(charTo)), where charFrom and charTo belongs to the same comic
+    fromToRdd = comicCharRdd.join(comicCharRdd).map(lambda (_, (f, t)): (f, set([t])))
+    # (char, adjacent character set)
+    graph = fromToRdd.reduceByKey(lambda set1, set2: set1 | set2)
 
-    graph = [(k, v) for k, v in graph.iteritems()]
+    def dropSelfMap(entry):
+        char, adjacent = entry
+        adjacent.discard(char)
+        return (char, list(adjacent))
+
+    graph = graph.map(dropSelfMap)
     return graph
-
-def _writeDistDict(distDict, filename):
-    with open(filename, 'w') as fh:
-        for k, d in distDict.iteritems():
-            fh.write('{0}: {1}\n'.format(k, d))
 
 if __name__ == '__main__':
     sc = pyspark.SparkContext(appName='YK-P4')
 
     filename = 'source.csv' 
-    graph = _buildGraph(filename)
-    graph = sc.parallelize(graph)
+    graph = _buildGraph(filename, sc)
+    graph.cache()
     
-    name = 'CAPTAIN AMERICA'
-    #name = 'MISS THING/MARY'
-    #name = 'ORWELL'
-    result = bfs(graph, name)
-    # time.sleep(5)
-    print '{0}: {1}'.format(name, result.count())
+    for name in ['CAPTAIN AMERICA', 'MISS THING/MARY', 'ORWELL']:
+        touched, dist = bfs(graph, name)
+        print '{0}: touched: {1}, diameter: {2}'.format(name, touched.count(), dist)
     #_writeDistDict(distDict, 'CAA') 
 

@@ -3,20 +3,23 @@ def bfs(graph, source):
     result = sc.parallelize([(source, 0)])
     frontier = result
     resultSize, newResultSize = 1, 0
+    dist = 0
 
     def bfsMapper(x):
         d, adjlist = x[1]
         return [(adj, d+1) for adj in adjlist]
 
-    while resultSize != newResultSize:
+    while True:
         resultSize = newResultSize
         frontier = frontier.join(graph) \
-                            .flatMap(bfsMapper) \
-                            .distinct() \
-                            .repartition(min(max(resultSize / 10, 1), 64))
+                            .flatMap(bfsMapper).distinct()
+
         result = result.union(frontier).reduceByKey(lambda d1, d2: min(d1, d2))
         # enforce lazy-evaluation
         newResultSize = result.count()
+        if newResultSize == resultSize:
+            break
+        dist += 1
 
-    return result 
+    return result, dist
   

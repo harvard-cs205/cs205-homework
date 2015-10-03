@@ -1,1 +1,14 @@
 # Your discussion here
+
+The representation of my graph is an adjacency list for each character. Each entry in the RDD is of the following format:
+  (characterName, [a list of adjacent characterNames])
+
+Character Name    |   Number of nodes touched    | Diameter
+-----------------------------------------------------------
+CAPTAIN AMERICA   |               6408           |    3
+MISS THING/MARRY  |               7              |    1
+ORWELL            |               9              |    1
+
+This diameter, 10, means the maximum iteration we will run, which is hardcoded and may cause the algorithm to miss some connected nodes if the diameter is larger than 10. To ensure that every node connected to source, we should make no such assumption and do not terminate the iteration until all the nodes we touch in one iteration have been visited in previous iterations.
+
+If a character does not have a defined distance, that means this character is not connected with the source character.
