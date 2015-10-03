@@ -10,13 +10,7 @@ comics = comics.reduceByKey(lambda x,y: x + y)
 nodes_neighbors = nodes.join(comics).map(get_neighbors).reduceByKey(group_neighbors)
 sorted_neighbors = nodes_neighbors.sortByKey()
 roots = [u'CAPTAIN AMERICA', u'MISS THING/MARY', u'ORWELL']
-print "Using accumulator"
 for r in roots:
-    print r + " " + str(len(ss_bfs_accum(sorted_neighbors, r)))
-
-print "Without accumulator"
-for r in roots:
-    print r + " " + str(len(ss_bfs(sorted_neighbors, r)))
-
+    print r + " " + str(ss_bfs_accum(sorted_neighbors, r))
 
 

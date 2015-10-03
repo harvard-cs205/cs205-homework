@@ -21,42 +21,24 @@ def get_neighbors(val):
 def group_neighbors(x, y):
     return set(x) | set(y)
 
-#custom Accumulator for storing hash instead of just a number
-#will store superhero -> distance from root
-class DistanceAccumulatorParam(AccumulatorParam):
-    def zero(self, initialValue):
-        return initialValue
+def count_overlap(dist1, dist2, accum):
+    accum.add(1)
+    return min(dist1, dist2)
 
-    def addInPlace(self, v1, v2):
-        for key in v2.keys():
-            if key not in v1:
-                v1[key] = v2[key]
-        return v1
-    
-#bfs search on rdd given root name using the custom Accumulator
-#optional parameter of diameter
 def ss_bfs_accum(rdd, root, diameter = -1):
-    distance_hash = rdd.context.accumulator({root: 0}, DistanceAccumulatorParam())
-    next_hop = rdd.lookup(root)[0]
+    rdd.partitionBy(20)
+    visit_rdd = rdd.filter(lambda x: x[0] == root)
+    distance_rdd = visit_rdd.map(lambda x: (x[0], 0))
     hops = 1
-    while (hops <= diameter or diameter < 0) and len(next_hop) > 0:
-        next_rdd = rdd.filter(lambda x: x[0] in next_hop)
-        next_rdd.foreach(lambda x: distance_hash.add({x[0] : hops}))
-        next_hop = set(next_rdd.flatMap(lambda x: x[1]).collect()) - set(distance_hash.value.keys())
+    count = 1
+    while (hops <= diameter or diameter < 0) and count > 0:
+        count_accum = rdd.context.accumulator(0)
+        visit_rdd = visit_rdd.flatMap(lambda x: x[1]).distinct(20)
+        distance_rdd = visit_rdd.map(lambda x: (x, hops)).union(distance_rdd).reduceByKey(lambda x,y: count_overlap(x,y,count_accum))
+        distance_rdd.foreach(lambda x:x)
+        count = visit_rdd.count() - count_accum.value
+        visit_rdd = rdd.join(visit_rdd.map(lambda x: (x, []))).map(lambda x: (x[0], x[1][0]))
         hops += 1
-    return distance_hash.value
-
-#bfs search on rdd given root name without Accumulator, turned out to be faster
-def ss_bfs(rdd, root, diameter = -1):
-    next_hop = rdd.lookup(root)[0]
-    h = {root: 0}
-    hops = 1
-    while (hops <= diameter or diameter < 0) and len(next_hop) > 0:
-        for characters in next_hop:
-            if characters not in h:
-                h[characters] = hops
-        next_hop = set(rdd.filter(lambda x: x[0] in next_hop).flatMap(lambda x: x[1]).collect()) - set(h.keys())
-        hops += 1
-    return h
+    return distance_rdd.count()
 
 
