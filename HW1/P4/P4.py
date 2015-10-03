@@ -50,6 +50,7 @@ def getGraph_cartesian(data):
 
 if __name__ == '__main__':
 	sc = pyspark.SparkContext()
+	sc.setLogLevel('WARN')
 
 	# Read in file
 	data = sc.textFile('source.csv')
