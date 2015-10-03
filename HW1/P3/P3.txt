@@ -1,3 +1,3 @@
-# Your discussion here
+# Here is the entry with the most anagrams:
 
 [(u'aerst', 11, [u'arets', u'aster', u'rates', u'reast', u'resat', u'stare', u'stear', u'strae', u'tares', u'tears', u'teras'])]
