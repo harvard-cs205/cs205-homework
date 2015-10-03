@@ -14,16 +14,20 @@ def mkInt(lst):
 	return [int(val) for val in lst]
 
 link_edges = links.map(lambda s: s.split(": ")).map(lambda s: (int(s[0]),s[1]))
-link_edges = link_edges.mapValues(lambda l: l.split(" ")).mapValues(list).mapValues(lambda x: mkInt(x)).partitionBy(16).cache()
-assoc_pages = pages.zipWithIndex().mapValues(lambda v: v+1).partitionBy(16)
+link_edges = link_edges.mapValues(lambda l: l.split(" ")).mapValues(list).mapValues(lambda x: mkInt(x)).partitionBy(32).cache()
+assoc_pages = pages.zipWithIndex().mapValues(lambda v: v+1).partitionBy(32)
 
 Harvard_ID = assoc_pages.lookup("Harvard_University")[0]
 Bacon_ID = assoc_pages.lookup("Kevin_Bacon")[0]
 
 
 #Run SS-BFS for Harvard > Bacon and Bacon > Harvard
-Harv2Bac_dist, Harv2Bac_numTouchedNodes = P5_bfs(link_edges, Harvard_ID, sc, Bacon_ID)
-Bac2Harv_dist, Bac2Harv_numTouchedNodes = P5_bfs(link_edges, Bacon_ID, sc, Harvard_ID)
+Harv2Bac_dist, Harv2Bac_numTouchedNodes, Harv2Bac_path = P5_bfs(link_edges, Harvard_ID, sc, Bacon_ID)
+Bac2Harv_dist, Bac2Harv_numTouchedNodes, Bac2Harv_path = P5_bfs(link_edges, Bacon_ID, sc, Harvard_ID)
 
-print "Harvard to Kevin Bacon: ", Harv2Bac_dist
-print "Kevin Bacon to Harvard: ", Bac2Harv_dist
+print "Harvard to Kevin Bacon: ", Harv2Bac_dist, " connections away through the following path" + '\n' 
+print Harv2Bac_path
+print '\n\n'
+print "Kevin Bacon to Harvard: ", Bac2Harv_dist, " connections away through the following path" + '\n'
+print Bac2Harv_path
+print '\n\n'
