@@ -17,7 +17,7 @@ def bfs(adj, start, sc, numPartitions, distances=None, stopNode=None):
     adj = adj.map(lambda x: x).partitionBy(numPartitions).cache()
     to_search = adj.filter(lambda (x, y): x == start)
     paths = to_search.map(lambda (x, neighbors): (x, [x]))
-    res = paths
+    #res = paths
 
 
     #elem looks like (node_to_Search_from, (([neighbors], _), [path]))
@@ -34,69 +34,24 @@ def bfs(adj, start, sc, numPartitions, distances=None, stopNode=None):
     def not_found(counter):
         counter.value == 0
 
-    while not_found(solutions):
+    while solutions.value == 0:
         #while True:
+        print "got here"
         searchers = adj.join(to_search)
         joined = searchers.join(paths)
         print joined.take(5)
         #return None, None
 
         # THis looks something like (node, [path]), (node, [path]) ....
-        reduced = joined.flatMap(lambda x: reducingFun(x, start, stopNode, solutions))
+        paths = joined.flatMap(lambda x: reducingFun(x, start, stopNode, solutions))
 
         # Get the outlying nodes.
-        to_search = reduced.keys().distinct().map(lambda x: (x, [-1]))
-        print reduced.take(10)
+        to_search = paths.keys().distinct().map(lambda x: (x, [-1]))
+        print paths.take(10)
 
-    res = reduced.filter(lambda (x, y): x == end).values()
+    res = paths.filter(lambda (x, y): x == stopNode).values()
     return res
-    '''
-    #adj = adj.map(lambda x: x).partitionBy(numPartitions).cache()
-    def reducer(tup):
-        left_val = tup[0]
-        right_vals = tup[1]
-        if len(right_vals) == 0:
-            return list(left_val)[0]
-        elif list(left_val)[0] == -1:
-            return list(right_vals)[0]
-        else:
-            return list(left_val)[0]
     
-    def divider(tup):
-        dist = tup[0]
-        node_vals = tup[1]
-        return [(nv, dist + 1) for nv in node_vals]
-
-    if distances == None:
-        distances = adj.mapValues(lambda _: (-1, [])
-
-    traversed = sc.parallelize([(start, 0)]).cache().partitionBy(numPartitions)
-    distances = distances.fullOuterJoin(traversed).mapValues(lambda (x, y): x if y == None else y).partitionBy(numPartitions).cache()
-    paths = sc.parallelize([(start, [start])])
-    #print distances.take(100)
-    assert(copartitioned(adj, distances))
-    farthest = 0
-    accum.add(1)
-    while accum.value != 0:
-        accum.value = 0
-        print "\n\nBFS: On iteration ", farthest, ' for ', start, '\n\n'
-        if stopNode != None and distances.lookup(stopNode)[0] != -1:
-            break
-        farthest_nodes = distances.filter(lambda (node, (dist, path)): dist == farthest)
-
-        
-        joined_farthest_neighbors = farthest_nodes.join(adj, numPartitions)
-
-
-        neighbor_distances = joined_farthest_neighbors.values().flatMap(divider).partitionBy(numPartitions).cache()
-        assert(copartitioned(neighbor_distances, distances))
-        distances = distances.cogroup(neighbor_distances).mapValues(reducer).cache()
-        farthest += 1
-        distances.filter(lambda (x, dist): dist == farthest).foreach(lambda x: accum.add(1))
-
-    return distances, distances.filter(lambda (node, dist): dist < 0)
-    '''
-
 ## This is for the connected components
 # Approach: BFS until it quits. Then reduce the distances to only the ones that are unreachable. Increment counter by 1. Restart BFS with the new set of distances.
 def count_connected_components(adj, numPartitions, sc):
