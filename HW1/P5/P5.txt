@@ -1,5 +1,7 @@
-Here is a shortest path between Kevin_Bacon and Harvard_University:
+# Here is a shortest path between Kevin_Bacon and Harvard_University:
 [u'Kevin_Bacon', u'John_Lithgow', u'Harvard_University']
 
-Here is a shortest path between Harvard_University and Kevin_Bacon: 
+# Here is a shortest path between Harvard_University and Kevin_Bacon: 
 [u'Harvard_University', u'The_New_York_Times', u'Judith_Miller_(journalist)', u'Kevin_Bacon']
+
+# 
