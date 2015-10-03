@@ -271,3 +271,7 @@ Kevin Bacon -> Harvard
  [u'Kevin_Bacon', u'John_Lithgow', u'Harvard_University'],
  [u'Kevin_Bacon', u'Marisa_Silver', u'Harvard_University'],
  [u'Kevin_Bacon', u'College_Bowl', u'Harvard_University']]
+
+
+Symmetric Links:{'max': 5709800, 'components': 559}
+Asymmetric Links:{'max': 1979400, 'components': 1728554}
