@@ -1,7 +1,7 @@
 import findspark
 findspark.init()
 from pyspark import SparkContext, SparkConf
-from P4.bfs.py import ssbfs
+from P4_bfs import ssbfs
 sc = SparkContext()
 
 # Build an rdd of issues with all their associated characters from the source.csv text file
