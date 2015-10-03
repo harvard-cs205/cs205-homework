@@ -56,12 +56,12 @@ if __name__ == '__main__':
     lines = sc.textFile('Shakespeare.txt')
     words = lines.flatMap(splitLine)
     filtered_words = words.filter(filter_word)
-    words_list = filtered_words.collect()
-    indexed_words = filtered_words.zipWithIndex()
-    indexed_words = indexed_words.map(lambda x: format_rdd(x, words_list)).filter(lambda x: x is not None)
+    indexed_words = filtered_words.zipWithIndex().map(lambda x: (x[1], x[0]))
+    offset_words_1 = indexed_words.map(lambda x: (x[0]-1, x[1]))
+    offset_words_2 = indexed_words.map(lambda x: (x[0]-2, x[1]))
+    indexed_words = indexed_words.join(offset_words_1).join(offset_words_2).map(lambda x: ((x[1][0][0], x[1][0][1]), [(x[1][1],1)]))
     word_model = indexed_words.reduceByKey(reduce_tuples)
-    word_model = word_model.sortByKey()
-    print word_model.map(lambda x: x).lookup((u'Now', u'is'))
+    word_model = word_model.sortByKey().cache()
     phrases = []
     for i in range(0, 10):
         phrases.append(generate_phrase(20, word_model))
