@@ -54,7 +54,7 @@ def create_symmetric_graph(fileName):
         partition_size).cache()
 
     # create list of nodes with initial distance = 99
-    nodes = edges.mapValues(lambda v: default_distance)
+    nodes = edges.mapValues(lambda v: default_distance).cache()
 
     return nodes, edges
 
@@ -77,7 +77,7 @@ def create_dual_graph(fileName):
         partition_size).cache()
 
     # create list of nodes with initial distance = 99
-    nodes = edges.mapValues(lambda v: default_distance)
+    nodes = edges.mapValues(lambda v: default_distance).cache()
 
     return nodes, edges
 
@@ -160,5 +160,6 @@ def find_components():
         if untouched_nodes.isEmpty():
             break
 
+        # get the first node that hasn't been touched to search again
         root = untouched_nodes.first()[0]
     pass

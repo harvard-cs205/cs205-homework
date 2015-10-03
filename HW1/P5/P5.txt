@@ -30,3 +30,21 @@ Or:
 [u'Harvard_University', u'Natalie_Portman', u'Paris,_je_t'aime', u'Kevin_Bacon']
 
 Finally, for some interesting paths:
+
+[(1431051, (3, u'Donald_Trump')), (4248345, (0, u'Rick_Rolled')), (4248905, (1, u'Rickrolling')), (3850582, (2, u'Paris_Hilton'))]
+TIME 155.4355411529541
+
+Which is:
+
+[u'Rick_Rolled', u'Rickrolling', u'Paris_Hilton', u'Donald_Trump']
+
+Another one:
+
+[(1431051, (0, u'Donald_Trump')), (946735, (3, u'Cat_and_Mouse_(James_Patterson_novel)')), (2484545, (2, u'James_Patterson')), (3831526, (1, u'Palm_Beach,_Florida')), (244473, (4, u'Aids'))]
+TIME 224.20844793319702
+
+=
+
+[u'Donald_Trump', u'Palm_Beach,_Florida', u'James_Patterson', u'Cat_and_Mouse_(James_Patterson_novel)', u'Aids']
+
+So the next likely president is only 3 hops away from Rick_Rolled and 4 hops from Aids. 
