@@ -15,9 +15,8 @@ However, i found this type of graph structure (one that is short and wide) to no
 
 This new graph is tall and skinny, which is much easier to manipulate in spark. 
 
-My BFS algorithm works as follows: it first inputs an origin node and sets that origin to 0, i then join that origin node with my graph to find all of my origin’s neighbors. those neighbors are assigned to a distance of 1 and saved in a new node RDD. I then join that RDD with the original graph to get the neighbors of the distance-1 neighbors. This process repeats for 10 iterations. However, during each iteration, to avoid duplicative calculations, I have included a line of code that a checks to see if a superhero has already been searched. I also took advantage of .cache() to reduce wasted time recalculating RDDs during each iteration. 
-
-Note that accumulators were not used here due to the inclusion of the line of code that checks to see for duplicative neighbors. 
+My BFS algorithm works as follows: it first inputs an origin node and sets that origin to 0, i then join that origin node with my graph to find all of my origin’s neighbors. those neighbors are assigned to a distance of 1 and saved in a new node RDD. I then join that RDD with the original graph to get the neighbors of the distance-1 neighbors. This process repeats until my accumulator no longer updates. The accumulator stops updating when there are no more neighbors to search. Specifically, during each iteration, to avoid duplicative calculations, I have included a line of code that a checks to see if a superhero has already been searched by looking at which characters were already included in my finall_rdd. I also took advantage of .cache() to reduce wasted time recalculating RDDs during each iteration. 
+ 
 
 ORWELL - 9
 MISS THING/MARY - 7
