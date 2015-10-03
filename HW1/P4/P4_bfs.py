@@ -26,14 +26,13 @@ def count_overlap(dist1, dist2, accum):
     return min(dist1, dist2)
 
 def ss_bfs_accum(rdd, root, diameter = -1):
-    rdd.partitionBy(20)
     visit_rdd = rdd.filter(lambda x: x[0] == root)
     distance_rdd = visit_rdd.map(lambda x: (x[0], 0))
     hops = 1
     count = 1
     while (hops <= diameter or diameter < 0) and count > 0:
         count_accum = rdd.context.accumulator(0)
-        visit_rdd = visit_rdd.flatMap(lambda x: x[1]).distinct(20)
+        visit_rdd = visit_rdd.flatMap(lambda x: x[1]).distinct()
         distance_rdd = visit_rdd.map(lambda x: (x, hops)).union(distance_rdd).reduceByKey(lambda x,y: count_overlap(x,y,count_accum))
         distance_rdd.foreach(lambda x:x)
         count = visit_rdd.count() - count_accum.value
