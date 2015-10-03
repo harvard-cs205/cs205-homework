@@ -76,6 +76,9 @@ def sparkBFS(context, rdd, v0):
     
         # (1) set accumulator for gray nodes to zero
         gray_accum = context.accumulator(0)
+
+        # filter for gray nodes to make it faster
+        # ==> look for http://datascience.stackexchange.com/questions/5667/spark-optimally-splitting-a-single-rdd-into-two
         
         # (2) start map process
         rdd = rdd.flatMap(expandNode)
