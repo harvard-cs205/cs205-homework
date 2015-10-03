@@ -1,18 +1,17 @@
 from operator import add
-from operator import itemgetter
-from itertools import groupby
 import time
+import sys
 
-import findspark
-findspark.init('/home/lhoang/spark')
+# import findspark
+# findspark.init('/home/lhoang/spark')
 
 import pyspark
 sc = pyspark.SparkContext(appName="spark1")
 
 partition_size = 20
-default_distance = 99999
+default_distance = sys.maxint
 sum_distance = sc.accumulator(0)
-
+sum_neighbors = sc.accumulator(0)
 
 def copartitioned(RDD1, RDD2):
     "check if two RDDs are copartitioned"
@@ -53,8 +52,10 @@ def create_symmetric_graph(fileName):
         add).map(lambda kv: (kv[0], list(set(kv[1])))).partitionBy(
         partition_size).cache()
 
-    # create list of nodes with initial distance = 99
-    nodes = edges.mapValues(lambda v: default_distance).cache()
+    # create list of nodes with initial distance
+    # no need to cached here as it will be done later after another
+    # transformation before iterative loop
+    nodes = edges.mapValues(lambda v: default_distance)
 
     return nodes, edges
 
@@ -76,8 +77,10 @@ def create_dual_graph(fileName):
         add).map(lambda kv: (kv[0], list(set(kv[1])))).partitionBy(
         partition_size).cache()
 
-    # create list of nodes with initial distance = 99
-    nodes = edges.mapValues(lambda v: default_distance).cache()
+    # create list of nodes with initial distance
+    # no need to cached here as it will be done later after another
+    # transformation before iterative loop
+    nodes = edges.mapValues(lambda v: default_distance)
 
     return nodes, edges
 
@@ -93,6 +96,20 @@ def update_accumulator(d):
         sum_distance += 1
 
 
+def tally_neighbors(neighbor_list):
+    global sum_neighbors
+    sum_neighbors += len(neighbor_list)
+    pass
+
+
+def flat_merge_list(id_list1, id_list2):
+    return list(set(id_list1 + id_list2))
+
+
+def merge_tuple_kv(list_kv):
+    return list(set(list_kv[0] + list_kv[1]))
+
+
 def bfs_search(nodes, edges, page):
     """
     Perform breadth-first search to find shortest path from root.
@@ -100,37 +117,89 @@ def bfs_search(nodes, edges, page):
     """
     root = nodes.filter(lambda kv: kv[0] == page)
 
+    # set the root node to distance 1 to make it a touched node
+    # to make sure it's not used for the next connected component search
+    nodes = nodes.map(lambda kv: (kv[0], 1 if kv[
+        0] == page else kv[1]), preservesPartitioning=True).cache()
+
+    assert copartitioned(nodes, edges)
+
     i = 1
     previous_sum_distance = 0
     while (True):
         begin_sum_distance = sum_distance.value
 
-        # get neighbors and make sure they are copartitioned with edges & nodes
-        # since each partition may contain duplicate keys, we use mapPartitions
-        # to eliminate these without causing a shuffle.
-        neighbors = edges.join(root).flatMap(
-            lambda kv: l_add_distance(kv[1][0], i)).distinct().partitionBy(
-              partition_size)
+        assert copartitioned(root, edges)
 
-        nodes = neighbors.union(nodes).reduceByKey(min)
+        # get neighbors of root
+        # [ (id, distance) ]
+        neighbors = edges.join(root).values().flatMap(
+            lambda kv: [(v, i) for v in kv[0]])
+
+        # get distinct neighbors and copartition with edges
+        distinct_neighbors = neighbors.reduceByKey(
+            lambda v1, v2: v1, numPartitions=edges.getNumPartitions())
+
+        assert copartitioned(distinct_neighbors, nodes)
+
+        # update distances in nodes by reducing with min on values
+        # format of nodes is [ (id, distance) ]
+        nodes = distinct_neighbors.union(nodes).reduceByKey(min).cache()
 
         # check for convergence using accumulator
         nodes.foreach(lambda kv: update_accumulator(kv[1]))
-
         if sum_distance.value - begin_sum_distance == previous_sum_distance:
             print 'Converged after ' + repr(i) + ' iterations'
             break
 
-        root = neighbors
+        root = distinct_neighbors.cache()
         i += 1
         previous_sum_distance = sum_distance.value - begin_sum_distance
 
     return nodes, edges
 
 
-def find_components():
-    # nodes, edges = create_symmetric_graph('links.smp')
-    nodes, edges = create_dual_graph('links.smp')
+def log_diameter_search(edges):
+
+    i = 0
+    previous_sum_neighbors = 0
+    while True:
+        begin_sum_neighbors = sum_neighbors.value
+
+        # take the neighbors [page_1, page_2, ...] and maps to
+        # [ (page_1, [page_1, page_2, ...]) ]
+        neighbor_edges = edges.values().flatMap(
+            lambda id_list: [(id, id_list) for id in id_list])
+
+        # reduce so that each page id maps to a unique list of
+        # connected neighbors
+        # [ (page_1, [page_1, page_2, ...]) ]
+        distinct_neighbor_edges = neighbor_edges.reduceByKey(
+            flat_merge_list, numPartitions=edges.getNumPartitions())
+
+        assert copartitioned(distinct_neighbor_edges, edges)
+
+        # join with original edge set to merge with new neighbors
+        # so that the set of immediate neighbors grows to the set of
+        # connected neighbors
+        # [ (page_1, [page_1, page_2, ...]) ]
+        merged_edges = distinct_neighbor_edges.join(edges).mapValues(
+            merge_tuple_kv)
+
+        # check for convergence using accumulator
+        merged_edges.foreach(lambda kv: tally_neighbors(kv[1]))
+        if sum_neighbors.value - begin_sum_neighbors == previous_sum_neighbors:
+            print 'Converged after ' + repr(i) + ' iterations'
+            break
+
+        edges = merged_edges.cache()
+        i += 1
+        previous_sum_neighbors = sum_neighbors.value - begin_sum_neighbors
+
+    return edges
+
+
+def find_components(nodes, edges):
     root = nodes.first()[0]
 
     global sum_distance
@@ -143,23 +212,57 @@ def find_components():
         nodes_bfs, _ = bfs_search(nodes, edges, root)
 
         num_components += 1
-        print '------------- COMPONENT ' + repr(num_components)
-        print '------------- ROOT = ' + repr(root)
+
+        print 'COMPONENT ' + repr(num_components)
+        print 'root = ' + repr(root)
 
         num_elements = nodes_bfs.filter(
             lambda kv: kv[1] < default_distance).count()
         print '# of connected elements = ' + repr(num_elements)
 
+        # if sum of elements in all components reaches total then quit
         num_total_component_elements += num_elements
         if num_total_component_elements >= num_total_elements:
             break
 
+        # if all nodes are touched then quit
         untouched_nodes = nodes_bfs.filter(
             lambda kv: kv[1] == default_distance)
-
         if untouched_nodes.isEmpty():
             break
 
         # get the first node that hasn't been touched to search again
         root = untouched_nodes.first()[0]
-    pass
+
+
+def find_components_log_diameter(nodes, edges):
+    edges_components = log_diameter_search(edges)
+    components = edges_components.map(
+        lambda kv: ' '.join(sorted(kv[1]))).distinct().collect()
+    print components
+
+
+quiet_logs(sc)
+
+# links_file = 'links.smp'
+links_file = 's3://Harvard-CS205/wikipedia/links-simple-sorted.txt'
+
+print '----- Symmetric Graph -----'
+start = time.time()
+
+nodes_sym, edges_sym = create_symmetric_graph(links_file)
+find_components_log_diameter(nodes_sym, edges_sym)
+
+print 'Time: ' + repr(time.time() - start)
+
+print '---------------------------'
+
+print '-----   Dual Graph    -----'
+start = time.time()
+
+nodes_dual, edges_dual = create_dual_graph(links_file)
+find_components_log_diameter(nodes_dual, edges_dual)
+
+print 'Time: ' + repr(time.time() - start)
+
+print 'FINISHED'
