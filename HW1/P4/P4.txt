@@ -1,4 +1,21 @@
 # Your discussion here
+
+If a character does not have a defined distance during the search then it means that it is not connected to the root node via any path.
+
+The diameter D can be thought of as the length of the longest path among all shortest paths between any two nodes in the graph. If D = 1, it means the longest path is only 1 edge, which also implies that our iterative algorithm only needs to run 1 iteration. Thus, in general D is the maximum number of iterations the search has to run in order to find all paths from a single source.
+
+The number of touched nodes for the 3 heros are:
+
+"CAPTAIN AMERICA":	6048
+"MISS THING/MARY":	7
+"ORWELL":			9
+
+Below is the full output of the program printed for two separate runs. The first run uses a diameter of 10, the second uses accumulator to detect if the search has converged.
+
+*****************************************************************
+********************* USING DIAMETER SEARCH *********************
+*****************************************************************
+
 ---------------------
 CAPTAIN AMERICA
 Showing 10 D-1 neighbors:
@@ -36,7 +53,9 @@ Number of touched nodes:
 Running time: 
 46.8514430523
 
-
+*****************************************************************
+******************** USING SPARK ACCUMULATOR ********************
+*****************************************************************
 
 previous sum: 0
 aggregate sum: 449386
