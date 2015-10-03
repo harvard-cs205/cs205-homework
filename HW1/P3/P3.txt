@@ -1,4 +1,6 @@
-# Your discussion here
+# On this problem I collaboration with the following:
+Andrew Petschek and Jonathan Friedman
+
 [(u'aerst',
   11,
   [u'arets',
