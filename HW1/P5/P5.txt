@@ -1,1 +1,4 @@
-# Your discussion here
+# kevinToHarvard = path_finder('Kevin_Bacon','Harvard_University', page_links, page_names, sc)
+[u'Kevin_Bacon', u'John_Lithgow', u'Harvard_University']
+
+
