@@ -10,13 +10,11 @@ def bfs2(nodeMap, rootNode):
     # initialize the "previous count"
     prevSize = 0
     # initialize set of current nodes (rdd.lookup would give a tuple, not an RDD) (note: nodeMap "should" be cached from P4.py)
-    currentNodes = nodeMap.filter(lambda node: node[0] == rootNode).cache() # cache
+    currentNodes = nodeMap.filter(lambda node: node[0] == rootNode)
     # initialize set of "touched" nodes
-    connectedNodes = currentNodes.map(lambda node: (node[0], 0))    
+    connectedNodes = currentNodes.map(lambda node: (node[0], 0)).cache() # cache
     # initialize the distance
     dist = 0
-    # cannot pass an RDD through rdd.filter, so create a list of touched nodes
-    l = connectedNodes.map(lambda node: node[0]).collect()
     # keep searching until the size of the map stops changing  
     while (mapSize.value > prevSize):
         # update prevSize 
@@ -25,15 +23,15 @@ def bfs2(nodeMap, rootNode):
         dist += 1
         # update currentNodes to the next "depth" of nodes
         currentNodes = currentNodes.flatMap(lambda node: node[1]).distinct()
-        # update currentNodes to contain only the new nodes (minimize bandwidth)
-        currentNodes = currentNodes.filter(lambda node: node not in l)
-        # update the accumulator (and cache currentNodes because we use it twice more)
-        currentNodes.cache().foreach(lambda node: mapSize.add(1))
-        # update the node list
-        l += currentNodes.collect()
+        # map currentNodes to contain distances, then perform a LOJ with connectedNodes
+        currentNodes = currentNodes.map(lambda node: (node, dist)).leftOuterJoin(connectedNodes) # LOJ shuffle
+        # filter currentNodes based on LOJ, then map back to (node, dist) pairs
+        currentNodes = currentNodes.filter(lambda (K, V): V[1] == None).map(lambda (K, V): (K, V[0])).cache() # cache
+        # update the accumulator
+        currentNodes.foreach(lambda node: mapSize.add(1))
         # update the connectivity map RDD
-        connectedNodes = currentNodes.map(lambda node: (node, dist)).union(connectedNodes)
+        connectedNodes = currentNodes.union(connectedNodes).cache() # cache
         # prepare currentNodes for the next iteration
-        currentNodes = nodeMap.join(currentNodes.map(lambda node: (node, {}))).map(lambda node: (node[0], node[1][0]))
+        currentNodes = nodeMap.join(currentNodes.map(lambda (K, V): (K, {}))).map(lambda node: (node[0], node[1][0])) # join shuffle
     # return the size of the world (but could return other constituents as well)
     return mapSize.value
