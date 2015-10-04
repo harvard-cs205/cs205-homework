@@ -12,3 +12,5 @@ is due to the fact that, no matter what partitioning scheme Spark chooses by def
 between the final partitioning scheme and the original partitionig scheme. It is likely for this reason that we see that, despite
 the fact that the work looks significantly more spread out in the random case (see the plot - as expected, the work is spread out
 in what appears to be, to a very good approximation, a normal distribution), the computation takes an equal amount of time.
+
+I am unsure how to explain the spike of work at the tail of the distribution, but it consistently appears despite the rest of the structure remaining constant.

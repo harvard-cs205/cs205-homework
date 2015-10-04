@@ -31,9 +31,9 @@ if __name__ == "__main__":
     # And generate our histogram
     partition_work = sum_values_for_partitions(pixels_and_counts)
     plt.hist(partition_work.take(partition_work.count()), bins=100)
-    plt.xlabel('Partition Number')
-    plt.ylabel('Compute')
-    plt.title('Total Compute vs. Partition - Random Partitioning Scheme')
+    plt.xlabel('Amount of Work')
+    plt.ylabel('Number of Partitions')
+    plt.title('Compute Distribution - Random Partitioning Scheme')
     plt.savefig('part_b.png')
 
     draw_image(pixels_and_counts)

@@ -13,9 +13,10 @@ NX = NY = 2000
 if __name__ == "__main__":
 
     # Declare our SparkContext
-    sc = SparkContext("local", "madelbrot")
+    sc = SparkContext("local", "mandelbrot")
 
     # Get the i, j pixel arrays
+    # Make sure they have 100 partitions (cartesian multiplies the partitions of each)
     xs = sc.parallelize(range(0, NX), 10)
     ys = sc.parallelize(range(0, NY), 10)
 
@@ -28,9 +29,9 @@ if __name__ == "__main__":
     # Generate plots to demonstrate work per partitions
     partition_work = sum_values_for_partitions(pixels_and_counts)
     plt.hist(partition_work.take(partition_work.count()), bins=100)
-    plt.xlabel('Partition Number')
-    plt.ylabel('Compute')
-    plt.title('Total Compute vs. Partition - Naive Partitioning Scheme')
+    plt.xlabel('Amount of Work')
+    plt.ylabel('Number of Partitions')
+    plt.title('Compute Distribution - Naive Partitioning Scheme')
     plt.savefig('part_a.png')
 
     draw_image(pixels_and_counts)
