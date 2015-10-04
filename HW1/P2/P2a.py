@@ -12,6 +12,8 @@ for i in array_1:
 		new_array.append((j,i))
 
 intermediate = sc.parallelize(new_array, 100).map(lambda x: ((x[0], x[1]), mandelbrot(x[0]/500.0 - 2, x[1]/500.0 - 2)))
+
+#intermediate = intermediate.partitionBy(100)
 sum_values = sum_values_for_partitions(intermediate)
 print "SUM VALUES IS"
 print sum_values.take(10)
