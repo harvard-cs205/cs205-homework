@@ -1,7 +1,9 @@
 # Your discussion here
-
+For Kevin to Harvard, I was able to run bfs on my local machine in 2 minutes. But I am only able to run bfs from Harvard to Kevin on AWS.
+Using 5 instances, I was able to get the result in around 15 minutes. I don't think my code is parallized enough, there are a few collects
+made in each iteration to get the neighbors of currently visiting nodes. 
 
 			---Results---
-(Child,Parent) [(2152782, 4625677)][(4625677, u'Six_degrees_of_separation')])   
-(Child,Parent) [(4625677, 2729536)][(2729536, u'Kevin_Bacon')] ) 
 'Kevin_Bacon' -> 'Six_degrees_of_separation' -> 'Harvard_university'
+
+'Harvard_university' -> 'Tommy_Lee_Jones'->'Gene_Hackman'->'Kevin_Bacon'
