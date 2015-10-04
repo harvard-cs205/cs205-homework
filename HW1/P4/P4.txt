@@ -1,1 +1,22 @@
 # Your discussion here
+
+I would like to start by acknowledging the help of Andrew Putschek and Taylor Killian who guided me towards the subtractByKey() function.
+
+*** GRAPH REPRESENTATION ***
+
+I used an flat edgelist representation, inspired by the wikipedia representation of P5. By flat, I mean that very edge is present. It is explicitly undirected, which means that both (a,b) and (b,a) are present in the edgelist if A and B appear in the same comic issue.
+
+*** Results ****
+
+• MISS THING/MARY:
+7 nodes touched
+
+• ORWELL:
+9 nodes touched
+
+• CAPTAIN AMERICA:
+6408 nodes touched
+
+*** Extra discussion ***
+
+The assumption of the diameter can be in my opinion disregarded as long as a break condition on the number of neighbours visited is present in the while loop. The diameter then only appears as a safety guideline, that will avoid the algorithm looping for ever in case something wrong happens.
