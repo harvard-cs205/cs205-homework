@@ -1,5 +1,6 @@
 from pyspark import SparkContext
 from P4_bfs import BFS
+import time
 
 def split_up_input(line):
     """ Takes in a string, assumed to be of the form '"character", "issue"'
@@ -12,8 +13,8 @@ def split_up_input(line):
     return (character, issue)
 
 def get_all_individual_pairs(issue_list_tup):
-    """ Takes a list of characters, all of which appear are assumed to appear in 
-    the same issue, and returns all combinations of (char1, [char2]). This is
+    """ Takes a list of characters, all of which are assumed to appear in 
+    the same issue, and returns all combinations of (char1, char2). This is
     sort of like a really poorly thought out adjacency matrix. For use in conjunction with flatMap
     and to be post-processed into an adjacency list representation.
     """
@@ -24,28 +25,30 @@ def get_all_individual_pairs(issue_list_tup):
     for c1 in list_of_chars:
         for c2 in list_of_chars:
             if (c1 != c2):              # avoid self-links 
-                edges.append((c1, [c2]))
-                edges.append((c2, [c1]))
+                edges.append((c1, c2))
+                edges.append((c2, c1))
 
     return tuple(edges)                 # flatMap expects a tuple
 
 if __name__ == "__main__":
 
+    start_time = time.time()
+
     # First get a SparkContext object
     sc = SparkContext('local', 'BFS')
+    sc.setLogLevel('WARN')
 
     # Now load in the data
-    data = sc.textFile('source.csv')
+    data = sc.textFile('source.csv', 16)
 
     # Get rid of the stupid quotes
     chars_and_issues = data.map(split_up_input)
 
-    # Flip it around and wrap in a list
-    issues_and_chars = chars_and_issues.map(lambda (x, y): (y, [x]))
+    # Flip it around for a groupByKey 
+    issues_and_chars = chars_and_issues.map(lambda (x, y): (y, x))
 
     # Now we have the issues as keys - all things with the same issue should be connected
-    # Thus reduceByKey gets us (almost) to an adjacency list representation
-    issues_and_chars = issues_and_chars.reduceByKey(lambda x, y: x + y)
+    issues_and_chars = issues_and_chars.groupByKey()
 
     # Now we access every single edge that appears in the graph
     all_edges = issues_and_chars.flatMap(get_all_individual_pairs)
@@ -53,16 +56,23 @@ if __name__ == "__main__":
     # Now each key is a character, and it appears many times -
     # once for each edge. Consolidate all of these into an adjacency
     # list representation of the graph.
-    marvel_graph = all_edges.reduceByKey(lambda x, y: x + y)
+    # We are on 4 cores so we give it 16 partitions. We will try to preserve this partitioning
+    # as we progress. We did not worry about the partitioning scheme of the previous RDD's
+    # because they were so transient.
+    marvel_graph = all_edges.groupByKey().partitionBy(16)
 
     # Clean up any duplicates that may appear
-    marvel_graph = marvel_graph.map(lambda (x, y): (x, list(set(y))))
+    # We preserve our partitioning scheme because we do not alter the key
+    marvel_graph = marvel_graph.map(lambda (x, y): (x, list(set(y))), preservesPartitioning = True)
     
     # Cache our graph to speed up the searches
-    marvel_graph.cache()
+    marvel_graph = marvel_graph.cache()
+
+    # Log the time to set up the graph
+    # Note: may be inaccurate due to laziness
+    print 'Setup time:', (time.time() - start_time)
 
     # Now run the first BFS
-    # We wil use an accumulator to keep track of how many nodes have been discovered each round
     ca_graph = BFS(marvel_graph,'CAPTAIN AMERICA', sc)
 
     # Filter out all nodes who never got their distances updated
@@ -80,6 +90,10 @@ if __name__ == "__main__":
     # Filter out all graphs who never got their distances updated
     num_touched_o = o_graph.filter(lambda (x, y): True if y[0] < 10**8 else False).count()
 
-    print 'Num touched for orwell:', num_touched_o
-    print 'Num touched for captain america:', num_touched_ca
-    print 'Num touched for miss thing:', num_touched_mtm
+
+    with open('P4_output.txt', 'w') as output_file:
+        output_file.write('Num touched for orwell: ' + str(num_touched_o))
+        output_file.write('Num touched for captain america: ' + str(num_touched_ca))
+        output_file.write('Num touched for miss thing: ' + str(num_touched_mtm))
+
+    print 'Total time:', (time.time() - start_time)

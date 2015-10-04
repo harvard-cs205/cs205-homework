@@ -1,13 +1,16 @@
 from functools import partial
+import time
 
-def BFS(graph, source_node, sc):
+MAX_DIST = 10**16
+
+def BFS(graph, source_node, target_node, sc):
     """ Runs a parallel BFS on graph.
     Graph is assumed to in the adjacency list representation of (node, (distance, [neighbors])).
     Distances are initilized to infinite in this function for assurance.
     Returns a graph RDD of the same form, only with correct distances.
     """
-    # First initialize all of the distances
-    dist_graph = graph.map(lambda (x, y): (x, (0, y)) if (x == source_node) else (x, (10**16, y)))
+    # First initialize all of the distances, colors, and path lists
+    dist_graph = graph.map(lambda (x, y): (x, (0, [], 'GRAY', y)) if (x == source_node) else (x, (MAX_DIST, [], 'BLACK', y)), preservesPartitioning = True)
     
     # Tell us when to stop... definitely don't want to stop before we begin
     keep_searching = True
@@ -15,87 +18,158 @@ def BFS(graph, source_node, sc):
     # Zero off our accumulator
     accum = sc.accumulator(0)
 
+    # Cache our graph to avoid unnecessary computation due to laziness 
+    dist_graph = dist_graph.cache()
+
+    # Arbitrarily set the target distance to a large number
+    # Also give us an array to hold the target path
+    target_d = 100000
+    target_path = []
+
     # Now map over the group, exploring one level each time
+    iter_counter = sc.accumulator(0)
     while (keep_searching):
+        before_combine = time.time()
 
-        # Explore one level from each node
+        # Take a step from each node at the same time
         dist_graph = dist_graph.flatMap(explore_level_from_node)
+        
+        # Group results
+        # This gives us an RDD of the form (node, [(d1, path1, c1, par1), ...]
+        dist_graph = dist_graph.groupByKey()
+        
+        # Now find the shortest distance, the lightest color, and reconstruct the adjacency list
+        dist_graph = dist_graph.map(partial(fix_up_nodes, acc=accum))
+        
+        # Use a count to force evaluation of the map - this is needed to properly increment
+        # the accumulator.
+        dist_graph.count()
 
-        # Combine results to get shortest distances and reconstruct adjacency lists
-        dist_graph = dist_graph.reduceByKey(partial(find_actual_distances, accum=accum))
+        # See if we have found the target node yet
+        target = dist_graph.lookup(target_node)[0]
 
-        # Now find out how many we newly discovered
-        # Note that, in this formalism, if we newly discover a node
-        # we have ALREADY found the best way to get there!
+        # If we found our target
+        if target[2] != 'BLACK':
+            target_d = target[0]
+            target_path = target[1] + [target_node]
+            keep_searching = False
+
+        # Print out some useful timing information
+        print 'Time to combine on iter', iter_counter.value, ':', (time.time() - before_combine)
+
+        # If we have gray nodes (i.e., ones to step from next round)
+        # keep stepping. Otherwise, stop.
         if (accum.value == 0):
             keep_searching = False
         else:
             # Start the counter over
+	    print 'Number of updated nodes:', accum.value, 'on iteration number:', iter_counter.value
             accum = sc.accumulator(0)
 
-    return dist_graph
+        # Cache our graph for improved speed on the next iteration
+        dist_graph = dist_graph.cache()
+
+        iter_counter.add(1)
+
+    return (target_d, target_path)
 
 def explore_level_from_node(node):
     """ Explores one level from the node node.
-    Node is assumed to come in the form (node, (current_best_distance_to_source), [neighbors]).
-    Updates each node connected to this node to have distance +1, and returns a list containing
-    the parent node that we came from.
-    To be used with flatMap to parallel BFS from each node. Some of the returned distances
-    will NOT be optimal - these will be eliminated with find_actual_distances.
+    Node is assumed to come in the form (node_name, (current_best_distance_to_source, curr_color, [neighbors]).
+    Updates each node connected to this node to have distance +1.
+    The update returns an empty adjacency list because we store every node in the whole graph again anyways.
+    We store all nodes in the graph so as to not lose any BLACK or WHITE nodes.
+    To be used with flatMap to parallel BFS from each node.
+    The original (non-optimal) distances will be removed with the later fix_up_nodes.
     """
 
     # Just split up the data for readability
     curr_node = node[0]
     d = node[1][0]
-    adj_list = node[1][1]
+    path = node[1][1]
+    color = node[1][2]
+    adj_list = node[1][3]
 
-    # Our list of results to be cast into a tuple and returned for flatMap
+    # Our list of results to be returned returned for flatMap
     results = []
 
     # Iterate over all other nodes, update their distances, and return the parent.
-    # Only do this if we have been to the node already - i.e., its current distance is not infinity
-    # This is my equivalent of the rdd.filter() optimizations
-    if (d < 10**16):
+    # Only do this if we have been to the node already - i.e., its color is GRAY 
+    # This is my equivalent of the rdd.filter() optimizations. When I used filter to only get the gray
+    # nodes, it required a filter and then a union to put the white and black nodes back in. This took
+    # significantly more time than just doing an if statement check like this.
+    if (color == 'GRAY'):
+        # Update the path: how we get here is how we got to node, plus node!
+        new_path =  path + [curr_node]
         for other_node in adj_list:
             # Append our tentative new distance
-            results.append((other_node, (d+1, [curr_node])))
-    #else:
-        # Otherwise we have an unexplored node...
-    #    accum.add(1)
+            # Alter the color to Gray
+            results.append(
+			    (other_node, (d+1, new_path, 'GRAY', []))
+			  )
 
-    # And lets not lose any nodes now...
-    results.append(node)
-
-    return tuple(results)
-
-def find_actual_distances(d1_par1, d2_par2, accum):
-    """ Reduce function for a graph RDD of the form (node, (distance_to_source, [parents])).
-    We assume the graph RDD just came out of explore_level_from_node, and thus has many duplicate
-    nodes and distances - most of which are not optimal. We reduce by taking only the shortest distance
-    from the source, as this is the distance we are interested in. We also combine ALL parents
-    to reconstruct the list of neighbors.
-    """
-    # Get the first distance and parents
-    d1 = d1_par1[0]
-    par1 = d1_par1[1]
-
-    # Get the second distance and parents
-    d2 = d2_par2[0]
-    par2 = d2_par2[1]
-
-    # Find the actual distance
-    d = 0
-    if d1 < d2:
-        d = d1 
+    # Now lets not lose any nodes
+    # If this was black, we did NOT step from it, and we should save it just as it came in
+    if (color == 'BLACK'):
+        results.append(node)
     else:
-        d = d2
+        # Otherwise, it was either white or we stepped from it
+        # If we stepped from it, we want it to be white, so:
+        results.append((curr_node, (d, path, 'WHITE', adj_list)))
 
-    # Are we newly discovering a node?
-    if (d1 == 10**16 or d2 == 10**16):
-        accum.add(1)
+    return results
 
-    # Reconstruct the adjacency list by combining parents
-    # Remove any duplicates that may appear
-    pars = list(set(par1 + par2))
+def fix_up_nodes(node, acc):
+    """ After stepping from each node and grouping by key, we have a big RDD of the form
+    (node, [(d1, path1, color1, adj1), ...])
+    We want to get the SHORTEST distance, the LIGHTEST color, and reconstruct the adjacency list.
+    For every node we update to GRAY, we have another node to step from in the next round.
+    This means we should increment our accumulator, which keeps track of how many we need to step from.
+    """
 
-    return (d, pars)
+    # Just separate the name and the tuple of distances, paths,
+    # colors, and adjacency lists
+    node_name = node[0]
+    dist_node_list = node[1]
+
+    # Get the distances, paths, colors, and potential adjacency lists all in list form
+    dist_list = map(lambda (x, y, z, q): x, dist_node_list)
+    path_lists = map(lambda (x, y, z, q): y, dist_node_list)
+    color_list = map(lambda (x, y, z, q): z, dist_node_list)
+    potential_adj_list = map(lambda (x, y, z, q): q, dist_node_list)
+
+    # The actual distance from the source is the smallest of any
+    # possible way to get there 
+    actual_dist = min(dist_list)
+
+    # The path is either nothing (havent gotten there yet) or we need to find it
+    path = []
+
+    # Sort the path list by length, and keep it distinct
+    sorted_path_list = sorted(path_lists, key=len)
+
+    # If the node was just black, we know [] wil be in the path_list
+    # In that case, we want the second shorted path
+    if ('BLACK' in color_list) and (len(sorted_path_list) > 1):
+        path = sorted_path_list[1]
+    else:
+        # Otherwise, we want the shortest path.
+        path = sorted_path_list[0]
+
+    if 'WHITE' in color_list:
+        # We've already been there, don't go again
+        color = 'WHITE'
+    elif 'GRAY' in color_list:
+        # People for the next round
+        # Also means we SHOULDN'T stop yet
+        color = 'GRAY'
+        acc.add(1)
+    else:
+        # Still haven't gotten to this guy
+        color = 'BLACK'
+
+    # Add all the adjacency lists from all the steps and get rid of any duplicates
+    # This duplicate check actually might not be necessary, but we will do so for safety
+    adj_list = list(set(reduce(lambda x, y: x + y, potential_adj_list)))
+
+    return (node_name, (actual_dist, path, color, adj_list))

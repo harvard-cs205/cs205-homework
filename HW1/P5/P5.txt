@@ -1,1 +1,5 @@
-# Your discussion here
+Distance from Harvard to Bacon and the path: (3, [2152782, 4994107, 1912325, 2729536])
+Distance from Bacon to Harvard and the path: (2, [2729536, 4625677, 2152782])
+
+Please note: The first node in these paths is the source (note that the first node of each is the same as the last node of the other).
+So although the path length is more than the distance - this is expected. The distance is considered to be the number of steps, not the number of elements in the path.
