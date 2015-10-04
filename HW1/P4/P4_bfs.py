@@ -34,7 +34,6 @@ def bfs_parallel(sc, graph, root):
     '''
     traversed = set()
     current = {root}
-    step = 0
 
     while current:
         filtered = graph.filter(lambda (k, v): k in current)
@@ -42,7 +41,6 @@ def bfs_parallel(sc, graph, root):
         counter = sc.accumulator(set(), AccumNodes())
         filtered.values().foreach(lambda x: counter.add(x))
         current = counter.value - traversed
-        step += 1
 
     numtraversed = len(traversed) - 1 # excl. root
     return numtraversed
