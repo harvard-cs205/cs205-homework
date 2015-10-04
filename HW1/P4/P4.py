@@ -1,10 +1,17 @@
 from operator import add
+from operator import itemgetter
+from itertools import groupby
+import time
 
-# import findspark
-# findspark.init('/home/lhoang/spark')
+import findspark
+findspark.init('/home/lhoang/spark')
 
-# import pyspark
-# sc = pyspark.SparkContext(appName="spark1")
+import pyspark
+sc = pyspark.SparkContext(appName="spark1")
+
+partition_size = 100
+default_distance = 99
+sum_distance = sc.accumulator(0)
 
 
 def create_graph(fileName):
@@ -21,89 +28,95 @@ def create_graph(fileName):
     g = vk.join(vk).map(lambda kv: sorted(list(set(list(kv[1]))))).filter(
         lambda seq: len(seq) > 1)
 
-    # remove duplicate records, then make relationship symmetric
-    # by creating reverse links: (hero1, hero2) to (hero2, hero1)
-    gr = g.map(lambda seq: (seq[0], seq[1])).distinct().flatMap(
-        lambda kv: [kv, (kv[1], kv[0])])
+    # create unique links (hero_i, hero_j)
+    links = g.map(lambda seq: (seq[0], seq[1])).distinct()
 
-    # now reduce the list of all (hero_i, hero_j) records by hero_i
-    # this gives a list of (hero_i, ([neighbors of hero_i], 0))
-    # where distances are initialized to 0
-    graph = gr.map(lambda kvp: (kvp[0], [kvp[1]])).reduceByKey(add).map(
-            lambda kv: (kv[0], (list(set(kv[1])), -1)))
+    # make links symmetric by mapping (hero_i, hero_j) to (hero_j, hero_i)
+    # then reduce to give a list of (hero_i, [neighbors of hero_i])
+    edges = links.flatMap(lambda kv: [kv, (kv[1], kv[0])]).map(
+        lambda kvp: (kvp[0], [kvp[1]])).reduceByKey(
+        add).map(lambda kv: (kv[0], list(set(kv[1])))).partitionBy(
+        partition_size).cache()
 
-    return graph
+    # create list of nodes with initial distance = 99
+    nodes = edges.mapValues(lambda v: default_distance)
 
-
-def bfs_search_iteration(i, graph, root):
-    """
-    Perform breadth-first search at iteration i.
-    :param i: The iteration.
-    :param graph: The current graph.
-    :param root: The root nodes to whose neighbors will update distances.
-    """
-    print 'i = ' + repr(i) + ', root count = ' + repr(len(root))
-
-    neighbors = graph.filter(lambda kv: kv[0] in root).flatMap(
-        lambda kv: kv[1][0]).collect()
-    neighbors = list(set(neighbors))
-
-    # increase distance for all neighbor nodes (excluding root)
-    # if the distance isn't already set
-    graph = graph.map(lambda kv: (kv[0], (kv[1][0], i)) if (
-        (kv[0] in neighbors) and (kv[1][1] == -1)) else kv)
-
-    return graph, neighbors
+    return nodes, edges
 
 
-def bfs_search(graph, hero):
+def l_add_distance(list, d):
+    for kv in list:
+        yield (kv, d)
+
+
+def update_accumulator(d):
+    global sum_distance
+    if d < default_distance:
+        sum_distance += 1
+
+
+def bfs_search(nodes, edges, hero, diameter):
     """
     Perform breadth-first search to find shortest path from hero.
     :param hero: The root node to find paths from.
     """
     # initially root nodes only contains the source node
     # but will grow to contain more nodes at each iteration
-    root = [hero]
-    diameter = 10
+    root = nodes.filter(lambda kv: kv[0] == hero)
 
-    # initially set distance to self to zero
-    graph = graph.map(lambda kv: (kv[0], (kv[1][0], 0)) if kv[
-        0] == hero else kv)
+    i = 1
+    previous_sum_distance = 0
+    while (True):
+        begin_sum_distance = sum_distance.value
 
-    # iteratively find distances for other nodes
-    for i in range(1, diameter + 1):
-        graph, root = bfs_search_iteration(i, graph, root)
+        # get neighbors and make sure they are copartitioned with edges & nodes
+        # since each partition may contain duplicate keys, we use mapPartitions
+        # to eliminate these without causing a shuffle.
+        neighbors = edges.join(root).flatMap(
+            lambda kv: l_add_distance(kv[1][0], i)).distinct().partitionBy(
+              partition_size)
 
-    return graph
+        nodes = neighbors.union(nodes).reduceByKey(min)
 
+        # check for convergence using accumulator
+        nodes.foreach(lambda kv: update_accumulator(kv[1]))
 
-def bfs_search_strange_behavior(graph, hero):
-    """
-    Similar to bfs_search but very strange behavior.
-    The iteration below does not update the graph properly so every
-    new iteration applies transformation to the original graph instead.
-    """
-    # initially root nodes only contains the source node
-    # but will grow to contain more nodes at each iteration
-    root = [hero]
-    diameter = 10
-
-    # initially set distance to self to zero
-    graph = graph.map(lambda kv: (kv[0], (kv[1][0], 0)) if kv[
-        0] == hero else kv)
-
-    for i in range(1, diameter + 1):
-        print 'i = ' + repr(i) + ', root count = ' + repr(len(root))
-
-        neighbors = graph.filter(lambda kv: kv[0] in root).flatMap(
-            lambda kv: kv[1][0]).collect()
-        neighbors = list(set(neighbors))
-
-        # increase distance for all neighbor nodes (excluding root)
-        # if the distance isn't already set
-        graph = graph.map(lambda kv: (kv[0], (kv[1][0], i)) if (
-            (kv[0] in neighbors) and (kv[1][1] == -1)) else kv)
+        if sum_distance.value - begin_sum_distance == previous_sum_distance:
+            print 'Converged after ' + repr(i) + ' iterations'
+            break
 
         root = neighbors
+        i += 1
+        previous_sum_distance = sum_distance.value - begin_sum_distance
 
-    return graph
+    return nodes, edges
+
+
+def main():
+    nodes, edges = create_graph('source.csv')
+
+    diameter = 10
+    num_display_neighbors = 10
+
+    root = ['CAPTAIN AMERICA', 'MISS THING/MARY', 'ORWELL']
+
+    for hero in root:
+        nodes_bfs, _ = bfs_search(nodes, edges, hero, diameter)
+
+        start = time.time()
+        print '---------------------'
+        print hero
+
+        for i in range(3):
+            print 'Showing ' + repr(num_display_neighbors) + ' D-' + repr(
+                i + 1) + ' neighbors:'
+            print nodes_bfs.filter(
+                lambda kv: kv[1] == i + 1).take(num_display_neighbors)
+
+        print 'Number of touched nodes:'
+        print nodes_bfs.filter(lambda kv: kv[1] != default_distance).count()
+
+        print 'Running time: '
+        print (time.time() - start)
+
+    sc.stop()

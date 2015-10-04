@@ -8,10 +8,11 @@ import sys
 import pyspark
 sc = pyspark.SparkContext(appName="spark1")
 
-partition_size = 20
+partition_size = 256
 default_distance = sys.maxint
 sum_distance = sc.accumulator(0)
 sum_neighbors = sc.accumulator(0)
+
 
 def copartitioned(RDD1, RDD2):
     "check if two RDDs are copartitioned"
@@ -21,8 +22,8 @@ def copartitioned(RDD1, RDD2):
 def l_get_symmetric_pairs(kv):
     neighbors = kv[1].split()
     for nb in neighbors:
-        yield (kv[0], nb)
-        yield (nb, kv[0])
+        yield (kv[0], [nb])
+        yield (nb, [kv[0]])
 
 
 def l_get_pairs(kv):
@@ -38,6 +39,41 @@ def quiet_logs(sc):
     logger.LogManager.getLogger("amazonaws").setLevel(logger.Level.WARN)
 
 
+def get_comic_to_hero(line):
+    split = line.split('"')
+    return (split[3], split[1])
+
+
+def create_marvel_graph(fileName):
+    """
+    Create a graph of character relationship given a file.
+    :param fileName: The csv file to load where each line = (hero, comic).
+    """
+    src = sc.textFile(fileName)
+
+    # convert records to (comic, hero)
+    vk = src.map(lambda x: x.split('"')).map(lambda tup: (tup[3], tup[1]))
+
+    # join records by comic to find which heroes are related
+    g = vk.join(vk).map(lambda kv: sorted(list(set(list(kv[1]))))).filter(
+        lambda seq: len(seq) > 1)
+
+    # create unique links (hero_i, hero_j)
+    links = g.map(lambda seq: (seq[0], seq[1])).distinct()
+
+    # make links symmetric by mapping (hero_i, hero_j) to (hero_j, hero_i)
+    # then reduce to give a list of (hero_i, [neighbors of hero_i])
+    edges = links.flatMap(lambda kv: [kv, (kv[1], kv[0])]).map(
+        lambda kvp: (kvp[0], [kvp[1]])).reduceByKey(
+        add).map(lambda kv: (kv[0], list(set(kv[1])))).partitionBy(
+        partition_size).cache()
+
+    # create list of nodes with initial distance = 99
+    nodes = edges.mapValues(lambda v: default_distance)
+
+    return nodes, edges
+
+
 def create_symmetric_graph(fileName):
     """
     Create a symmetric graph of wiki pages.
@@ -48,9 +84,9 @@ def create_symmetric_graph(fileName):
     # make symmetric links then reduce to give a list of
     # (page_i, [neighbors of page_i])
     edges = src.map(lambda x: x.split(':')).flatMap(
-        l_get_symmetric_pairs).distinct().reduceByKey(
-        add).map(lambda kv: (kv[0], list(set(kv[1])))).partitionBy(
-        partition_size).cache()
+        l_get_symmetric_pairs).reduceByKey(
+        add, numPartitions=partition_size).mapValues(
+        lambda v: list(set(v))).cache()
 
     # create list of nodes with initial distance
     # no need to cached here as it will be done later after another
@@ -69,13 +105,19 @@ def create_dual_graph(fileName):
 
     # make dual links then reduce to give a list of
     # (page_i, [neighbors of page_i])
+
+    # get edge pairs [(page_i, page_j)]
     edge_pairs = src.map(lambda x: x.split(':')).flatMap(
-        l_get_pairs)
+        lambda kv: [(kv[0], nb) for nb in kv[1].split()])
+
+    # get reverse edge pairs [(page_j, page_i)]
     edge_pairs_reverse = edge_pairs.map(lambda kv: (kv[1], kv[0]))
 
-    edges = edge_pairs.intersection(edge_pairs_reverse).reduceByKey(
-        add).map(lambda kv: (kv[0], list(set(kv[1])))).partitionBy(
-        partition_size).cache()
+    # intersect edge and reverse_edge to keep only the dual links
+    edges = edge_pairs.intersection(edge_pairs_reverse).mapValues(
+        lambda v: [v]).reduceByKey(
+        add, numPartitions=partition_size).mapValues(
+        lambda v: list(set(v))).cache()
 
     # create list of nodes with initial distance
     # no need to cached here as it will be done later after another
@@ -160,11 +202,12 @@ def bfs_search(nodes, edges, page):
 
 
 def log_diameter_search(edges):
+    global sum_neighbors
 
     i = 0
     previous_sum_neighbors = 0
     while True:
-        begin_sum_neighbors = sum_neighbors.value
+        sum_neighbors += -sum_neighbors.value
 
         # take the neighbors [page_1, page_2, ...] and maps to
         # [ (page_1, [page_1, page_2, ...]) ]
@@ -186,15 +229,18 @@ def log_diameter_search(edges):
         merged_edges = distinct_neighbor_edges.join(edges).mapValues(
             merge_tuple_kv)
 
+        print '-i ' + repr(i) + ', sum: ' + repr(previous_sum_neighbors)
+
         # check for convergence using accumulator
         merged_edges.foreach(lambda kv: tally_neighbors(kv[1]))
-        if sum_neighbors.value - begin_sum_neighbors == previous_sum_neighbors:
+        if sum_neighbors.value == previous_sum_neighbors:
             print 'Converged after ' + repr(i) + ' iterations'
             break
 
+        print '+i ' + repr(i) + ', sum: ' + repr(previous_sum_neighbors)
         edges = merged_edges.cache()
         i += 1
-        previous_sum_neighbors = sum_neighbors.value - begin_sum_neighbors
+        previous_sum_neighbors = sum_neighbors.value
 
     return edges
 
@@ -207,6 +253,8 @@ def find_components(nodes, edges):
     num_components = 0
     num_total_elements = nodes.count()
     num_total_component_elements = 0
+
+    visited_nodes = nodes
     while True:
         sum_distance += -sum_distance.value
         nodes_bfs, _ = bfs_search(nodes, edges, root)
@@ -225,11 +273,21 @@ def find_components(nodes, edges):
         if num_total_component_elements >= num_total_elements:
             break
 
+        assert copartitioned(visited_nodes, nodes_bfs)
+
+        # combine with previous bfs graph to update the list
+        # of visited nodes
+        new_visited_nodes = visited_nodes.union(
+            nodes_bfs).reduceByKey(min)
+
         # if all nodes are touched then quit
-        untouched_nodes = nodes_bfs.filter(
+        untouched_nodes = new_visited_nodes.filter(
             lambda kv: kv[1] == default_distance)
         if untouched_nodes.isEmpty():
             break
+
+        # set visited nodes for next iteration
+        visited_nodes = new_visited_nodes.cache()
 
         # get the first node that hasn't been touched to search again
         root = untouched_nodes.first()[0]
@@ -237,32 +295,41 @@ def find_components(nodes, edges):
 
 def find_components_log_diameter(nodes, edges):
     edges_components = log_diameter_search(edges)
+
     components = edges_components.map(
-        lambda kv: ' '.join(sorted(kv[1]))).distinct().collect()
-    print components
+        lambda kv: ' '.join(sorted(kv[1]))).distinct()
+
+    max_num_elements = components.map(
+        lambda v: len(v.split())).takeOrdered(1, lambda v: -v)
+
+    print '# of components: ' + repr(components.count())
+    print 'max # of elements: ' + repr(max_num_elements)
 
 
-quiet_logs(sc)
+def main():
+    quiet_logs(sc)
 
-# links_file = 'links.smp'
-links_file = 's3://Harvard-CS205/wikipedia/links-simple-sorted.txt'
+    # links_file = 'links.smp'
+    # links_file = '../P4/source.csv'
+    # links_file = 'links-simple-sorted-100.txt'
+    links_file = 's3://Harvard-CS205/wikipedia/links-simple-sorted.txt'
 
-print '----- Symmetric Graph -----'
-start = time.time()
+    print '----- Symmetric Graph -----'
+    start = time.time()
 
-nodes_sym, edges_sym = create_symmetric_graph(links_file)
-find_components_log_diameter(nodes_sym, edges_sym)
+    nodes_sym, edges_sym = create_symmetric_graph(links_file)
+    find_components_log_diameter(nodes_sym, edges_sym)
 
-print 'Time: ' + repr(time.time() - start)
+    print 'Time: ' + repr(time.time() - start)
 
-print '---------------------------'
+    print '---------------------------'
 
-print '-----   Dual Graph    -----'
-start = time.time()
+    print '-----   Dual Graph    -----'
+    start = time.time()
 
-nodes_dual, edges_dual = create_dual_graph(links_file)
-find_components_log_diameter(nodes_dual, edges_dual)
+    nodes_dual, edges_dual = create_dual_graph(links_file)
+    find_components_log_diameter(nodes_dual, edges_dual)
 
-print 'Time: ' + repr(time.time() - start)
+    print 'Time: ' + repr(time.time() - start)
 
-print 'FINISHED'
+    print 'FINISHED'

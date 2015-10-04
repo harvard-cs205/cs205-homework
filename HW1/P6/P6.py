@@ -1,3 +1,5 @@
+import random
+
 import findspark
 findspark.init('/home/lhoang/spark')
 
@@ -33,6 +35,27 @@ def is_number(s):
         return True
     except ValueError:
         return False
+
+
+def generate_next_word(kv):
+    '''
+    Generate next word by sampling from the list of possible
+    next words based on their counts.
+    '''
+    sum_occurences = 0
+    for v in kv[1][0]:
+        sum_occurences += v[1]
+
+    random_index = random.randint(1, sum_occurences)
+
+    next_word = kv[1][0][0][0]
+    for v in kv[1][0]:
+        if random_index <= 0:
+            next_word = v[0]
+            break
+        random_index -= v[1]
+
+    return ((kv[0][1], next_word), kv[1][1] + ' ' + kv[0][0])
 
 
 def discard_word(s):
@@ -77,9 +100,7 @@ sentences = sc.parallelize(model.takeSample(
 for iteration in range(num_words_per_sentence):
     # get the next pair of words
     # [ (k, v), 'path' ]
-    next_pairs = sentences.map(
-        lambda kv: ((kv[0][1], kv[1][0][0][0]),
-                    kv[1][1] + ' ' + kv[0][0]))
+    next_pairs = sentences.map(generate_next_word)
 
     # join pair of words with model so we can find next words
     # [ (k, v), ( [(k, c), (k, c), . . .], 'path' ) ]
