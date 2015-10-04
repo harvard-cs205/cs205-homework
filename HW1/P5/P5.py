@@ -25,8 +25,9 @@ print Harvard_ID
 print Bacon_ID
 
 #determine the shortest path between Harv->Bacon and Bacon->Harv
-#print bfs(Harvard_ID,links,sc,Bacon_ID)
+
 print bfs(Bacon_ID,links,sc,Harvard_ID)
-#print connected_components(Harvard_ID,links,sc)
+print bfs(Harvard_ID,links,sc,Bacon_ID)
+print connected_components(Harvard_ID,links,sc)
 
 

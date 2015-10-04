@@ -1,5 +1,5 @@
 #NOTE: File P5.py should be used to call this function below to find
-#shortest path between two nodes
+#shortest path between two nodes.
 
 import numpy as np
 
