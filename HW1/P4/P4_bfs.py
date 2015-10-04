@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[5]:
+# In[6]:
 
 def make_hero_graph(text_path, sc, n_parts):
 
@@ -26,6 +26,7 @@ def make_hero_graph(text_path, sc, n_parts):
     hero_graph = comic_hero_join.combineByKey(lambda x: x, 
                                      lambda a, b: a.union(b), 
                                      lambda a, b: a.union(b))
+    hero_graph = hero_graph.map(lambda KV: (KV[0], KV[1] - {KV[0]}), True)
     assert hero_graph.partitioner == comic_key.partitioner
     return hero_graph
 
@@ -50,49 +51,53 @@ def do_bfs1(sc, source_node, hero_graph, n_parts):
 # In[2]:
 
 # Version without assuming graph diameter, using accumulator
-def do_bfs2(sc, source_node, hero_graph, n_parts):
-
+def do_bfs2(sc, source_node, hero_graph, n_parts, stop_node):
     # Make sure pre-join RDDs are copartitioned
     node_hist = (sc.parallelize([(source_node, 0)])
                  .partitionBy(n_parts, hash))
     new_nodes = node_hist
     hero_graph = hero_graph.partitionBy(n_parts, hash).cache()
+    hero_filt = hero_graph
     assert new_nodes.partitioner == hero_graph.partitioner
 
     # Keep track of whether there are no new nodes touched
-    new_count = 0
     accum = sc.accumulator(1)
 
     # Distance corresponding to current iteration
     iter_i = 0 
 
-
-    while accum.value > 0:
-        new_count = accum.value
-
-        # How do I do this without a collect???
-        new_set = set(new_nodes.map(lambda x: x[0]).collect())
-        hero_filt = hero_graph.filter(lambda x: x[0] in new_set)
-
+    while (accum.value > 0 
+           and new_nodes.filter(lambda x: x[0] == stop_node).count() == 0):
+        print('Starting iteration {}'.format(iter_i))
         assert new_nodes.partitioner == hero_filt.partitioner
-        def count_map(K, accum):
-            accum.add(1)
-            return (K, iter_i + 1)
+        #         def count_map(K, accum):
+        #             accum.add(1)
+        #             return (K, iter_i + 1)
         neighbors = (new_nodes.join(hero_filt)
                      .flatMap(lambda x: x[1][1])
+                     .distinct()
                      .map(lambda x: (x, iter_i + 1)))
-        
-        # If new nodes were touched, new_count 
-        # will no longer be equal to accum.value
 
+        hero_filt = hero_filt.subtractByKey(new_nodes)
+        hero_filt = hero_filt.partitionBy(n_parts, hash).cache()
+
+        # Take away the nodes that were already explored; these are not new
         new_nodes = neighbors.subtractByKey(node_hist)
+        new_nodes = new_nodes.partitionBy(n_parts, hash).cache()
 
+        # Use an accumulator for no reason; 
+        # equivalent to performing a count on new_nodes
         accum = sc.accumulator(0)
         new_nodes.foreach(lambda _: accum.add(1))
         node_hist = (node_hist + new_nodes).cache()
-        
-        new_nodes = new_nodes.partitionBy(n_parts, hash).cache()
+
+
 
         iter_i = iter_i + 1
     return node_hist
+
+
+# In[ ]:
+
+
 

@@ -1,12 +1,12 @@
 Number of touched nodes at each iteration: (distance, # of heroes)
 
-CAPTAIN AMERICA:[(0, 1), (1, 1906), (2, 54399), (3, 1144)]
+CAPTAIN AMERICA:[(0, 1), (1, 1906), (2, 4463), (3, 38)]
 
 MISS THING/MARY:[(0, 1), (1, 6)]
 
 ORWELL:[(0, 1), (1, 8)]
 
-
+Graph representation:
 I represented the hero graph as a dictionary of keys and values, where each key is a different node, paired with a list of distinct nodes that are neighbors of the key. 
 
 Short answer part 1:
