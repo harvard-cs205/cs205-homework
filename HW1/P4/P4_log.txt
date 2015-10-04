@@ -1,0 +1,26 @@
+Origin = CAPTAIN AMERICA
+The diameter is3
+The total number of nodes touched:6408
+After 1 turn, the number of new visited nodes is 1906
+After 2 turn, the number of new visited nodes is 4463
+After 3 turn, the number of new visited nodes is 38
+After 4 turn, the number of new visited nodes is 0
+
+
+
+Origin = MISS THING/MARY
+The diameter is1
+The total number of nodes touched:7
+After 1 turn, the number of new visited nodes is 6
+After 2 turn, the number of new visited nodes is 0
+
+
+
+Origin = ORWELL
+The diameter is1
+The total number of nodes touched:9
+After 1 turn, the number of new visited nodes is 8
+After 2 turn, the number of new visited nodes is 0
+
+
+
