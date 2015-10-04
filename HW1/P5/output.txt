@@ -1,0 +1,7 @@
+Shortest paths from Kevin_Bacon to Harvard_University:
+
+Kevin_Bacon -> Marisa_Silver -> Harvard_University
+Kevin_Bacon -> Six_degrees_of_separation -> Harvard_University
+Kevin_Bacon -> John_Lithgow -> Harvard_University
+Kevin_Bacon -> Time_(magazine) -> Harvard_University
+Kevin_Bacon -> College_Bowl -> Harvard_University
