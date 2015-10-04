@@ -1,1 +1,17 @@
-# Your discussion here
+If the diameter of the graph is assumed to be 10, it means that among the shortest distances between any set of two nodes, the longest is 10. In our searching context, this means that all nodes will be reached after 10 searches, and the distance variable for any node cannot be larger than 10.
+
+If a character does have a defined distance from the root node in my diagram (assuming after infinite number of searches), it means that the character and the "cluster" of characters this character belongs to are not connected to the root character and the cluster the root belongs to, like islands/continents that are not connected to each other by land. 
+
+CAPTAIN AMERICA
+Step:  1 ; New Nodes:  1906 ; Total Nodes:  1907 .
+Step:  2 ; New Nodes:  4463 ; Total Nodes:  6370 .
+Step:  3 ; New Nodes:  38 ; Total Nodes:  6408 .
+Step:  4 ; New Nodes:  0 ; Total Nodes:  6408 .
+
+MISS THING/MARY
+Step:  1 ; New Nodes:  6 ; Total Nodes:  7 .
+Step:  2 ; New Nodes:  0 ; Total Nodes:  7 .
+
+ORWELL
+Step:  1 ; New Nodes:  8 ; Total Nodes:  9 .
+Step:  2 ; New Nodes:  0 ; Total Nodes:  9 .
