@@ -1,5 +1,7 @@
 # Your discussion here
 
+Part1 shortest paths
+
 I ran two times and got two results:
 
 From Kevin_Bacon to Harvard_University:
@@ -30,4 +32,15 @@ Harvard_University
 1998
 1958
 Kevin_Bacon
+
+The way I find the shortest path is by using BFS on the source similar to P4. The different part is we need to save the parent node along with exploring new neighbors in order to output the shortest path. I maintain another RDD(key: child, value: parent) to store the parent of each nodes we visited during BFS. Whenever I explore new neighbors from the current nodes, I filter out the neighbors that are new to us. And then I use flatMap to creat (new neighbor, the node explored this node) as (child, parent) pair. Eliminate duplicate new neighbors that results from two different nodes in the same level exploing the same new node (we can arbitrarily select one to be parent). Union this result back to the child, parent RDD.
+Run the iteration till we reach the destination, then we can look up the child, parent RDD to back trace the path from destination to root.
+
+
+
+I wrote a connected components searching algorithm, which theoretically should have complextiy O(log D). However, it works on a small test case but can not run on the wikipedia links due to memory limitation. The error message was:
+IOException: No space left on device
+
+The concept of my algorithm is that all nodes exploring their neighbors in parallel, and every node unifies with their neighbors into a supernode. In each supernode we choose the node with min index as the representer. The next step is iteratedly find out supernodes that share same nodes, and then unify these two supernodes together. We count the number of supernodes in each iteration. When this number stop decreasing, we terminate the iteration and now the remained supernodes are the connected components.
+
 

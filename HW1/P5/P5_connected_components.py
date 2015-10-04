@@ -68,8 +68,8 @@ if __name__ == '__main__':
     sc.setLogLevel('WARN')
     
     print "load text"
-    txtfile = sc.textFile('component.txt', 32) #load text
-    #txtfile = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt', 32)
+    #txtfile = sc.textFile('component.txt', 32) #load text
+    txtfile = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt', 32)
     print "build graph"
     adjacent_graph = txtfile.map(link_string_to_KV) #transform to graph
     
