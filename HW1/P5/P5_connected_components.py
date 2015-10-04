@@ -45,37 +45,23 @@ def exploreCom(p):
 def unionreduce(v1, v2):
     return v1 | v2
 
-def components(graph_rdd, edge_rdd):
-    neighbor_union = graph_rdd.map( unionNeighbors ).reduceByKey( unionreduce ) #union node with its neighbors, choose the smallest node as key
-    before = neighbor_union.count()
+def components(graph_rdd):
+    component_union = graph_rdd.map( unionNeighbors ).reduceByKey( unionreduce ) #union node with its neighbors, choose the smallest node as key
+    before = component_union.count()
     print "iteration", 0
-    #print neighbor_union.collect()
-    #component_union = component_union.flatMap( exploreCom ).map( electsmallest ).reduceByKey( unionreduce ) # one iteration to union neighbor supernode
-#    component_union = neighbor_union.flatMap( exploreCom )
-    #print "flatMap"
-    #print component_union.collect()
-#    component_union = component_union.reduceByKey( unionreduce )
-    #print "reduce after flat"
-    #print component_union.collect()
-#    component_union = component_union.map( electsmallest )
-    #print "elect smallest"
-    #print component_union.collect()
-#    component_union = component_union.reduceByKey( unionreduce )
-    component_union = neighbor_union.flatMap( exploreCom ).reduceByKey( unionreduce ).map( electsmallest ).reduceByKey( unionreduce )
-    after = component_union.count()
-    print "iteration", 1
-    #print component_union.collect()
-    i = 1
-    while after < before:
+   #print component_union.collect()
+    i = 0
+    while True:
         component_union = component_union.flatMap( exploreCom ).reduceByKey( unionreduce ).map( electsmallest ).reduceByKey( unionreduce )
-        before = after
-        after = component_union.count()
+        #print component_union.collect()
         i += 1
         print "iteration", i
-        #print component_union.collect()
+        after = component_union.count()
+        if after == before:
+            break
+        before = after
         
-    print after
-    return after
+    return component_union.count(), max(  component_union.map( lambda p: len(p[1]) ).collect()  )
 
 if __name__ == '__main__':
     sc = SparkContext("local", appName="Spark1")
@@ -93,12 +79,8 @@ if __name__ == '__main__':
     print "built symmetric graph"
     #print symmetric.collect()
     
-    symmetric_edge = symmetric.flatMap( buildEdge )
-    print "built symmetric edge"
-    print symmetric_edge.collect()
-    
     num_com = components(symmetric)
-    print "symmetric has component", num_com
+    print "symmetric has component", num_com[0], "largest component", num_com[1]
     
 
 
@@ -110,10 +92,6 @@ if __name__ == '__main__':
     print "built bidirectional graph"
     #print bidirectional.collect()
     
-    bidirectional_edge = bidirectional.flatMap(buildEdge)
-    print "built bidirectional edge"
-    print bidirectional_edge.collect()
-    
     num_com = components(bidirectional)
-    print "bidirectional has component", num_com
+    print "bidirectional has component", num_com[0], "largest component", num_com[1]
     
