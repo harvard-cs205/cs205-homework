@@ -93,10 +93,10 @@ version as I know it works on smaller data sets.
 I am cognizant of the fact that repeatedly running BFS is not the most
 efficient solution when the edge list is large. I read through some articles
 that suggested quicker algorithms by remapping the graph into a different
-format before performing the search, and this may be investigated for 
-future iterations.
+format before performing the search, and this may be investigated in
+the future.
 
-I attempted an alternate solution based on a Piazza hint, where I took all
+I did attempt an alternate solution based on a Piazza hint, where I took all
 edges, flipped the node numbers, combined them into one set, and then reduced
 the values to identify the vertex with the minimum ID, storing it with the
 vertex ID. I then went through an iterative process to either keep that
