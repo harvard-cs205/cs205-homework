@@ -1,3 +1,17 @@
+from pyspark import SparkContext, SparkConf
+sc = SparkContext()
+
+num_partitions = 72
+
+# Make page_links and flatten
+# from1: to11 to12 to13
+page_links_with_strings = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt').map(lambda line: (int(line[:line.rindex(':')]), line[line.rindex(':') + 2:]))
+
+# (1, [1664968]), (2, [3, 4])
+page_links = page_links_with_strings.map(lambda line: (line[0], [int(x) for x in line[1].split(' ')])).partitionBy(num_partitions).cache()
+print "Total number of original nodes: ", len(page_links.keys().collect())
+
+
 def lesserFirst(x):
     tmp_list = combineLists([x[0]], x[1])
     least = float("inf")
@@ -42,7 +56,7 @@ def getCogrouper(x):
             return (x[0], item[0])
 
 # Single-Source Breadth-First Search using no collects :)
-def ssbfs(start_name, graph, sc, num_partitions):
+def ssbfs(start_name, graph, sc):
     print "Running SS-BFS for key ", start_name
     nodes = sc.parallelize([(start_name, 0)])
     itr_acc = sc.accumulator(0)
@@ -63,11 +77,8 @@ def ssbfs(start_name, graph, sc, num_partitions):
     #print  "Nodes connected to %s: %s" % (start_name, nodes.count())
     return nodes
 
-def connectedComponents(page_links, sc, num_partitions):
-    symmetric_connected_node_list = page_links.map(lambda x: lesserFirst(x)).reduceByKey(lambda x,y: combineLists(x,y))
-    symmetric_connected_node_list = symmetric_connected_node_list.union(symmetric_connected_node_list.flatMapValues(lambda x: x).map(lambda x: (x[1], [x[0]])))    
+def connectedComponents(symmetric_connected_node_list, sc):
     nodes_left = symmetric_connected_node_list
-    
     num_groups = 0
     largest_size = 0
     total_num_nodes_touched = 0
@@ -77,7 +88,7 @@ def connectedComponents(page_links, sc, num_partitions):
         print "New Iteration - starting with %s nodes left to collect" % nodes_left.count()
         current = nodes_left.take(1)
         current = current[0][0]
-        linked_nodes = ssbfs(current, symmetric_connected_node_list, sc, num_partitions)
+        linked_nodes = ssbfs(current, symmetric_connected_node_list, sc)
         num_groups+=1
         current_group_count = linked_nodes.count()
         if (current_group_count) > largest_size:
@@ -97,24 +108,48 @@ def connectedComponents(page_links, sc, num_partitions):
     return num_groups
     
 # Counts as an edge even if the link goes in only one direction
-def uniConnectedComponents(page_links, sc, num_partitions):
+def uniConnectedComponents(page_links, sc):
     print "Running Uni-Directional Connected Components"
-    return connectedComponents(page_links, sc, num_partitions)
+    symmetric_connected_node_list = page_links.map(lambda x: lesserFirst(x)).reduceByKey(lambda x,y: combineLists(x,y))
+    symmetric_connected_node_list = symmetric_connected_node_list.union(symmetric_connected_node_list.flatMapValues(lambda x: x).map(lambda x: (x[1], [x[0]])))    
+    
+    return connectedComponents(symmetric_connected_node_list, sc)
     
 # Only counts as an edge if the link goes in both directions
-def biConnectedComponents(page_links, sc, num_partitions):
+def biConnectedComponents(page_links, sc):
     print "Running Bi-Directional Connected Components"
     selves = page_links.keys().map(lambda x: (x, [x]))
     page_links = page_links.union(selves)
     
     symmetric_connected_node_list = page_links
-    num_ccs = symmetric_connected_node_list.count()
-
     symmetric_connected_nodes = symmetric_connected_node_list.flatMapValues(lambda x: x)
     symmetric_connected_nodes_r = symmetric_connected_nodes.map(lambda x: (x[1], x[0]))
     nodes = symmetric_connected_nodes_r.join(symmetric_connected_node_list)
     
     nodes = nodes.map(lambda x: (x[0], takeOnlyDoubles(x[1][0], list(x[1][1]))))
     nodes = nodes.map(lambda x: lesserFirst(x)).reduceByKey(lambda x,y: combineLists(x,y))
-    nodes = connectedComponents(nodes, sc, num_partitions)
+    nodes = nodes.union(nodes.flatMapValues(lambda x: x).map(lambda x: (x[1], [x[0]])))    
+    nodes = connectedComponents(nodes, sc)
     return nodes
+
+
+
+#########################
+## LINKS ARE SYMMETRIC ##
+#########################
+
+# Run uni-directional Connected Components, where a link only needs to exist in one direction to count
+print "##########################################"
+uni_nodes = uniConnectedComponents(page_links, sc)
+print "##########################################"
+
+
+
+#############################
+## LINKS ARE NOT SYMMETRIC ##
+#############################
+
+# Run bi-directional Connected Components, where a link must exist in both directions to count
+print "##########################################"
+bi_nodes = biConnectedComponents(page_links, sc)
+print "##########################################"
