@@ -77,16 +77,15 @@ def sparkBFS(context, rdd, v0):
         # (1) set accumulator for gray nodes to zero
         gray_accum = context.accumulator(0)
 
-        # # split dataset into one of all the gray nodes 
-        # # (the ones to visit next) and the remaining ones
-        # rddGray = rdd.filter(lambda x: x[1][2] == 1)
-        # rddRest = rdd.filter(lambda x: x[1][2] != 1)
+        # split dataset into one of all the gray nodes 
+        # (the ones to visit next) and the remaining ones
+        rddGray = rdd.filter(lambda x: x[1][2] == 1)
+        rddRest = rdd.filter(lambda x: x[1][2] != 1)
 
-        # # (2) start map process
-        # rddGray = rddGray.flatMap(expandNode)
+        # (2) start map process
+        rddGray = rddGray.flatMap(expandNode)
 
-        # rdd = rddRest.union(rddGray)
-        rdd = rdd.flatMap(expandNode)
+        rdd = rddRest.union(rddGray)
 
         # (3) then reduce by key
         rdd = rdd.reduceByKey(reduceNodes)

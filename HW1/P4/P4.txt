@@ -1,6 +1,35 @@
 # Your discussion here
 
-
+Number of touched nodes:
+========================
 CAPTAIN AMERICA : 6407 nodes visited
 MISS THING/MARY : 6 nodes visited
 ORWELL : 8 nodes visited
+
+
+Graph structure:
+================
+In my BFS algorithm, I use tuples containing an adjacency list as my graph representation with the vertex as key. In all my algorithms for P4/P5 I pass the graph structure always in the form
+
+v | [v_1, ..., v_d]
+.
+.
+.
+
+for a given vertex v, its neighbours n(v) = [v_1, ..., v_d]. For the BFS one needs to keep track of the distance to the start vertex v0 and whether nodes are visited. In the tradition of graph alogrithms I label this property color with
+WHITE = not explored / not visited yet
+GRAY = next to explore (current node to expand)
+BLACK = visited, not of interested anymore 
+these are encoded as numbers (0,1,2) to allow for easier processing in the reduce step.
+
+v | [v_1, ..., v_d] | disttov0 | color 
+
+Graph Diameter:
+===============
+The graph diameter D is the length of the longest path in a graph. A BFS based single-source shortest path search needs to run in the worst case D rounds of the map-reduce algorithm. A graph for this worst case is e.g.
+v0 - v1 - v2 - ... - vD
+when we start at v0, the algorithm needs D rounds. In the first part of the question, was to use 10 rounds of map-reduce to solve the graph, as its Diameter was assumed to be 10. With this assumption, no check after each round is required if at the given round there are still any nodes left to explore. Especially this check, makes computation slower and more expansive. Thus, knowledge of the graph diameter or a useful assumotion might increase overall speed tremendously. One idea might be also to first run 5-10 rounds and then begin to check afterwards, if there are still nodes to explore in each round or every 3rd round or so.
+
+Untouched Nodes:
+================
+The BFS algorithm determines, if there are no more nodes to explore. However, this does not mean that all nodes have been touched. Nodes that are untouched (and have therefore diststov0 = Inf) lie (for an undirected graph) in another connected component or are not reachable. If a characterfor example has no defined distance (i.e. after termination his disttov0 is still 0), he might not have any connection to other characters. 
