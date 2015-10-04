@@ -24,7 +24,7 @@ def loadAndFilter(filename, sc):
     combinedThreeWordsWithCount = combinedThreeWordsWithCount.reduceByKey(lambda c1, c2: c1 + c2)
     # ((word, word.next), [(word.next.next, N)])
     combinedThreeWordsWithCount = combinedThreeWordsWithCount.map(lambda ((k, v), c): (k, [(v, c)]))
-
+    # Call the map to get around with the bug in lookup()
     markovWords = combinedThreeWordsWithCount.reduceByKey(lambda l1, l2: l1 + l2).map(lambda kv: kv)
 
     return markovWords
