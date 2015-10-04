@@ -1,2 +1,3 @@
 # Your discussion here
-Kevin_Bacon -> 1958 -> 1998 -> Harvard_University
+Directed path
+Harvard_University -> 1998 -> 1958 -> Kevin_Bacon
