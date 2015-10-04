@@ -15,3 +15,18 @@ Num of nodes has distance 0 from ORWELL: 8
 ORWELL touched 8 nodes in total, using 1 iterations
 
 
+My graph implementation:
+
+My graph is implemented as a Key-Value pair RDD. Each item in the RDD is in the form (character_name , (distance_from_root, [character_neighbor_1, character_neighbor_2...] ) ). At the beginning, the distance of root node is initilized to 0 and all other nodes have distance of 999999. The distance of nodes are updated through each loop of my BFS algorithm.
+
+Problem Discussion:
+
+> What does this diameter imply about the maximum number of steps in which your
+search must be executed?
+
+If the diameter is 10, my BFS algorithm shouldn't loop more than 10 times. The diameter should be the maximum possible of distance from any node in the graph to the root.
+
+>What does it mean if a character does not have a defined distance during the
+search?
+
+During each search(root = "CAPTAIN AMERICA" / "MISS THING/MARY" / "ORWELL"), the nodes with undefined distance, with distance of 999999 in my case, are actually node not being touched. These nodes have are not connected to the root node in each search. In each search, the node touched by each root represent a connected component isolated from the whole graph.
