@@ -1,1 +1,7 @@
 # Your discussion here
+The result of P2a is reasonable. It failed to produce a very handy partition. Because for the 2000*2000 pixels, some of the pixel's greyscale value was calculated and drew many times, while some of them might never been touched. So it is a bad idea to partition them in the default way.
+
+I used a random shuffle in P2b. Because hence the pixels will be randomly shuffled into different partitions. Hence the average numbers of calculations will be approximately the same. I think this is a good way to partition because of the randomness in making choices. Visually the P2b histogram also produced a histogram similar to binomial distribution.
+
+
+The tradoff of this way is that shuffling takes time. The algorithm has a running time of O(n). Hence for large files, this might not be a good way in memory management and processing time.
