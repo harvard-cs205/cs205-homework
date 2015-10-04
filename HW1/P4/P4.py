@@ -4,7 +4,7 @@ from urllib2 import urlopen
 import os
 
 if __name__=='__main__':
-    NPART = 16
+    NPART = 4*16
     characters = [u'CAPTAIN AMERICA', u'ORWELL', u'MISS THING/MARY']
     # initialize spark
     sc = SparkContext()
@@ -18,7 +18,7 @@ if __name__=='__main__':
             f.write(urlopen(url).read())
 
     # load data into a rdd (issue, character)
-    data = sc.textFile(datafile).map(
+    data = sc.textFile(datafile, 32).map(
         lambda line: tuple([w.strip('"') for w in 
             line.split('","')])[::-1])
 
@@ -30,8 +30,7 @@ if __name__=='__main__':
     edges = edges.filter(lambda (chr1, chr2): chr1 != chr2)
 
     # create graph rdd (character, {all linked characters})
-    graph = edges.groupByKey().mapValues(set).repartition(NPART)
-    graph.cache()
+    graph = edges.groupByKey().mapValues(set).repartition(NPART).cache()
 
     # serial implemention
     # print 'Serial implemention'

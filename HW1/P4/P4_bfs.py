@@ -21,12 +21,12 @@ def bfs_serial(graph, root, iteration=10):
     return numtraversed
 
 class AccumNodes(AccumulatorParam):
-    def addInPlace(self, value1, value2):
-        value1 |= value2
-        return value1
+    def addInPlace(self, v1, v2):
+        v1 |= v2
+        return v1
 
-    def zero(self, value):
-        return value
+    def zero(self, val):
+        return val
 
 def bfs_parallel(sc, graph, root):
     '''
