@@ -31,12 +31,14 @@ def BFS(graph, source_node, sc):
         dist_graph = dist_graph.flatMap(explore_level_from_node)
         
         # Group results
-        # This gives us an RDD of the form (node, [(d1, par1), (d2, par2), ...]
-        dist_graph = dist_graph.groupByKey()
+        # This gives us an RDD of the form (node, [(d1, color1, par1)...
+#        dist_graph = dist_graph.groupByKey()
         
         # Now find the shortest distance, the lightest color, and reconstruct the adjacency list
-        dist_graph = dist_graph.map(partial(fix_up_nodes, acc=accum))
+#        dist_graph = dist_graph.map(partial(fix_up_nodes, acc=accum))
         
+        dist_graph = dist_graph.reduceByKey(partial(reduce_func, acc=accum))
+
         # Use a count to force evaluation of the map - this is needed to properly increment
         # the accumulator.
         dist_graph.count()
@@ -48,6 +50,7 @@ def BFS(graph, source_node, sc):
         if (accum.value == 0):
             keep_searching = False
         else:
+            print 'Num changed:', accum.value
             # Start the counter over
             accum = sc.accumulator(0)
 
@@ -134,3 +137,27 @@ def fix_up_nodes(node, acc):
     adj_list = list(set(reduce(lambda x, y: x + y, parents)))
 
     return (node_name, (actual_dist, color, adj_list))
+
+def reduce_func(dist_node_list1, dist_node_list2, acc):
+
+    d1 = dist_node_list1[0]
+    c1 = dist_node_list1[1]
+    par1 = dist_node_list1[2]
+    d2 = dist_node_list2[0]
+    c2 = dist_node_list2[1]
+    par2 = dist_node_list2[2]
+
+    d = d2
+    if d1 < d2:
+        d = d1
+
+    c = 'BLACK'
+    if 'WHITE' in [c1, c2]:
+        c = 'WHITE'
+    elif 'GRAY' in [c1, c2]:
+        c = 'GRAY'
+        acc.add(1)
+
+    adj_list = list(set(par1 + par2))
+
+    return (d, c, adj_list)
