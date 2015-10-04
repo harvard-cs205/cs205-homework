@@ -47,6 +47,6 @@ def nTouched(sc, adjList, startN = 0):
         if updates.value == 0:
             break
 
-    touched = graphRDD.map(lambda (k,v): int(v[0]!=INF))\
+    touched = graphRDD.map(lambda (k,v): int(v[0]!=INF), preservesPartitioning=True)\
                     .reduce(lambda a,b: a+b)
     return touched

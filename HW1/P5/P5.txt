@@ -1,1 +1,32 @@
-# Your discussion here
+# Results
+A shortest path from Harvard University to Kevin Bacon (2 steps):
+
+Harvard University -> Marisa Silver -> Kevin Bacon
+
+A shortest path from Kevin Bacon to Harvard University (3 steps):
+
+Kevin Bacon -> Jack Lemmon -> Mister Roberts (film) -> Kevin Bacon
+
+# The approach
+We adjust the BFS algorithm from P4 to also store the path at each step. At the end, it is simply a matter of
+reading the path. Specifically, each element in the RDD is as follows:
+
+( node_index, ( current_dist, adj_list, color, path ) )
+
+where "path" is a Python list with the nodes traversed from source to node_index.
+
+We can use this same algorithm to check for connected components, although it is quite slow since it takes O(N)
+iterations in the worse case (completely disconnected graph.) There are faster algorithms like Hash-to-min which
+is lg(D) iterations where D is the diameter of the graph, and union star which is [lg(N)]^2 iterations.
+
+# Environment
+Both parts of the problem were done on AWS through the interactive PySpark shell so that errors could be quickly
+debugged.
+
+24 partitions were used since 3 xlarge instances were created on AWS, each with 4 virtual cores.
+
+preservePartioning was used when there were operations which did not change the key, but the nature of the
+algorithm chosen means there were constantly new elements being added to the RDD through flatMap.
+
+Rather than join the page names and operate on the strings, the initial numbers were used for
+fast comparisons in the graph RDD. Only at the end do we look up the corresponding names from the path.

@@ -1,3 +1,7 @@
+# Assumptions
+I've tried to clean the data set somewhat by removing whitespace and making sure there are no duplicate
+or self-edges. This leads to a slightly lower number of total nodes (and hence fewer touched nodes.)
+
 # Running the script
 $SPARK_HOME/bin/spark-submit P4.py
 
@@ -15,10 +19,10 @@ node (or to conclude that no path exists.)
 
 # Undefined distance
 If a node has an undefined distance after our search completes, this means it was not reachable from the start node.
-In my implementation, this meant that the distance was equal to some constant, large number.
+In my implementation, this meant that the distance was equal to some constant, large number "INF".
 
 # Graph representation
-We can complete the BFS computation using 1 RDD. Each element in the RDD consists of a key-value pair
+Each element in the RDD consists of a key-value pair
 such that the index of the node (an integer) is the key, and the value is a tuple that contains the current
 distance to the source node (or "INFINITY" if it is not reachable,) the adjacency list for that node, and the
 color of the node. Color is either {WHITE = 0, GRAY = 1, BLACK = 2} corresponding to whether the node is not yet
@@ -34,7 +38,7 @@ for every node except the source node, which has current distance equal to 0, an
 During the map step, the BFS expands all nodes that are "GRAY" and simply returns the nodes that are "WHITE" or
 "BLACK." The "GRAY" nodes are expanded by using a flatMap() and setting their distances to the current distance
 plus 1. To save on memory, we omit the adjacency matrix as there must already exist some other copy of it due to
-the way we initialize the RDD; this information is recovered in the reduce step and saves on memory shuffling.
+the way we initialize the RDD; this information is recovered in the reduce step.
 
 In the reduce step, we can combine all elements with the same key using reduceByKey(), noting that we can take the
 minimum distance,
@@ -57,7 +61,7 @@ Explicitly requesting RDDs to be cached actually slowed things down in this exam
 so and this just ended up adding more operations unnecessarily.
 
 Increasing partitions above 2 also surprisingly seems to slow down the program, with 2 partitions being optimal
-(dual-core system.)
+(on my dual-core system.)
 
 The filter() transformation was not really relevant for this implementation since all nodes are required when
 performing the reduce step in order to combine information and save on bandwidth. As a rough bound, we will never
