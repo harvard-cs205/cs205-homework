@@ -1,1 +1,17 @@
-# Your discussion here
+Result of CAPTAIN AMERICA
+Num of nodes has distance 0 from CAPTAIN AMERICA: 1906
+Num of nodes has distance 1 from CAPTAIN AMERICA: 4463
+Num of nodes has distance 2 from CAPTAIN AMERICA: 38
+CAPTAIN AMERICA touched 6407 nodes in total, using 3 iterations
+
+
+Result of MISS THING/MARY
+Num of nodes has distance 0 from MISS THING/MARY: 6
+MISS THING/MARY touched 6 nodes in total, using 1 iterations
+
+
+Result of ORWELL
+Num of nodes has distance 0 from ORWELL: 8
+ORWELL touched 8 nodes in total, using 1 iterations
+
+

@@ -1,14 +1,11 @@
-
-
 import time
 import findspark
 findspark.init('/home/zelong/spark')
 import pyspark
-import P4_bfs
+from P4_bfs import bfs
+starttime = time.time()
 
-#starttime = time.time()
-
-sc = pyspark.SparkContext()
+sc = pyspark.SparkContext('local','bfs')
 # Construct the graph from data
 data = sc.textFile('source.csv')
 pair = data.map(lambda x: x[1:-1].split("\",\""))
@@ -29,32 +26,50 @@ graph = neighbor.groupByKey().map(lambda x: (x[0], list(set([i for j in x[1] for
 graph_dist = graph.map(lambda x: (x[0], ( 999999 , x[1]   )))
 
 
+#generate txt file
+f = open('P4.txt','w')
 
-output = P4_bfs.bfs(graph_dist, 'CAPTAIN AMERICA', 4 )
-result = output[0]
-num_iter = output[1]
-#endtime = time.time()
-print result.filter(lambda x: x[1][0] == 1).count()
-print result.filter(lambda x: x[1][0] == 2).count()
-print result.filter(lambda x: x[1][0] == 3).count()
+#write result of "CAPTAIN AMERICA"
+output = bfs(graph_dist, 'CAPTAIN AMERICA', 6, sc )
+result = output[0].cache()
+num_iter = output[1] - 1
+num_of_node = output[2]
+f.write('Result of CAPTAIN AMERICA\n')
+for i in range(num_iter):
+	sentence = "Num of nodes has distance %d from CAPTAIN AMERICA: %d\n" % ( (i) , result.filter(lambda x: x[1][0] == (i+1)).count())
+	f.write(sentence)
 
-#print "TIMe", endtime - starttime
-#print num_iter
+summary = "CAPTAIN AMERICA touched %d nodes in total, using %d iterations\n\n\n" % (num_of_node, num_iter)
+f.write(summary)
 
 
-#print P4_bfs.bfs(graph_dist, 'CAPTAIN AMERICA', 10 ).lookup('CAPTAIN AMERICA')[0][0]
-#print sorted(P4_bfs.bfs(graph_dist, 'CAPTAIN AMERICA', 10 ).lookup('VAPOR')[0][1]) == sorted(graph_dist.lookup('VAPOR')[0][1])
-#print graph_dist.lookup('VAPOR')[0][0]
-#print P4_bfs.bfs(graph_dist, 'CAPTAIN AMERICA', 10 ).take(2)
+#write result of "MISS THING/MARY"
+output = bfs(graph_dist, 'MISS THING/MARY', 6, sc )
+result = output[0].cache()
+num_iter = output[1] - 1
+num_of_node = output[2]
+f.write('Result of MISS THING/MARY\n')
+for i in range(num_iter):
+	sentence = "Num of nodes has distance %d from MISS THING/MARY: %d\n" % ((i), result.filter(lambda x: x[1][0] == (i+1)).count())
+	f.write(sentence)
 
-#print len(graph_dist.lookup('CAPTAIN AMERICA')[0][1])
-#print graph_dist.keys().take(5)
-#print group_by_movie.collect()[0]
-#print assign_neighbor(group_by_movie.collect()[0][1])
-#print neighbor.take(5)
-#s = str(result_rdd.max(key = compare))
-#print data.count()
-#print pair.collect()[27]
+summary = "MISS THING/MARY touched %d nodes in total, using %d iterations\n\n\n" % (num_of_node, num_iter)
+f.write(summary)
+
+#write result of "ORWELL"
+output = bfs(graph_dist, 'ORWELL', 6, sc )
+result = output[0].cache()
+num_iter = output[1] - 1
+num_of_node = output[2]
+f.write('Result of ORWELL\n')
+for i in range(num_iter):
+	sentence = "Num of nodes has distance %d from ORWELL: %d\n" % ((i),  result.filter(lambda x: x[1][0] == (i + 1)).count())
+	f.write(sentence)
+
+summary = "ORWELL touched %d nodes in total, using %d iterations\n\n\n" % (num_of_node, num_iter)
+f.write(summary)
+
+
 
 
 
