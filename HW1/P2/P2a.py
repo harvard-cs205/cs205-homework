@@ -1,29 +1,22 @@
 from P2 import *
-
-import findspark
-findspark.find()
-findspark.init(edit_profile=True)
+import numpy as np
+import matplotlib.pyplot as plt
 import pyspark
-sc = pyspark.SparkContext()
-
-def mandelbrot(x, y):
-    z = c = complex(x, y)
-    iteration = 0
-    max_iteration = 511  # arbitrary cutoff
-    while abs(z) < 2 and iteration < max_iteration:
-        z = z * z + c
-        iteration += 1
-    return iteration
-
-# Your code here
-def form():
-    iteration_count = []
-    for i in range(20):
-        for j in range(20):
-            x = j/5 - 2
-            y = i/5 - 2
-            iteration_count.append(mandelbrot(x, y))
-    return iteration_count
 
 
-rdd = sc.parallelize()
+if __name__ == "__main__":
+    sc = pyspark.SparkContext()
+
+    i_rdd = sc.parallelize(xrange(2000), 10)
+    j_rdd = sc.parallelize(xrange(2000), 10)
+    complex_rdd = i_rdd.cartesian(j_rdd).cache()
+    result = complex_rdd.map(lambda x: ((x[0], x[1]),mandelbrot(x[1]/500.0 -2, x[0]/500.0 -2)))
+
+    draw_image(result)
+
+    sum_rdd = sum_values_for_partitions(result)
+    plt.hist(sum_rdd.collect(), 10)
+    plt.xlabel('Number of computation')
+    plt.ylabel('Percentage')
+    plt.title('Computation Distribution')    
+    plt.savefig('test_hist_a.png')
