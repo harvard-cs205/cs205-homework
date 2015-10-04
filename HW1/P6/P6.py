@@ -43,6 +43,7 @@ def sumValues(list):
 
 word_groups2 = word_groups.values().groupByKey().map(lambda x: (x[0], sumValues(list(x[1]))))
 
+# Gets the next word randomly from a weighted list
 def getNiceTuple(cur_string, second, next_list):
     wwlist = []
     for ww in next_list:
@@ -55,6 +56,7 @@ def getNiceTuple(cur_string, second, next_list):
 print "Generating 10 sentences now"
 for i in range(0, 10):
     current_state = sc.parallelize(word_groups2.takeSample(False, 1, i)).map(lambda seq: getNiceTuple(str(seq[0][0]), seq[0][1], seq[1])).take(1)[0]
+    # For each first two word pair, generate the next 18 words
     for i in range (0, 18):
         current_state = getNiceTuple(current_state[0], current_state[1][1], word_groups2.lookup(current_state[1])[0])
     print current_state[0]
