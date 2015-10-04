@@ -1,5 +1,5 @@
 from pyspark import SparkContext
-from P4_bfs import bfs
+from P4_bfs import *
 
 if __name__ == "__main__":
     
@@ -24,6 +24,13 @@ if __name__ == "__main__":
     # reduce the character map to contain a unique set of values
     charMap = charMap.reduceByKey(lambda set1, set2: set1 | set2).sortByKey()
     
-    bfs(charMap, "CAPTAIN AMERICA")
+    # remove the repetitive character element from the graph for ease in processing
+    charMap = charMap.map(lambda (K, V): (K, V.difference({K}))).cache()
+    
+    # run single-source breadth-first search
+    chars = ["CAPTAIN AMERICA", "MISS THING/MARY", "ORWELL"]
+    
+    for char in chars:
+        print ''.join([char,": ",str(bfs2(charMap, char)),"\n"])
     
     sc.stop()

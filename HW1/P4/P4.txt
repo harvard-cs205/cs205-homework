@@ -1,1 +1,23 @@
-# Your discussion here
+Problem 4.
+
+I chose to use a key/value tuple with key = character_name and value = set([characters]). Using the set would maintain uniqueness of the elements in the data structure. Also, I removed the key (character_name) from the set value.
+
+Note: It seems that I am able to pass the RDD from my main program into my bfs function when submitting via spark-submit, but the pyspark console whines that there is no spark context.
+
+
+Touched nodes (diameter 10):
+CAPTAIN AMERICA: 6408
+MISS THING/MARY: 7
+ORWELL: 9
+
+Touched nodes (relaxed diameter):
+CAPTAIN AMERICA: 6408
+MISS THING/MARY: 7
+ORWELL: 9
+
+The diameter gives the largest distance between two nodes in a closed group of nodes. Thus, with a diameter of 10 in our graph, we would assume that any connectivity beyond 10 edges is not relevant (e.g., a deep, narrow path). Theoretically, this restriction would imply that depending on the source node, restricting the diameter could lead to different connectivity maps, even within the same closed graphs. After relaxing the diameter (i.e., waiting for convergence of the map size), we saw that the graphs still maintained the same number of touched nodes. In fact, it took only 2-4 loops of the program to reach convergence, meaning that the diameters of our graphs are of lengths 2-4. Also, given that these graphs have different sets of touched nodes (we know empirically as well as from the difference in numbers of touched nodes), we know that there does not exist any connectivity between the Captain America, Miss Thing/Mary, and Orwell universes, given our data set. 
+
+TL;DR
+Graph diameter: a given maximum graph diameter implies that the actual diameter of the worlds is likely less than 10 OR connectivity beyond 10 edges is "negligible" for our purposes.
+Untouched nodes: if a character does not have a defined distance during the search, it means that there exists no path between the searched character and the "neglected" character (e.g., Orwell vs. Miss Thing/Mary vs. Captain America).
+
