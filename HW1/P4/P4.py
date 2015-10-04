@@ -3,6 +3,7 @@ findspark.init()
 import pyspark
 import itertools
 from P4_bfs import BFS
+import time
 
 if __name__ == "__main__":  
     sc = pyspark.SparkContext()
@@ -31,7 +32,7 @@ if __name__ == "__main__":
     source = source.reduceByKey(func)
     
     # Partition and cache the source
-    source = source.partitionBy(4).cache()
+    source = source.partitionBy(2).cache()
 
     # Verify that Captain America has 1933 edges... but this returns 1906.  Good enough for now
     # print len(source.lookup(u'CAPTAIN AMERICA')[0])    
@@ -39,6 +40,10 @@ if __name__ == "__main__":
     # Verify that there are 6449 nodes... but this returns 6444.  Good enough for now
     # print len(source.collect())
 
+    print("Calling BFS function")
+    start = time.time()
+
+    
     # Call the BFS function to demonstrate that it works
     res1 = BFS(sc, source, u'CAPTAIN AMERICA').values().collect()
     res2 = BFS(sc, source, u'MISS THING/MARY').values().collect()
@@ -46,3 +51,4 @@ if __name__ == "__main__":
     print("Captain America is connected to " + str(len(res1)) + " nodes, with a maximum distance of " + str(max(res1)) + ".")
     print("Miss Thing/Mary is connected to " + str(len(res2)) + " nodes, with a maximum distance of " + str(max(res2)) + ".")
     print("Orwell is connected to " + str(len(res3)) + " nodes, with a maximum distance of " + str(max(res3)) + ".")
+    print("BFS took " + str(time.time()-start) + " Seconds")
