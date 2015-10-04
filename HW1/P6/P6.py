@@ -7,7 +7,7 @@ def word_match(line):
     To be used with flatMap, is it returns a tuple of all the words in a given line.
     """
     # Just one or more letters
-    a_word = re.compile(r"\w+")
+    a_word = re.compile(r"[\w']+")
     # Match all the words in a given line
     matches = a_word.findall(line)
     
