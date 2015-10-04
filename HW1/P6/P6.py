@@ -38,28 +38,28 @@ def build_model(text):
 
 
 def build_phrases(text_model, number):
-	all_phrases = []
-	for j in xrange(number):
-	    
+    all_phrases = []
+    for j in xrange(number):
 
-	    starting_words = text_model.takeSample(False, 1, int(np.random.uniform(0,100000,1)))
-	    phrase = []
-	    w1,w2 = starting_words[0][0]
-	    phrase.append(w1)
-	    phrase.append(w2)
-	    #We make a list with the possible third words weighted by their number of ocurrences
-	    new_list = sum([([k[0]]*k[1]) for k in starting_words[0][1].items()],[])
-	    phrase.append(np.random.choice(new_list))
-	    
-	    for i in xrange(17):
+        starting_words = text_model.takeSample(False, 1, int(np.random.uniform(0,100000,1)))
+        phrase = []
+        w1,w2 = starting_words[0][0]
+        phrase.append(w1)
+        phrase.append(w2)
+        #We make a list with the possible third words weighted by their number of ocurrences
+        new_list = sum([([k[0]]*k[1]) for k in starting_words[0][1].items()],[])
+        phrase.append(np.random.choice(new_list))
 
-	        starting_words = text_model.lookup((phrase[i+1],phrase[i+2]))
-	        new_list = sum([([k[0]]*k[1]) for k in starting_words[0].items()],[])
-	        phrase.append(np.random.choice(new_list))
-	        
-	    all_phrases.append(' '.join(phrase))
-	    
-	    return all_phrases
+        for i in xrange(17):
+
+            starting_words = text_model.lookup((phrase[i+1],phrase[i+2]))
+            new_list = sum([([k[0]]*k[1]) for k in starting_words[0].items()],[])
+            phrase.append(np.random.choice(new_list))
+        
+        phrase = ' '.join(phrase)
+        all_phrases.append(phrase)
+
+    return all_phrases
 
 
 if __name__ == '__main__':
@@ -72,6 +72,6 @@ if __name__ == '__main__':
 
 	print random_phrases
 
-	np.savetxt('Random_Shakespeare.txt', random_phrases)
+	np.savetxt('./Random_Shakespeare.txt', random_phrases)
 
 
