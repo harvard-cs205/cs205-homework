@@ -1,1 +1,40 @@
-# Your discussion here
+# Results
+Starting with ['the', 'chantry']
+the chantry by; there, before the last, not least in love, Upbraid my falsehood when th' hast wrong'd me. My
+
+Starting with ['the', 'pith']
+the pith of business 'Twixt you there's difference; but the most unnatural and faithless service. Heaven has an excellent good
+
+Starting with ['answers,', 'And']
+answers, And poise the cause why we are not still keep her ignorant of what you will. An may hide
+
+Starting with ['desires', 'Buys']
+desires Buys herself bread and clothes. It is Lord Angelo dukes it well befits you should tender your supposed aid,
+
+Starting with ['maids;', 'so']
+maids; so without these follies are within the hollow mine of gold. Other, less fine in love, or no, must
+
+Starting with ['My', 'lungs']
+My lungs began to reign, Before whose glory was great of birth; And that, my liege, my wife a handkerchief-
+
+Starting with ['Either', 'a']
+Either a coward than a fellow, look you there. But, say, what to do; adieu. Fare you well. Commend me
+
+Starting with ['profess', 'not']
+profess not talking. Only this- Let each take some. [Giving them money] Nay, put out thy youth In different pleasures.
+
+Starting with ['note.', 'Upon']
+note. Upon my honour- Ham. Then you say well. Mer. Yea, is it true that a thing impossible To compass
+
+Starting with ["determin'd,", 'not']
+determin'd, not concluded yet; But there is two months since, Stabb'd in my sight. To plead mine innocence; for that
+
+
+# Approach
+We create the RDD in the specifications after pre-processing and filtering out certain words using
+regular expressions.
+
+To select words, we randomly sample a starting word. Then we select some number in the range (0,1) uniformly.
+After normalizing each count for all posible next words, we subtract the normalized count from the random number.
+If this result is less than 0, then we select the current word, otherwise we move on to the next word. This way,
+we have a method for word selection biased based on the word counts.
