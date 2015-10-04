@@ -29,6 +29,6 @@ def draw_image(rdd):
     im[I, J] = np.log(C + 1)  # log intensity makes it easier to see levels
     plt.imshow(im, cmap=cm.gray)
     plt.savefig('mandelbrot.png')
-    plt.show()
+    #plt.show()
 
     return im
