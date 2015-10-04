@@ -1,9 +1,9 @@
-from P4_bfs import * 
+from P4_bfssat import * 
 import pyspark
 from pyspark import SparkContext
 sc = SparkContext("local[4]")
 
-#sc.setLogLevel("ERROR")
+sc.setLogLevel("ERROR")
 
 import numpy as np
 import matplotlib.pyplot as plt 

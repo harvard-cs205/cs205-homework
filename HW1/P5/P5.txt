@@ -1,10 +1,11 @@
 # Your discussion here
 I collaborated with Taylor Killian and Reinier Maat on this question.
 
-I had some trouble with this question. While my P5 methodology was successful when run against the Marvel data, the Wikipedia dataset appears to be too large as my P5.py file runs for a really long time. This is likely due to the fact that I am calling .join() on a large dataset (i.e. my graph). Despite the two being co-partitioned, this still seems to be a very long process. My methodology avoids .collect() as was directed in the HW instructions. Thus, given time constraints I was unable to find a full solution using only RDDs (and not .collect()).
+Despite ensuring co-partitioning, this still seems to be a very long process on AWS. My methodology avoids .collect() as was directed in the HW instructions, but unfortunately takes about 20 minutes to find the two distances listed below on AWS w/ 5 executors running. 
 
-That said, I am told Kevin Bacon is 2 steps away from Harvard and Harvard is 4 steps away from Kevin Bacon. Interesting!
+Harvard -> Kevin Bacon = 3 steps
+Kevin Bacon -> Harvard = 2 steps
 
-As for the connected components, this too was not fully run using AWS due to the above as well. However, my implementation is as follows. I first have the function start with a single source and find all of that source’s neighbors and then all of those neighbors’ neighbors etc… with each iteration checking to see if any of my neighbors found are duplicates. This loop ends when there are no new neighbors found. Then, my function compares all of those characters with the original starting graph and determines if there are any unfound characters using .subtractByKey(). If so, then it randomly takes one of those unfound characters and sets that as the new origin source and starts the aforementioned loop all over again. This two-step process of looping and checking continues until every character in the graph has been accounted for. 
+As for the connected components, I first have the function start with a single source and find all of that source’s neighbors and then all of those neighbors’ neighbors etc… with each iteration checking to see if any of my neighbors found are duplicates. This loop ends when there are no new neighbors found. Then, my function compares all of those characters with the original starting graph and determines if there are any unfound characters using .subtractByKey(). If so, then it randomly takes one of those unfound characters and sets that as the new origin source and starts the aforementioned loop all over again. This two-step process of looping and checking continues until every character in the graph has been accounted for. 
 
-Again, using .join() here on such a big dataset seems to be too computationally intensive for Spark on AWS as my function runs for > an hour with no solution output yet. Frustrating, but i did enjoy this question nonetheless.  
+ 
