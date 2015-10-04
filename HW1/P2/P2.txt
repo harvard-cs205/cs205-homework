@@ -81,11 +81,12 @@ One possible strategy we explored was to modify the code so that the
 partitions would group pixels either row-wise or column-wise: e.g. the first
 column would be assigned to the first partition, the second column to the
 second partition, and so on, to be repeated for every 100 blocks (think 
-"striped" pattern). This strategy was inspired by: http://www.matthiasbook.de/papers/parallelfractals/agglomeration.html. A histogram was plotted
-(see P2c_hist.py). The result: no partition involved more than 
-0.1 x 1e7 iterations -- an improvement with respect to this maximum value
-compared to the previous part; however, the load still did not seem to be
-very evenly balanced. 
+"striped" pattern). This strategy was inspired by: 
+http://www.matthiasbook.de/papers/parallelfractals/agglomeration.html. 
+A histogram was plotted (see P2c_hist.py). 
+The result: no partition involved more than 0.1 x 1e7 iterations -- 
+an improvement with respect to this maximum value compared to the previous
+part; however, the load still did not seem to be very evenly balanced. 
 
 ####################
 
@@ -127,12 +128,12 @@ to complete the drawing task also decreased (down from 9 seconds):
     75th percentile   2   s
     Max Duration      3   s
 
-	Shuffle Read Size / Records
-	21.7 KB / 62
-	22.4 KB / 64
-	22.6 KB / 64
-	22.9 KB / 65
-	23.6 KB / 66
+    Shuffle Read Size / Records
+    21.7 KB / 62
+    22.4 KB / 64
+    22.6 KB / 64
+    22.9 KB / 65
+    23.6 KB / 66
 
 The work is better balanced, but at a cost of performing a shuffle.
 If the amount of data to be shuffled as a result of the repartitioning was
