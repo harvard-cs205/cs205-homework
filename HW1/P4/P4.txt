@@ -9,5 +9,7 @@ MISS THING/MARY reachable characters: 7
 ORWELL diameter: 1
 ORWELL reachable characters: 9
 
+The diameter is exactly the maximum iteration we need to run for BFS. The root in BFS can find the node within one more distance in each iteration, and the diameter is the longest distance so after diameter iterations the root can reach all nodes.
+
 We relax the diameter constraint by exploring until no neighbors are new nodes, so we no longer need to keep iteration until diameter is ten. If the nodes are untouched in the end of BFS, it means these nodes are not connected with the source vertex we specified in the beginning.
 

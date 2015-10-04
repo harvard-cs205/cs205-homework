@@ -1,11 +1,31 @@
 # Your discussion here
+
+I ran two times and got two results:
+
 From Kevin_Bacon to Harvard_University:
+
+Kevin_Bacon
+John_Lithgow
+Harvard_University
+
+or
+
 Kevin_Bacon
 College_Bowl
 Harvard_University
 
 
+
+
 From Harvard_University to Kevin_Bacon:
+
+Harvard_University
+Jack_Lemmon
+JFK_(film)
+Kevin_Bacon
+
+or
+
 Harvard_University
 1998
 1958
