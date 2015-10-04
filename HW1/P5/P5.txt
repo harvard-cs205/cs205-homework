@@ -90,6 +90,10 @@ a huge bill on my credit card, and there was no way of keeping track of the
 current bill while doing the job. However, I have submitted the current
 version as I know it works on smaller data sets.
 
+Addendum: It appears that one of the first iterations will take the longest
+because the connected graph is quite large. So in theory, if I waited long
+enough I may get an answer output. That said...
+
 I am cognizant of the fact that repeatedly running BFS is not the most
 efficient solution when the edge list is large. I read through some articles
 that suggested quicker algorithms by remapping the graph into a different
