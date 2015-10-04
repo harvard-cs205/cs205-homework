@@ -14,9 +14,9 @@ def bfs(graph, start):
         distance = iteration.value
         new_distances = toVisit.map(lambda KV: (KV[0], distance))
         #Update record of previously visited nodes
-        distances = distances.union(new_distances).reduceByKey(lambda x, y: min(x, y))
+        distances = distances.union(new_distances).reduceByKey(lambda x, y: min(x, y)).cache()
         #Update record of nodes to visit
         neighbors = toVisit.flatMap(lambda KV: KV[1]).collect()
-        toVisit = graph.filter(lambda KV: KV[0] in neighbors).subtractByKey(distances, 8)
+        toVisit = graph.filter(lambda KV: KV[0] in neighbors).subtractByKey(distances, 8).cache()
         iteration.add(1)
     return touched.value

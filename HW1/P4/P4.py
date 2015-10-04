@@ -2,7 +2,7 @@ from P4_bfs import *
 from pyspark import SparkContext, SparkConf
 
 #Setup
-conf = SparkConf().setAppName("comic_graph").setMaster("local")
+conf = SparkConf().setAppName("comic_graph").setMaster("local[*]")
 sc = SparkContext(conf=conf)
 
 #Generate mapping from character to other characters they appear with

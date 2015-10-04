@@ -3,7 +3,7 @@ from pyspark import SparkContext, SparkConf
 import matplotlib.pyplot as plt
 
 #Setup
-conf = SparkConf().setAppName("Mandelbrot").setMaster("local")
+conf = SparkConf().setAppName("Mandelbrot").setMaster("local[*]")
 sc = SparkContext(conf=conf)
 
 #Create x and y axes each with 2000 points divided into 10 partitions, then convert to a grid
@@ -18,5 +18,5 @@ assert mandelbrot2d.getNumPartitions() == 100
 #Sum repetitions for each partition and plot
 summed = sum_values_for_partitions(mandelbrot2d)
 plt.hist(summed.collect())
-plt.savefig("P2a.png")
+plt.savefig("P2a_hist.png")
 draw_image(mandelbrot2d)

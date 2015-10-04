@@ -1,7 +1,7 @@
 from pyspark import SparkContext, SparkConf
 
 #Setup
-conf = SparkConf().setAppName("anagrams").setMaster("local")
+conf = SparkConf().setAppName("anagrams").setMaster("local[*]")
 sc = SparkContext(conf=conf)
 
 #For each word, create a key out of its ordered sequence of letters
