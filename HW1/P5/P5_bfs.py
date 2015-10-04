@@ -22,7 +22,7 @@ def path_finder(start_name, end_name, page_links, page_names, sc):
         new_paths_unique_r = new_paths_unique_r.subtractByKey(paths_r)
             
         new_paths_unique = new_paths_unique_r.map(lambda x: (x[1], x[0]))
-        paths = paths.union(new_paths_unique).partitionBy(8).cache()
+        paths = paths.union(new_paths_unique).partitionBy(32).cache()
         frontier_links = new_paths_unique.values()
         
         # Short-circuit if the end_id is in the frontier list
