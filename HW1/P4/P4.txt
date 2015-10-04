@@ -10,4 +10,3 @@ Results:
 Discussion:
 	1. What is the diameter of a search tree?
 	Diameter of a search graph is the maximum distance from one node to another. Setting the diameter to be 10 implies the maximum number of steps this search can cost is O(N^10), where N is the all the nodes in the graph.
-	2. 
