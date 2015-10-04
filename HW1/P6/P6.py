@@ -6,6 +6,9 @@ import numpy as np
 
 sc = pyspark.SparkContext()
 
+########################################################################################
+#Clean the data and construct the RDD
+########################################################################################
 def only_capt_letter(x):
 #this function will return true if x contain only letters and all letters are in capital
 	if x.isalpha():
@@ -27,7 +30,9 @@ words_no_number = words.filter(lambda x: not x.isdigit())
 words_no_cap = words_no_number.filter(lambda x: not only_capt_letter(x))
 
 words_filtered = words_no_cap.filter(lambda x: not capt_letter_period(x)).filter(lambda x: not x=='')
-
+#########################################################################################
+#Shift word RDD
+#Generate RDD with items containing 3 consecutive words
 zip_index = words_filtered.zipWithIndex()
 no_shift = zip_index.map(lambda x: (x[1], ( 0, x[0])))
 left_shift1 = no_shift.map(lambda x: (x[0]-1, (1,x[1][1])))
@@ -49,6 +54,10 @@ triple_words = ordered_phrase.map(lambda x: (x[1], 1))
 triple_count = triple_words.reduceByKey(lambda x,y : x + y)
 two_word_count = triple_count.map(lambda x: (tuple(list(x[0])[0:2]), (list(x[0])[2], x[1]) ))
 pattern = two_word_count.groupByKey().map(lambda x: (x[0], [i for i in x[1]]))
+
+##########################################################################################
+#Function that based on two consecutive words, choose the thrid word
+#Porbability will be higher on the words with more frequence
 
 def generate_words(n):
     start = pattern.takeSample(True, 1)[0]
