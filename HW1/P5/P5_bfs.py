@@ -1,36 +1,7 @@
 from pyspark import AccumulatorParam
 
-def copartitioned(RDD1, RDD2):
-    return RDD1.partitioner == RDD2.partitioner
-
-def _bfs(graph, source):
-    sc = graph.context
-    result = graph.filter(lambda (k,v): k == source).mapValues(lambda _: 0)
-    assert copartitioned(result, graph)
-    frontier = result.mapValues(lambda _: 0)
-    assert copartitioned(result, frontier)
-    numPtt = result.getNumPartitions()
-
-    resultSize, newResultSize = 1, 0
-
-    def bfsMapper(x):
-        d, adjlist = x[1]
-        return [(adj, d+1) for adj in adjlist]
-
-    while resultSize != newResultSize:
-        resultSize = newResultSize
-        frontier = frontier.join(graph) \
-                            .flatMap(bfsMapper)
-
-        result = result.union(frontier).reduceByKey(lambda d1, d2: min(d1, d2), numPartitions=numPtt)
-        assert copartitioned(result, graph)
-        # enforce lazy-evaluation
-        newResultSize = result.count()
-        result.cache()
-        frontier.cache()
-
-    return result 
-
+# Accumulator used for BFS. Basically the algorithm adds all the visited
+# nodes in one iteration into this accumulator instance.
 class SetAccm(AccumulatorParam):
     def zero(self, s):
         return s
@@ -39,19 +10,46 @@ class SetAccm(AccumulatorParam):
         s1 |= s2
         return s1
 
-def shortestPath(graph, source, end):
+def bfs(graph, source):
     sc = graph.context
     childParent = sc.parallelize([(source, -1)])
 
     frontier, closed = set([source]), set([source])
 
     while True:
+        # Initialize the accumulator in each iteration
         tmpFoundAccm = sc.accumulator(set(), SetAccm())
+        # Those entries in frontier queue will be searched
         toSearch = graph.filter(lambda (k, _): k in frontier)
+        # Add all the adjacent nodes into the accumulator
         toSearch.foreach(lambda (k, adj): tmpFoundAccm.add(set(adj)))
 
+        frontier = tmpFoundAccm.value - closed
+        if len(frontier) == 0:
+            return None
+
+        closed |= tmpFoundAccm.value
+    return closed
+
+def shortestPath(graph, source, end):
+    sc = graph.context
+    # RDD to record (childIndex, parentIndex), source's parent is -1
+    childParent = sc.parallelize([(source, -1)])
+    # frontier queue and close set
+    frontier, closed = set([source]), set([source])
+
+    while True:
+        # Initialize the accumulator in each iteration
+        tmpFoundAccm = sc.accumulator(set(), SetAccm())
+        # Those entries in frontier queue will be searched
+        toSearch = graph.filter(lambda (k, _): k in frontier)
+        # Add all the adjacent nodes into the accumulator
+        toSearch.foreach(lambda (k, adj): tmpFoundAccm.add(set(adj)))
+        # Create child-parent pair
         curChildParent = toSearch.flatMap(lambda (p, chdr): [(c, p) for c in chdr])
+        # Reduce the child-parent pair, choose any parent as the child's parent is acceptable
         curChildParent = curChildParent.reduceByKey(lambda p1, p2: p1)
+        # Set only those pairs whose child has not been visited before.
         curChildParent = curChildParent.filter(lambda (c, p): c not in closed)
         childParent = childParent.union(curChildParent)
 
@@ -62,10 +60,13 @@ def shortestPath(graph, source, end):
         closed |= tmpFoundAccm.value
         
         if end in frontier:
+            # At this point, a complete path from source to end is found.
+            # chdToFind: current child whose parent needs to be found.
             dist, chdToFind = 0, end
             path = [chdToFind]
 
             while True:
+                # Find the parent of the current chdToFind
                 entry = childParent.filter(lambda (k, _): k == chdToFind).collect()
                 if len(entry) == 0:
                     return None
@@ -75,28 +76,21 @@ def shortestPath(graph, source, end):
 
                 path.append(chdToFind)
                 dist += 1
+            # Reverse the path so that it is source to end
             path = path[::-1]
             return path, dist
     return None
 
-
 def connected(graph):
-    keyList = graph.map(lambda kv: (kv[0], 0))
+    keyList = graph.map(lambda kv: (kv[0]))
     count = 0
     while True:
-        #keyList.cache()
-        #keyListCount = keyList.count()
-        #print "Key list count: ", keyListCount
-        #if keyListCount == 0:
-        #    break
         try:
-            source = keyList.take(1)[0][0]
-            #print source
-            # very important! O.W. keyList.getNumPartitions() will grow gradually
-            # keyList = keyList.repartition(max(NUM_PTT_LOWER, min(keyList.getNumPartitions()+1, NUM_PTT_UPPER)))
-            components = _bfs(graph, source)
+            source = keyList.take(1)[0]
+            closed = bfs(graph, source)
             count += 1
-            keyList = keyList.subtractByKey(components, components.getNumPartitions())
+            # Remove those that are visited
+            keyList = keyList.filter(lambda k: k not in closed)
             keyList.cache()
 
             print 'Count for this iter is {0}'.format(count)
