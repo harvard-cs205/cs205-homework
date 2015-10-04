@@ -10,7 +10,7 @@ def sparkBFS(context, rdd, v0):
     imaxvalue = sys.maxint
 
     # currently our rdd looks like (v, [v1, v2, ...]). now we map it to a tuple with
-    # (v, <adj. list.>, disttov0, color) where disttov0 is 0 for v = v0 and imaxvalue else,
+    # (v, (<adj. list.>, disttov0, color)) where disttov0 is 0 for v = v0 and imaxvalue else,
     # color = GRAY for v0 and BLACK else
     # WHITE means vertex not visited yet
     # GRAY means vertex is visited in the next hop
@@ -27,12 +27,12 @@ def sparkBFS(context, rdd, v0):
     
     # helper functions for one hop START
     
-    # say we have given (v, [v_1, ..., v_d], d, 'GRAY')
+    # say we have given (v, ([v_1, ..., v_d], d, 'GRAY'))
     # this will be expanded to 
-    # (v_1, NULL, d+1, 'GRAY')
+    # (v_1, (NULL, d+1, 'GRAY'))
     # ...
-    # (v_d, NULL, d+1, 'GRAY')
-    # (v, [v_1, ..., v_d], d, 'BLACK')
+    # (v_d, (NULL, d+1, 'GRAY'))
+    # (v, ([v_1, ..., v_d], d, 'BLACK'))
     # in the next step we can then call a reducebykey to update distances/adjacency lists
     def expandNode(x):
         if x[1][2] == 1: # 'GRAY'
@@ -52,7 +52,7 @@ def sparkBFS(context, rdd, v0):
     # the minimum distance, longest adjacency list and darkest color
     # the algorithm will determine if there is no gray node left
     def reduceNodes(a, b):
-        res = (a[0] if len(a[0]) > len(b[0]) else b[0], min(a[1], b[1]), min(a[2], b[2]))
+        res = (a[0] + b[0], min(a[1], b[1]), min(a[2], b[2]))
 
         # return a tuple of 3 entries
         return res
@@ -77,12 +77,17 @@ def sparkBFS(context, rdd, v0):
         # (1) set accumulator for gray nodes to zero
         gray_accum = context.accumulator(0)
 
-        # filter for gray nodes to make it faster
-        # ==> look for http://datascience.stackexchange.com/questions/5667/spark-optimally-splitting-a-single-rdd-into-two
-        
-        # (2) start map process
+        # # split dataset into one of all the gray nodes 
+        # # (the ones to visit next) and the remaining ones
+        # rddGray = rdd.filter(lambda x: x[1][2] == 1)
+        # rddRest = rdd.filter(lambda x: x[1][2] != 1)
+
+        # # (2) start map process
+        # rddGray = rddGray.flatMap(expandNode)
+
+        # rdd = rddRest.union(rddGray)
         rdd = rdd.flatMap(expandNode)
-        
+
         # (3) then reduce by key
         rdd = rdd.reduceByKey(reduceNodes)
         
