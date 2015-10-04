@@ -1,13 +1,34 @@
 # Your discussion here
-For ”CAPTAIN AMERICA” I got distance of 3.
-For ”MISS THING/MARY” I got distance of 1.
-For ”ORWELL I got distance of 1.
 
-Distance of 3 means the furthest node from Captain America was 3 nodes away.
+---Graph Representation---
+Graph = [(HeroName,[HeroName1,HeroName2]),(),...]
+Each hero is a key, and value of that hero is a list with the heros that the key is associated with.(Been in the same comic)
+
+
+		---Results---
+Start Node: CAPTAIN AMERICA
+Nodes touch on iteration 0 1                                                    
+Nodes touch on iteration 1 1906
+Nodes touch on iteration 2 4463
+Nodes touch on iteration 3 38
+
+Start Node: MISS THING/MARY
+Nodes touch on iteration 0 1                                                    
+Nodes touch on iteration 1 6
+Nodes touch on iteration 2 0
+Nodes touch on iteration 3 0
+
+Start Node: ORWELL
+Nodes touch on iteration 0 1                                                    
+Nodes touch on iteration 1 8
+Nodes touch on iteration 2 0
+Nodes touch on iteration 3 0
+
 
 Q1.What does this diameter imply about the maximum number of steps in which your
 search must be executed?
 A1.Given diameter d, then the maximum number of steps is d. For example, if we had a linear tree of 11 nodes, then the diameter is 10.
+Given this info, we could have a for loop and know when to exit the loop.
 
 Q2.What does it mean if a character does not have a defined distance during the
 search?

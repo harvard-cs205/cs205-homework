@@ -1,1 +1,7 @@
 # Your discussion here
+
+
+			---Results---
+(Child,Parent) [(2152782, 4625677)][(4625677, u'Six_degrees_of_separation')])   
+(Child,Parent) [(4625677, 2729536)][(2729536, u'Kevin_Bacon')] ) 
+'Kevin_Bacon' -> 'Six_degrees_of_separation' -> 'Harvard_university'
