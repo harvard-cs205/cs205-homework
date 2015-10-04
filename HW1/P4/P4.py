@@ -35,5 +35,4 @@ if __name__ == '__main__':
     for name in ['CAPTAIN AMERICA', 'MISS THING/MARY', 'ORWELL']:
         touched, dist = bfs(graph, name)
         print '{0}: touched: {1}, diameter: {2}'.format(name, touched.count(), dist)
-    #_writeDistDict(distDict, 'CAA') 
 
