@@ -45,7 +45,7 @@ def exploreCom(p):
 def unionreduce(v1, v2):
     return v1 | v2
 
-def components(graph_rdd):
+def components(graph_rdd, edge_rdd):
     neighbor_union = graph_rdd.map( unionNeighbors ).reduceByKey( unionreduce ) #union node with its neighbors, choose the smallest node as key
     before = neighbor_union.count()
     print "iteration", 0
