@@ -48,7 +48,6 @@ def shortest_path_parallel(sc, graph, root_node):
 #         print depth
         depth += 1 # increment the depth
         # filter on only the nodes in the queue
-        # grab out their children
         filtered_graph = graph.filter(lambda (Node, V): Node in queue)
         #print "filtered_graph:", filtered_graph.values().collect()
         # update the traversed nodes with the nodes in the queue
@@ -56,12 +55,12 @@ def shortest_path_parallel(sc, graph, root_node):
         # to store the children of traversed nodes from the queue
         traversed_nodes_children = sc.accumulator(set(), AccumParam_Set()) 
 	
-	# Loop through each node in the filtered_graph to add on children
+	    # Loop through each node in the filtered_graph to add on children
         filtered_graph.values().foreach(lambda x: traversed_nodes_children.add(set(x)))
         
         #print "traversed_nodes_children value:", traversed_nodes_children.value
         #print "traversed_nodes: ", traversed_nodes
-	# update queue
+	    # update queue
         queue = traversed_nodes_children.value - traversed_nodes
         #print "queue: ", queue
     return len(traversed_nodes) - 1, depth        
