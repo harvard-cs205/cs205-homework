@@ -7,6 +7,8 @@ findspark.init()
 import pyspark
 sc = pyspark.SparkContext()
 
+sc.setLogLevel('WARN')
+
 
 def larger(x, y):
     """
@@ -51,32 +53,55 @@ def create_update_accumulator():
 with open('source.csv', 'r') as infile:
     characters = sc.parallelize(list(csv.reader(infile))).map(lambda x: (x[0].strip(), x[1].strip()))
 
-adjacency_list = characters.map(lambda x: (x[1], [x[0]])).reduceByKey(lambda x, y: x + y).flatMap(get_edges).map(lambda x: (x[0], [x[1]])).reduceByKey(lambda x, y: x + y)
-
-# map onto joined RDD w/ adjacency list to get the right neighbors list
-get_neighbors = lambda x: (x[0], (x[1][0][0], x[1][0][1], x[1][1]))
-
-# reduce by key with this function to or the flag, min the distance, and take the larger neighbors list
-collapse_nodes = lambda x, y: (any((x[0], y[0])), min(x[1], y[1]), larger(x[2], y[2]))
+# reduce by key with this function to max the flag, min the distance, and take the larger neighbors list
+collapse_nodes = lambda x, y: (max((x[0], y[0])), min(x[1], y[1]), larger(x[2], y[2]))
 
 
 def bfs(source):
-    accum, update_accumulator = create_update_accumulator()
-    vertices = sc.parallelize([(source, (False, 0, []))]).join(adjacency_list).map(get_neighbors)
+    def initialize_nodes(x):
+        flag = 0
+        dist = 9999
+        if x[0] == source:
+            flag = 1
+            dist = 0
+        return (x[0], (flag, dist, x[1]))
+
+    def create_add_neighbors():
+        accum = sc.accumulator(0)
+        def add_neighbors(node):
+            (node, (flag, dist, neighbors)) = node
+            nodes = []
+            if flag == 1:
+                accum.add(1)
+                for neighbor in neighbors:
+                    nodes.append((neighbor, (1, dist + 1, [])))
+                nodes.append((node, (2, dist, neighbors)))
+            else:
+                nodes.append((node, (flag, dist, neighbors)))
+
+            return nodes
+
+        return accum, add_neighbors
+
+    vertices = characters.map(lambda x: (x[1], [x[0]])).reduceByKey(lambda x, y: x + y).flatMap(get_edges).map(lambda x: (x[0], [x[1]])).reduceByKey(lambda x, y: x + y).map(initialize_nodes)
+    accum, add_neighbors = create_add_neighbors()
+    # ("Node", (flag, dist, [neighbors]))
     dist = 0
-    old_num_falses = -1
-    accum = sc.accumulator(0)
+    old_num_ones = -1
 
     # stop if number of non-explored nodes has not changed since last iteration
     # (stored in accumulator)
-    while dist < 5:
-        old_num_falses = accum.value
-        vertices = vertices.flatMap(lambda x: [(neighbor, (False, dist + 1, [])) for neighbor in x[1][2]] + [(x[0], (True, x[1][1], x[1][2]))]).reduceByKey(collapse_nodes)
-        to_search = vertices.filter(lambda x: x[1][0] is False).join(adjacency_list).map(get_neighbors)
-        already_searched = vertices.filter(lambda x: x[1][0] is True)
-        vertices = to_search.union(already_searched).reduceByKey(collapse_nodes).map(update_accumulator)
+    # Flags:
+    # 0 = have not touched
+    # 1 = touched, need to add neighbors
+    # 2 = have added all neighbors
+    while accum.value != old_num_ones:
+        old_num_ones = accum.value
+        accum, add_neighbors = create_add_neighbors()
+        vertices = vertices.flatMap(add_neighbors).reduceByKey(collapse_nodes)
+        vertices.count()
         dist += 1
 
-    return vertices
+    return vertices.filter(lambda x: x[1][0] == 2)
 
-a = bfs("ORWELL").collect()
+a = bfs("CAPTAIN AMERICA")
