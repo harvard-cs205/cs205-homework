@@ -1,4 +1,25 @@
 # Your discussion here
+If we assume the diameter of this graph is 10, that means the search will take
+no more than 10 steps to execute, because the diameter of a graph is defined as
+the "longest shortest path", i.e., the maximum geodesic distance between any
+pair of nodes on the graph. Each step of SS-BFS increases the search path
+length by one, so a path of 10 steps between two nodes will take 10 steps to
+traverse. Thus SS-BFS terminates in steps <= graph diameter.
+
+If a character does not have a defined distance during SS-BFS, that indicates
+that the character is not on a connected component of the graph with the source
+character. SS-BFS traverses the graph along edges only, so any nodes that are
+not connected to the origin will never be reached.
+
+I chose to represent the graph as an adjacency list, i.e., an RDD with elements
+of the form (character, [list of neighbors]). During SS-BFS, I also added a
+distance component to the values associated with each character. An adjacency
+list allows easy identification of outgoing links, and since this graph is
+undirected, working with outgoing vs incoming links is equivalent. Because the
+graph is not highly connected (there are many characters that are only linked
+to a small number of others), an adjacency matrix would be a very sparse matrix
+and so waste a lot of space, so an adjacency list was preferable in this case.
+
 Cap: touched 6408 nodes
 Miss Thing: touched 7 nodes
 Orwell: touched 9 nodes
