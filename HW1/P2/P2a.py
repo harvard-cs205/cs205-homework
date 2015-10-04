@@ -1,3 +1,4 @@
+# (c) 2015 L.Spiegelberg
 import findspark
 findspark.init()
 
@@ -20,7 +21,7 @@ def setupMandelbrot():
     # define here count of partitions
     num_partitions = 100;
     
-    # create the space (this can be also done using spark's cartesian command)
+    # create the space
     nx, ny = (2000, 2000)
     x = range(0, nx)
     y = range(0, ny)

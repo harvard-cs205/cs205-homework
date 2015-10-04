@@ -1,1 +1,11 @@
 # Your discussion here
+
+By default Spark stores data according to its keys. I.e. if we have key k and N partitions, the data associated with k will be stored in partition k % N (modulo operator). For the given task (comouting the Mandelbrot set) this behaviour is somehow not very favorable. The main problem is, that over the computational domain, the needed computing varies a lot. Simply speaking, the whiter a region of the image is, the more computing power was needed in this region. 
+
+To allow for faster computation by avoiding that one partition has still to compute a lot data while the others are finished (or request data which results in avoidable communication), a repartitioning strategy is needed in the beginning. The aim of such an strategy is to ideally balance computing cost equally among all partitions.
+
+A first simple strategy is random partitioning. For each Pixel a random partition is chosen uniformly. The advantage of this strategy is that it is very easy to implement and can be applied fast to the data. The resulting histogram (P2b_hist.png) shows that indeed this simple tsratgey balanced data pretty well compared to the histogram of Spark's default partition strategy.
+
+My second strategy relies a bit more on the idea that 'brightness' of a region indicates needed computational time. Thus, in the second strategy, an Image is computed at a lower resolution. Then the cumulated "effort" is plotted for each line (column). Interestingly, the shape of this function looks like a sigmoid! So, I decided to fit a sigmoid curve to the low resolution data. To obtain now a partition I divide the image space [0, 1] (effort has been normalized s.t. total effort = 1) into 100 buckets. Mapping these back gives for each buckets boundaries which form a new partition. 
+
+However, after comparing both strategies, in practice random partitioning seemed to work better. Also, its implementation is much more simple and straight-forward. Concluding, I would recommend random partioning for this problem. 
