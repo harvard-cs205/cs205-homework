@@ -54,7 +54,8 @@ The median value was only 0.3 seconds while some tasks took as long as
 was even more revealing: the distribution is clearly unimodal.
 
 Also, there were a lot of small values, and some VERY large values, some as
-many as 2 x 1e7 units(!): some tasks took long to complete... and those that took long, took really long!
+many as 2 x 1e7 units(!): some tasks took long to complete... and those that
+took long, took really long!
 
 ####################
 
