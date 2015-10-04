@@ -2,7 +2,6 @@
 *.pyc
 *.csv
 links-simple-sorted.txt
-
 titles-sorted.txt
 medium-links-simple-sorted.txt
 short-links-simple-sorted.txt
