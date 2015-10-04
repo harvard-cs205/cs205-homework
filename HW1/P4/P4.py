@@ -45,6 +45,7 @@ textFile = sc.textFile('source.csv',20)
 #################################
 #.map(lambda x:(x.replace('"','|').split('|')[3].strip(),x.replace('"','|').split('|')[1].strip()))
 startNode = 'CAPTAIN AMERICA'		
+#startNode = 'MISS THING/MARY'
 graph = (
 	textFile
 	.map(lambda x:(x.split('"')[3],x.split('"')[1]))

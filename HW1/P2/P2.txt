@@ -1,1 +1,9 @@
 # Your discussion here
+In the default partitioning strategy, almost 90% of the partitions were doing near 0 calculations. The other 10% were
+doing most of the work, while the rest were just sitting there wasting their processing power. 
+
+For my partitioning strategy, I randomized my x,y coordinates before taking the cartesian. Thus my matrix would contain
+all the points in some random order. This randomization created a more evenly distributed load across the executors as 
+can be seen from P2b.png. Most of the executors have a medium-sized load, thus there is not much wasted processing power.
+There are still a few partitions that have a bigger load than the rest, but is much improved over the previous partitioning
+strategy.
