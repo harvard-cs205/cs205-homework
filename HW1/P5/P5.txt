@@ -63,162 +63,100 @@ So the next likely president is only 3 hops away from Rick_Rolled and 4 hops fro
 The connected component search can be done simply using BFS. We start from a single node and search for its neighbors. This first iteration gives us the first connected component. Then, the algorithm finds the next node that hasn't been touched by previous iterations and search for its neighbors again. Continuing this process we should be able to find all components of the graph.
 
 
-
-Converged after 2 iterations
+----- Symmetric Graph -----
+Converged after 12 iterations
 COMPONENT 1
-root = u'4649389'
-# of connected elements = 11
+root = u'4213665'
+# of connected elements = 5709800
 Converged after 2 iterations
 COMPONENT 2
-root = u'3691765'
-# of connected elements = 11
-Converged after 3 iterations
+root = u'3911034'
+# of connected elements = 2
+Converged after 2 iterations
 COMPONENT 3
-root = u'1658496'
-# of connected elements = 11
+root = u'2229525'
+# of connected elements = 2
 Converged after 2 iterations
 COMPONENT 4
-root = u'1575232'
-# of connected elements = 11
+root = u'5592176'
+# of connected elements = 2
 Converged after 2 iterations
 COMPONENT 5
-root = u'5333265'
-# of connected elements = 11
+root = u'1600259'
+# of connected elements = 2
 Converged after 2 iterations
 COMPONENT 6
-root = u'3590684'
-# of connected elements = 11
+root = u'528749'
+# of connected elements = 2
 Converged after 2 iterations
 COMPONENT 7
-root = u'2620368'
-# of connected elements = 11
+root = u'4962074'
+# of connected elements = 2
 Converged after 2 iterations
 COMPONENT 8
-root = u'72707'
-# of connected elements = 11
+root = u'1437661'
+# of connected elements = 2
 Converged after 2 iterations
 COMPONENT 9
-root = u'5554835'
-# of connected elements = 11
+root = u'5082513'
+# of connected elements = 2
 Converged after 2 iterations
 COMPONENT 10
-root = u'1195317'
-# of connected elements = 11
+root = u'4773434'
+# of connected elements = 2
 Converged after 2 iterations
 COMPONENT 11
-root = u'378466'
-# of connected elements = 11
+root = u'5240015'
+# of connected elements = 2
 Converged after 2 iterations
 COMPONENT 12
-root = u'287144'
-# of connected elements = 11
+root = u'4185764'
+# of connected elements = 2
 Converged after 2 iterations
 COMPONENT 13
-root = u'2750913'
-# of connected elements = 11
+root = u'5070829'
+# of connected elements = 2
 Converged after 3 iterations
 COMPONENT 14
-root = u'4568316'
-# of connected elements = 11
-Converged after 3 iterations
+root = u'4370461'
+# of connected elements = 3
+Converged after 2 iterations
 COMPONENT 15
-root = u'5327952'
-# of connected elements = 11
+root = u'4121284'
+# of connected elements = 2
+Converged after 2 iterations
 COMPONENT 16
-root = u'3181141'
-# of connected elements = 11
+root = u'666388'
+# of connected elements = 2
+Converged after 2 iterations
 COMPONENT 17
-root = u'4942073'
-# of connected elements = 11
-Converged after 3 iterations
+root = u'2285689'
+# of connected elements = 2
+Converged after 2 iterations
 COMPONENT 18
-root = u'4967335'
-# of connected elements = 11
+root = u'5455582'
+# of connected elements = 2
 Converged after 3 iterations
 COMPONENT 19
-root = u'1583071'
-# of connected elements = 11
+root = u'1680065'
+# of connected elements = 4
 Converged after 3 iterations
 COMPONENT 20
-root = u'2560282'
-# of connected elements = 11
+root = u'897496'
+# of connected elements = 4
 Converged after 2 iterations
 COMPONENT 21
-root = u'3888329'
-# of connected elements = 11
+root = u'3537131'
+# of connected elements = 2
 Converged after 2 iterations
 COMPONENT 22
-root = u'4984084'
-# of connected elements = 11
-Converged after 3 iterations
+root = u'1100625'
+# of connected elements = 2
+Converged after 2 iterations
 COMPONENT 23
-root = u'3582067'
-# of connected elements = 11
-Converged after 3 iterations
+root = u'1487289'
+# of connected elements = 2
+Converged after 2 iterations
 COMPONENT 24
-root = u'4724057'
-# of connected elements = 11
-Converged after 3 iterations
-COMPONENT 25
-root = u'5466561'
-# of connected elements = 11
-Converged after 2 iterations
-COMPONENT 26
-root = u'2231278'
-# of connected elements = 11
-Converged after 3 iterations
-COMPONENT 27
-root = u'4967146'
-# of connected elements = 11
-Converged after 2 iterations
-COMPONENT 28
-root = u'4024478'
-# of connected elements = 11
-Converged after 3 iterations
-COMPONENT 29
-root = u'2680502'
-# of connected elements = 11
-Converged after 3 iterations
-COMPONENT 30
-root = u'3478249'
-# of connected elements = 11
-Converged after 2 iterations
-COMPONENT 31
-root = u'5502191'
-# of connected elements = 11
-Converged after 2 iterations
-COMPONENT 32
-root = u'4096372'
-# of connected elements = 11
-Converged after 3 iterations
-COMPONENT 33
-root = u'3951715'
-# of connected elements = 11
-Converged after 2 iterations
-COMPONENT 34
-root = u'2668993'
-# of connected elements = 11
-Converged after 2 iterations
-COMPONENT 35
-root = u'1082682'
-# of connected elements = 11
-Converged after 2 iterations
-COMPONENT 36
-root = u'3501044'
-# of connected elements = 11
-Converged after 3 iterations
-COMPONENT 37
-root = u'4203398'
-# of connected elements = 11
-Converged after 3 iterations
-COMPONENT 38
-root = u'569404'
-# of connected elements = 11
-Converged after 2 iterations
-COMPONENT 39
-root = u'4992267'
-# of connected elements = 11
-Converged after 2 iterations
-COMPONENT 40
-root = u'4492224'
-# of connected elements = 11
+root = u'2819825'
+# of connected elements = 2
