@@ -11,7 +11,7 @@ def P5_bfs(grph,source,sc,dest=False):
 	while not nodes.isEmpty():
 		nodes = grph.join(nodes).flatMapValues(lambda x: [(t,x[1]+1) for t in x[0]]).values().distinct()
 		nodes = nodes.subtractByKey(visitedNodes)
-		visitedNodes = visitedNodes.union(nodes).cache()
+		visitedNodes = visitedNodes.union(nodes)
 		
 		if not visitedNodes.filter(lambda x: x[0]==dest).isEmpty():
 			print "Found destination!"
@@ -27,11 +27,12 @@ def P5_bfs(grph,source,sc,dest=False):
 		destDist = np.min(visitedNodes.lookup(dest))
 		traceDist = destDist #Count the dist we're tracing backward
 		nodeTraceback = [dest]
+		VISITED = visitedNodes.join(grph).cache()
 		path = []
 		while traceDist > 0:
-			path_tuple = visitedNodes.join(grph).filter(lambda x: x[1][0] == traceDist).filter(lambda x: x[0] in nodeTraceback).collect()[0]
+			path_tuple = VISITED.filter(lambda x: x[1][0] == traceDist).filter(lambda x: x[0] in nodeTraceback).takeSample(False,1)[0]
 			nodeTraceback = path_tuple[1][1]
-			path_tuple = (path_tuple[0], path_tuple[1][0])
+			path_tuple = (path_tuple[0], path_tuple[1][0][0])
 			traceDist -= 1 #Decrement counter
 			path.append(path_tuple)
 		path.reverse()

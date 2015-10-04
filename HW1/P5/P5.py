@@ -6,15 +6,15 @@ from P5_bfs import *
 sc = SparkContext()
 sc.setLogLevel("ERROR")
 
-links = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt')
-pages = sc.textFile('s3://Harvard-CS205/wikipedia/titles-sorted.txt')
+links = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt',32)
+pages = sc.textFile('s3://Harvard-CS205/wikipedia/titles-sorted.txt',32)
 
 #Creating the graph
 def mkInt(lst):
 	return [int(val) for val in lst]
 
 link_edges = links.map(lambda s: s.split(": ")).map(lambda s: (int(s[0]),s[1]))
-link_edges = link_edges.mapValues(lambda l: l.split(" ")).mapValues(list).mapValues(lambda x: mkInt(x)).partitionBy(32).cache()
+link_edges = link_edges.mapValues(lambda l: l.split(" ")).mapValues(list).mapValues(lambda x: mkInt(x)).partitionBy(256).cache()
 assoc_pages = pages.zipWithIndex().mapValues(lambda v: v+1).partitionBy(32)
 
 Harvard_ID = assoc_pages.lookup("Harvard_University")[0]
