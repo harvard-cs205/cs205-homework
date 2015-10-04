@@ -1,1 +1,5 @@
-# Your discussion here
+The shortest path from "Kevin_Bacon" to "Harvard_University" is
+('Kevin_Bacon', 'College_Bowl', 'Harvard_University').
+
+The shortest path from "Harvard_University" to "Kevin_Bacon" is
+('Harvard_University', '1998', '1958', 'Kevin_Bacon').

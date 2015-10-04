@@ -1,72 +1,69 @@
 from pyspark import SparkContext, AccumulatorParam
 
 class AccumNodes(AccumulatorParam):
-    def addInPlace(self, value1, value2):
-        value1 |= value2
-        return value1
+    def addInPlace(self, val1, val2):
+        val1 |= val2
+        return val1
 
-    def zero(self, value):
-        return value
+    def zero(self, val):
+        return val
 
 def parse_text(line):
     data = line.split(': ')
-    return (int(data[0]), set([int(i) for i in data[1].split()]))
+    return (int(data[0]), set(map(int, data[1].split())))
 
-def bfs_parallel(sc, links, names, root, target):
-    # convert names to indices
-    names_indices = names.zipWithIndex().map(lambda (n, i): (n, i+1))
-    indices_names = names_indices.map(lambda (n, i): (i, n))
-    root = names_indices.lookup(root)[0]
-    target = names_indices.lookup(target)[0]
-
+def bfs(sc, links, names, root, target):
+    # add indices to names for future lookups
+    name_index = names.zipWithIndex().map(lambda (n, i): (n, i+1))
+    index_name = name_index.map(lambda (n, i): (i, n)).sortByKey()
+    root = name_index.lookup(root)[0]
+    target = name_index.lookup(target)[0]
     traversed = set()
-    current = {root}
-    # save paths from root to target
+    current = set([root])
+    # save paths from root to target as a rdd (child, parent)
+    # initialize to (root, -1)
     paths = sc.parallelize([(root, -1)])
 
     while current:
         traversed |= current
-        if target in traversed: # target reached
+        if target not in traversed: 
+            filtered = links.filter(lambda (k, v): k in current)
+            counter = sc.accumulator(set(), AccumNodes())
+            filtered.values().foreach(lambda x: counter.add(x))
+            # path from current nodes to children
+            path = filtered.flatMapValues(lambda x: x).map(lambda (parent, child): (child, parent))
+            # to preserve directionality of the links, eliminate path from child to parent
+            # drop paths with traversed nodes as children 
+            paths = path.subtractByKey(paths).union(paths)
+            current = counter.value - traversed
+        else: # target reached
             break
-        filtered = links.filter(lambda (k, v): k in current)
-        counter = sc.accumulator(set(), AccumNodes())
-        filtered.values().foreach(lambda x: counter.add(x))
-        # get path from current nodes to children
-        path = filtered.flatMapValues(lambda x: x).map(
-            lambda (parent, child): (child, parent))
-        # to preserve directionality of the links
-        # we need to eliminate path from child to parent
-        # so we drop path that has a traversed node as child 
-        paths = path.subtractByKey(paths).union(paths)
-        current = counter.value - traversed
-        
+    
     if target in traversed:
-        # trace path
+        paths = paths.repartition(32).sortByKey().cache()
+        # trace path from target to root
         reverse_path = [target]
-        while True:
-            next = paths.lookup(reverse_path[-1])[0]
-            if next == -1:
-                break
+        next = paths.lookup(reverse_path[-1])[0]
+        while next != -1:
             reverse_path.append(next)
-        print [indices_names.lookup(i)[0] for i in reverse_path[::-1]]
+            next = paths.lookup(reverse_path[-1])[0]
+        return [index_name.lookup(i)[0] for i in reverse_path[::-1]]
     else:
-        print "No path between %s and %s" %(root, target)
+        print "No path from", root, "to", target
 
-if __name__=='__main__':
-    NPART = 32
+if __name__ == '__main__':
+    # set up partitioning params
+    NPART = 9*16
+
     # initialize spark
-    sc = SparkContext()
-    links = sc.textFile(
-        's3://Harvard-CS205/wikipedia/links-simple-sorted.txt', NPART)
-    names = sc.textFile(
-        's3://Harvard-CS205/wikipedia/titles-sorted.txt', NPART)
+    sc = SparkContext("local", appName="BFS")
 
-    # links = sc.textFile(
-    #     'links-simple-sorted.txt', NPART)
-    # names = sc.textFile(
-    #     'titles-sorted.txt', NPART)
-
-    # load data into a rdd (issue, character)
-    links = links.map(parse_text).cache()
-    bfs_parallel(sc, links, names, 'Kevin_Bacon', 'Harvard_University')
-    # bfs_parallel(sc, links, names, 'Jeff', 'Stephen')
+    # load files
+    links = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt', NPART).map(parse_text).cache()
+    names = sc.textFile('s3://Harvard-CS205/wikipedia/titles-sorted.txt', NPART).cache()
+    
+    # run BFS
+    kevin_to_harvard = bfs(sc, links, names, 'Kevin_Bacon', 'Harvard_University')
+    harvard_to_kevin = bfs(sc, links, names, 'Harvard_University', 'Kevin_Bacon')
+    print kevin_to_harvard
+    print harvard_to_kevin
