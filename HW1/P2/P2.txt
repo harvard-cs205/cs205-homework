@@ -1,1 +1,7 @@
 # Your discussion here
+
+From the histogram of P2a, which use default partition on the range vector, I see that the distirbution is left-skewed. The computation is siginificantly heavy on one single partition and very few on other partitions. Thus, when the partitions with less computation finish their jobs, they have to wait for the partition with most computation to finish.
+
+In the script of P2b, I randomized the range vector fisrt and then partition it as usual. At this time, from the histogram of P2b, the computation is more balanced between partitions. 
+
+I test the running time of each case. From my result, I can see that the running time of P2b is faster than that of P2a.
