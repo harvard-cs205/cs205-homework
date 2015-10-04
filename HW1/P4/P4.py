@@ -1,7 +1,6 @@
 import findspark
 findspark.init()
 import pyspark
-import json
 sc = pyspark.SparkContext(appName="")
 from P4_bfs import bfs
 
