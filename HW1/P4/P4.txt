@@ -142,7 +142,8 @@ If a character does not have a defined distance at the end of the search
 (assuming we initialized all nodes to be searched with an undefined distance),
 that means they could not be reached during the search and are out of
 the network or neighbourhood of the character being searched. They may be
-an "island" or in a separate connected graph, disconnected from the connected graph containing the character being searched.
+an "island" or in a separate connected graph, disconnected from the 
+connected graph containing the character being searched.
 
 ####################
 
