@@ -3,8 +3,8 @@ def process_line(s):
     line_split = s.split('","')
     return (line_split[1].replace('"',''),[line_split[0].replace('"','')])
 
-def current_count(i):
-    return (lambda x: i)
+def to_touch_untouched(to_touch):
+    return lambda (k,(d,ns)): k in to_touch and d == -1
 
 def ss_bfs(sc, graph, origin):
     '''
@@ -16,21 +16,36 @@ def ss_bfs(sc, graph, origin):
            names of all characters that co-appear with that character
     origin: string, the name of a character to use as origin for the SS-BFS
     '''
-    to_touch = sc.parallelize([(origin, 0)])
-    touched = sc.parallelize([(origin, 0)])
+    to_touch = set([origin])
+    ttrdd = sc.parallelize(to_touch)
+    touched = sc.emptyRDD()
 
-    dist_so_far = 1
-    # while the next level queue is not empty
-    while not to_touch.isEmpty():
+    # set all distances to infinity (i.e., -1)
+    graph_dists = graph.mapValues(lambda v: (-1, v))
 
-        # get all the neighbors of all characters at current distance
-        all_neighbors = to_touch.join(graph).flatMap(lambda (k,(v1,v2)): [(v,dist_so_far) for v in v2])
+    dist_so_far = 0
+    # imitating a do-while loop
+    while True:
+        acc = sc.accumulator(0)
 
-        # throw out duplicates and ones we've already touched
-        to_touch = all_neighbors.reduceByKey(lambda d1, d2: d1).subtractByKey(touched).cache()
+        # find untouched nodes from our list of nodes to touch
+        ttns = graph_dists.filter(to_touch_untouched(to_touch))
 
-        # save new distances
-        touched = touched.union(to_touch).cache()
+        # update set of neighbors to touch
+        def count_get_neighbors(ns):
+            acc.add(1)
+            return ns
+        ttrdd = ttns.flatMap(lambda (k,(d,ns)): count_get_neighbors(ns))
+        to_touch = set(ttrdd.collect())
+
+        # set new distances
+        touched = touched.union(ttns.mapValues(lambda v: dist_so_far)).cache()
+        graph_dists = graph_dists.leftOuterJoin(ttns).mapValues(lambda (v,w): (dist_so_far, w[1]) if w else v).cache()
+
         dist_so_far += 1
+
+        # the do-while condition
+        if acc.value == 0:
+            break
 
     return touched

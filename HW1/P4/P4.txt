@@ -1,1 +1,4 @@
 # Your discussion here
+Cap: touched 6408 nodes
+Miss Thing: touched 7 nodes
+Orwell: touched 9 nodes
