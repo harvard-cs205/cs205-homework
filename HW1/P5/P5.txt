@@ -1,1 +1,15 @@
 # Your discussion here
+---------Shortest Path----------------
+
+'Kevin_Bacon'--------->'John_Lithgow'--------->Harvard_University(arrived!)
+
+and
+
+'Harvard_University'--------->'September_16'--------->'Mickey_Rourke'--------->Kevin_Bacon(arrived!)
+
+--------------------------------------
+
+
+The above path is not unique but it is correct. Since I check 'John_Lithow' was a neighbor of 'Kevin_Bacon' and 'Harvard_University' is a neighbor of 'John_Lithow'. 
+
+'September_16' is a neighbor of 'Harvard_University', 'Mickey_Rourke' is a neighbor of 'September_16', and 'Kevin_Bacon' is a neighbor of 'Mickey_Rourke'.
