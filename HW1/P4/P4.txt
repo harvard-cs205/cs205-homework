@@ -1,1 +1,21 @@
 # Your discussion here
+1. Graph representation:
+Basic representation
+[(character_name, [adjacent_nodes_list])]
+
+Derived representation for BFS
+[(character_name, ([adjacent_nodes_list], distance, is_used))]
+
+2. Number of touched nodes
+CAPTAIN AMERICA: 6408
+MISS THING/MARY: 7
+ORWELL: 9
+
+3. Discussions
+Q1: What does this diameter imply about the maximum number of steps in which your search must be executed? 
+
+The maximum number of steps in which search must be executed is equal to the graph’s diameter. This is because the diameter d of a graph is defined as the maximum eccentricity of any vertex in the graph, which means that the diameter is the length of the shortest path between the most distanced nodes. To determine the diameter of a graph, first find the shortest path between each pair of vertices. The greatest length of any of these paths is the diameter of the graph. 
+
+Q2: What does it mean if a character does not have a defined distance during the search?
+
+This means that they are disconnected with root or their distance to root is greater than predefined diameter(if given).
