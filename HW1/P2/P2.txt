@@ -1,1 +1,4 @@
-# Your discussion here
+I use two different partition strategies to do this exercise. 
+From the histogram in part(a), we can see that most of the partitions have small iteration time. However, there are some partitions take too much iterations. These are the stragglers that slow down the whole parallel programming.
+Therefore, I change another strategy. In part(b), we can see that most of the partitions have similar iterations because heavy-computing pixels are evenly distributed.
+The tradeoff of the problem is part(b) needs more time to repartition. Overhead of repartition must smaller than the time repartition saves.
