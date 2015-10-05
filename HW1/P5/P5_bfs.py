@@ -64,12 +64,8 @@ def main(argv):
 	  .map(lambda x: (x[1][0][0], (x[1][0][1], x[1][1]))) \
 	  .groupByKey().map(lambda x: zip(*sorted(list(x[1])))[1]).collect()
 
-	 #backup
-	with open('output.txt', 'wb') as f:
-		f.write(str(resultPaths))
-
 	# collect the paths in a human readable format
-	with open('outputH.txt', 'wb') as f:
+	with open('output.txt', 'wb') as f:
 		f.write('Shortest paths from %s to %s:\n\n' % (keyString0, keyStringT))
 		for path in resultPaths:
 	            path = list(path) 

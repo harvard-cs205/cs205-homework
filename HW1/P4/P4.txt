@@ -33,3 +33,8 @@ when we start at v0, the algorithm needs D rounds. In the first part of the ques
 Untouched Nodes:
 ================
 The BFS algorithm determines, if there are no more nodes to explore. However, this does not mean that all nodes have been touched. Nodes that are untouched (and have therefore diststov0 = Inf) lie (for an undirected graph) in another connected component or are not reachable. If a characterfor example has no defined distance (i.e. after termination his disttov0 is still 0), he might not have any connection to other characters. 
+
+
+Files:
+======
+P4_aws.py conatins a Spark only version that can be used on AWS (after right setup of the source.csv file, i.e. in a s3 bucket). P4.py is a pandas based version, which converts first the graph representation

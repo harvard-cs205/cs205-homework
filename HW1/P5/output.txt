@@ -1,1 +1,4 @@
-[(u'Kevin_Bacon', u'College_Bowl', u'Harvard_University'), (u'Harvard_University', u'Gilmore_Girls', u'Liza_Weil', u'Kevin_Bacon')]
+Shortest paths from Kevin_Bacon to Harvard_University:
+
+Kevin_Bacon -> College_Bowl -> Harvard_University
+Harvard_University -> Gilmore_Girls -> Liza_Weil -> Kevin_Bacon

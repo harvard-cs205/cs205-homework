@@ -1,4 +1,0 @@
-Shortest paths from Kevin_Bacon to Harvard_University:
-
-Kevin_Bacon -> College_Bowl -> Harvard_University
-Harvard_University -> Gilmore_Girls -> Liza_Weil -> Kevin_Bacon
