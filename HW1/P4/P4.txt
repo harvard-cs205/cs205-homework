@@ -26,4 +26,4 @@ There is a required shuffle when I swap the K,V after doing the join, and I repa
 
 If we assume the graph diameter is 10, and we want to calculate all of the connected nodes to, for example, Captain America, we need to iterate 10 times. Based on the definition of a graph diameter (the longest shortest path from one node to another), the furthest away a node could be from Captain America is 10. 
 
-If a character does not get a distance defined during the search, it is either part of a different connected component, or the graph diameter is larger than assumed (if assumed). Since I do not assume a diameter, but only stop searching when I stop finding new connections, a character not getting touched indicates
+If a character does not get a distance defined during the search, it is either part of a different connected component, or the graph diameter is larger than assumed (if assumed). Since I do not assume a diameter, but only stop searching when I stop finding new connections, a character not getting touched indicates that it is part of a different connected component.

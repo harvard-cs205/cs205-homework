@@ -2,3 +2,36 @@
 I wasn't able to decipher the hint about connected components, and so my technique was to simply do BFS iteratively until I had mapped out the entire space. The problem with this was that most of the connected components are just two nodes that link to each other. 
 
 When I assumed a fully symmetric graph, there was one huge connected component contatining all but ~7000 pages. Of those, 6000 are not linked to anything, and 1000 are (probably) linked to 1 or 2 other pages. Because each iteration took about 1 minute on the cluster, it was infeasible to count up what was likely to be 500 pairwise links.
+
+Below is some dialog from part of the connected component code. The lists represent number of nodes found after each iteration. Once the entire component has been explored, the touched nodes are removed from the rank list RDD and the search is performed using a new start node. 
+
+131072
+[1, 52]
+[1, 52, 168873]
+[1, 52, 168873, 2943911]
+[1, 52, 168873, 2943911, 2513313]
+[1, 52, 168873, 2943911, 2513313, 83163]
+[1, 52, 168873, 2943911, 2513313, 83163, 476]
+[1, 52, 168873, 2943911, 2513313, 83163, 476, 8]
+[1, 52, 168873, 2943911, 2513313, 83163, 476, 8, 1]
+[1, 52, 168873, 2943911, 2513313, 83163, 476, 8, 1, 1]
+[1, 52, 168873, 2943911, 2513313, 83163, 476, 8, 1, 1, 1]
+[1, 52, 168873, 2943911, 2513313, 83163, 476, 8, 1, 1, 1, 0]
+Number of Nodes Left= 1193
+3561984
+[1, 1]
+[1, 1, 0]
+Number of Nodes Left= 1191
+2789632
+[1, 2]
+[1, 2, 0]
+Number of Nodes Left= 1188
+5004160
+[1, 1]
+[1, 1, 0]
+Number of Nodes Left= 1186
+2982912
+[1, 1]
+[1, 1, 0]
+Number of Nodes Left= 1184
+3135616
