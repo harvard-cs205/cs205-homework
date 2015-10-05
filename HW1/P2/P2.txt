@@ -9,3 +9,10 @@ A first simple strategy is random partitioning. For each Pixel a random partitio
 My second strategy relies a bit more on the idea that 'brightness' of a region indicates needed computational time. Thus, in the second strategy, an Image is computed at a lower resolution. Then the cumulated "effort" is plotted for each line (column). Interestingly, the shape of this function looks like a sigmoid! So, I decided to fit a sigmoid curve to the low resolution data. To obtain now a partition I divide the image space [0, 1] (effort has been normalized s.t. total effort = 1) into 100 buckets. Mapping these back gives for each buckets boundaries which form a new partition. 
 
 However, after comparing both strategies, in practice random partitioning seemed to work better. Also, its implementation is much more simple and straight-forward. Concluding, I would recommend random partioning for this problem. 
+
+Generally speaking, with every (re)partitioning stragey the question is whether its cost of computaton is benefitting to the overall cost (in the sense it lowers it). The cost of a repartitioning structure can be divided into two components:
+
+(1) cost for computing where to map the current dataset to
+(2) shuffle cost
+
+For the random strategy (1) is very low whereas (2) can be very high, as we randomly shuffle over the whole network. Thus, the second strategy might provide less shuffle cost (more data stays at the same place) but it does require on the other hand a lot more precomputation.

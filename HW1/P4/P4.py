@@ -9,11 +9,6 @@ import pandas as pd
 import os
 import sys
 
-import matplotlib.ticker as ticker   
-import seaborn as sns
-sns.set_style("whitegrid")
-
-
 from P4_bfs import *
 
 # convert Marvelgraph data to edge list using pandas

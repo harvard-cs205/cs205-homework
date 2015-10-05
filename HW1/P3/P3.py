@@ -7,11 +7,6 @@ findspark.init()
 import urllib
 from pyspark import SparkContext, SparkConf
 
-import matplotlib.ticker as ticker   
-import seaborn as sns
-sns.set_style("whitegrid")
-
-
 # setup spark
 conf = SparkConf().setAppName('Anagram')
 sc = SparkContext(conf=conf)

@@ -8,6 +8,9 @@ def sparkSSSP(context, rdd, v0, vT, max_iter):
     # prepare data structure for single source shortest paths
     imaxvalue = sys.maxint
 
+    # get number of partitions
+    num_partitions = rdd.getNumPartitions()
+
     # currently our rdd looks like (v, [v1, v2, ...]). now we map it to a tuple with
     # (v, <adj. list.>, disttov0, color, <pred. list>) where disttov0 is 0 for v = v0 and imaxvalue else,
     # color = GRAY for v0 and BLACK else
@@ -37,11 +40,16 @@ def sparkSSSP(context, rdd, v0, vT, max_iter):
         if x[1][2] == 1: # 'GRAY'
         # set current node to visited
             res = []
-            res.append( (x[0], (x[1][0], x[1][1], 0, [x[1][3]])) ) # 'BLACK'
+
+            res.append( (x[0], (x[1][0], x[1][1], 0, x[1][3])) ) # 'BLACK'
+            # allp paths
+            #res.append( (x[0], (x[1][0], x[1][1], 0, [x[1][3]])) ) # 'BLACK'
 
             # spawn new GRAY nodes
             for i in range(0, len(x[1][0])):
-                res.append( (x[1][0][i], ([], x[1][1] + 1, 1, [x[1][3] + [x[0]]])) ) # 'GRAY'
+                res.append( (x[1][0][i], ([], x[1][1] + 1, 1, x[1][3] + [x[0]])) ) # 'GRAY'
+                #allp version
+                #res.append( (x[1][0][i], ([], x[1][1] + 1, 1, [x[1][3] + [x[0]]])) ) # 'GRAY'
 
             return tuple(res)
         else: 
@@ -54,32 +62,36 @@ def sparkSSSP(context, rdd, v0, vT, max_iter):
     def reduceNodes(a, b):
 
         # simple solution for only some shortest path
-        #res = (a[0] if len(a[0]) > len(b[0]) else b[0], min(a[1], b[1]), min(a[2], b[2]), a[3] if a[1] < b[1] else b[3])
+        res = (a[0] if len(a[0]) > len(b[0]) else b[0], min(a[1], b[1]), min(a[2], b[2]), a[3] if a[1] < b[1] else b[3])
 
-        #solution for multiple shortest paths is more complicated ==> we store them in a list!
-        spath_list = [];
-
-        spath_lista = a[3]
-        spath_listb = b[3]
-
-        min_dist = 0
-
-        if a[1] < b[1]:
-            spath_list = spath_lista
-            min_dist = a[1]
-        elif a[1] > b[1]:
-            spath_list = spath_listb
-            min_dist = b[1]
-        else:
-            # both are at the same distance --> merge shortest path lists!
-            spath_list = spath_lista + spath_listb
-            min_dist = a[1]
-
-        # construct tuple
-        res = (a[0] if len(a[0]) > len(b[0]) else b[0], min_dist, min(a[2], b[2]), spath_list)
-
-        # return a tuple of 3 entries
         return res
+
+
+        # # all path version
+        # #solution for multiple shortest paths is more complicated ==> we store them in a list!
+        # spath_list = [];
+
+        # spath_lista = a[3]
+        # spath_listb = b[3]
+
+        # min_dist = 0
+
+        # if a[1] < b[1]:
+        #     spath_list = spath_lista
+        #     min_dist = a[1]
+        # elif a[1] > b[1]:
+        #     spath_list = spath_listb
+        #     min_dist = b[1]
+        # else:
+        #     # both are at the same distance --> merge shortest path lists!
+        #     spath_list = spath_lista + spath_listb
+        #     min_dist = a[1]
+
+        # # construct tuple
+        # res = (a[0] if len(a[0]) > len(b[0]) else b[0], min_dist, min(a[2], b[2]), spath_list)
+
+        # # return a tuple of 3 entries
+        # return res
     
     def countGrayNodes(x, gray_accum):
         # inc count of remaining gray nodes by 1!
@@ -111,7 +123,7 @@ def sparkSSSP(context, rdd, v0, vT, max_iter):
         # (2) start map process
         rddGray = rddGray.flatMap(expandNode)
 
-        rdd = rddRest.union(rddGray)
+        rdd = rddRest.union(rddGray).partitionBy(num_partitions)
 
         # (3) then reduce by key
         rdd = rdd.reduceByKey(reduceNodes)
@@ -119,11 +131,12 @@ def sparkSSSP(context, rdd, v0, vT, max_iter):
         # (4) map to count gray nodes
         rdd = rdd.map(functools.partial(countGrayNodes, gray_accum=gray_accum))
         
-        # (5) use here a flatmap to solve for all shortest paths (applies only)
-        rdd = rdd.flatMap(lambda x: [(x[0], (x[1][0], x[1][1], x[1][2], y)) for y in x[1][3]])
+        # all pairs
+        ## (5) use here a flatmap to solve for all shortest paths (applies only)
+        #rdd = rdd.flatMap(lambda x: [(x[0], (x[1][0], x[1][1], x[1][2], y)) for y in x[1][3]])
         
         # (6) check if target node vT was reached
-        rdd_containing_vT = rdd.filter(lambda x: x[0] == vT and x[1][2] == 1)
+        rdd_containing_vT = rdd.filter(lambda x: x[0] == vT and x[1][2] <= 1)
         
         # call count to evaluate accumulator correctly
         rdd.count()

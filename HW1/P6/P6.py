@@ -10,9 +10,6 @@ import re
 import os
 import sys
 
-import matplotlib.ticker as ticker   
-import seaborn as sns
-sns.set_style("whitegrid")
 
 def downloadFiles():
 	# load textlist from net
