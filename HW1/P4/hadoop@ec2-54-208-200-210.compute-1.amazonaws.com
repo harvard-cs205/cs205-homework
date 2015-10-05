@@ -10,7 +10,7 @@ if __name__ == "__main__":
 
     # Load the lines of the text file 
     source = sc.textFile("source.csv")
-   
+
     # Split the issue id from the superhero's name
     source = source.map(lambda x: x.split('","'))
 

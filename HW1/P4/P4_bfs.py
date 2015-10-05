@@ -1,7 +1,9 @@
 def BFS(sc, graph, name):
+
+    # Note: on the Virtual machine, things work best if everything is partitioned into 2.  
     
-    # Rdd of name, shortest distance tuples that will be returned.  In each iteration, heros are added to this.  Initialize with the source node, and partition into 4 partitions to match the graph.
-    rdd = sc.parallelize([(name, 0)], 4)
+    # Rdd of name, shortest distance tuples that will be returned.  In each iteration, heros are added to this.  Initialize with the source node, and partition into 2 partitions to match the graph.
+    rdd = sc.parallelize([(name, 0)], 2).cache()
     
     # This RDD is used intermediately to build a collection of connections to build on
     namesRdd = rdd
