@@ -1,1 +1,15 @@
-# Your discussion here
+Shortest paths from Kevin_Bacon to Harvard_University (and vice versa):
+-----------------------------------------------------------------------
+
+=> Some examples are
+
+Kevin_Bacon -> College_Bowl -> Harvard_University
+Harvard_University -> Gilmore_Girls -> Liza_Weil -> Kevin_Bacon
+
+
+Connected Components:
+---------------------
+
+Tried my code succesfully with the Marvel Graph (4 components) and wrote conversion functions (tested)
+for the Wikidata. However my min based algorithm didn't converge after 45min, so I canceled it.
+If you do have enough computing time, feel free to run it on your hardware, it might converge.
