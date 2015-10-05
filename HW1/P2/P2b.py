@@ -7,7 +7,6 @@ from P2 import *
 import numpy as np
 import matplotlib.pyplot as plt
 
-#sc = pyspark.SparkContext("local", "P2a.py", pyFiles=['P2.py'] )
 sc =pyspark.SparkContext()
 
 data=[]
