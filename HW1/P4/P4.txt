@@ -1,1 +1,16 @@
-# Your discussion here
+George Lok
+Problem 4
+
+Graph Representation: Adjacency list
+RDD, allEdges, consists of source node as keys and list of destination nodes as values.
+
+i.e. (source, [list of adj nodes)
+
+Results:
+CAPTAIN AMERICA: 6408 touched nodes
+MISS THING/MARY: 7 touched nodes
+ORWELL: 9 touched nodes
+
+Knowing the exact diameter means that we just have to push our our frontier up to a set diamater range.  This also means that if we were being inefficient, we don't need to remember which nodes we have already visited, since we can just keep track of our current iteration.
+
+If a character does not have a defined distance, that means that there is no path between our two characters.  Since our graph is undirected, this means that the two characters must be in different connected components.

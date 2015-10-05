@@ -1,1 +1,1 @@
-# Your discussion here
+From our results, we see that with random partitioning caused by partitionBy, we were able to have much more even load balancing without needing to do large computation to determine our partitioning hash function compared to the default partioning algorithm.  However, by using randoming partition, we are unable to use the structure of the problem to our full advantage, and it can even be detrimental in some cases if the problem has a specific structure that we have an optimized partioning hash algorithm for.

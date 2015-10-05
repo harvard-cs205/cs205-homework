@@ -1,3 +1,6 @@
+# Author: George Lok
+# P2b.py
+
 from P2 import *
 
 # Your code here

@@ -1,3 +1,6 @@
+# Author: George Lok
+# P4.py
+
 from P4_bfs import *
 
 import findspark
@@ -5,7 +8,6 @@ findspark.init('/Users/georgelok/spark')
 
 import pyspark
 sc = pyspark.SparkContext(appName="P4")
-
 
 def lineSplitFunction(line) :
     line = line[1:-1] # Remove unnecessary quotes
@@ -20,7 +22,7 @@ def flatmapFunctor (x) :
     chars = list(x[1])
     results = []
     for char in chars :
-        # Somewhat inefficient, but using remove for some reason was buggy
+        # Not the most efficent, but using list.remove for some reason was buggy
         results.append((char, set([x for x in chars if x != char])))
     return results
 
@@ -37,9 +39,7 @@ ac1, nodes1 = SSBFS("CAPTAIN AMERICA", allEdges, sc)
 ac2, nodes2 = SSBFS("MISS THING/MARY", allEdges, sc)
 
 ac3, nodes3 = SSBFS("ORWELL", allEdges, sc)
+
 print "CAPTAIN AMERICA: " + str(ac1) + " touched nodes"
 print "MISS THING/MARY: " + str(ac2) + " touched nodes"
 print "ORWELL: " + str(ac3) + " touched nodes"
-
-
-

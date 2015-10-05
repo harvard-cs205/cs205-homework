@@ -1,3 +1,6 @@
+# Author: George Lok
+# P3.py
+
 import findspark
 findspark.init('/Users/georgelok/spark')
 

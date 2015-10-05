@@ -1,1 +1,17 @@
-# Your discussion here
+George Lok
+Problem 5
+
+Example Shortest Paths
+
+Bacon to Harvard 
+Kevin_Bacon, Marisa_Silver, Harvard_University
+Kevin_Bacon, Six_degrees_of_separation, Harvard_University
+Kevin_Bacon, Time_(magazine), Harvard_University
+Kevin_Bacon, John_Lithgow, Harvard_University
+Kevin_Bacon, College_Bowl, Harvard_University
+
+Harvard to Bacon 
+Harvard_University, 1998, 1958, Kevin_Bacon
+Harvard_University, February_26, 1958, Kevin_Bacon
+Harvard_University, September_2, 1958, Kevin_Bacon
+Harvard_University, Andy_Borowitz, 1958, Kevin_Bacon

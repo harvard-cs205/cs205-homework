@@ -1,3 +1,6 @@
+# Author: George Lok
+# P2a.py
+
 from P2 import *
 
 # Your code here

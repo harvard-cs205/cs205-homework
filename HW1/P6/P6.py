@@ -1,4 +1,6 @@
 # Author : George Lok
+# P6.py
+
 from numpy.random import choice
 from random import randint
 
@@ -92,9 +94,10 @@ def createNextPhaseFunction(prevResults) :
         if not firstPair in ref :
             return [([],[])]
         results = []
+
         # It is entirely possible for us to have two of the same pair to appear, so
         # we account for this case by using flatmap.
-        # Note that means that this might not strictly be fully parallel.
+        # Note that means that this might not strictly be fully parallel in this section
         for wordList in ref[firstPair] :
             bins = []
             for (choice, count) in choices :
