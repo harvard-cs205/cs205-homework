@@ -1,58 +1,60 @@
+def copartitioned(RDD1, RDD2):
+    "check if two RDDs are copartitioned"
+    return RDD1.partitioner == RDD2.partitioner
+def reducer(tup):
+    left_val = tup[0]
+    right_vals = tup[1]
+    if len(right_vals) == 0:
+        return list(left_val)[0]
+    elif list(left_val)[0] == -1:
+        return list(right_vals)[0]
+    else:
+        return list(left_val)[0]
+
+def divider(tup):
+    dist = tup[0]
+    node_vals = tup[1]
+    return [(nv, dist + 1) for nv in node_vals]
+
 #######
 # Implements Breadth First Search
 # Arguments:
-# 	adj (KV RDD): Edge list. For example: [(1,2), (1, 3), (2,3), (3, 2)] is the graph where there is a directed edge from 1 to 2 and 1 to 3, edges in both directions between 2 and 3.
+# 	adj (KV RDD): Adjacency list graph representation. Value is an iterator over neighbors.
 # 	start (string): Where the breadth first search will start
+#   sc: SparkContext
 # Returns:
-# 	(RDD) Distances to each point, and (RDD) list of all points that were not reachable.
+# 	(RDD) Distances to each point
 def bfs(adj, start, sc, numPartitions):
-	accum = sc.accumulator(0)
-	print 'Adjacency partitions:', adj.getNumPartitions()
-
-	def reduceFun(tup):
-		#global accum
-		if tup[0] == None:
-			#accum.add(1)
-			return tup[1]
-		elif tup[1] == None:
-			return tup[0]
-		else:
-			return min(tup[0], tup[1])
-
-	def reduceFun2(tup):
-		if tup[1] == None:
-			return tup[0]
-		else:
-			return max(tup[0],tup[1])
+    accum = sc.accumulator(0)
+    adj = adj.map(lambda x: x).partitionBy(numPartitions).cache()
 
 
+    distances = adj.mapValues(lambda _: -1).partitionBy(numPartitions)
+    traversed = sc.parallelize([(start, 0)]).cache().partitionBy(numPartitions)
+    distances = distances.fullOuterJoin(traversed).mapValues(lambda (x, y): x if y == None else y).partitionBy(numPartitions).cache()
+    
+    assert(copartitioned(adj, distances))
+    farthest = 0
+    accum.add(1)
+    while accum.value != 0:
+        accum.value = 0
+        print "\n\nBFS: On iteration ", farthest, ' for ', start, '\n\n'
 
-	distances = adj.map(lambda (node, neighbor): (node, -1.0)).distinct()
-	traversed = sc.parallelize([(start, 0)]).cache().partitionBy(numPartitions)
-	print 'Start traverse partitions:', traversed.getNumPartitions()
-	farthest = 0
-	accum.add(1)
-	while accum.value != 0:
-		accum.value = 0
-		print "\n\nOn iteration ", farthest, ' for ', start, '\n\n'
-		# get all of the neighboring superheros
-		#	Start by filtering for the ones that are farthest away
-		# 	Then join this with the adjacency matrix, which gives you all of the places it can go
-		#	Get just the neighbors by using .values()
-		# 	Get rid of the distance value from the left side
-		#	Keep only the unique ones using distinct (since there could be multipe ways to reach a node)
-		#	Add the distance to them, using a lambda that makes the neighbors into KVs with Key = name, Value = dist
-		neighbors = traversed.filter(lambda (node, dist): dist == farthest).join(adj, numPartitions).values().values().distinct().map(lambda x: (x, farthest + 1), True)
-		# combine the neighbors with what we already had, removing values we have already seen.
-		traversed = traversed.fullOuterJoin(neighbors, numPartitions).mapValues(reduceFun)
-		#traversed.count()
-		# force the eval to calculate the accum values.
-		farthest += 1
-		traversed.filter(lambda (x, dist): dist == farthest).foreach(lambda x: accum.add(1))
+        # Get the nodes that are farthest away
+        farthest_nodes = distances.filter(lambda (node, dist): dist == farthest)
 
-	print 'End tranverse partitions:', traversed.getNumPartitions()
+        # Get their neighbors, and get the distances of each neighbor
+        assert(copartitioned(farthest_nodes,adj))
+        joined_farthest_neighbors = farthest_nodes.join(adj, numPartitions)
+        neighbor_distances = joined_farthest_neighbors.values().flatMap(divider).partitionBy(numPartitions).cache()
+        
+        # Combine the distances of the neighbors with the distances we already have
+        assert(copartitioned(neighbor_distances, distances))
+        distances = distances.cogroup(neighbor_distances).mapValues(reducer).cache()
+        farthest += 1
 
-	final_vals = distances.leftOuterJoin(traversed).mapValues(reduceFun2)
-	#print "Distance Distribution for ", start 
-	#print final_vals.values().countByValue(), '\n'
-	return final_vals, final_vals.filter(lambda (node, dist): dist < 0)
+        # For each element just added, increment the accumulator
+        distances.filter(lambda (x, dist): dist == farthest).foreach(lambda x: accum.add(1))
+
+    return distances
+
