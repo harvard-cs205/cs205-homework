@@ -4,13 +4,16 @@ def reset_accumulators(sc):
 	sc.explored = sc.accumulator(0)
 
 def make_to_be_visited(explored, unvisited):
+	"""Create to_be_visited function with given accumulators"""
 	def to_be_visited((n, (adj, distance))):
+		"""Check if a node has been visited after join"""
 		if distance is not None:
-			explored.add(1)
+			unvisited.add(1)
 			return True
-		unvisited.add(1)
+		explored.add(1)
 		return False
 	return to_be_visited
+
 
 def reduce_distances((n, (d1, d2))):
 	return (n, d2) if d2 is not None else (n, d1)
@@ -22,7 +25,8 @@ def bfs2(sc, adjacencies, root):
 	distances = sc.parallelize([])
 	last_visited_state = (-1, -1) 
 
-	for i in range(100):
+	i = 1
+	while(True):
 		last_unvisited = sc.unvisited.value
 		last_explored = sc.explored.value
 
@@ -32,11 +36,14 @@ def bfs2(sc, adjacencies, root):
 		distances = distances.fullOuterJoin(flattened).map(reduce_distances)
 		to_visit = visited_this_iteration.flatMap(lambda (n, (adj, distance)): adj).distinct().map(lambda a:(a, i))
 
+		#  terminate if the number of unvisited and visited nodes is unchanged: this means the bfs hasn't made progress
 		visited_state = (sc.unvisited.value - last_unvisited, sc.explored.value - last_explored)
 		if visited_state == last_visited_state:
 			break
 		else:
 			last_visited_state = visited_state
+
+		i += 1
 
 	return distances.count()
 

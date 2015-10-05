@@ -1,1 +1,6 @@
-# Your discussion here
+Harvard to Kevin Bacon path:
+[u'Harvard_University', u'Gilmore_Girls', u'Liza_Weil', u'Kevin_Bacon']
+Kevin Bacon to Harvard path:
+[u'Kevin_Bacon', u'Time_(magazine)', u'Harvard_University']
+
+In P4, I implemented one BFS that used a hash set queue to prevent visiting the same node twice and another that used Spark joins to solve the same problem. The set approach was much faster, but required broadcasting the whole set to each worker. In this implementation, I avoided the large broadcast by using a set accumulator (an idea inspired by some of my classmates). I also saved the whole path to each node being visited since saving every possible path used too much memory I ended up using reducedByKey to just take an arbitrary path. Combining the set accumulator with a "queue" and "visited" Python sets that don't get broadcasted allowed for a more efficient way to avoid revisiting nodes than by P4 implementations - the algorithm found a path from Kevin Bacon to Harvard in around 75 seconds.
