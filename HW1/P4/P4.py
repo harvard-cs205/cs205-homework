@@ -2,6 +2,7 @@ from pyspark import SparkContext
 from P4_bfs import *
 
 sc = SparkContext("local", "Marvel charater graph")
+accum = sc.accumulator(0)
 
 marvel_csv = sc.textFile("source.csv")
 
