@@ -1,17 +1,15 @@
-from P4_bfssat import * 
+from P4_bfs import * 
 import pyspark
 from pyspark import SparkContext
 sc = SparkContext("local[4]")
-
 sc.setLogLevel("ERROR")
 
-import numpy as np
-import matplotlib.pyplot as plt 
+#import data. split lines into comic books and superheroes..
 data = sc.textFile('data.txt')
-Superheros = data.map(lambda word: word.split('",')[0]).map(lambda word: word.strip('"').encode("utf-8"))
+Superheroes = data.map(lambda word: word.split('",')[0]).map(lambda word: word.strip('"').encode("utf-8"))
 Comics= data.map(lambda word: word.split('",')[1]).map(lambda word: word.strip('"').encode("utf-8"))
 
-RDD1= Comics.zip(Superheros)
+RDD1= Comics.zip(Superheroes)
 RDD2 = RDD1.join(RDD1) #K,(V,W) = Comic, (Superhero,Superhero)
 
 #create edge list and ensure no one is linked to themselves (this assumes
@@ -23,10 +21,10 @@ SOURCE = 'ORWELL'
 SOURCE2 = 'MISS THING/MARY'
 SOURCE3 = 'CAPTAIN AMERICA'
 
-count1=bfs(SOURCE,Graph,sc)
-count2=bfs(SOURCE2,Graph,sc)
-count3=bfs(SOURCE3,Graph,sc)
+Orwell_count=bfs(SOURCE,Graph,sc)
+Miss_thing_mary_count=bfs(SOURCE2,Graph,sc)
+Captain_America_count=bfs(SOURCE3,Graph,sc)
 
-print count1
-print count2
-print count3
+print Orwell_count
+print Miss_thing_mary_count
+print Captain_America_count

@@ -1,9 +1,12 @@
 def bfs(SOURCE,Graph,sc):
+    #set source as first node at distance 0    
     node1 = [(SOURCE,0)]
     node1 = sc.parallelize(node1).partitionBy(8)
     final_rdd1 = node1
     i = 0
     
+    #initialize an accumulator and set to 0. Create while loop to run
+    #while accumulator matches value of the i iterator 
     accumulator = sc.accumulator(0)
     i = 0
     while accumulator.value == i:        
