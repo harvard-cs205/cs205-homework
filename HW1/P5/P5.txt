@@ -8,7 +8,7 @@ Kevin Bacon -> Harvard University
 [u'Kevin_Bacon', u'College_Bowl', u'Harvard_University']
 
 
-Harvard University -> Kevin Bacon (lot's of paths!)
+Harvard University -> Kevin Bacon (lots of paths!)
 [u'Harvard_University', u'John_Lithgow', u'Footloose', u'Kevin_Bacon']
 [u'Harvard_University', u'Thomas_Dudley', u'Kyra_Sedgwick', u'Kevin_Bacon']
 [u'Harvard_University', u'Natalie_Portman', u'Erd\u0151s\u2013Bacon_number', u'Kevin_Bacon']

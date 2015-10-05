@@ -1,3 +1,14 @@
+##############
+# Ankit Gupta
+# ankitgupta@college.harvard.edu
+# CS 205, Problem Set 1, P6
+#
+# Implementation of BFS
+#
+# Note that I have kept some lines (commented out) to show how I tested this locally. Please ignore those if running on AWS.
+# I have included comments that explain what files I used to test this locally before on AWS. 
+##############
+
 # Comment out these lines when running on AWS
 import findspark
 findspark.init()
@@ -8,28 +19,66 @@ sc = pyspark.SparkContext(appName="Spark1")
 import numpy as np 
 import itertools
 
+# Checks if the two RDDs are copartioned.
+#   Ex: assert(copartitioned(rdd1, rdd2))
 def copartitioned(RDD1, RDD2):
     "check if two RDDs are copartitioned"
     return RDD1.partitioner == RDD2.partitioner
 
-def reducingFun(elem):
+# This function is used to generate paths.
+def pathGeneratingReducer(elem):
     (prev, ((neighbors, _), path)) = elem
     generated_paths = []
     for neighbor in neighbors:
         generated_paths.append((neighbor, path + [neighbor]))
     return generated_paths
 
-#######
+# Borrowed from Professor's Github example on SparkPageRank
+def link_string_to_KV(s):
+    src, dests = s.split(': ')
+    dests = [int(to) - 1 for to in dests.split(' ')]
+    return (int(src) - 1, dests)
+
+##
+# Maps a node number to the associated title.
+# Arguments:
+#   arr: A list of nodes numbers
+#   reached_to_name: A dict that maps node numbers of nodes that the BFS reached to their name
+# Returns:
+#   List containing the named nodes
+def map_node_to_name(arr, reached_to_name):
+    ret = []
+    for elem in arr:
+        ret.append(reached_to_name[elem])
+    return ret
+
+##
+# Given the graph and start and end nodes, returns the paths (named with titles) from start node to end node.
+# Arguments:
+#   adj: The graph in adjacency list representation
+#   start_node: The node # where BFS is starting
+#   end_node: The node # where BFS is ending
+
+def get_paths(adj, start_node, sc, num_Partitions, end_node, indexed_titles):
+    paths = bfs(adj, start_node, end_node, sc, num_Partitions)
+    paths = paths.cache()
+    names_touched = paths.flatMap(lambda x: x).distinct().map(lambda node: (node, node)).partitionBy(num_Partitions).join(indexed_titles).mapValues(lambda (x, y): y)
+    reached_to_name = names_touched.collectAsMap()
+    named_paths = paths.map(lambda x: map_node_to_name(x, reached_to_name))
+    return named_paths.collect()
+
+##
 # Implements Breadth First Search
 # Arguments:
 # 	adj (KV RDD): adjacency list - these are directed edges. 
 # 	start (string): Where the breadth first search will start
+#   end: where to stop
 #   sc: the sparkContext
 #   numPartitions: number of partitions in RDDs being joined
-#   stopNode: where to stop
+#   
 # Returns:
-# 	RDD of paths to stopNode from start
-def bfs(adj, start, sc, numPartitions, stopNode):
+# 	RDD of paths to end from start
+def bfs(adj, start, end, sc, numPartitions):
 
     solutions = sc.accumulator(0)
 
@@ -48,15 +97,15 @@ def bfs(adj, start, sc, numPartitions, stopNode):
         joined = searchers.join(paths)
 
         # THis looks something like (node, [path]), (node, [path]) ....
-        paths = joined.flatMap(reducingFun).partitionBy(numPartitions).cache()
-        # This determines if stopNode has been found.
-        paths.filter(lambda (node, _): node == stopNode).foreach(lambda _: solutions.add(1))
+        paths = joined.flatMap(pathGeneratingReducer).partitionBy(numPartitions).cache()
+        # This determines if end has been found.
+        paths.filter(lambda (node, _): node == end).foreach(lambda _: solutions.add(1))
         # Get the outlying nodes
         to_search = paths.keys().distinct().map(lambda x: (x, [-1])).partitionBy(numPartitions).cache()
 
 
     # Get all of the paths that end with the node we are interested in.
-    res = paths.filter(lambda (x, y): x == stopNode).values()
+    res = paths.filter(lambda (x, y): x == end).values()
     return res
 
 
@@ -73,9 +122,10 @@ logger.LogManager.getLogger("akka").setLevel( logger.Level.ERROR )
 #titlelist = sc.textFile('../P5/generated_titles_1000_sorted.txt', 32)
 #linklist = sc.textFile('../P5/generated_links_10000_sorted.txt', 32)
 #titlelist = sc.textFile('../P5/generated_titles_10000_sorted.txt', 32)
-linklist = sc.textFile('../P5/generated_links_2mil_sorted.txt', 32)
-titlelist = sc.textFile('../P5/generated_titles_2mil_sorted.txt', 32)
-
+#linklist = sc.textFile('../P5/generated_links_2mil_sorted.txt', 32)
+#titlelist = sc.textFile('../P5/generated_titles_2mil_sorted.txt', 32)
+linklist = sc.textFile('../P5/links-simple-sorted.txt', 32)
+titlelist = sc.textFile('../P5/titles_sorted.txt', 32)
 # Uncomment these when running on AWS!
 #linklist = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt', 32)
 #titlelist = sc.textFile('s3://Harvard-CS205/wikipedia/titles-sorted.txt', 32)
@@ -85,41 +135,36 @@ numerical_titles = titlelist.zipWithIndex().cache()
 indexed_titles = numerical_titles.map(lambda (x, y): (y, x)).partitionBy(num_Partitions).cache()
 num_nodes = numerical_titles.count()
 
-# Borrowed from Professor's Github example on SparkPageRank
-def link_string_to_KV(s):
-    src, dests = s.split(': ')
-    dests = [int(to) - 1 for to in dests.split(' ')]
-    return (int(src) - 1, dests)
 
-def map_node_to_name(arr, reached_to_name):
-    ret = []
-    for elem in arr:
-        ret.append(reached_to_name[elem])
-    return ret
 
-split_list = linklist.map(link_string_to_KV).cache()
-nodes = split_list.map(lambda (x,y): int(x), True)
-assert(copartitioned(split_list, nodes))
+graph = linklist.map(link_string_to_KV).cache()
+nodes = graph.map(lambda (x,y): int(x), True)
+assert(copartitioned(graph, nodes))
 
 # Change these to be the appropriate start and end locations.
-start = "Kevin_Bacon"
-end = "Harvard_University"
+#bacon = "Kevin_Bacon"
+#harvard = "Harvard_University"
+bacon = 'TITLE_a'
+harvard = 'TITLE_c'
 
-start_node = numerical_titles.lookup(start)[0]
-end_node = numerical_titles.lookup(end)[0]
+bacon_node = numerical_titles.lookup(bacon)[0]
+harvard_node = numerical_titles.lookup(harvard)[0]
 
-paths = bfs(split_list, start_node, sc, num_Partitions, end_node)
-paths = paths.cache()
+print get_paths(graph, bacon_node, sc, num_Partitions, harvard_node, indexed_titles), '\n\n'
+print get_paths(graph, harvard_node, sc, num_Partitions, bacon_node, indexed_titles)
+
+#paths = bfs(graph, start_node, sc, num_Partitions, end_node)
+#paths = paths.cache()
 
 # Now that we have the paths, we need to get the actual names of the pages associated with those paths. 
 # Get the unique items that are reached, join that with the indexed_titles
-names_touched = paths.flatMap(lambda x: x).distinct().map(lambda node: (node, node)).partitionBy(num_Partitions).join(indexed_titles).mapValues(lambda (x, y): y)
+#names_touched = paths.flatMap(lambda x: x).distinct().map(lambda node: (node, node)).partitionBy(num_Partitions).join(indexed_titles).mapValues(lambda (x, y): y)
 
 # Extract a dictionary from the RDD, with key being the node #, and value being the name.
-reached_to_name = names_touched.collectAsMap()
+#reached_to_name = names_touched.collectAsMap()
 # Convert the paths to named paths
-named_paths = paths.map(lambda x: map_node_to_name(x, reached_to_name))
-print named_paths.collect()
+#named_paths = paths.map(lambda x: map_node_to_name(x, reached_to_name))
+#print named_paths.collect()
 
 
 

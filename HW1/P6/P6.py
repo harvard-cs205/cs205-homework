@@ -4,18 +4,21 @@
 # CS 205, Problem Set 1, P6
 #
 ##############
+# Comment out these lines when running on AWS
+import findspark
+findspark.init()
 
 from pyspark import SparkContext
 sc = SparkContext(appName="Simple")
+
+import numpy as np 
+import itertools
+from collections import Counter
 
 # Reduce the amount that Spark logs to terminal.
 logger = sc._jvm.org.apache.log4j
 logger.LogManager.getLogger("org"). setLevel( logger.Level.ERROR )
 logger.LogManager.getLogger("akka").setLevel( logger.Level.ERROR )
-
-import numpy as np 
-import itertools
-from collections import Counter
 
 # Converts list of words to list of (Word, Count) tuples
 # Arguments:
@@ -79,13 +82,16 @@ words = lines_with_numbers\
 		.filter(lambda x: not (x.isalpha() and x.isupper()))\
 		.filter(lambda x: not (x[:-1].isupper() and x[-1] == '.'))
 
+
+num_partitions = 256
+
 # This is a KV RDD with K = word index, V = word
-words_with_index = words.zipWithIndex().map(lambda (x,y): (y, x))
+words_with_index = words.zipWithIndex().map(lambda (x,y): (y, x)).partitionBy(num_partitions)
 
 # Here we subtract 1 from every index.
-offset1 = words_with_index.map(lambda (x, y): (x - 1, y))
+offset1 = words_with_index.map(lambda (x, y): (x - 1, y)).partitionBy(num_partitions)
 # Here we subtract 2 from every index.
-offset2 = words_with_index.map(lambda (x, y): (x - 2, y))
+offset2 = words_with_index.map(lambda (x, y): (x - 2, y)).partitionBy(num_partitions)
 
 # Merge the three, and that gives us phrases that are in tuples ((Word1, Word2), Word3) as we wanted.
 # GroupByKey converts this to RDD where each element is of the form ((Word1, Word2), [Word3a, Word3b, Word3c, ...])
@@ -96,7 +102,9 @@ joined_words = words_with_index\
 				.values()\
 				.groupByKey()\
 				.mapValues(getCounts)\
-				.map(lambda x: x)
+				.map(lambda x: x)\
+				.cache()
+				
 
 phrases = []
 for i in range(10):
