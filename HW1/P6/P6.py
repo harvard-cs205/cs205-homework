@@ -1,17 +1,28 @@
 from pyspark import SparkContext
 import random
 
+# define a function to account for increased chance of appearing if seen multiple times
+def thirdWord(tup):
+    thirdWords = map.value[tup]
+    words = []
+    for (x,c) in thirdWords:
+        for i in xrange(c):
+            words.append(x)
+    return random.choice(words)
+
+# define a function to filter words that do not fit our "criteria"
+def wordFilter(word):
+    if (word.isdigit()):
+        return False
+    if (word.isalpha() and word.isupper()):
+        return False
+    if (word.endswith(".") and word[:-1].isalpha() and word[:-1].isupper()):
+        return False
+    return True
+
+
 if __name__ == "__main__":
-    
-    def wordFilter(word):
-        if (word.isdigit()):
-            return False
-        if (word.isalpha() and word.isupper()):
-            return False
-        if (word.endswith(".") and word[:-1].isalpha() and word[:-1].isupper()):
-            return False
-        return True
-    
+
     # initialize SparkContext
     sc = SparkContext(appName="Markov Shakespeare")
     
@@ -39,27 +50,15 @@ if __name__ == "__main__":
     # validate the results of finalWordMap
     # print(finalWordMap.lookup(("Now","is")).collect())
     
-    # broadcast the final word map
-    map = sc.broadcast(finalWordMap.collect())
+    # broadcast the final word map as a dictionary
+    map = sc.broadcast(dict(finalWordMap.collect()))
     
     # choose 10 starting pairs of words to begin
-    phrases = sc.parallelize(random.choice(map.value) for i in xrange(10))
+    phrases = sc.parallelize(random.choice(map.value.keys()) for i in xrange(10))
     
     # rearrange into list format
-    phrases = phrases.map(lambda tup: [tup[0][0], tup[0][1]])
-    
-    # convert the broadcast map into a dictionary
-    dct = dict(map.value)
-    
-    # define a function to account for increased chance of appearing if seen multiple times
-    def thirdWord(tup):
-        thirdWords = dct[tup]
-        words = []
-        for (x,c) in thirdWords:
-            for i in xrange(c):
-                words.append(x)
-        return random.choice(words)
-    
+    phrases = phrases.map(lambda tup: [tup[0], tup[1]])
+        
     # iterate to obtain 20 words total
     for i in xrange(18):
         phrases = phrases.map(lambda phrase: phrase + [thirdWord((phrase[-2],phrase[-1]))])
