@@ -5,6 +5,6 @@ Finding Directed Paths
 
 The shortest path from Kevin_Bacon to Harvard_University is distance = 2  (see P5_bfs.py)
 
-The sortest path from Harvard University to Kevin_Bacon is distance =   (see P5_fromHarvardtoBacon.py)
+The sortest path from Harvard University to Kevin_Bacon is distance =  3 (see P5_fromHarvardtoBacon.py)
 
 
