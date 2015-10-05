@@ -1,1 +1,27 @@
-# Your discussion here
+## Discussion
+———————————————
+
+My graph data structure is represented as a dictionary in python where the key is the character and the value is a list of the character’s neighbors. Please find below for the logs from the execution of the three sample characters.
+
+CAPTAIN AMERICA: 
+The number of new visited nodes corresponding to depth 1 is 1906
+The number of new visited nodes corresponding to depth 2 is 4463
+The number of new visited nodes corresponding to depth 3 is 38
+The number of new visited nodes corresponding to depth 4 is 0
+
+Total nodes visited: 6408
+MISS THING/MARY: 
+The number of new visited nodes corresponding to depth 1 is 6
+The number of new visited nodes corresponding to depth 2 is 0
+
+Total nodes visited: 7
+ORWELL: 
+The number of new visited nodes corresponding to depth 1 is 8
+The number of new visited nodes corresponding to depth 2 is 0
+
+Total nodes visited: 9
+
+
+As we can see from the result above, the diameter for CAPTAIN AMERICA, whereas the diameters for the rest two characters are 1. MAX = 10 means that the graph’s diameter should not exceed 10. Characters that exceed 10 will be discarded.
+
+If the character is not defined is a graph, it means that character is not in the connected components.

@@ -1,1 +1,5 @@
 # Your discussion here
+
+From the histogram produced by P2a.py, we found that a lot of computation (iterations) is focused on some specific partitions. Ideally, if we want to take full advantage of parallel computing, we want to partition elements so that each partition should take roughly the same amount of time (load balanced partition). By adding a shuffle line, we found that the computation histogram produced by P2b.py shows a distribution close to normal, indicating that computation is distributed across partitions evenly.
+
+The tradeoff is the shuffle time here. If we want to distribute the computation evenly, we need to take the shuffle time into account. In this problem, the P2a and P2b takes similar time.
