@@ -1,0 +1,9 @@
+# Your discussion here
+
+Finding Directed Paths:
+From “Kevin Bacon” to “Harvard University”, one of the shortest path is 
+[u'Kevin_Bacon', u'Marisa_Silver', u'Harvard_University'](takes only a few seconds)
+
+For the opposite direction, it'll take too much time. 
+
+
