@@ -26,10 +26,13 @@ table_heros=L_table_filtered_comics.map(lambda TFC: (TFC[0][0], TFC[1][1]))
 
 # then group by hero
 hero_graph=table_heros.reduceByKey(lambda x,y: x+y)
+# get rid of duplications
 hero_graph=hero_graph.mapValues(set)
 hero_graph=hero_graph.mapValues(list)
+# filter out the key hero in the neighbor list
 hero_graph=hero_graph.map(lambda (K,V): (K, [x for x in V if x!=K]))
 
+# try out these strings
 v_str1='"CAPTAIN AMERICA"'
 v_str2='"MISS THING/MARY"'
 v_str3='"ORWELL"'
