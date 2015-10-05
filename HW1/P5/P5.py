@@ -62,15 +62,17 @@ while not found:
     newdists = newdists.mapValues(update_dist)
     dist = newdists.union(dist).reduceByKey(
     lambda x,y: max(x,y))
+    
     if dist.filter(lambda (k,v): k==target and v>=0).count() > 0:
-        found = True      
+        found = True
+
     counter += 1
 
 # Recover a shortest path    
-lenfromstart = -1
 length = 0
 wherefrom = target
 final_path = [target]
+
 while wherefrom != startpage:
     wherefrom = dist.filter(lambda (k,v): k==wherefrom).first()[1][1][0]
     final_path.append(wherefrom)
