@@ -1,16 +1,23 @@
-def BFS(start, rdd):
-    visited = set()
+from pyspark import AccumulatorParam
+
+def BFS(start, rdd, sc):
+    class SetAccumulatorParam(AccumulatorParam):
+        def zero(self, initialValue):
+            return set()
+
+        def addInPlace(self, v1, v2):
+            v1 |= v2
+            return v1
+    visited = sc.accumulator(set(), SetAccumulatorParam())
+    #visited = set()
     not_visited = set([start])
     iteration = 0
-    nums = []
-    #print not_visited
+    
     while(len(not_visited)>0):
         iteration += 1
-        all_paths = rdd.filter(lambda KV: KV[0] in not_visited).collect()
-        visited |= not_visited
-        children = set()
-        for KV in all_paths:
-            children |= set(KV[1])
-        not_visited = children-visited
+        pre = set(list(visited.value))
+        rdd.filter(lambda (K, V): K in not_visited).foreach(lambda (K, V): visited.add(V))
+        print iteration, start, len(visited.value), len(pre)
+        not_visited = visited.value-pre
 
-    return len(visited)-1, iteration
+    return len(visited.value)-1, iteration

@@ -1,48 +1,32 @@
-from P4_bfs import *
 import findspark
 findspark.init('/home/toby/spark')
-
 import pyspark
-
 sc = pyspark.SparkContext(appName="Spark 2")
-myfile = "source.csv"
+sc.setLogLevel('WARN') 
 
-graph = sc.textFile(myfile)
+from P4_bfs import *
+if __name__ == '__main__':
 
-def parser(string):
-    words = string.split("\"")
-    return words[3].strip(), words[1].strip()
+    myfile = "source.csv"
+    graph = sc.textFile(myfile)
 
-graph = graph.map(parser)
-graph = graph.join(graph)
-graph = graph.filter(lambda element: element[1][0]!=element[1][1])
+    def parser(string):
+        words = string.split("\"")
+        #return words[3], words[1]
+        return words[3].strip(), words[1].strip()
 
-graph = graph.map(lambda element: (element[1][0], set([element[1][1]])))
-graph = graph.reduceByKey(lambda a, b: a|b)
-graph = graph.map(lambda element: (element[0], list(element[1])))
-graph = graph#.partitionBy(100)
-path = graph.collectAsMap()
+    graph = graph.map(parser)
+    graph = graph.join(graph) # pair up two characters
+    graph = graph.filter(lambda (book, chars): chars[0]!=chars[1]) # delete self edge
+
+    graph = graph.map(lambda (book, chars): (chars[0], set([chars[1]])))
+    graph = graph.reduceByKey(lambda a, b: a|b) # [key, set(children)]
+    graph = graph.partitionBy(16)
 
 
-characters = ["CAPTAIN AMERICA", "MISS THING/MARY", "ORWELL"]
-num_nodes = []
-for character in characters:
-    num_nodes.append(BFS(character, graph))
-for character in characters:
-    print character, "has"
-print num_nodes
-
-#print graph.map(lambda x: x).lookup("M")
-#print graph.filter(lambda KV: KV[0]=="MISS THING/MARY").collect()
-#print "Number of nodes visited is", num_nodes 
-#print graph.map(lambda x: x).lookup("MISS THING/MARY")
-#print path["MISS THING/MARY"]
-#for Key, Value in a.iteritems():
-#    print Key, ":", Value
-#    print
-#    print
-#print path['STERLING'] 
-#print path['PANTHER CUB/']
-#print path['SWORDSMAN IV/']
-#print path['AMAZO-MAXI-WOMAN/']
-#print path['DARLEGUNG, GEN.']
+    characters = ["CAPTAIN AMERICA", "MISS THING/MARY", "ORWELL"]
+    num_nodes = []
+    for character in characters:
+        num_nodes.append(BFS(character, graph, sc))
+    for i, character in enumerate(characters):
+        print character, "is connected by", num_nodes[i]
