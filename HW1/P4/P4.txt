@@ -1,8 +1,18 @@
-If a character does not have a defined distance during the search then it means that it is not connected to the root node via any path.
+If a character does not have a defined distance during the search
+then it means that it is not connected to the root node via any path.
 
-The diameter D can be thought of as the length of the longest path among all shortest paths between any two nodes in the graph. If D = 1, it means the longest path is only 1 edge, which also implies that our iterative algorithm only needs to run 1 iteration. Thus, in general D is the maximum number of iterations the search has to run in order to find all paths from a single source.
+The diameter D can be thought of as the length of the longest path
+among all shortest paths between any two nodes in the graph. If D = 1,
+it means the longest path is only 1 edge, which also implies that our
+iterative algorithm only needs to run 1 iteration. Thus, in general D
+is the maximum number of iterations the search has to run in order to
+find all paths from a single source.
 
-In the problem, the graph representation is a pair of (V, E) of nodes and edges. Nodes are represented as a pair RDD mapping from a hero to the distance from the source. Initially the distance is set to inifinity and is updated as it is discovered in the search. Edges are represented as a pair RDD mapping from a hero to list of neighbors.
+In the problem, the graph representation is a pair of (V, E) of nodes
+and edges. Nodes are represented as a pair RDD mapping from a hero to
+the distance from the source. Initially the distance is set to inifinity
+and is updated as it is discovered in the search. Edges are represented
+as a pair RDD mapping from a hero to list of neighbors.
 
 The number of touched nodes for the 3 heros are:
 
@@ -10,7 +20,9 @@ The number of touched nodes for the 3 heros are:
 "MISS THING/MARY":	7
 "ORWELL":			9
 
-Below is the full output of the program printed for two separate runs. The first run uses a diameter of 10, the second uses accumulator to detect if the search has converged.
+Below is the full output of the program printed for two separate runs.
+The first run uses a diameter of 10, the second uses accumulator to
+detect if the search has converged.
 
 *****************************************************************
 ********************* USING DIAMETER SEARCH *********************

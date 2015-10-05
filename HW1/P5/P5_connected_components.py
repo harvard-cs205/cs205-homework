@@ -2,13 +2,13 @@ from operator import add
 import time
 import sys
 
-# import findspark
-# findspark.init('/home/lhoang/spark')
+import findspark
+findspark.init('/home/lhoang/spark')
 
 import pyspark
 sc = pyspark.SparkContext(appName="spark1")
 
-partition_size = 256
+partition_size = 32
 default_distance = sys.maxint
 sum_distance = sc.accumulator(0)
 sum_neighbors = sc.accumulator(0)
@@ -229,7 +229,7 @@ def min_search(nodes, edges):
 
     # initially set the value of each node to itself
     node_membership = nodes.map(
-        lambda kv: (kv[0], kv[0]), preservesPartitioning=True)
+        lambda kv: (kv[0], kv[0]), preservesPartitioning=True).cache()
 
     i = 0
     previous_sum_neighbors = 0
@@ -357,18 +357,18 @@ def main():
     # links_file = 'links_bug.smp'
     # links_file = '../P4/source.csv'
     # links_file = 'links-simple-sorted-10k.txt'
-    # links_file = 'links-simple-sorted-3.txt'
-    links_file = 's3://Harvard-CS205/wikipedia/links-simple-sorted.txt'
+    links_file = 'links-simple-sorted.txt'
+    # links_file = 's3://Harvard-CS205/wikipedia/links-simple-sorted.txt'
 
-    print '----- Symmetric Graph -----'
-    start = time.time()
+    # print '----- Symmetric Graph -----'
+    # start = time.time()
 
-    nodes_sym, edges_sym = create_symmetric_graph(links_file)
-    find_components_min(nodes_sym, edges_sym)
+    # nodes_sym, edges_sym = create_symmetric_graph(links_file)
+    # find_components_min(nodes_sym, edges_sym)
 
-    print 'Time: ' + repr(time.time() - start)
+    # print 'Time: ' + repr(time.time() - start)
 
-    print '---------------------------'
+    # print '---------------------------'
 
     print '-----   Dual Graph    -----'
     start = time.time()
