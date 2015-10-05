@@ -2,7 +2,7 @@
 # findspark.init()
 import pyspark
 sc = pyspark.SparkContext()
-
+N = 32
 
 def link_string_to_KV(s):
         src, dests = s.split(': ')
@@ -57,7 +57,7 @@ def shortest_path(graph, nodeA, nodeB, N):
         
         assert copartitioned(nodes_3, nodes_4)
 
-        nodes = nodes.cogroup(nodes_2).map(lambda x: (x[0], get_first_non_empty_cogroup(list(x[1])))).partitionBy(8).cache()
+        nodes = nodes.cogroup(nodes_2).map(lambda x: (x[0], get_first_non_empty_cogroup(list(x[1])))).partitionBy(N).cache()
 
         
         if nodes_2.map(lambda x: x[0]).filter(lambda x: node_destination[0] == x).count() > 0:
@@ -80,22 +80,21 @@ def shortest_path(graph, nodeA, nodeB, N):
 def transformToWords(b):
     path = []
     for i in b:
-        if len(i)>1:
-
-            path.append([page_names.lookup(j)[0] for j in i])
-        else:
-
+        if type(i[0]) is int:
             path.append(page_names.lookup(i[0])[0])
+        else:
+            for j in i:           
+                path.append([page_names.lookup(k)[0] for k in j])
     return path
 
 if __name__ == '__main__':
 
 
-    links = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt')
-    page_names = sc.textFile('s3://Harvard-CS205/wikipedia/titles-sorted.txt')
+    # links = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt')
+    # page_names = sc.textFile('s3://Harvard-CS205/wikipedia/titles-sorted.txt')
 
-    # links = sc.textFile('./testdata.txt')
-    # page_names = sc.textFile('./pages.txt')
+    links = sc.textFile('./testdata.txt')
+    page_names = sc.textFile('./pages.txt')
     # process links into (node #, [neighbor node #, neighbor node #, ...]
 
     neighbor_graph = links.map(link_string_to_KV)
@@ -108,9 +107,9 @@ if __name__ == '__main__':
     page_names = page_names.sortByKey().cache()
 
     
-    [distKH, pathKH] = shortest_path(neighbor_graph, Kevin, Harvard, 32)
+    [distKH, pathKH] = shortest_path(neighbor_graph, Kevin, Harvard, N)
 
-    [distHK, pathHK] = shortest_path(neighbor_graph,  Harvard, Kevin, 32)
+    [distHK, pathHK] = shortest_path(neighbor_graph,  Harvard, Kevin, N)
 
     print "The distance from Harvard University to Kevin Bacon is", distHK,"and the possible paths are:", transformToWords(pathHK),". The distance from Kevin Bacon to Harvard University is", distKH,"and the possible paths are:", transformToWords(pathKH)
 
