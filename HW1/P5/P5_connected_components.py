@@ -106,11 +106,11 @@ def connected_components(graph, N):
 if __name__ == '__main__':
 
 
-    # links = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt')
-    # page_names = sc.textFile('s3://Harvard-CS205/wikipedia/titles-sorted.txt')
+    links = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt')
+    page_names = sc.textFile('s3://Harvard-CS205/wikipedia/titles-sorted.txt')
 
-    links = sc.textFile('./testdata.txt')
-    page_names = sc.textFile('./pages.txt')
+    # links = sc.textFile('./testdata.txt')
+    # page_names = sc.textFile('./pages.txt')
     # process links into (node #, [neighbor node #, neighbor node #, ...]
 
     neighbor_graph = links.map(link_string_to_KV)
