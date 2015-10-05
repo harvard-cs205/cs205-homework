@@ -2,17 +2,18 @@ import pyspark
 
 def Graph_BFS(graph, v_str, limitedDiam,sc):
     
+    # function for flatMaping certain level of nodes to a series of nodes
     def DistrFunc(node):
         dist=node[1][1]
         currNode=node[0]
         listNeighbors=node[1][0]
-        #currLevel=node[1][2]
         result=[node]
         if dist==currLevel:
             for neighbor in listNeighbors:
                 result.append((neighbor, ([],dist+1)))
         return result
-
+    
+    # function for reduceByKey, updating the the distance and neighbor list
     def reduceFunc(var1,var2):
         dist1=var1[1]
         neighbor1=var1[0]
@@ -28,12 +29,13 @@ def Graph_BFS(graph, v_str, limitedDiam,sc):
         neighbor=neighbor1+neighbor2
         return (neighbor, d)
     
-    # map each node in graph rdd to tuple
+    # BFS start:
+    # preprocessing, map each node in graph rdd to tuple
     SG=graph.map(lambda node: (node[0],(node[1], 0)) if node[0]==v_str else (node[0],(node[1], 1000)))
     Diameter=10
-    currLevel=0
+    currLevel=0  # current level
     numVisitedNodes = sc.accumulator(1)
-    if limitedDiam:
+    if limitedDiam:  # is diameter limited? 
         while currLevel<Diameter:
             SG=SG.flatMap(DistrFunc)
             SG=SG.reduceByKey(reduceFunc)
@@ -53,4 +55,4 @@ def Graph_BFS(graph, v_str, limitedDiam,sc):
             else:
                 currLevel=currLevel+1
 
-    print 'Total: ', numVisitedNodes.value
+    print 'Total Nodes Touched: ', numVisitedNodes.value
