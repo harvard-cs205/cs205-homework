@@ -1,1 +1,14 @@
-# Your discussion here
+
+
+Discuss your choice in terms of 
+
+	I chose to employ a random shuffle of the cartesian coordinates in order to produce a more balanced computational load for the partitions. 
+
+(a) how well it balances work:
+	
+	I believe this partitioning balancing stategy works well for this problem. This is because there is a low computation cost to executing a random shuffle of data elements, it is definately less costly than employing a logical partitioning method on the graph. It achieves greater load balancing than the default partitioning because the default paritioning is based on the numerical values of the cartisian coordinates. These numerical values do not balance the load, because there are large, geometrically adjacent portions of the graph which have almost no computational cost. These adjacent portions of the graph are placed in the same partition by default, a partition which then has a low computational density. However, portions of the graph which are much more computationally expensive are also adjacent to eachother, and as a result of the default numerical partitioning strategy, are assinged to the same partition. By randomly shuffling the cartesian coordinates, we ensure that the computational expensive areas of the mandelbrot function are more likely to be uniformily dispersed. These results are visually evident the the two attached graphs: P2a_hist.png and P2b_hist.png. The first graph displays the unshuffled and unbalanced computation spread across workers, while the second graph shows a more uniformily dispersed computational strategy associated with shuffling the coordinates. 
+
+
+(b) its costs, particularly shuffle costs.
+
+	There is a cost with balancing the work more uniformily; this is a shuffle cost. This cost in linear, and does take up extra memory, which could be problematic as the data to be shuffled grows very large. However, I believe in this particualr instance the cost is worth the performance gain in load balancing. 
