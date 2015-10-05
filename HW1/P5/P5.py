@@ -10,8 +10,6 @@ sc.setLogLevel("ERROR")
 #loading in the data
 links = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt')
 page_names = sc.textFile('s3://Harvard-CS205/wikipedia/titles-sorted.txt')
-#links = sc.textFile('test.txt')
-#page_names = sc.textFile('test2.txt')
 
 #zip page names with index to get a table for us to reference which page is which
 page_names = page_names.zipWithIndex().map(lambda (K, V): (V+1, K)).cache()
@@ -25,9 +23,16 @@ print Harvard_ID
 print Bacon_ID
 
 #determine shortest path between Harv->Bacon and Bacon->Harv
-
 print bfs(Bacon_ID,links,sc,Harvard_ID)
 print bfs(Harvard_ID,links,sc,Bacon_ID)
+
+#COMMENTING OUT CONNECTED COMPONENTS BELOW BECAUSE IT IS EXTRA CREDIT. PLEASE
+#LOOK AT P5_CONNECTED_COMPONENTS.PY CODE FOR MY WORK ON THIS PART OF THE QUESTION. 
+#HOWEVER, AWS RUNS FOR A VERY LONG TIME WHEN I TRY TO RUN THIS PART OF MY CODE. 
+#THANKS! :) 
+
 #print connected_components(Harvard_ID,links,sc)
+
+
 
 

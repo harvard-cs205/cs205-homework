@@ -10,16 +10,21 @@ def copartitioned(RDD1, RDD2):
 sequence = []
   
 def bfs(SOURCE,Graph,sc,DEST=False):
+    #set source as source node and distance to 0    
     node1 = [(SOURCE,0)]
     node1 = sc.parallelize(node1).partitionBy(128)
     final_rdd1 = node1    
+    #set first step in sequence to be source node    
     sequence.append(SOURCE) 
     at_destination = False
+    #create while loop that continues until we hit our destination node.    
     while not at_destination:
         
+        #join with Graph to get neighbors
         node1 = Graph.join(node1)
         assert copartitioned(node1, Graph)        
         
+        #update distance to +1
         node1 = node1.distinct().values().mapValues(lambda x: x+1).partitionBy(128)
         
         node2 = node1.subtractByKey(final_rdd1)                   
@@ -27,18 +32,21 @@ def bfs(SOURCE,Graph,sc,DEST=False):
         
         node1 = node2
         
+        #add found neighbors to final RDD
         final_rdd2 = final_rdd1.union(node1)
         assert copartitioned(final_rdd2,final_rdd1)
         
         final_rdd1 = final_rdd2
         final_rdd1.cache()
         
+        #check to see if at destination
         if final_rdd1.lookup(DEST):
            at_destination = True
     
     final_rdd_g1 = final_rdd1.groupByKey().mapValues(list)
     final_rdd_g1.cache()
     
+    #Determine the steps to our destination node at distances of 2 and/or 3
     distance = np.min(final_rdd_g1.lookup(DEST))
     if distance == 2:
         RDD1 = final_rdd1.filter(lambda (K,V): V == (distance - 1)).partitionBy(128)
@@ -47,7 +55,8 @@ def bfs(SOURCE,Graph,sc,DEST=False):
         RDD4 = RDD3.keys()
         sequence.append(RDD4.collect()[0])
         sequence.append(DEST)
-  
+    
+    #returns 1 of the shortest paths. not all.
     if distance == 3:
         RDD1 = final_rdd1.filter(lambda (K,V): V == (distance - 1)).partitionBy(128)
         RDD2 = Graph.join(RDD1)
@@ -60,7 +69,5 @@ def bfs(SOURCE,Graph,sc,DEST=False):
         sequence.append(RDD4)
         sequence.append(RDD8)
         sequence.append(DEST)
-        
-        
+                
     return np.min(final_rdd_g1.lookup(DEST)), sequence
-    #return np.min(final_rdd_g1.lookup(DEST))

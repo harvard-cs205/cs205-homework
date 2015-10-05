@@ -13,6 +13,7 @@ def connected_components(SOURCE,Graph,sc,):
     node1 = sc.parallelize(node1).partitionBy(128)
     Components_sym = []
     Graph2 = Graph.map(lambda (K,V): (V,K))
+    #create undirected Graph of A->B now also has B->A    
     Graph_sym = Graph.union(Graph2).distinct().groupByKey().partitionBy(128).cache()
     final_rdd1_sym = node1
     node1_sym = node1
