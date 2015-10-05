@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt 
 import matplotlib.cm as cm
 sc = SparkContext("local")
-
+sc.setLogLevel("ERROR")
 
 def mandelbrot(x, y):
     z = c = complex(x, y)
@@ -48,6 +48,6 @@ pixels = pix1D.cartesian(pix1D).partitionBy(100).repartition(100)
 mandrdd = pixels.map(lambda i: (i, mandelbrot((i[1]/500.)-2,(i[0]/500.0)-2)))
 
 plt.hist(sum_values_for_partitions(mandrdd).collect())
-plt.savefig("P2b_hist.png")
 plt.xlabel("Iteration Count")
 plt.ylabel("Count")
+plt.savefig("P2b_hist.png")

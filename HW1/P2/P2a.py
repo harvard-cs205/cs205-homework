@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import random
 sc = SparkContext("local")
+sc.setLogLevel("ERROR")
 
 #import functions from HW
 def mandelbrot(x, y):
@@ -35,13 +36,12 @@ def draw_image(rdd):
     plt.imshow(im, cmap=cm.gray)
     plt.show()
 
-#define single array of 2000 pixels and use .cartesian to get 2 dimensions.
+#define single array of 2000 pixels and use .cartesian() to get 2 dimensions.
 #partition size of 10 is initially used because .cartesian results in 10x10 = 100    
 pixel = range(2000)
 pix1D=sc.parallelize(pixel,10)
 pixels = pix1D.cartesian(pix1D)
 mandrdd = pixels.map(lambda i: (i, mandelbrot((i[1]/500.)-2,(i[0]/500.0)-2)))
-mandrdd.take(3)
 draw_image(mandrdd)
 plt.hist(sum_values_for_partitions(mandrdd).collect(),bins=6)
 plt.xlabel("Iteration Count")
