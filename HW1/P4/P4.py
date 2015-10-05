@@ -19,15 +19,16 @@ if __name__ == "__main__":
     edges_rdd = edges_rdd.union(edges_rdd.map(lambda (k, v): (v, k), True))  # undirected graph
     edges_rdd = edges_rdd.distinct(N).filter(lambda (hero1, hero2): hero1 != hero2)  # filter duplicates, links to self
 
-    # Now group by character for easy retrieval:
+    # Now group by character for easy retrieval (only needed for (1) and (3)):
     graph = edges_rdd.groupByKey(numPartitions=N).mapValues(list).sortByKey(numPartitions=N)
     graph.cache()
 
-    print "DONE BUILDING GRAPH. STARTING BFS..."
+    print "Done building graph. Starting BFS . . .",
 
     # Distance to nodes in network (Choose...)
-    # one = distance_to_all_nodes_serial("ORWELL", graph).collect()  # SERIAL VERSION
-    two = distance_to_all_nodes_edge("CAPTAIN AMERICA", edges_rdd, N).collect()  # EDGE TUPLE VERSION (preferred)
-    # three = distance_to_all_nodes_spark("ORWELL", graph).collect()  # GRAPH-LIST VERSION
-    print two
-    print "Nodes: ", len(two)
+    # result = distance_to_all_nodes_spark("ORWELL", graph).collect()  #  (1) GRAPH-LIST VERSION w/ accumulator
+    result = distance_to_all_nodes_edge("CAPTAIN AMERICA", edges_rdd, N).collect()  # (2) EDGE TUPLE VERSION (preferred)
+    # result = distance_to_all_nodes_serial("ORWELL", graph).collect()  # (3) SERIAL VERSION
+    print result
+    print "Nodes: ", len(result)
+

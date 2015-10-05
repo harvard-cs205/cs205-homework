@@ -9,6 +9,7 @@
 
 ## Directory-based project format:
 .idea/
+/HW1/P5/Keypair.pem
 # if you remove the above rule, at least ignore the following:
 
 # User-specific stuff:
