@@ -13,21 +13,21 @@ WHAT DOES IT MEAN IF A CHARACTER DOES NOT HAVE A DEFINED DISTANCE DURING THE SEA
 If a character does not have a defined distance, it means that the character is not connected to all of the other characters. This is if the character is either alone or other characters are alone and do not connect to other characters. Therefore, if one character is alone, it will not have a distance during this search as it is not connected to all other characters. The distance for this matter is just telling us how far we must go from that character to obtain to connect to all of the other characters in the graph.
 
 
-CODE OUTPUT/ NUMBER OF TOUCHED NODES IN EACH OF THE SEARCHES:
+CODE OUTPUT/ NUMBER OF TOUCHED NODES IN EACH OF THE SEARCHES (INCLUDING ITSLEF):
 Character's Name:  CAPTAIN AMERICA
 Iteration:  3
 New Number of Characters:  19
 First Character Numbers:  6426
-Number of Characters Not Touched:  6407
+Number of Characters Not Touched:  6408
 
 Character's Name:  MISS THING/MARY
-Iteration:  2
+Iteration:  1
 New Number of Characters:  6419
 First Character Numbers:  6426
 Number of Characters Not Touched:  7
 
 Character's Name:  ORWELL
-Iteration:  2
+Iteration:  1
 New Number of Characters:  6417
 First Character Numbers:  6426
 Number of Characters Not Touched:  9

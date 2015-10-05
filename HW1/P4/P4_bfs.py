@@ -1,4 +1,3 @@
-#matts better bfs
 def SSBFS(RDD,character_name):
 	# CREATE AN RDD THAT HAS ALL OF THE CHARACTERS AND THEIR CONNECTIONS
 	# GET INITIAL COUNT OF THE RDD SO THAT WE CAN COMPARE HOW MANY HAVE CHANGED
@@ -23,7 +22,8 @@ def SSBFS(RDD,character_name):
 	charsListNumNew=charsList.count()
 
 	# SET THE ITERATION TO 0 FOR THE SEARCH AND PRINT CURRENT STATE
-	iteration=0
+	
+	iteration=sc.accumulator(0)
 	print "##BEGIN##"
 	print "Iteration:",iteration
 	print "New Characters:",charsListNumNew
@@ -56,7 +56,7 @@ def SSBFS(RDD,character_name):
 	    print "Iteration:",iteration
 	    print "New Characters:",charsListNumNew
 	    print "Old Characters:",charsListNumOld
-	
+	iteration=iteration.value-1
 	# PRINT THE FINAL STATE OF THE ANALYSIS WITH THE OUTPUT REQUESTED
 	print"###DONE###"
 	print "Iteration:",iteration

@@ -51,10 +51,10 @@ iteration,charsListNumNew,charsListNumFirst=SSBFS(connections,characterName)
 
 print "#################"
 print "Character's Name: ", characterName
-print "Iteration: ",iteration
+print "Iteration: ",iteration+1
 print "New Number of Characters: ",charsListNumNew
 print "First Character Numbers: ", charsListNumFirst
-print "Number of Characters Not Touched: ", charsListNumFirst-charsListNumNew
+print "Number of Characters Not Touched: ", (charsListNumFirst-charsListNumNew+1)
 
 
 ############ DO THE ANALYSIS FOR MISS THING/MARRY#########

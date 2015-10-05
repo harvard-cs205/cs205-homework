@@ -1,1 +1,12 @@
-# Your discussion here
+
+From Harvard_University to Kevin_Bacon it took 3 steps.
+
+The path it took was the following: 
+
+Harvard_University to Gilmore_Girls to Liza_Weil to Kevin_Bacon
+
+From Kevin_Bacon to Harvard_University it took 2 steps.
+
+The path it took was the following: 
+
+Kevin_Bacon to College_Bowl to Harvard_University
