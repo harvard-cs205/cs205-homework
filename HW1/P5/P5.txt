@@ -1,1 +1,15 @@
 # Your discussion here
+
+1. Find Shortest Paths (Finding Directed Paths)
+
+(1) Harvard_University -> Kevin_Bacon
+[u'2152782', u'4530382', u'44868', u'2729536']
+[u'Harvard_University', u'September_8', u'1958', u'Kevin_Bacon']
+
+(2) Kevin_Bacon -> Harvard_University
+[u'2729536', u'2578703', u'2152782']
+[u'Kevin_Bacon', u'John_Lithgow', u'Harvard_University']
+
+(3) Korea -> Harvard_University (this is for interesting pair)
+[u'2784007', u'3829551', u'2152782']
+[u'Korea', u'Paleolithic', u'Harvard_University']
