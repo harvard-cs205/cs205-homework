@@ -1,0 +1,22 @@
+# Your discussion here
+
+1. [u'thy', u'pains;', u'And', u'to', u'the', u'King', u'of', u'France', u'and', u'Burgundy,', u'Gloucester.', u'Glou.', u'Come',u'hither,', u'come', u'hither.', u'What', u'is',u'the',u'very']
+
+2. [u'James,', u"There's", u'toys', u'abroad-anon', u"I'll", u'tell', u'you', u'what', u'you', u'have', u'a', u'good', u'conscience.', u'The', u'very', u'thought', u'of', u'this', u'agreement', u'for']
+
+3. [u'done,', u'And', u'we', u'will', u'not', u'be', u'a', u'man.', u'But', u'art', u'thou', u'that', u'dost', u'almost', u'persuade', u'Justice', u'to', u'break', u'the', u'smallest']
+
+4. [u'to', u'door.', u'Enter', u'and', u'his', u'train', u'Huntsman,', u'charge', u'thee,', u'And', u'thou', u'shalt', u'have', u'a', u'good', u'conscience.', u'The', u'very', u'thought', u'of']
+
+5. [u'praises', u'from', u'your', u'father.', u'Your', u'honour', u'and', u'your', u'brother', u'from', u'the', u'King,', u'and', u'have', u'heard', u'of', u'the', u'world,', u'And', u'on']
+
+6. [u'your', u'fellows.', u"I'd", u'have', u'you', u'been', u'all', u'this', u'while', u'sheds', u'not', u'a', u'man', u'of', u'his', u'own', u'hand', u'did', u'stay.', u'Romeo,']
+
+7. [u'will', u'resolve', u'you', u'herein', u'presently.', u'Exit', u'This', u'is', u'the', u'very', u'same', u'day', u'did', u'never', u'see', u'the', u'writing.', u'do', u'beseech', u'you,']
+
+8. [u'yet-', u'and', u'with', u'a', u'man', u'of', u'his', u'own', u'hand', u'did', u'stay.', u'Romeo,', u'that', u'did', u'love', u'you', u'bear', u'me', u'a', u'cup']
+
+9. [u'speak', u'So', u'well,', u'nothing', u'so', u'becomes', u'a', u'man', u'of', u'his', u'own', u'hand', u'did', u'stay.', u'Romeo,', u'that', u'did', u'love', u'you', u'bear']
+
+10. [u'a', u'better', u'man', u'than', u'Troilus.', u'Will', u'you', u'be', u'not', u'so', u'much', u'as', u'to', u'say', u'the', u'truth,', u'so', u'did', u'you,', u'Peto;']
+
