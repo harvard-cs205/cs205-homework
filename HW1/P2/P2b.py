@@ -19,10 +19,3 @@ draw_image(rdd2)
 computeEffort = sum_values_for_partitions(rdd2)
 plt.hist(computeEffort.collect())
 plt.savefig('Randomized partitioning')
-
-# # Divide mandelbrot computation into 100 partitions
-# rdd = sc.parallelize(board)
-# rdd1 = rdd.zipWithIndex()
-# # Want to change index to the index modulo 100 (# of partitions)
-# rdd2 = rdd1.map(lambda (pos, idx): (pos, idx % 100))
-# rdd2.sort()

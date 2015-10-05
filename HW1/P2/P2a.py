@@ -10,7 +10,7 @@ rdd1 = rdd.cartesian(rdd)
 rdd2 = rdd1.map(lambda (i,j): ((i,j), mandelbrot(j/500.0 - 2, i/500.0 - 2)))
 
 # Draw image
-#draw_image(rdd2)
+draw_image(rdd2)
 
 # Produce histogram of compute effort on each partition
 computeEffort = sum_values_for_partitions(rdd2)

@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt 
 import matplotlib.cm as cm
-import pyspark 
+import pyspark
 
 def mandelbrot(x, y):
     z = c = complex(x, y)

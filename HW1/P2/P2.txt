@@ -4,3 +4,12 @@
 # Best results so far with 1 executor/worker-node (--num-executors)
 # 4-8 cores/executor (--executor-cores)
 # 5+ GB/executors (--executor-memory)
+# copartitioned: rdd1.partitioner == rdd2.partitioner
+# Search prof's name on github and look at most recent repo
+# can use assert to test
+# page_ranks = neighbors.mapValues(lambda _ : 1.0) -> changes all values to 1.0
+# assert copartitioned(neighbors, page_ranks) COSTS NOTHING BTW. just checks that 2 rdds have the same partitions.
+# partitionBy(), map(preservingPartitioning=True)
+
+After hadoop@...
+# spark-submit --num-executors 4 --executor-cores 4 --executor-memory 8gPageRank.py
