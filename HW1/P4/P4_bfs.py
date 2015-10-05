@@ -31,9 +31,9 @@ def BFS(MC_Graph, init_node):
 
     # Accumulator set to 0
     accum = sc.accumulator(0) 
-
+    iterate_flag = True
     # Perform BFS iteratively. Each iteration expands the search frontier by one hop.
-    for i in xrange(diameter):    
+    while iterate_flag:    
 
         #########################################################################
         # This step first use rdd.filter() to optimize the amount of data transferred 
@@ -47,13 +47,17 @@ def BFS(MC_Graph, init_node):
         updated_nodes = MC_Graph_bfs.filter(lambda x: 
             x[1][2] == False).flatMap(
             partial(update_graph, 
-                mc_graph = broadcast_graph)).groupByKey().mapValues(reduce_nodes)
-        
-        print 'activation number: ', updated_nodes.count()
-        
+                mc_graph = broadcast_graph, accum = accum)).groupByKey().mapValues(reduce_nodes)
+                
         # Since only a part of MC_Graph_bfs is updated each time, union the used and 
         # unused nodes to get the most up-to-date gragh
         MC_Graph_bfs = MC_Graph_bfs.filter(lambda x: x[1][2] == True).union(updated_nodes)
+
+        #Stop when no new nodes are found in current iteration
+        if (accum.value == 0):
+            iterate_flag = False
+        else:
+            accum = sc.accumulator(0)
       
     # get the number of touched nodes by counting the number of nodes with distance 
     # smaller than infinite  
@@ -68,8 +72,7 @@ def BFS(MC_Graph, init_node):
 #
 #########################################################################
 
-def update_graph(node, mc_graph):
-
+def update_graph(node, mc_graph, accum):
     # extract values from node for clarity
     character_name = node[0]
     adj_list = node[1][0]
@@ -91,7 +94,7 @@ def update_graph(node, mc_graph):
                 result.append(new_node)
         # Set the is_used state to True since it has already touch its adj_list
         node[1][2] = True
-    
+        accum.add(1)
     # Append the node itself as an element of result
     result.append(node)
     return result
@@ -99,3 +102,4 @@ def update_graph(node, mc_graph):
 def reduce_nodes(nodes_list):
     nodes_list = list(nodes_list)
     return sorted(nodes_list, key = lambda x: x[1])[0]
+    
