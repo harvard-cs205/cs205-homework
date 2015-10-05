@@ -1,1 +1,4 @@
 # Your discussion here
+('aerst', 11, ['arets', 'aster', 'rates', 'reast', 'resat', 'stare', 'stear', 'strae', 'tares', 'tears', 'teras'])
+
+Above is the entry with most anagrams, 11.
