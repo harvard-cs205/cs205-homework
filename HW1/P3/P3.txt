@@ -1,3 +1,4 @@
+Assuming that we want the first one in alphabetical order, the single entry with the most anagrams is: 
 
 ************ New Letter Sequence ****************
 Sorted Letter Sequence: aelst

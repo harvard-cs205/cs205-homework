@@ -1,9 +1,19 @@
-BY: MATHEUS C. FERNANDES
+BY: MATHEUS C. FERNANDES - CS205 HW1 PROBLEM 4
 
 
+DESCRIPTION OF GRAPH REPRESENTATION:
+The graph is set in a way that the key represents the individual character and the values represent the characters the key characters is connected to. This is done by joining all of the characters with each other, so that each connection also refers to itself as a connection. Then I subtract the connections of each character to itself and make sure that each character has only one list through the groupByKey operation. This approach insures a flawless match between one character and each character it encountered in each book separately. This also ensures that connections are not accounted for multiple times as it would create unless work for the code later on to do the BFS.
 
 
-CODE OUTPUT:
+WHAT DOES THIS DIAMETER IMPLY ABOUT THE MAXIMUM NUMBER OF STEPS IN WHICH YOUR SEARCH MUST BE EXECUTED?
+Since the diameter of this graph is known to be 10, then that means that the maximum number of steps would be 10. However, we did not use 10 steps for any of the characters, so therefore we cannot disprove that the diameter of the graph is 10 as we are well bellow the margin.
+
+
+WHAT DOES IT MEAN IF A CHARACTER DOES NOT HAVE A DEFINED DISTANCE DURING THE SEARCH?
+If a character does not have a defined distance, it means that the character is not connected to all of the other characters. This is if the character is either alone or other characters are alone and do not connect to other characters. Therefore, if one character is alone, it will not have a distance during this search as it is not connected to all other characters. The distance for this matter is just telling us how far we must go from that character to obtain to connect to all of the other characters in the graph.
+
+
+CODE OUTPUT/ NUMBER OF TOUCHED NODES IN EACH OF THE SEARCHES:
 Character's Name:  CAPTAIN AMERICA
 Iteration:  3
 New Number of Characters:  19

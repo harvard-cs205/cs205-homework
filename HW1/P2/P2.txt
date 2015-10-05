@@ -1,1 +1,7 @@
-# Your discussion here
+By: Matheus Fernandes - CS205 HW1 Problem 2
+
+Your discussion of the results and tradeoffs:
+
+The difference between part a) and part b) is that one uses a different parititioning strategy than the other. However, this simple differnece has a effect on the speed of the computation. As you can see from the histograms, using the default partitioning of the Mandelbrot function, we get that the work is not very evenly distributed between workers. That is because it distributes evenly in order, whereas the work is highly consentrated near the center and to the left of the center. So whenever it is orderly distributed some workers get overloaded with itterations whereas other workers do not get as many itterations assigned. This is extremely inefficient as it can be tought of as reduced into a few workers where most of the work is done in series. 
+
+The improvement of part b is that now I distribute the work randomly between worker in space. That is why I use the random number generator in the function to distribure the RDD. Having the work distributed randomly over space among the workers, makes the iteration more evenly distributed. This certainly reflects in the histogram as most of the workers have an even amount of iterations to go through. Hence, we were able to distribute the work in parallael more efficiently. This, of course, assumes that the problem is 'ridiculously parallel', which the mandelbrot set clearly is. The trade off for this is that depending on the dataset size, the shuffle cost could be relatively high. However, the benefit of having the code more efficient by an order of magnitude most certainly will overcome the shuffle cost for most sizes of data as it will speed up the code significantly.
