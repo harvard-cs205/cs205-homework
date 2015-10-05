@@ -21,7 +21,7 @@ def bfs_look2(edgelist,from_,to_,dmax,sc):
         
         temp = edgelist.join(nextneigh).partitionBy(64)
         
-        nextneigh = temp.mapValues(lambda V: (V[0],V[1]+1)).values().distinct().subtractByKey(distance)
+        nextneigh = temp.map(lambda (K,V): (V[0],V[1]+1)).distinct().subtractByKey(distance)
         nextneigh.foreach(increase_accum)
         
         temp2 = temp.map(lambda (K,V): (V[0],K)).subtractByKey(distance).map(lambda (K,V): (V,K))
