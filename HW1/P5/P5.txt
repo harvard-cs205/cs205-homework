@@ -3,8 +3,8 @@ Shortest paths from Kevin_Bacon to Harvard_University (and vice versa):
 
 => Some examples are
 
-Kevin_Bacon -> Marisa_Silver -> Harvard_University
-Harvard_University -> Jack_Lemmon -> Rod_Steiger -> Kevin_Bacon
+Kevin_Bacon -> College_Bowl -> Harvard_University
+Harvard_University -> Gilmore_Girls -> Liza_Weil -> Kevin_Bacon
 
 
 Connected Components:
