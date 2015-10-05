@@ -1,0 +1,14 @@
+# Your discussion here
+
+1. for the graph representation, firstly convert the initial RDD into a RDD (issue, {all characters in the issue}). Then, convert the new RDD into a RDD (node, {neighbor1, neighbor2, ...}) whose values' type are all set. 
+
+2. the number of touched nodes:(including the start node itself)
+"CAPTAIN AMERICA": 6048
+"MISS THING/MARY": 7
+"ORWELL":9
+
+If a node doesn't have a defined distance, there will be no path between the start node and this node, which means the node's character has never appeared in the same comic issues as the character of the start node or of its neighbors. For example, the touched nodes for "CAPTAIN AMERICA" is 6048 and the total nodes number is 6444. Thus, only a few characters have never been in the same issues as "CAPTAIN AMERICA" or as its neighbors. 
+
+In the function SS_BFS(G, node_source), each iteration will check all the nodes having the same distance from the start node except those already having a shorter distance. Thus, we could remove the assumption of diameter since we can use a RDD queue to check if there are neighbors of touched nodes which haven't been visited. If queue is empty, the "While" loop will stop and the function will return the number of touched nodes. 
+
+
