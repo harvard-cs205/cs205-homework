@@ -32,15 +32,14 @@ def BFS(graph, source_node, target_node, sc):
         before_combine = time.time()
 
         # Take a step from each node at the same time
-        dist_graph = dist_graph.flatMap(explore_level_from_node)
+        # We range partition our graph so that the following reduce has no shuffle at all
+        dist_graph = dist_graph.flatMap(explore_level_from_node).partitionBy(256)
         
-        # Group results
-        # This gives us an RDD of the form (node, [(d1, path1, c1, par1), ...]
-        dist_graph = dist_graph.groupByKey()
-        
-        # Now find the shortest distance, the lightest color, and reconstruct the adjacency list
-        dist_graph = dist_graph.map(partial(fix_up_nodes, acc=accum))
-        
+        # Reduce by key with the reduce function below to get the best distances, the correct path,
+        # and the lightest color. Originally implemented with a groupByKey and then a reduce,
+        # but found this to be faster due to reduction of shuffles
+        dist_graph = dist_graph.reduceByKey(partial(fix_up_nodes, acc=accum))
+
         # Use a count to force evaluation of the map - this is needed to properly increment
         # the accumulator.
         dist_graph.count()
@@ -119,57 +118,49 @@ def explore_level_from_node(node):
 
     return results
 
-def fix_up_nodes(node, acc):
-    """ After stepping from each node and grouping by key, we have a big RDD of the form
-    (node, [(d1, path1, color1, adj1), ...])
-    We want to get the SHORTEST distance, the LIGHTEST color, and reconstruct the adjacency list.
-    For every node we update to GRAY, we have another node to step from in the next round.
-    This means we should increment our accumulator, which keeps track of how many we need to step from.
+def fix_up_nodes(dist_node_list1, dist_node_list2, acc):
+    """ Reduce function to be used after flatMap explore_level_from_node.
+    Gets the best distance, the path, the correct color, and the adjacency list.
     """
 
-    # Just separate the name and the tuple of distances, paths,
-    # colors, and adjacency lists
-    node_name = node[0]
-    dist_node_list = node[1]
+    # Just get the variables from the two lists
+    d1 = dist_node_list1[0]
+    p1 = dist_node_list1[1]
+    c1 = dist_node_list1[2]
+    par1 = dist_node_list1[3]
+    d2 = dist_node_list2[0]
+    p2 = dist_node_list2[1]
+    c2 = dist_node_list2[2]
+    par2 = dist_node_list2[3]
 
-    # Get the distances, paths, colors, and potential adjacency lists all in list form
-    dist_list = map(lambda (x, y, z, q): x, dist_node_list)
-    path_lists = map(lambda (x, y, z, q): y, dist_node_list)
-    color_list = map(lambda (x, y, z, q): z, dist_node_list)
-    potential_adj_list = map(lambda (x, y, z, q): q, dist_node_list)
+    # The correct distance is the minimum
+    d = min(d1, d2)
 
-    # The actual distance from the source is the smallest of any
-    # possible way to get there 
-    actual_dist = min(dist_list)
-
-    # The path is either nothing (havent gotten there yet) or we need to find it
-    path = []
-
-    # Sort the path list by length, and keep it distinct
-    sorted_path_list = sorted(path_lists, key=len)
-
-    # If the node was just black, we know [] wil be in the path_list
-    # In that case, we want the second shorted path
-    if ('BLACK' in color_list) and (len(sorted_path_list) > 1):
-        path = sorted_path_list[1]
+    # Pick the path
+    # A few edge cases: if neither is the empty list, we take the shorter one
+    # If one of them IS the empty list, we want the OTHER one
+    p = []
+    if (p1 != []) and (p2 != []):
+        len1 = len(p1)
+        len2 =len(p2)
+        p = p1
+        if len2 < len1:
+            p = p2
     else:
-        # Otherwise, we want the shortest path.
-        path = sorted_path_list[0]
+        if p1 == []:
+            p = p2
+        else:
+            p = p1
 
-    if 'WHITE' in color_list:
-        # We've already been there, don't go again
-        color = 'WHITE'
-    elif 'GRAY' in color_list:
-        # People for the next round
-        # Also means we SHOULDN'T stop yet
-        color = 'GRAY'
+    c = 'BLACK'
+    # We just want the lightest color
+    if 'WHITE' in [c1, c2]:
+        c = 'WHITE'
+    elif 'GRAY' in [c1, c2]:
+        c = 'GRAY'
         acc.add(1)
-    else:
-        # Still haven't gotten to this guy
-        color = 'BLACK'
 
-    # Add all the adjacency lists from all the steps and get rid of any duplicates
-    # This duplicate check actually might not be necessary, but we will do so for safety
-    adj_list = list(set(reduce(lambda x, y: x + y, potential_adj_list)))
+    # And the adjacency list comes from reconstruction
+    adj_list = list(set(par1 + par2))
 
-    return (node_name, (actual_dist, path, color, adj_list))
+    return (d, p, c, adj_list)

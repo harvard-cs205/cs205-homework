@@ -1,6 +1,6 @@
 from pyspark import SparkContext
 import time
-from P5_connected_components import cc_2, get_symmetric_graph
+from P5_connected_components import cc_2
 from P5_bfs import BFS
 
 def get_links(link_str):
@@ -51,30 +51,33 @@ if __name__ == "__main__":
     # Now get our graph, partition it, and cache it
     page_graph = links.map(get_links).partitionBy(256).cache()
 
+    # NOTE: Below preprocessing code works fine. Commented out to increase speed because we are not currently
+    # doing the connected component calculation.
+
     # Reverse it, copartition it with page_graph
-    reversed_graph = page_graph.flatMap(reverse_links).groupByKey().map(lambda (x, y): (x, list(y))).partitionBy(256).cache()
+#    reversed_graph = page_graph.flatMap(reverse_links).groupByKey().map(lambda (x, y): (x, list(y))).partitionBy(256).cache()
 
     # Now get the symmetric subgraph and make the graph symmetric
     # First join them: every node will appear twice, once with forward edges and once with reverse
     # Cache it so we dont do this union twice
-    double_graph = page_graph.union(reversed_graph).cache()
+#    double_graph = page_graph.union(reversed_graph).cache()
 
     # Now get the other two graphs
-    before_symm_subgraph = time.time()
-    symmetric_subgraph = double_graph.reduceByKey(lambda adj1, adj2: list(set(adj1) & set(adj2))).partitionBy(256).cache()
-    symmetric_subgraph.count()
-    print 'Time to construct symmetric subgraph:', time.time() - before_symm_subgraph
+#    before_symm_subgraph = time.time()
+#    symmetric_subgraph = double_graph.reduceByKey(lambda adj1, adj2: list(set(adj1) & set(adj2))).partitionBy(256).cache()
+#    symmetric_subgraph.count()
+#    print 'Time to construct symmetric subgraph:', time.time() - before_symm_subgraph
 
     # And the totally symmetric graph
-    before_undirect = time.time()
-    undirected_graph = double_graph.reduceByKey(lambda adj1, adj2: list(set(adj1) | set(adj2))).partitionBy(256).cache()
-    undirected_graph.count()
-    print 'Time to construct undirected graph:', time.time() - before_undirect
+#    before_undirect = time.time()
+#    undirected_graph = double_graph.reduceByKey(lambda adj1, adj2: list(set(adj1) | set(adj2))).partitionBy(256).cache()
+#    undirected_graph.count()
+#    print 'Time to construct undirected graph:', time.time() - before_undirect
 
 
     # Now find the connected components
     # NOTE: This is commented out because it takes basically forever.
-    # It was tested on a subset of the wikipedia data of size 50,000 it and it worked, as well as the marvel data
+    # It was tested on a subset of the wikipedia data of size 50,000 it and it worked quite fast. It also ran well on the marvel data
 #    with open('ccs.txt', 'w') as out_file:
 #        print >> out_file, 'Number of ccs and size of the largest in totally undirected graph:', cc_2(sc, symmetric_subgraph)
 #        print >> out_file, 'Number of ccs and size of the largest in symmetric subgraph:', cc_2(sc, undirected_graph)
