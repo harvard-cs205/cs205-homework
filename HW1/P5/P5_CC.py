@@ -1,6 +1,4 @@
 from pyspark import SparkContext, SparkConf
-#from pyspark import SparkContext as sc
-import P5_bfs
 
 if 'sc' not in globals():
 	conf = SparkConf().setAppName('BFS')
