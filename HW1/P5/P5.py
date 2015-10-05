@@ -1,12 +1,15 @@
+# For each node, I store all the nodes that connect to it in a shortest path.
+# To recover a shortest path, I start at the ending node and choose one of the
+# nodes that connect to it. Then I choose a node that connects to that node, and so on,
+# until I get back to the starting node.
+
 import pyspark
-import time
 sc = pyspark.SparkContext()
 sc.setLogLevel('WARN')
 
 # Set number of partitions
 pc = 100
 
-starttime = time.time()
 # Define some functions
 def update_dist(v):
     """
@@ -39,11 +42,8 @@ page_names = page_names.zipWithIndex().map(lambda (n, id): (id + 1, n))
 page_names = page_names.sortByKey().cache()
 
 # Switch 'target' and 'startpage' to find a Harvard -> Kevin path
-target = page_names.filter(lambda (k, v): v == 'Kevin_Bacon').collect()[0][0]
-startpage = page_names.filter(lambda (k, v): v == 'Harvard_University').collect()[0][0] 
-
-print 'loaded everything at', time.localtime().tm_hour, ':', time.localtime().tm_min
-starttime = time.time()
+startpage = page_names.filter(lambda (k, v): v == 'Kevin_Bacon').collect()[0][0]
+target = page_names.filter(lambda (k, v): v == 'Harvard_University').collect()[0][0] 
  
 # Find the shortest path           
 dist = page_pairs.keys().distinct().map(lambda v: (v,-1))
@@ -54,8 +54,6 @@ connected = connected.partitionBy(pc)
 counter = 1
 found = False
 
-print 'made it to loop at', time.localtime().tm_hour, ':', time.localtime().tm_min
-
 while not found:
     starttime = time.time()
     connected = page_pairs.join(connected).mapValues(
@@ -64,12 +62,9 @@ while not found:
     newdists = newdists.mapValues(update_dist)
     dist = newdists.union(dist).reduceByKey(
     lambda x,y: max(x,y))
-    
     if dist.filter(lambda (k,v): k==target and v>=0).count() > 0:
-        found = True
-        
+        found = True      
     counter += 1
-    print 'finished loop', counter-1, 'at', time.localtime().tm_hour, ':', time.localtime().tm_min
 
 # Recover a shortest path    
 lenfromstart = -1
@@ -81,10 +76,9 @@ while wherefrom != startpage:
     final_path.append(wherefrom)
     length += 1
     
-print final_path
 final_path_names = []
-for i in final_path:
-    print i, page_names.filter(lambda (k, v): k == i).collect()[0]
-    final_path_names.append(page_names.filter(lambda (k, v): k == i).collect()[0][1])
+for i in range(len(final_path)-1, -1, -1):
+    final_path_names.append(page_names.filter(
+    lambda (k, v): k == final_path[i]).collect()[0][1])
 
 print 'Final path:\n', final_path_names, '\n\nLength:', length
