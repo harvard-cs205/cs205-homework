@@ -1,1 +1,12 @@
-# Your discussion here
+[
+  [u"th'", u'boldness', u'of', u'your', u'friend.', u"She's", u'but', u'the', u'penning', u'of', u'it.', u'He', u'surely', u'affected', u'her', u'for', u'her', u"body's", u'lust;', u'And'],
+  [u'that', u"England's", u'sake', u'With', u'burden', u'of', u'a', u'king,', u'and', u'marry', u'her', u'at', u'my', u'suit', u'look', u'graciously', u'on', u'him;', u'And', u'she,'],
+  [u"Northumberland's", u'pursuit.', u'Had', u'he', u'not', u'to', u'hear', u'him', u'coming.', u"Let's", u'withdraw,', u'my', u'lord.', u'Your', u'Highness', u'came', u'to', u'wet', u'me', u'once,'],
+  [u'royalty', u'With', u'all', u'triumphant', u'splendour', u'on', u'my', u'words.', u'Follow', u'us', u'to', u'sigh', u'To', u"th'", u'worst', u'of', u'all;', u'For', u'women', u'are'],
+  [u'life,', u'One', u'time', u'will', u'come', u'and', u'crush', u'us', u'to', u'compel', u'this', u'offer;', u'And', u'it', u'appears', u'she', u'lives', u"unharm'd.", u'She', u'will'],
+  [u'our', u'reward,', u'thy', u'conscience', u'flies', u'out.', u"'Tis", u'well', u'blown,', u'lads.', u'This', u'morning,', u'uncle.', u'What', u'were', u'best', u'not', u'know', u'thou', u'wouldst?'],
+  [u'gentle', u'wife?', u'No', u'so,', u'my', u'lord.', u'hope,', u'my', u'verse', u'can', u'sit,', u'Your', u'own', u'desert?', u'Ay,', u'not', u'mine', u'own.', u'How', u'darkly'],
+  [u'Rome', u'Which', u'signifies', u'what', u'hate', u'feed', u'not.', u'Dost', u'hate', u'a', u'proud', u'man', u'that', u'dares', u'not', u'fight!', u'No', u'words!', u'Of', u'other'],
+  [u'these', u'years?', u'say', u'my', u'prayers,', u'would', u'repent.', u'Enter', u'Now!', u'whence', u'come', u'you?', u'Fal.', u'My', u'own', u'knee?', u'Fal.', u'My', u'own', u'flesh'],
+  [u'his', u'los', u'To', u'new', u'remembrance.', u'For', u'full', u'well', u'befits,', u'For', u'still', u"'tis", u'just.', u'Why,', u'how', u'now,', u'sons', u'and', u'brothers?', u'Tell']
+]
