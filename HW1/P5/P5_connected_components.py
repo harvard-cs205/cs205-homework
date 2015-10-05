@@ -48,13 +48,14 @@ if __name__ == '__main__':
     links = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt', NPART).map(parse_text)
     # links = sc.textFile('links-simple-sorted.txt', NPART).map(parse_text)
 
+    forward_links = links.flatMapValues(I).map(swapkv)
+    backward_links = links.flatMapValues(I).map(swapkv)
+    
     # convert to symmetric links
-    symmetric_links = links.flatMapValues(I).map(lambda (parent, child): (child, set([parent]))).union(links).reduceByKey(union).cache()
+    symmetric_links = forward_links.union(backward_links).groupByKey().map(lambda (parent, child): (parent, set(child))).cache()
     # print symmetric_links.collect()
 
     # convert to bidirectional links
-    forward_links = links.flatMapValues(I).map(swapkv)
-    backward_links = links.flatMapValues(I).map(swapkv)
     bidirectional_links = forward_links.intersection(backward_links).groupByKey().map(lambda (parent, child): (parent, set(child))).cache()
     # print bidirectional_links.collect()
     
