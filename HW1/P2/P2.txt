@@ -1,1 +1,6 @@
 # Your discussion here
+
+For the default partitioning, most of the partitions take a small number of iterations, while a few take large iterations, as we can see a long tail toward the right of graph. 
+Thus most partitions with fewer iterations have to wait until the few partitions with large iterations to run, there are a bunch of wasted cycles.
+
+For the load-balanced partitioning, there is a nice normal-distributed graph, the largest iterations are much smaller than those in default partitioning. Most of the partitions fall in the middle range of the iterations. 

@@ -1,1 +1,16 @@
 # Your discussion here
+
+
+Shortest path from Kevin_Bacon to Harvard_University:
+
+u'Kevin_Bacon'
+u'Six_degrees_of_separation'
+u'Harvard_University'
+
+
+Shortest path from Harvard_University to Kevin_Bacon: 
+u'Harvard_University'
+u'Jack_Lemmon'
+u'Mister_Roberts_(film)'
+u'Kevin_Bacon'
+
