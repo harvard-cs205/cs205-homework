@@ -1,6 +1,7 @@
 # Default
 *~
 *.pyc
+*.DS_Store
 
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio
 
