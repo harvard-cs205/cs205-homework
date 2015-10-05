@@ -4,8 +4,16 @@ I collaborated with Taylor Killian and Reinier Maat on this question.
 
 
 Harvard -> Kevin Bacon = 3 steps
-Kevin Bacon -> Harvard = 2 steps
+	Harvard -> National_Lampoon's_Animal_House -> National_Lampoon_(magazine) -> Kevin Bacon
 
-As for the connected components, I first have the function start with a single source and find all of that source’s neighbors and then all of those neighbors’ neighbors etc… with each iteration checking to see if any of my neighbors found are duplicates. This loop ends when there are no new neighbors found. Then, my function compares all of those characters with the original starting graph and determines if there are any unfound characters using .subtractByKey(). If so, then it randomly takes one of those unfound characters and sets that as the new origin source and starts the aforementioned loop all over again. This two-step process of looping and checking continues until every character in the graph has been accounted for. 
+Kevin Bacon -> Harvard = 2 steps
+   	Kevin Bacon -> Six Degrees of Separation -> Harvard University
+
+
+Note, my code outputs the page IDs for the paths…to convert to a string, I used the following code:
+
+page_names.filter(lambda (K,V): K == <page_id>).collect()[0][1]
+
+Extra Credit: As for the connected components, I first have the function start with a single source and find all of that source’s neighbors and then all of those neighbors’ neighbors etc… with each iteration checking to see if any of my neighbors found are duplicates. This loop ends when there are no new neighbors found. Then, my function compares all of those characters with the original starting graph and determines if there are any unfound characters using .subtractByKey(). If so, then it randomly takes one of those unfound characters and sets that as the new origin source and starts the aforementioned loop all over again. This two-step process of looping and checking continues until every character in the graph has been accounted for. 
 
  

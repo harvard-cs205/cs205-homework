@@ -1,5 +1,5 @@
-from P5_bfssat import * 
-from P5_connected_componentssat import *
+from P5_bfs import * 
+from P5_connected_components import *
 import pyspark
 from pyspark import SparkContext
 
@@ -24,10 +24,10 @@ Bacon_ID = page_names.filter(lambda (K,V): V == 'Kevin_Bacon').collect()[0][0]
 print Harvard_ID
 print Bacon_ID
 
-#determine the shortest path between Harv->Bacon and Bacon->Harv
+#determine shortest path between Harv->Bacon and Bacon->Harv
 
 print bfs(Bacon_ID,links,sc,Harvard_ID)
 print bfs(Harvard_ID,links,sc,Bacon_ID)
-print connected_components(Harvard_ID,links,sc)
+#print connected_components(Harvard_ID,links,sc)
 
 

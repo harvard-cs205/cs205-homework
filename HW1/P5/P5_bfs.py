@@ -1,5 +1,5 @@
 #NOTE: File P5.py should be used to call this function below to find
-#shortest path between two nodes.
+#shortest path between two nodes
 
 import numpy as np
 
@@ -7,7 +7,8 @@ def copartitioned(RDD1, RDD2):
     "check if two RDDs are copartitioned"
     return RDD1.partitioner == RDD2.partitioner
     
-sequence = []    
+sequence = []
+  
 def bfs(SOURCE,Graph,sc,DEST=False):
     node1 = [(SOURCE,0)]
     node1 = sc.parallelize(node1).partitionBy(128)
@@ -35,17 +36,31 @@ def bfs(SOURCE,Graph,sc,DEST=False):
         if final_rdd1.lookup(DEST):
            at_destination = True
     
-    final_rdd_g1 = final_rdd1.groupByKey().mapValues(list).cache()
+    final_rdd_g1 = final_rdd1.groupByKey().mapValues(list)
+    final_rdd_g1.cache()
     
-    #to get sequence from Kevin Bacon to Harvard
     distance = np.min(final_rdd_g1.lookup(DEST))
-    
-    RDD1 = final_rdd1.filter(lambda (K,V): V == (distance - 1)).partitionBy(128)
-    RDD2 = Graph.join(RDD1)
-    RDD3 = RDD2.filter(lambda (K,V): V[0] == DEST)
-    RDD4 = RDD3.keys()
-
-    sequence.append(RDD4.collect())
-    sequence.append(DEST)
-    
+    if distance == 2:
+        RDD1 = final_rdd1.filter(lambda (K,V): V == (distance - 1)).partitionBy(128)
+        RDD2 = Graph.join(RDD1)
+        RDD3 = RDD2.filter(lambda (K,V): V[0] == DEST)
+        RDD4 = RDD3.keys()
+        sequence.append(RDD4.collect()[0])
+        sequence.append(DEST)
+  
+    if distance == 3:
+        RDD1 = final_rdd1.filter(lambda (K,V): V == (distance - 1)).partitionBy(128)
+        RDD2 = Graph.join(RDD1)
+        RDD3 = RDD2.filter(lambda (K,V): V[0] == DEST)
+        RDD4 = RDD3.keys().collect()[0]
+        RDD5 = final_rdd1.filter(lambda (K,V): V == (distance - 2)).partitionBy(128)
+        RDD6 = Graph.join(RDD5)
+        RDD7 = RDD6.filter(lambda (K,V): V[0] == RDD4)
+        RDD8 = RDD7.keys().collect()[0]
+        sequence.append(RDD4)
+        sequence.append(RDD8)
+        sequence.append(DEST)
+        
+        
     return np.min(final_rdd_g1.lookup(DEST)), sequence
+    #return np.min(final_rdd_g1.lookup(DEST))
