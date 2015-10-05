@@ -1,1 +1,4 @@
 # Your discussion here
+I wasn't able to decipher the hint about connected components, and so my technique was to simply do BFS iteratively until I had mapped out the entire space. The problem with this was that most of the connected components are just two nodes that link to each other. 
+
+When I assumed a fully symmetric graph, there was one huge connected component contatining all but ~7000 pages. Of those, 6000 are not linked to anything, and 1000 are (probably) linked to 1 or 2 other pages. Because each iteration took about 1 minute on the cluster, it was infeasible to count up what was likely to be 500 pairwise links.

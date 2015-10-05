@@ -1,9 +1,29 @@
 CAPTAIN AMERICA has 6408 connected nodes.
-36 of the characters are not connected. 
+18 of the characters are not connected. 
 
 MISS THING/MARY has 7 connected nodes.
-6437 of the characters are not connected. 
+6419 of the characters are not connected. 
 
 ORWELL has 9 connected nodes.
-6435 of the characters are not connected. 
+6417 of the characters are not connected. 
 
+I represented my graph by first defining an RDD of (K,V) of graph edges:
+A->B
+A->C
+A->D
+B->C
+B->F
+...
+I then created an RDD of (K,V) with all the unique characters, and their associated level in the graph (graph rank). If they were not assigned a level, V=None. Initially, one character/node is designated the start node and assigned V=0. 
+
+From that the iteration goes like this:
+	While new characters are still being found:
+		Join graph edges with filter(graph rank==current level)
+		Make each associated character the new K of (K,V)
+		Merge new character list with graph rank (carry graph rank over to next iteration)
+
+There is a required shuffle when I swap the K,V after doing the join, and I repartition that RDD after each iteration to maintain copartitioning.
+
+If we assume the graph diameter is 10, and we want to calculate all of the connected nodes to, for example, Captain America, we need to iterate 10 times. Based on the definition of a graph diameter (the longest shortest path from one node to another), the furthest away a node could be from Captain America is 10. 
+
+If a character does not get a distance defined during the search, it is either part of a different connected component, or the graph diameter is larger than assumed (if assumed). Since I do not assume a diameter, but only stop searching when I stop finding new connections, a character not getting touched indicates

@@ -1,8 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt 
 import matplotlib.cm as cm
-#from pyspark import SparkContext
-
+from pyspark import SparkContext, SparkConf
+if 'sc' not in globals():
+	conf = SparkConf().setAppName('BFS').setMaster('local')
+	sc = SparkContext(conf=conf)
 
 def mandelbrot(x, y):
     z = c = complex(x, y)
@@ -12,8 +14,7 @@ def mandelbrot(x, y):
         z = z * z + c
         iteration += 1
     return iteration
-def dummy(x,y):
-	return (x+y)*5
+
 def sum_values_for_partitions(rdd):
     'Returns (as an RDD) the sum of V for each partition of a (K, V) RDD'
     # note that the function passed to mapPartitions should return a sequence,
@@ -33,11 +34,25 @@ def draw_image(rdd):
     plt.show()
 
 if __name__ == "__main__":
-  #  sc = SparkContext(appName="Mandelbrot")
     Nmax=2000
     idx=sc.parallelize(range(1,Nmax),10) #desired number of partitions is 100, 
-    xy=idx.cartesian(idx).map(lambda i: ((i[1],i[0]),(i[1]/500.0-2,i[0]/500.0-2)))
-    z=xy.map(lambda i: (i[0], mandelbrot(i[1][1],i[1][0])))
-    draw_image(z)
+    Ntot=np.power(Nmax,2)
+    xy_idx=idx.cartesian(idx).map(lambda i: (i[1],i[0]))
+    # for the parallelization scheme chosen, let us look at how the partitions are divided
+    xylist=xy_idx.collect() #look at how the xy rdd was partitioned
+    psize=Ntot/100
+    plt.plot(*zip(*xylist[0*psize:1*psize]),c='g',linestyle='None',marker='.')
+    plt.plot(*zip(*xylist[1*psize:2*psize]),c='r',linestyle='None',marker='.')
+    plt.plot(*zip(*xylist[2*psize:3*psize]),c='b',linestyle='None',marker='.')
+    plt.savefig('original_partitioning.pdf',format='pdf')   
     
-    partition_counts=sum_values_for_partitions(z).collect()
+ #    xy=idx.cartesian(idx).map(lambda i: ((i[1],i[0]),(i[1]/500.0-2,i[0]/500.0-2)))
+#     z=xy.map(lambda i: (i[0], mandelbrot(i[1][1],i[1][0])))
+#     #draw_image(z)
+#     
+#     partition_counts=sum_values_for_partitions(z).collect()
+#     plt.hist(partition_counts)
+#     plt.xlabel('Counts per partition')
+#     plt.ylabel('Number of partitions')
+#     plt.title('No Fancy Partitioning')
+#     plt.savefig('No_Fancy_partitioning.pdf',format='pdf') 

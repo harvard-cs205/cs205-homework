@@ -1,54 +1,32 @@
-import numpy as np
-import matplotlib.pyplot as plt 
-import matplotlib.cm as cm
-
-
+import P4_bfs
+from pyspark import SparkContext, SparkConf
+if 'sc' not in globals():
+	conf = SparkConf().setAppName('BFS').setMaster('local')
+	sc = SparkContext(conf=conf)
 
 if __name__ == "__main__":
 	csv=sc.textFile("source.csv")
-	data_char=csv.map(lambda x:tuple(x.strip('"').split('","'))).distinct().cache()
-	data_char_next=data_char
-	data_comic=data_char.map(lambda i: (i[1],i[0]))
-	data_comic_next=data_comic
-	#grouped_by_name=data.groupByKey().map(lambda i:(i[0],list(set(i[1]))))
-	#grouped_by_comic=data.map(lambda i: (i[1],i[0])) \
-	#	.groupByKey().map(lambda i:(i[0],list(set(i[1]))))
-	graph=sc.parallelize([('CAPTAIN AMERICA',0)])
-	graph_level=graph
-	level=0
-	Nmax=5
-	graph_size=[1]
+	num_partitions=8
+	data_char=csv.map(lambda x:tuple(x.strip('"').split('","'))).distinct()
+	data_comic=data_char.map(P4_bfs.swap_KV)
+	graph_edges=data_comic.join(data_comic)\
+		.values() \
+		.filter(lambda i:i[0]!=i[1]) \
+		.distinct()\
+		.partitionBy(num_partitions).cache()
+	char_list=graph_edges.keys().distinct()
+	tot_char=char_list.count()	
+	info=''
+	start_char=['CAPTAIN AMERICA','MISS THING/MARY','ORWELL']
 	
-	#graph_level_arr=[['CAPTAIN AMERICA']]
-	for level in range(0,Nmax):	
-		#get list of comics for which character was present
-		comic_list=graph_level.join(data_char) \
-			.flatMap(lambda i:i[1][1:]).distinct()
-		#get list of characters from those comics	
-		char_list=comic_list.map(lambda i:(i,1)) \
-			.join(data_comic) \
-			.flatMap(lambda i:i[1][1:]).distinct()
-		level += 1 
-		
-		#gets rid of duplicate comic books from current iteration and 
-		#duplicate characters from previous iteration
-		data_comic=data_comic_next.subtractByKey(comic_list.map(lambda i:(i,1))).cache()
-		data_char=data_comic.map(lambda i: (i[1],i[0])).cache()
-		
-		#stores the data set with removed characters for the next iteration
-		#we don't want to use it for the next search since we've already removed
-		#the characters we will be searching for.
-		data_char_next=data_char.subtractByKey(char_list.map(lambda i:(i,1)))
-		data_comic_next=data_char_next.map(lambda i: (i[1],i[0]))
-		
-		
-		graph_level=char_list.map(lambda i:(i,level)).subtractByKey(graph).cache()
-		graph_size.append(graph_level.count())
-#		graph_level_arr.append(graph_level.collect())
-		graph=graph+char_list.map(lambda i:(i,level)).cache() #union
-		
+	for char in start_char:
+		graph_size=P4_bfs.num_connections_bfs(char,graph_edges,char_list,num_partitions,sc)
 
+		num_nodes=sum(graph_size)	
 
-
-#.flatMap(lambda i:chain.from_iterable(i[1])).distinct().collect()
-	
+		rem=tot_char-num_nodes
+	 	info=info+char+' has '+str(num_nodes)+' connected nodes.\n'+ str(rem)+\
+	 		' of the characters are not connected. \n\n'
+ 	
+ 	with open('P4.txt','w') as f:
+ 		f.write(info)	
