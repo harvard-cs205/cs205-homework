@@ -14,5 +14,3 @@ def bfs(graph, starting_char):
         print len(list(set(neighbors)-set(BFS_list)))
     #print len(BFS_list)
     
-
-
