@@ -3,4 +3,4 @@ Harvard_University -> Jack_Lemmon -> Rod_Steiger -> Kevin_Bacon (3)
 
 Kevin_Bacon -> College_Bowl -> Harvard_University (2)
 
-The connected component algorithm takes too long... but it works on smaller dataset (Marvel)
+The connected component algorithm takes too long... but it works on smaller dataset (Marvel has 22 connected components)
