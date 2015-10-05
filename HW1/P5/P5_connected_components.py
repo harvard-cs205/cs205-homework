@@ -1,7 +1,7 @@
 from pyspark import SparkContext, SparkConf
 sc = SparkContext()
 
-num_partitions = 72
+num_partitions = 128
 
 # Make page_links and flatten
 # from1: to11 to12 to13
@@ -9,7 +9,7 @@ page_links_with_strings = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple
 
 # (1, [1664968]), (2, [3, 4])
 page_links = page_links_with_strings.map(lambda line: (line[0], [int(x) for x in line[1].split(' ')])).partitionBy(num_partitions).cache()
-print "Total number of original nodes: ", len(page_links.keys().collect())
+print "Total number of original nodes: ", page_links.keys().count()
 
 
 def lesserFirst(x):
@@ -74,7 +74,6 @@ def ssbfs(start_name, graph, sc):
             break
         print "Nodes added in iteration %s: %s"  % (itr_acc.value, node_count - total_acc.value)
         total_acc+=node_count - total_acc.value
-    #print  "Nodes connected to %s: %s" % (start_name, nodes.count())
     return nodes
 
 def connectedComponents(symmetric_connected_node_list, sc):
@@ -97,7 +96,7 @@ def connectedComponents(symmetric_connected_node_list, sc):
         
         nodes_left = nodes_left.subtractByKey(linked_nodes).partitionBy(num_partitions).cache()
         
-        if nodes_left.count() == 0:
+        if (nodes_left is None) or (nodes_left.count() == 0):
             print "No reduction! Breaking!"
             break
 
@@ -110,7 +109,7 @@ def connectedComponents(symmetric_connected_node_list, sc):
 # Counts as an edge even if the link goes in only one direction
 def uniConnectedComponents(page_links, sc):
     print "Running Uni-Directional Connected Components"
-    symmetric_connected_node_list = page_links.map(lambda x: lesserFirst(x)).reduceByKey(lambda x,y: combineLists(x,y))
+    symmetric_connected_node_list = page_links.map(lambda x: lesserFirst(x)).groupByKey().map(lambda x: (x[0], list(x[1])[0]))
     symmetric_connected_node_list = symmetric_connected_node_list.union(symmetric_connected_node_list.flatMapValues(lambda x: x).map(lambda x: (x[1], [x[0]])))    
     
     return connectedComponents(symmetric_connected_node_list, sc)
@@ -127,7 +126,7 @@ def biConnectedComponents(page_links, sc):
     nodes = symmetric_connected_nodes_r.join(symmetric_connected_node_list)
     
     nodes = nodes.map(lambda x: (x[0], takeOnlyDoubles(x[1][0], list(x[1][1]))))
-    nodes = nodes.map(lambda x: lesserFirst(x)).reduceByKey(lambda x,y: combineLists(x,y))
+    nodes = nodes.map(lambda x: lesserFirst(x)).groupByKey().map(lambda x: (x[0], list(x[1])[0]))
     nodes = nodes.union(nodes.flatMapValues(lambda x: x).map(lambda x: (x[1], [x[0]])))    
     nodes = connectedComponents(nodes, sc)
     return nodes
