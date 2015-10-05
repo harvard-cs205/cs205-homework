@@ -1,1 +1,23 @@
-# Your discussion here
+# Results
+
+The optimised version was both faster, and had a more even distribution of iterations per partition. The key things
+attempted in the optimised version:
+
+- Rather than rely on default partitioning, notice that the we needed to use 100 tasks for the Mandelbrot calculation
+anyway, so might as well use 100 partitions from the start.
+- Randomise the inputs (i.e. the x-y coordinates) so that each partition gets a similar amount of work.
+
+The result is that:
+- computation time was reduced by 1/4 (from 40 seconds to 30 seconds);
+- shuffle read/writes were eliminated entirely because no repartitioning occurs; and
+- iterations per partition is far more evenly distributed.
+
+# Trade-offs
+
+While there were better results in the optimised version, there were some tradeoffs:
+- The input array was generated on the driver and then parallelized, meaning the driver stores 2000^2 elements.
+Not a problem at this dimension but potentially problematic for larger images. Using cartesian functions within
+the RDD means there is shuffling, but less strain on the driver.
+
+- Shuffling the input array takes some time, especially for very large inputs. At 2000^2 elements, this is
+unlikely to cause much issue, but at even larger sizes it might be problematic.

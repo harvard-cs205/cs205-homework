@@ -5,14 +5,11 @@
 
 from pyspark import SparkContext
 
-sc = SparkContext("local", "P5", pyFiles=[])
-
-import csv
-import time
+sc = SparkContext(appName="P5")
 
 INF = 999999999
 
-numPart = 2
+numPart = 24
 updates = sc.accumulator(0)
 
 # Map: emit neighbour nodes if GRAY, otherwise
@@ -102,25 +99,26 @@ def oneDir(v):
 
 
 links = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt')
-allN = links.flatMap(emitN).reduceByKey(lambda a, b: a+b)
+allN = links.flatMap(emitN).reduceByKey(lambda a, b: a+b).partitionBy(numPart).cache()
 links_undir = allN.mapValues(onlyBothDir)
 links_dir = allN.mapValues(oneDir)
 
-print links_undir.take(1)
-print links_dir.take(1)
+# print links_undir.take(1)
+# print links_dir.take(1)
 
 
 f = open('out2.txt','w')
 res = findComponents(links_undir)
+print 'Connected Components:', res
 f.write(str(res))
 f.close()
-print 'Connected Components:', res
 
 f = open('out3.txt','w')
 res = findComponents(links_dir)
+print 'Connected Components:', res
 f.write(str(res))
 f.close()
-print 'Connected Components:', res
+
 
 # rddList = []
 #

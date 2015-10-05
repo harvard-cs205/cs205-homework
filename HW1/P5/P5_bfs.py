@@ -139,7 +139,7 @@ def emitN(s):
     ret.append( (cur, nbs) )
     return ret
 
-def onlyBothDir(v)):
+def onlyBothDir(v):
     ret = []
     count = {}
     for c in v:
