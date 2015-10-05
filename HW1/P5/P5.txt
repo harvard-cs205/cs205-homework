@@ -1,1 +1,15 @@
-# Your discussion here
+Kevin Bacon -> Harvard University
+---------------------------------
+Kevin Bacon -> Lori Singer -> Yo-Yo Ma -> Harvard University
+
+Harvard University -> Kevin Bacon
+---------------------------------
+Harvard University -> Syracuse University -> WFUV -> Kevin Bacon
+
+
+NOTE: In today’s Wikipedia, both of these paths contain missing links. However, they were both valid paths when the dataset was created. This can be confirmed by searching links-simple-sorted.txt.
+
+One example possible change: on January 22, 2009, near the time the dataset was posted, the wiki page for Syracuse University had a list of New York college radio stations at the bottom, which contained a link to Fordham’s WFUV. Syracuse’s current page does not have this list, and thus has no link to WFUV. Compare
+https://en.wikipedia.org/w/index.php?title=Syracuse_University&oldid=265658337
+and
+https://en.wikipedia.org/wiki/Syracuse_University
