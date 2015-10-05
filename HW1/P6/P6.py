@@ -1,5 +1,5 @@
-from pyspark import SparkContext as sc
-sc = sc(appName="P3")
+from pyspark import SparkContext
+sc = SparkContext(appName="P3")
 import numpy.random as rand
 
 # Open file and split into words
