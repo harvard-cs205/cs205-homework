@@ -1,1 +1,31 @@
-# Your discussion here
+Report: Kevin_Bacon --> Harvard_University
+Found target in 2 degrees from root!
+[u'Marisa_Silver', u'Harvard_University']
+Total time: 94.6115090847
+
+Report: Harvard_University --> Kevin_Bacon
+Found target in 3 degrees from root!
+[u'National_Association_of_College_and_University_Residence_Halls', u"National_Lampoon's_Animal_House", u'Kevin_Bacon']
+Total time: 212.57339716
+
+*** Bonus Pairings ***
+
+Report: Captain_America --> Kevin_Bacon
+Found target in 3 degrees from root!
+[u'Paramus,_New_Jersey', u'1990_in_film', u'Kevin_Bacon']
+Total time: 166.937416077
+
+Report: Kevin_Bacon --> Captain_America
+Found target in 2 degrees from root!
+[u'The_Colbert_Report', u'Captain_America']
+Total time: 94.0487689972
+
+Report: O_Captain!_My_Captain! --> Captain_America
+Found target in 4 degrees from root!
+[u'Bridgeton_News', u'Tadao_Ando', u'Transhumanism', u'Captain_America']
+Total time: 247.084980965
+
+Report: Captain_America --> O_Captain!_My_Captain!
+Found target in 3 degrees from root!
+[u'Buttermilk_Channel', u'Walt_Whitman', u'O_Captain!_My_Captain!']
+Total time: 167.743580818
