@@ -1,1 +1,52 @@
 # Your discussion here
+
+1. graph representation :
+
+By reading the 'source.csv', I constructed 'marvel_character_graph',
+which is RDD in form of (character, [neighbors]).
+
+And then, I pass this 'marvel_character_graph' to BFS_relax_diameter() function.
+In this function, it implements another graph representation RDD,
+which is 'dist_graph' variable.
+It is RDD in form of (character, (shortest_distance, [neighbors]))
+
+
+2. number of touched nodes in (ORWELL, MISS THING/MARY, CAPTAIN AMERICA) searches :
+
+(1) Root node :  ORWELL
+Number of nodes touched :  8 (excluding root itself)
+diameter :  1
+[(u'LUDLUM, ROSS', 1), (u'ASHER, MICHAEL', 1), (u'OSWALD', 1), (u'HOFFMAN', 1), (u'FAGIN', 1), (u'ASHER, CARL', 1), (u'ASHER, DONNA', 1), (u'NILES, SEN. CATHERIN', 1), (u'ORWELL', 0)]
+
+(2) Root node :  MISS THING/MARY
+Number of nodes touched :  6 (excluding root itself)
+diameter :  1
+[(u'STERLING', 1), (u'DARLEGUNG, GEN.', 1), (u'SWORDSMAN IV/', 1), (u'MANT/ERNEST', 1), (u'PANTHER CUB/', 1), (u'AMAZO-MAXI-WOMAN/', 1), (u'MISS THING/MARY', 0)]
+
+(3) Root node :  CAPTAIN AMERICA
+Number of nodes touched :  6407 (excluding root itself)
+diameter :  3
+(I omitted the list of touched nodes since it is too many)
+
+
+3. What does this diameter imply about
+the maximum number of steps in which your search must be executed?
+
+If the diameter of a graph is D, it means the length of the longest path is D.
+Therefore, in worst case, BFS algorithm will run D rounds.
+And if the time complexity of RDD computation in each step is T,
+then T*D time would be needed for the search, in worst case.
+
+Hence, putting a specific diameter in search can be unfavorable way.
+For example, in the first part of the question, we are asked to set diameter as 10,
+and actually, it turned out to be that all 3 characters (Captain America, Orwell, Miss Thing) had only 3 level(diameter) at most.
+Therefore, without knowing appropriate diameter, we were wasting 7 times of RDD computation,
+thereby resulting the total time complexity of our search to be increased.
+
+
+4. What does it mean if a character does not have a defined distance during the search?
+
+If a character does not have a defined distance during the search,
+we can interpret it as, this character has not been visited yet,
+or does not have any neighbors (any edges to different characters).
+If it's the case of latter one, this character would have been isolated (or disjointed) from the whole graph.
