@@ -32,4 +32,5 @@ Given this info, we could have a for loop and know when to exit the loop.
 
 Q2.What does it mean if a character does not have a defined distance during the
 search?
-A2.For my program, all nodes are first assigned a distance of -1, so each character WILL have a defined distance. The starting node is assigned distance 0. So if the starting node has no neighbors, then bfs function will return 0. Else it will return the distance of the furthest child from it. 
+A2.If a node does not have a defined distance, then that node is not associated with our
+starting character.
