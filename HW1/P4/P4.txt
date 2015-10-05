@@ -1,1 +1,26 @@
-# Your discussion here
+Results:
+
+For , CAPTAIN AMERICA
+the number of nodes in the graph is  6408
+the diameter is  3
+For , MISS THING/MARY
+the number of nodes in the graph is  7
+the diameter is  1
+For , ORWELL
+the number of nodes in the graph is  9
+the diameter is  1
+
+1) The graph diameter is the maximum distance that has been reached during the BFS.
+
+2) If a character does not have a defined distance during the search, it means that it is not in the graph!
+
+About the graph representation:
+I took time to document the code very well, so please refer to the code.
+Quick summary:
+- For the BFS I used the following RDD: each node has this structure (k,v), where v has 3 component:
+    (key=name of a hero,
+    value =[distance to the root, [list of connexion], flag: 0 if not seen, 1 if marked, 2 if visited])
+
+Use of the accumulator as a stopping condition (nota bene: it could have been a python variable).
+I stop the search when there is no marked nodes anymore. So when I hit this condition I increment the accumulator.
+
