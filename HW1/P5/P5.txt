@@ -1,1 +1,14 @@
 # Your discussion here
+
+1. Short Path
+1) ”Kevin_Bacon" -> "Harvard University"
+Using Labels : 2729536 -> 2578703 -> 2152782
+Using Paget Titles : Kevin_Bacon -> John_Lithgow -> Harvard_University
+
+2) "Harvard University" -> "Kevin Bacon"
+Using Labels : 2152782 -> 4530382 -> 44868 -> 2729536
+Using Paget Titles : Harvard_University -> September_8 -> 1958 -> Kevin_Bacon
+
+2. Connected Components
+I couldn't finish it because it needs to do lots of experiments with AWS while we are not allowed to run
+AWS instances for a long time because of free credits.
