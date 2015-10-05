@@ -5,4 +5,7 @@ The shortest path from "Harvard_University" to "Kevin_Bacon" is
 ('Harvard_University', '1998', '1958', 'Kevin_Bacon').
 
 Number of connected components is TODO and the number of nodes in the 
-largest component is TODO.
+largest component is TODO in the symmetrically linked graph.
+
+Number of connected components is TODO and the number of nodes in the 
+largest component is TODO in the bidirectionally linked graph.

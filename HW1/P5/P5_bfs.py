@@ -12,10 +12,16 @@ def parse_text(line):
     data = line.split(': ')
     return (int(data[0]), set(map(int, data[1].split())))
 
+def I(x):
+    return x
+
+def swapkv((k, v)):
+    return v, k
+
 def bfs(sc, links, names, root, target):
     # add indices to names for future lookups
     name_index = names.zipWithIndex().map(lambda (n, i): (n, i+1))
-    index_name = name_index.map(lambda (n, i): (i, n)).sortByKey()
+    index_name = name_index.map(swapkv).sortByKey()
     root = name_index.lookup(root)[0]
     target = name_index.lookup(target)[0]
     traversed = set()
@@ -31,7 +37,7 @@ def bfs(sc, links, names, root, target):
             counter = sc.accumulator(set(), AccumNodes())
             filtered.values().foreach(lambda x: counter.add(x))
             # path from current nodes to children
-            path = filtered.flatMapValues(lambda x: x).map(lambda (parent, child): (child, parent))
+            path = filtered.flatMapValues(I).map(swapkv)
             # to preserve directionality of the links, eliminate path from child to parent
             # drop paths with traversed nodes as children 
             paths = path.subtractByKey(paths).union(paths)
@@ -61,6 +67,8 @@ if __name__ == '__main__':
     # load files
     links = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt', NPART).map(parse_text).cache()
     names = sc.textFile('s3://Harvard-CS205/wikipedia/titles-sorted.txt', NPART).cache()
+    # links = sc.textFile('links-simple-sorted.txt', NPART).map(parse_text).cache()
+    # names = sc.textFile('titles-sorted.txt', NPART).cache()
     
     # run BFS
     kevin_to_harvard = bfs(sc, links, names, 'Kevin_Bacon', 'Harvard_University')
