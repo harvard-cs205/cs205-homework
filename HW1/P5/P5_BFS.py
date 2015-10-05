@@ -32,6 +32,7 @@ def bfs_look2(edgelist,from_,to_,dmax,sc):
             return result
         distance = distance.union(nextneigh).cache()
         result = distance.join(sc.parallelize([(to_,dis)])).partitionBy(64)
+        
         if not result.isEmpty():
             result = result.mapValues(lambda v: v[0]).collect()
             result2 = paths.join(sc.parallelize([(to_,dis)])).partitionBy(64).collect()

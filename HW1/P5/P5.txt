@@ -1,3 +1,9 @@
 # Your discussion here
 
 Did not manage to make my code work on AWS but the code works locally on the Marvel graph and a test graph created in the same way as the Wikipedia graph…
+
+I added the test graph and the python code used to test it, result are:
+
+([('10', 4)], [('10', (['8', ['4', ['2', ['1', '<-']]]], 4)), ('10', (['8', ['7', ['3', ['1', '<-']]]], 4))])
+
+which means two paths of equal length 4 and their details.
