@@ -1,63 +1,6 @@
 from functools import partial
 import time
 
-# def connected_components(sc, graph):
-    # """ Function which finds the number of connected components in spark RDD graph.
-    # Graph is assumed to be in an adjacency list representation, with (k, v) pairs (node, adj_list).
-    # We pick a node at random and BFS until the search has converged.
-    # At this point, we have found one connected component.
-    # We subtract this connected component from the graph and repeat until the RDD is empty.
-    # """
-
-    # # Cache the graph for speed
-    # graph = graph.cache()
-
-    # # Grab an arbitrary node frmo the graph, with replacement (doesn't matter since we only take one)
-    # random_node = graph.takeSample(True, 1)[0]
-
-    # # Get the name of the node because we are in the adjacency list representation
-    # random_node = random_node[0]
-
-    # # Make an accumulator to keep track of the number of connected components
-    # num_ccs = sc.accumulator(0)
-
-    # # Declare an array to keep track of cc sizes
-    # cc_sizes = []
-
-    # # While our graph is not yet empty...
-    # while (graph.count() > 0):
-
-        # # Get our first connected component by searching the graph
-        # searched_graph = BFS_cc(graph, random_node, sc)
-
-        # # Black nodes are ones we have not touched yet
-        # # Note y == (d, c, adj_list) so y[1] == c
-        # not_in_cc = searched_graph.filter(lambda (x, y): y[2] == 'BLACK')
-
-        # # Number in the connected component is the number in the original graph
-        # # minus the number not in the connected component
-        # num_in_cc = searched_graph.count() - not_in_cc.count()
-        # cc_sizes.append(num_in_cc)
-
-        # # Get rid of the distances and colors - we want to start over
-        # # Note y == (d, path, c, adj_list) so y[-1] == adj_list
-        # graph = not_in_cc.map(lambda (x, y): (x, y[-1]) )
-
-        # # Cache our graph to improve speeds
-        # graph = graph.cache()
-
-        # # Pluck a random node from this graph
-        # # When we finish, we can't take any nodes, so we need this if statement
-        # if (graph.count() > 0):
-            # random_node = graph.takeSample(True, 1)[0]
-            # random_node = random_node[0]
-
-        # # And of course increment our accumulator
-        # num_ccs.add(1)
-
-    # # And return the number of connected components
-#     return num_ccs.value, max(cc_sizes)
-
 def cc_2(sc, graph):
     """ Finds connected components of a symmetric graph.
     Graph is assumed to in the adjacency list representation of (node, (distance, [neighbors])).
@@ -93,11 +36,13 @@ def cc_2(sc, graph):
         before_combine = time.time()
 
         # Take a step from each node at the same time and get new labels
-        labeled_graph = labeled_graph.flatMap(update_labels)
-        
+        labeled_graph = labeled_graph.flatMap(update_labels).partitionBy(256)
+
         # Group results
         # This gives us an RDD of the form (node, [(label1, color1, par1), ...]
-        labeled_graph = labeled_graph.groupByKey()
+        # Despite a reduceByKey being faster in the BFS case, I found that a groupByKey followed
+        # by a reduce was faster for finding connected components. I have been unable to explain why.
+        labeled_graph = labeled_graph.groupByKey().partitionBy(256)
         
         # Reassign labels and colors correctly
         labeled_graph = labeled_graph.map(partial(get_correct_labels, acc=accum))
@@ -210,8 +155,6 @@ def get_correct_labels(node, acc):
     # The correct label is the minimum label
     actual_label = min(label_list)
 
-    # The only node in the list colored BLACK is this node
-    # That will tell us what its old label was
     #### NOTE: 'BLACK' should clearly be in ALL lists, as we map across all nodes
     #### and even if we do not propagate any information, return the node with the label 'BLACK'.
     #### This algorithm works perfectly on the marvel data but I was getting an error with the Wiki
@@ -219,6 +162,8 @@ def get_correct_labels(node, acc):
     #### For that reason I added this if statement. It seems to imply that some page links to a page
     #### that is not actually in the dataset?
     if 'BLACK' in color_list:
+        # The only node in the list colored BLACK is this node
+        # That will tell us what its old label was
         my_index = color_list.index('BLACK')
 
         # If we haven't been updated, we can't contribute to the update right now
@@ -231,96 +176,69 @@ def get_correct_labels(node, acc):
 
         # Add all the adjacency lists from all the steps and get rid of any duplicates
         # This actually might not be necessary, but we will do so for safety
-        adj_list = list(set(reduce(lambda x, y: x + y, potential_adj_list)))
+        try:
+            adj_list = list(set(reduce(lambda x, y: x + y, potential_adj_list)))
+        except:
+            print potential_adj_list
 
         return (node_name, (actual_label, color, adj_list))
     else:
         #### NOTE: otherwise, we are on that one strange node causing an error...
         adj_list = list(set(reduce(lambda x, y: x + y, potential_adj_list)))
+
+        # We might as well propagate it's label...
+        color = 'WHITE'
         
+        # Log some information about what's going on here...
+        with open('error.log', 'a') as log_file:
+            print node_name, 'is not in the original dataset?'
+            print >> log_file, node_name, actual_label, adj_list 
+
         # Just reappend the node (as it should be there anyways) and carry on
         return (node_name, (actual_label, color, adj_list))
 
-def get_symmetric_graph(graph):
-    """ Returns the largest undirected subgraph of graph.
-    Runs a parallel BFS on graph and records, for each node, all the parents that got there
-    and also the original adjacency list. Compares the two to find symmetric nodes.
-    Graph is assumed to be in the adjacency list representation of (node, [neighbors]).
-    This is for use with the connected component problem to initialize one of the graphs. 
-    """
+def get_correct_labels_reduce_func(label_node_list1, label_node_list2, acc):
 
-    # Cache our graph to avoid unnecessary computation due to laziness 
-    graph = graph.cache()
+    label1 = label_node_list1[0]
+    c1 = label_node_list1[1]
+    adj1 = label_node_list1[2]
 
-    # Take a step from each node at the same time
-    all_nodes_with_parents = graph.flatMap(explore_and_store_parents)
+    label2 = label_node_list2[0]
+    c2 = label_node_list2[1]
+    adj2 = label_node_list2[2]
 
-    # Group results
-    # This gives us an RDD of the form (node, [[par1], [par2], ... , adj_list]
-    nodes_with_parents = all_nodes_with_parents.groupByKey()
-    
-    # Now find only the symmetric nodes
-    symmetric_graph = nodes_with_parents.map(find_symmetric_links)
-    
-    return symmetric_graph 
+    c = 'BLACK'
+    label = label1
 
-def find_symmetric_links(node_list_tup):
-    """ After stepping from each node and grouping by key, we have a big RDD of the form
-    (node, [orig_adj_list, [parent_1], [parent_2] ...].
-    orig_adj_list is the original adjacency list.
-    parent_n is a parent that we got to this node from.
-    Symmetric links are those for which parent_n appears in orig_adj_list
-    """
+    if c1 == 'BLACK':
+        # Then this is the OLD distance
+        if label1 <= label2:
+            # Then we shouldnt be updated and we have no new info
+            c = 'BLACK'
+            label = label1
+        else:
+            # We got updated - update the label and set node for propagation
+            # Note - at SOME POINT we will have to compare our old label to a new one
+            # We may even end up finding a BETTER label after this comparison, but that's fine
+            # the point is that the label still changed
+            c = 'WHITE'
+            label = label2
+            acc.add(1)
+    elif c2 == 'BLACK':
+        # Symmetric case
+        if label2 <= label1:
+            c = 'BLACK'
+            label = label2
+        else:
+            c = 'WHITE'
+            label = label1
+            acc.add(1)
+    else:
+        # If neither of them are black, just take the better one
+        c = 'WHITE'
+        label = min(label1, label2)
 
-    # Just separate the name and the parents/adjacency list 
-    node_name = node_list_tup[0]
-    list_of_pars_and_colors = node_list_tup[1]
+    # Reconstruct the adjacency list and (maybe) remove duplicates
+    adj_list = list(set(adj1 + adj2))
 
-    # Separate the colors and the parents
-    colors = map(lambda (x, y): x, list_of_pars_and_colors)
-    pars = map(lambda (x, y): y, list_of_pars_and_colors) 
-
-    # Now isolate where our adjacency list is
-    adj_list_idx = colors.index('BLACK')
-
-    # And get the original adjacency list
-    adj_list = pars[adj_list_idx]
-
-    # Now remove this from the list of parents
-    del pars[adj_list_idx]
-
-    # Flatten the singleton list of parents
-    pars = [x[0] for x in pars]
-
-    # And find the intersection... set intersection works fine because we have no duplicates
-    symm = list(set(pars) & set(adj_list))
-
-    return (node_name, symm) 
-
-def explore_and_store_parents(node):
-    """ Explores one level from the node node.
-    For each node we step to, we return (node_stepped_to, node) - i.e., the reverse of the edge we traveled
-    We also return the node and its original adjacency list.
-    To be used with flatMap, so we can later compare reverse edges with actual edges.
-    """
-
-    # Just split up the data for readability
-    curr_node = node[0]
-    adj_list = node[1]
-
-    # Our list of results to be returned for flatMap
-    results = []
-
-    # Start off by adding the current node
-    # Mark our adjacency list with 'BLACK'
-    results.append(
-            (curr_node, ('BLACK', adj_list))
-            )
-
-    # Iterate over all other nodes and store reverse edges 
-    for other_node in adj_list:
-        results.append(
-                (other_node, ('WHITE', [curr_node]))
-                )
-
-    return results
+    return (label, c, adj_list)

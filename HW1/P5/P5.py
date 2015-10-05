@@ -1,4 +1,5 @@
 from pyspark import SparkContext
+import time
 from P5_connected_components import cc_2, get_symmetric_graph
 from P5_bfs import BFS
 
@@ -17,6 +18,16 @@ def get_links(link_str):
 
     # Cast the page to an int for easy indexing
     return (int(page), links)
+
+def reverse_links(node_adj_tup):
+    """ To be used with flatMap
+    Reverses all edges in the graph
+    """
+
+    node = node_adj_tup[0]
+    adj_list = node_adj_tup[1]
+
+    return [(other_node, node) for other_node in adj_list]
 
 if __name__ == "__main__":
 
@@ -40,13 +51,33 @@ if __name__ == "__main__":
     # Now get our graph, partition it, and cache it
     page_graph = links.map(get_links).partitionBy(256).cache()
 
-    # Get the symmetric subgraph
-#    symmetric = get_symmetric_graph(page_graph) 
+    # Reverse it, copartition it with page_graph
+    reversed_graph = page_graph.flatMap(reverse_links).groupByKey().map(lambda (x, y): (x, list(y))).partitionBy(256).cache()
+
+    # Now get the symmetric subgraph and make the graph symmetric
+    # First join them: every node will appear twice, once with forward edges and once with reverse
+    # Cache it so we dont do this union twice
+    double_graph = page_graph.union(reversed_graph).cache()
+
+    # Now get the other two graphs
+    before_symm_subgraph = time.time()
+    symmetric_subgraph = double_graph.reduceByKey(lambda adj1, adj2: list(set(adj1) & set(adj2))).partitionBy(256).cache()
+    symmetric_subgraph.count()
+    print 'Time to construct symmetric subgraph:', time.time() - before_symm_subgraph
+
+    # And the totally symmetric graph
+    before_undirect = time.time()
+    undirected_graph = double_graph.reduceByKey(lambda adj1, adj2: list(set(adj1) | set(adj2))).partitionBy(256).cache()
+    undirected_graph.count()
+    print 'Time to construct undirected graph:', time.time() - before_undirect
+
 
     # Now find the connected components
-#    with open('output.txt', 'w') as out_file:
-#        print >> out_file, 'Number of ccs and size of the largest in totally undirected graph:', cc_2(sc, page_graph)
-#        print >> out_file, 'Number of ccs and size of the largest in symmetric subgraph:', cc_2(sc, symmetric)
+    # NOTE: This is commented out because it takes basically forever.
+    # It was tested on a subset of the wikipedia data of size 50,000 it and it worked, as well as the marvel data
+#    with open('ccs.txt', 'w') as out_file:
+#        print >> out_file, 'Number of ccs and size of the largest in totally undirected graph:', cc_2(sc, symmetric_subgraph)
+#        print >> out_file, 'Number of ccs and size of the largest in symmetric subgraph:', cc_2(sc, undirected_graph)
 
     # Now we need to find the id's corresponding to Kevin Bacon and Harvard
     # Note that because we store our graph as (id, n) we can't do a simple lookup
