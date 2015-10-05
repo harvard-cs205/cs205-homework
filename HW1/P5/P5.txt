@@ -1,1 +1,3 @@
 # Your discussion here
+
+Did not manage to make my code work on AWS but the code works locally on the Marvel graph and a test graph created in the same way as the Wikipedia graph…
