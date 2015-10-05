@@ -56,7 +56,7 @@ def make_rdds(tfn,lfn,n):
 				.partitionBy(n)
 			)
 
-	graph  = (sc.textFile(lfn,n_parts)
+	graph  = (sc.textFile(lfn,n)
 				 .cache()
 				 .map(lambda x: x.split(" "))
 				 .map(lambda x: (int(x[0][:-1]),(x[1:],None))) # [:-1] omits colon, gives (node,[associated]) tuples
