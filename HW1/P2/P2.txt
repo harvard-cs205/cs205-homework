@@ -1,0 +1,16 @@
+# Your discussion here
+
+For the default partition, create a parallelize collection by calling SparkContext's parallelize method and use the second parameter of the function to cut the dataset into 10 partitions. Then, use rdd. cartesian function to pass the pixel at (i, j) into 100 partitions. 
+
+From figure P2a_hist, we found that jobs by using default partition are significantly unbalanced. Most partitions are distributed to the less iterations, very few partitions are for large iterations and most excution time are spent on the parts requiring more iterations. 
+
+In order to rebalance the task, we firstly try to use partitionBy(numPartitions=100, partitionFunc=lambda x: random.randint(0, 100)) to resuffle the data in pixel RDD randomly. From P2b1_hist, we found that jobs are better distributed for 200000-2500000 iterations, but there is still a few distributions distributed to large iterations which could be slow tasks and cause the computation to have poor parallelism. 
+
+After discussing with other classmates, we try to reshuffle the data before using parallelize method, which means:
+
+x=range(2000)
+random.shuffle(x)
+ii=sc.parallelize(x, numSlices=10). 
+
+In this way, all the pixels are shuffled randomly. From P2b2_hist, we found that the distribution of partitions is approximately a normal distribution. 
+
