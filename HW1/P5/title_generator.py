@@ -1,5 +1,5 @@
 import random
-total_nodes = 2000000
+total_nodes = 100000
 
 
 for node in range(1, total_nodes):

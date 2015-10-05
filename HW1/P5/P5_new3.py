@@ -19,21 +19,21 @@ logger.LogManager.getLogger("akka").setLevel( logger.Level.ERROR )
 # Uncomment the appropriate set of files when running locally!
 # 	These are files I generated in order to run tests locally before running on AWS
 # 	The number in the file names indicates the number of nodes. Each node has an average of 25 out links (same as true dataset)
-linklist = sc.textFile('../P5/generated_links_1000_sorted.txt', 32)
-titlelist = sc.textFile('../P5/generated_titles_1000_sorted.txt', 32)
+#linklist = sc.textFile('../P5/generated_links_1000_sorted.txt', 32)
+#titlelist = sc.textFile('../P5/generated_titles_1000_sorted.txt', 32)
 #linklist = sc.textFile('../P5/generated_links_10000_sorted.txt', 32)
 #titlelist = sc.textFile('../P5/generated_titles_10000_sorted.txt', 32)
 #linklist = sc.textFile('../P5/generated_links_100000_sorted.txt', 32)
 #titlelist = sc.textFile('../P5/generated_titles_100000_sorted.txt', 32)
-#linklist = sc.textFile('../P5/generated_links_2mil_sorted.txt', 32)
-#titlelist = sc.textFile('../P5/generated_titles_2mil_sorted.txt', 32)
+linklist = sc.textFile('../P5/generated_links_2mil_sorted.txt', 32)
+titlelist = sc.textFile('../P5/generated_titles_2mil_sorted.txt', 32)
 
 # Uncomment these when running on AWS@
 #linklist = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt', 32)
 #titlelist = sc.textFile('s3://Harvard-CS205/wikipedia/titles-sorted.txt', 32)
 
 numerical_titles = titlelist.zipWithIndex().cache()
-
+indexed_titles = titlelist.map(lambda (x, y): (y, x)).cache()
 num_nodes = numerical_titles.count()
 #num_Partitions = int(num_nodes/50)
 num_Partitions = 256
@@ -49,10 +49,10 @@ nodes = split_list.map(lambda (x,y): int(x), True)
 assert(copartitioned(split_list, nodes))
 
 # Change these to be the appropriate start and end locations.
-#start = "Kevin_Bacon"
-#end = "Harvard_University"
-start = 'TITLE_8'
-end = "TITLE_4"
+start = "Kevin_Bacon"
+end = "Harvard_University"
+#start = 'TITLE_8'
+#end = "TITLE_4"
 
 start_node = numerical_titles.lookup(start)[0]
 end_node = numerical_titles.lookup(end)[0]

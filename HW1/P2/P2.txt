@@ -1,1 +1,8 @@
 # Your discussion here
+
+
+Ultimately, we get different results from the two of these. Naturally, having another partitionBy will lead to another shuffle, and this does, on my local machine, lead to a slight slowdown. However, this is not problematic, since a computation like this can be very easily parallelized (since it is embarassingly parallel), and therefore being able to balance loads will allow this to work extremely well on a distributed cluster, such as on AWS.
+
+Looking at the graphs directly, we see that in the first part, most of the partitions have very little load, and a few of them have a ton of load (note the log scale). 
+
+However, in the second technique, we find that all of them have very close to the same load, and that load is much lower than the max load from the first part!

@@ -6,9 +6,11 @@ def copartitioned(RDD1, RDD2):
 #######
 # Implements Breadth First Search
 # Arguments:
-# 	adj (KV RDD): Edge list. For example: [(1,2), (1, 3), (2,3), (3, 2)] is the graph where there is a directed edge from 1 to 2 and 1 to 3, edges in both directions between 2 and 3.
+# 	adj (KV RDD): adjacency list - these are directed edges. 
 # 	start (string): Where the breadth first search will start
-#   If a stopNode is provided, then it will stop iterating once that node is found.
+#   sc: the sparkContext
+#   numPartitions:
+#   stopNode: where to stop
 # Returns:
 # 	(RDD) Distances to each point, and (RDD) list of all points that were not reachable.
 def bfs(adj, start, sc, numPartitions, stopNode):
@@ -48,7 +50,6 @@ def bfs(adj, start, sc, numPartitions, stopNode):
         paths.filter(lambda (node, _): node == stopNode).foreach(lambda _: solutions.add(1))
         # Get the outlying nodes
         to_search = paths.keys().distinct().map(lambda x: (x, [-1])).partitionBy(numPartitions).cache()
-        print "Solutions: ", solutions.value
 
 
     # Get all of the paths that end with the node we are interested in.
