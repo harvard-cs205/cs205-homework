@@ -4,7 +4,8 @@ import pyspark
 
 
 def distance_to_all_nodes_spark(root_node, graph_rdd):
-    """A fast parallel implementation of the search algorithm (does leave RDD for neighbors, for performace reasons)"""
+    """A fast parallel implementation of the search algorithm
+       (does leave RDD for neighbors, for performace reasons in small graphs)."""
     result = graph_rdd.context.parallelize([(root_node, 0)])
     visited = {root_node}  # set initial node
     neighbors = set(graph_rdd.lookup(root_node)[0])   # set initial neighbors
@@ -24,18 +25,19 @@ def distance_to_all_nodes_spark(root_node, graph_rdd):
 
 
 def distance_to_all_nodes_edge(root_node, edges_rdd, N):
-    """Using edge tuples to determine distances to all nodes, without leaving Spark"""
+    """Using edge tuples to determine distances to all nodes, without leaving Spark."""
     edges_rdd = edges_rdd.partitionBy(N)
     edges_rdd = edges_rdd.cache()
     result = edges_rdd.context.parallelize([(root_node, 0)])
     rdd = result
     while not rdd.isEmpty():
-        rdd = edges_rdd.join(rdd).partitionBy(N).values()
-        rdd = rdd.distinct()
+        print '.',
+        rdd = edges_rdd.join(rdd).partitionBy(N).values().distinct()
         rdd = rdd.subtractByKey(result)  # don't repeat work
         rdd = rdd.mapValues(lambda v: v + 1)
         result = result.union(rdd).partitionBy(N)
         rdd = rdd.cache()
+    print '.'
     return result
 
 
@@ -53,8 +55,6 @@ def distance_to_all_nodes_serial(root_node, graph_rdd):
     print len(result)  # number of nodes touched on
     result_rdd = graph_rdd.keys().map(lambda key: (key, -1) if key not in result else (key, result[key]), True)
     return result_rdd  # -1 means no connection (within 10 steps)
-
-
 
 
 
