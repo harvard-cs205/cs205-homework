@@ -1,1 +1,5 @@
-# Your discussion here
+Nodes reachable within 10 steps by "CAPTAIN AMERICA":   6408
+Nodes reachable within 10 steps by "MISS THING/MARY":   7
+Nodes reachable within 10 steps by "ORWELL":            9
+
+Based on how I did 
