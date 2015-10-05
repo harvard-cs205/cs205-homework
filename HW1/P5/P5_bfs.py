@@ -22,7 +22,7 @@ def filter ((source, paths)) :
      return paths is not None
 
 # Source Destination Breadth First Search
-def SDBFS(source, dest, graph) :
+def SDBFS(source, dest, graph, sc) :
     # Using 2 executors with 4 cores, so 32 partitions seems reasonable. 
     # Paths will store our shortest paths if they exist.  
     paths = graph.keys().map(lambda x : (x,[[]])).partitionBy(32)
