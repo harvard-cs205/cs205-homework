@@ -1,1 +1,10 @@
-# Your discussion here
+Count the number of nodes touched in each of the above searches and place these counts in
+your writeup. What does it mean if a character does not have a defined distance during the
+search?
+
+Nodes Touched:
+Captain America: 6408
+Miss Thing/Mary: 7
+Orwell: 9
+
+If a character does not have a define distance during the search, it means that there is no path (of length less than or equal to 10, with our diameter assumption) between the source character and that character.
