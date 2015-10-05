@@ -1,3 +1,11 @@
 # Your discussion here
 
+In order to obtain the shortest path, I first transformed the (node, neighbor) rdd into (node, neighbor, depth, origin) rdd. Then for the nodes in the current layer, I flatMap all the neighbors to become keys and map back the depth and its origin. Already existed nodes are ignored. Once the end node is found, I filter the rdd with just the end row and other depths. Then I reverse calculate the path from that node. It takes about 40 minutes to run on cluster.
+
+
+Path from Kevin Bacon to Harvard University and reverse (not unique):
+
+u'Harvard_University' -> u'2008' -> u'2008_in_film' -> u'Kevin_Bacon')
+
 u'Kevin_Bacon' -> u'College_Bowl' -> u'Harvard_University'
+
