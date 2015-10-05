@@ -1,8 +1,8 @@
 “There are several possible partitioning strategies to achieve this goal, with different tradeoffs. Produce a histogram of compute effort for each partition for your partitioning choice. Discuss your choice in terms of (a) how well it balances work, and (b) its costs, particularly shuffle costs.”
 
-The partitioning of my choice is random assignment of partitions to each point.
+The partitioning of my choice is random assignment of partitions (from 1 to 100) to each point.
 
-As we can see in the histograms, the work is much more balanced for the random partitions (it looks like an almost perfect normal distribution) than for the default ones. And consequently the duration of the work is also smaller for the random partitions (the points with more cost of calculation, the bright ones, are spread across all the partitions).
+As we can see in the histograms, the work is much more balanced for the random partitions (it looks like an almost perfect normal distribution) than for the default ones. And consequently the duration of the work is also smaller for the random partitions. In that scenario, the points with more cost of calculation, the bright ones, are spread across all the partitions. In the default case, the bright points are concentrated in some partitions; since for the job to be over all the partitions must be finished, this make all the process slower.
 
 By looking at the information in localhost4040/jobs we can get the following data:
 
