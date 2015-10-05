@@ -20,7 +20,7 @@ edgelist = rdd1.join(rdd1).map(lambda (K,V): V).filter(lambda (K,V): K!=V).disti
 edgelist.take(1)
 edgelist.cache()
 
-print "Edgelist is ready, starting computing"
+print "Edgelist ready, starting computing"
 
 start2 = time.time()
 missmary = bfs(edgelist,'MISS THING/MARY',10,sc)
