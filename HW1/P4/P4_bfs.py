@@ -6,6 +6,46 @@ from functools import partial
 # using Breadth-First Search algorithm. This is the last version that uses 
 # Spark Accumulators and rdd.filters() for optimization
 #########################################################################
+
+def reduce_nodes(nodes_list):
+    nodes_list = list(nodes_list)
+    return sorted(nodes_list, key = lambda x: x[1])[0]
+
+#########################################################################
+# 
+# The update_graph is performed on each node in the filtered range (unused)
+# during each iteration. 
+#
+#########################################################################
+
+def update_graph(node, mc_graph, accum):
+    # extract values from node for clarity
+    character_name = node[0]
+    adj_list = node[1][0]
+    dist = node[1][1]
+    is_used = node[1][2]
+    
+    mc_graph = mc_graph.value
+    result = []
+
+    #if the node has been touched (dist < inf), use it to touch its adjacent nodes
+    if dist < float("inf"):
+        for i in adj_list:
+            #Get the adjacent node
+            new_node = (i, mc_graph[i])
+
+            # Set distance if it is current min and append it to result list
+            if new_node[1][1] > (dist + 1):
+                new_node[1][1] = (dist + 1)
+                result.append(new_node)
+        # Set the is_used state to True since it has already touch its adj_list
+        node[1][2] = True
+        accum.add(1)
+    # Append the node itself as an element of result
+    result.append(node)
+    return result
+
+
 def BFS(MC_Graph, init_node):
 
     # Transform MC_Graph (character_name, [adj_list]) to MC_Graph_bfs to 
@@ -26,8 +66,6 @@ def BFS(MC_Graph, init_node):
     # This is used for lookup during each update
     tmp = dict(MC_Graph_bfs.collect())
     broadcast_graph = sc.broadcast(tmp)
-    
-    diameter = 10
 
     # Accumulator set to 0
     accum = sc.accumulator(0) 
@@ -64,42 +102,4 @@ def BFS(MC_Graph, init_node):
     touched_nodes_num = MC_Graph_bfs.filter(lambda x: x[1][1] < float("inf")).count()
 
     return touched_nodes_num
-
-#########################################################################
-# 
-# The update_graph is performed on each node in the filtered range (unused)
-# during each iteration. 
-#
-#########################################################################
-
-def update_graph(node, mc_graph, accum):
-    # extract values from node for clarity
-    character_name = node[0]
-    adj_list = node[1][0]
-    dist = node[1][1]
-    is_used = node[1][2]
-    
-    mc_graph = mc_graph.value
-    result = []
-
-    #if the node has been touched (dist < inf), use it to touch its adjacent nodes
-    if dist < float("inf"):
-        for i in adj_list:
-            #Get the adjacent node
-            new_node = (i, mc_graph[i])
-
-            # Set distance if it is current min and append it to result list
-            if new_node[1][1] > (dist + 1):
-                new_node[1][1] = (dist + 1)
-                result.append(new_node)
-        # Set the is_used state to True since it has already touch its adj_list
-        node[1][2] = True
-        accum.add(1)
-    # Append the node itself as an element of result
-    result.append(node)
-    return result
-
-def reduce_nodes(nodes_list):
-    nodes_list = list(nodes_list)
-    return sorted(nodes_list, key = lambda x: x[1])[0]
     
