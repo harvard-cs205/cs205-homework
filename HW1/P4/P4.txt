@@ -6,6 +6,8 @@ Basic representation
 Derived representation for BFS
 [(character_name, ([adjacent_nodes_list], distance, is_used))]
 
+#”is_used “ records whether a node has been used to touch other nodes, since one node is only given one chance to touch other nodes, this can be used as a filtering criteria
+
 2. Number of touched nodes
 CAPTAIN AMERICA: 6408
 MISS THING/MARY: 7

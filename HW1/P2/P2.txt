@@ -1,1 +1,9 @@
 # Your discussion here
+
+As clearly shown in P2a_hist.png, over 85% of tasks have very small number of computations, in contrast with less than 10 tasks which has several orders of magnitude higher computation numbers. This result in poor parallelism since slow tasks take most of the execution time while the majority of tasks finish far earlier, and the overall time increased unnecessarily.
+
+To better balance workload between different partitions (multiple subtasks), I changed the partitioning strategy to try to make each task be approximately equal in execution time (see P2b.py and P2b_hist.png):
+
+The basic idea is to apply “partitionBy” command right after cartesian to randomly repartition the jobs. The presumption is that the random repartition will at least more evenly distribute the jobs than the default partition method, since the periodic nature of cartesian, certain partitions will be given an unequal number of expensive jobs. As can be seen in P2b_hist.png, the workload is better balanced and evenly distributed compared to P2a_hist.png, with over 70% of jobs concentrated at around 2*10^6 -2.1*10^6, but apparently the result is still not very good since the standard deviation is still pretty big.
+
+A more balanced is way to use partitioner and zipWithIndex to index each job, than dispatch jobs to workers according to their index number: those located in the centre (brighter pixels) has larger iteration counts so they should be allocated separately. However, the index step and shuffle take extra overhead ,especially when the dataset grow sufficiently big the overhead could largely outweigh the time saved by balanced work. This is be considered as tradeoff and should be judged on a case-by-case manner. 

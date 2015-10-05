@@ -17,7 +17,10 @@ def generatePairs(node_set):
                 edges.append((i, j))
     return edges
 
-if __name__ == '__main__':
+if __name__ == "__main__":
+
+	sc = pyspark.SparkContext()
+
 	rawData = sc.textFile("source.csv").map(lambda line: line.split('","')).map(lambda x: [x[0]+'"', '"'+x[1]]).cache()
 
 	# Get the list of all characters
