@@ -1,1 +1,34 @@
 # Your discussion here
+The following are the lines that were created using biased distributions based on the Shakespeare data after randomly sampling in data from the Shakespeare text.
+
+
+
+[u'us.', u'The', u'ways', u'are', u'dangerous', u'weapons', u'for', u'maids.', u'Marg.', u'Well,', u'will', u'be', u"rul'd.", u"Call't", u'not', u'a', u'tomb', u'Which', u'hides', u'your']
+us. The ways are dangerous weapons for maids. Marg. Well will be rul’d. Call’t not a tomb which hides your
+
+[u'for', u"Brutus'", u'sake,', u'am', u'beholding', u'to', u'your', u'honourable', u'load-', u'If', u'honour', u'may', u'be', u'had.', u'And', u'yet', u'would', u'it', u'had', u'it']
+for Brutus sake am beholding to your honourable load- If honour may be had. and yet would it had it
+
+[u'peerless', u'feature,', u'joined', u'with', u'no', u'worse', u'fortune!', u'But', u'never', u'once', u'again', u'we', u'sit,', u'once', u'again', u"crown'd,", u'And', u"look'd", u'upon', u'things']
+peerless feature joined with no worse fortune! But never once again we sit once again crown’d And look’d upon things
+
+[u'give', u'us.', u'This', u'day', u'is', u'it,', u'Adam,', u'that', u'grieves', u'me;', u'and', u'this', u'valour', u'comes', u'of', u'a', u'jakes', u'with', u'him.', u'Off']
+give us. This day is it Adam that grieves me and this valour comes of a jakes with him. Off
+
+[u'Had', u'virtuous', u'uncles', u'to', u'protect', u'his', u'Grace.', u'My', u'lord,', u'is', u'pressing', u'to', u'death,', u'And,', u'winking,', u'leapt', u'into', u'it.', u'Say,', u'who']
+Had virtuous uncles to protect his Grace. My lord is pressing you to death and winking leapt into it. Say who
+
+[u'The', u'west', u'yet', u'glimmers', u'with', u'some', u'device,', u'Iago;', u'and', u'rather,', u'as', u'it', u'is.', u'Come,', u'go', u'with', u'us;', u'and', u'on', u'this,']
+The west yet glimmers with some device Iago: and rather as it is Come go with us: and on this.
+
+[u'up-staring-then', u'like', u'reeds,', u'not', u'hair-', u'Was', u'the', u'first', u'of', u'difference', u'and', u'decay', u'It', u'useth', u'an', u'enforced', u'pilgrimage.', u'The', u'sullen', u'passage']
+up-staring-then like reeds not hair- Was the first of difference and decay It seth an enforced pilgrimage. The sullen passage
+
+[u'wisdom', u'best', u'shall', u'think.', u'Bleed,', u'bleed,', u'poor', u'country!', u'Great', u'tyranny,', u'lay', u'thou', u'thy', u'oaths,', u'And', u"entertain'd", u'me', u'with', u'orisons,', u'for']
+wisdom best shall think. Bleed bleed poor country! Great tyranny lay thou thy oaths. And entertain’d me with orisons for
+
+[u'mine', u'It', u'shall', u'be', u'an', u'undertaker,', u'am', u'for', u'you.', u'Sir,', u'will', u'tell', u'her,', u'let', u'her', u'be', u'made', u'of', u'no', u'moment,']
+mine It shall be an undertaker am for you. Sir will tell her let her be made of no moment
+
+[u’brother.', u'Exit', u'Why', u'look', u'you', u'lisp', u'and', u'wear', u'a', u'beard', u'of', u'formal', u'cut,', u'Full', u'of', u'sad', u'mischance;', u'These', u'English', u'woes']
+brother Exit Why look list and wear a beard of formal cut Full of sad mischance; These English woes
