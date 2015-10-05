@@ -1,5 +1,5 @@
 Using almost the same BFS algorithm as in P4, just add a parent. And note that the neighbors are now children. 
-The search can be done in local. And the whole process would take up to 10 minutes.
+The search can be done in local. When running on local machine, each search could take up to 10 minutes.
 
 From ‘Harvard’ to ‘Kevin_Bacon’:
 [u'Kevin_Bacon', u'Liza_Weil', u'Gilmore_Girls', u'Harvard_University’]
