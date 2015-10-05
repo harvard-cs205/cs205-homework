@@ -1,1 +1,17 @@
-# Your discussion here
+In part (a), the issue is that the Mandelbrot computation is much more
+intensive near the center of the image. Since the neighbor pixels of (x,y)
+indices are likely sent to the same partition, this ends up creating more
+work for partitions that contain the center pixels. 
+
+To mitigate this, we can create a scheme where pixels are partitioned in
+a random manner. Part (b) effectively solves the problem this way.
+Indices (i,j) are sorted in random order and mapped to corresponding (x,y)
+index which result in a more well-balanced partitioning scheme as shown in
+P2b_hist.png. 
+
+A nice feature of the approach in (b) is that the shuffle cost is bundled
+with the creation of the RDD, so that it is as minimal as possible.
+
+An alternative way to achieve more balanced partitioning is to use the
+default partitionBy() function. This gives the histogram plot as shown
+in P2b_hist_partition_by_default.

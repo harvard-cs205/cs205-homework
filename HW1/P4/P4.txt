@@ -1,1 +1,140 @@
-# Your discussion here
+If a character does not have a defined distance during the search
+then it means that it is not connected to the root node via any path.
+
+The diameter D can be thought of as the length of the longest path
+among all shortest paths between any two nodes in the graph. If D = 1,
+it means the longest path is only 1 edge, which also implies that our
+iterative algorithm only needs to run 1 iteration. Thus, in general D
+is the maximum number of iterations the search has to run in order to
+find all paths from a single source.
+
+In the problem, the graph representation is a pair of (V, E) of nodes
+and edges. Nodes are represented as a pair RDD mapping from a hero to
+the distance from the source. Initially the distance is set to inifinity
+and is updated as it is discovered in the search. Edges are represented
+as a pair RDD mapping from a hero to list of neighbors.
+
+The number of touched nodes for the 3 heros are:
+
+"CAPTAIN AMERICA":	6048
+"MISS THING/MARY":	7
+"ORWELL":			9
+
+Below is the full output of the program printed for two separate runs.
+The first run uses a diameter of 10, the second uses accumulator to
+detect if the search has converged.
+
+*****************************************************************
+********************* USING DIAMETER SEARCH *********************
+*****************************************************************
+
+---------------------
+CAPTAIN AMERICA
+Showing 10 D-1 neighbors:
+[(u'CHADWICK, CHEER', 1), (u'QUASAR III/WENDELL V', 1), (u'PHARAOH RAMA-TUT', 1), (u'ORPHAN-MAKER/PETER', 1), (u'THALLIUM', 1), (u'POTTER, BETSY BEATTY', 1), (u'GAMBONNO, LUIGI', 1), (u'BAZIN, ANDREW', 1), (u'HAYWIRE/', 1), (u'TAGAR', 1)]
+Showing 10 D-2 neighbors:
+[(u'LINAK', 2), (u'GREY KING/ADDISON FA', 2), (u'SWEEPZWEAK', 2), (u'STUNNER/ANGELINA BRA', 2), (u'FORRESTER, CAPT. ALE', 2), (u'FORTUNE', 2), (u"K'RIN", 2), (u'AIRBORNE/', 2), (u'VERMIN II', 2), (u'GREICO, LINDA', 2)]
+Showing 10 D-3 neighbors:
+[(u"G'RATH", 3), (u'OUBLIETTE/', 3), (u'LEONINUS', 3), (u'LOGAN, WAYNE', 3), (u'OZ, DR. MALACHI', 3), (u'BLACK TALON III', 3), (u'DRAGONMEGAS, JESSIE', 3), (u'CHAKRA II', 3), (u'SCOTT, JAKE', 3), (u'SAINT, AMANDA', 3)]
+Number of touched nodes:
+6408
+Running time: 
+118.997498035
+---------------------
+MISS THING/MARY
+Showing 10 D-1 neighbors:
+[(u'MANT/ERNEST', 1), (u'STERLING', 1), (u'PANTHER CUB/', 1), (u'DARLEGUNG, GEN.', 1), (u'SWORDSMAN IV/', 1), (u'AMAZO-MAXI-WOMAN/', 1)]
+Showing 10 D-2 neighbors:
+[(u'MISS THING/MARY', 2)]
+Showing 10 D-3 neighbors:
+[]
+Number of touched nodes:
+7
+Running time: 
+46.2227180004
+---------------------
+ORWELL
+Showing 10 D-1 neighbors:
+[(u'HOFFMAN', 1), (u'NILES, SEN. CATHERIN', 1), (u'ASHER, DONNA', 1), (u'LUDLUM, ROSS', 1), (u'OSWALD', 1), (u'FAGIN', 1), (u'ASHER, CARL', 1), (u'ASHER, MICHAEL', 1)]
+Showing 10 D-2 neighbors:
+[(u'ORWELL', 2)]
+Showing 10 D-3 neighbors:
+[]
+Number of touched nodes:
+9
+Running time: 
+46.8514430523
+
+*****************************************************************
+******************** USING SPARK ACCUMULATOR ********************
+*****************************************************************
+
+previous sum: 0
+aggregate sum: 449386
+449386
+previous sum: 449386
+aggregate sum: 465764
+16378
+previous sum: 16378
+aggregate sum: 478494
+12730
+previous sum: 12730
+aggregate sum: 491224
+12730
+Converged after 4 iterations
+---------------------
+CAPTAIN AMERICA
+Showing 10 D-1 neighbors:
+[(u'CHADWICK, CHEER', 1), (u'PHARAOH RAMA-TUT', 1), (u'QUASAR III/WENDELL V', 1), (u'TAGAR', 1), (u'GAMBONNO, LUIGI', 1), (u'ORPHAN-MAKER/PETER', 1), (u'THALLIUM', 1), (u'POTTER, BETSY BEATTY', 1), (u'HAYWIRE/', 1), (u'BAZIN, ANDREW', 1)]
+Showing 10 D-2 neighbors:
+[(u'SPIRAL II/ESTELLE GE', 2), (u'FORTUNE', 2), (u'SWEEPZWEAK', 2), (u'STUNNER/ANGELINA BRA', 2), (u'LINAK', 2), (u'MARCEAUX, THEOREN', 2), (u"K'RIN", 2), (u'HYBRID/JAMES JIMMY M', 2), (u'DRAGONWING/', 2), (u'VERMIN II', 2)]
+Showing 10 D-3 neighbors:
+[(u"G'RATH", 3), (u'OUBLIETTE/', 3), (u'LEONINUS', 3), (u'LOGAN, WAYNE', 3), (u'OZ, DR. MALACHI', 3), (u'BLACK TALON III', 3), (u'DRAGONMEGAS, JESSIE', 3), (u'CHAKRA II', 3), (u'SCOTT, JAKE', 3), (u'SAINT, AMANDA', 3)]
+Number of touched nodes:
+6408
+Running time: 
+5.21178102493
+previous sum: 0
+aggregate sum: 1126810
+635586
+previous sum: 635586
+aggregate sum: 1762299
+635489
+previous sum: 635489
+aggregate sum: 2397788
+635489
+Converged after 3 iterations
+---------------------
+MISS THING/MARY
+Showing 10 D-1 neighbors:
+[(u'MANT/ERNEST', 1), (u'STERLING', 1), (u'PANTHER CUB/', 1), (u'DARLEGUNG, GEN.', 1), (u'SWORDSMAN IV/', 1), (u'AMAZO-MAXI-WOMAN/', 1)]
+Showing 10 D-2 neighbors:
+[(u'MISS THING/MARY', 2)]
+Showing 10 D-3 neighbors:
+[]
+Number of touched nodes:
+7
+Running time: 
+9.835242033
+previous sum: 0
+aggregate sum: 3033178
+635390
+previous sum: 635390
+aggregate sum: 3668471
+635293
+previous sum: 635293
+aggregate sum: 4303764
+635293
+Converged after 3 iterations
+---------------------
+ORWELL
+Showing 10 D-1 neighbors:
+[(u'HOFFMAN', 1), (u'NILES, SEN. CATHERIN', 1), (u'ASHER, DONNA', 1), (u'LUDLUM, ROSS', 1), (u'OSWALD', 1), (u'FAGIN', 1), (u'ASHER, CARL', 1), (u'ASHER, MICHAEL', 1)]
+Showing 10 D-2 neighbors:
+[(u'ORWELL', 2)]
+Showing 10 D-3 neighbors:
+[]
+Number of touched nodes:
+9
+Running time: 
+9.83340191841

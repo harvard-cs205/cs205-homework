@@ -1,1 +1,125 @@
-# Your discussion here
+********************************************************************
+********************** BFS SEARCH DISCUSSION ***********************
+********************************************************************
+
+This section discusses BFS search results. For connected components,
+please see below.
+
+***** Short answers *****
+
+[u'Kevin_Bacon', u'Marisa_Silver', u'Harvard_University']
+[u'Kevin_Bacon', u'College_Bowl', u'Harvard_University']
+[u'Harvard_University', u'Natalie_Portman', u'Paris,_je_t'aime', u'Kevin_Bacon']
+
+***** Interesting-path answers *****
+
+[u'Rick_Rolled', u'Rickrolling', u'Paris_Hilton', u'Donald_Trump']
+[u'Donald_Trump', u'Palm_Beach,_Florida', u'James_Patterson', u'Cat_and_Mouse_(James_Patterson_novel)', u'Aids']
+
+***** Long answers *****
+
+Below is the output of running P5_bfs.py on AWS cluster with 4 executors and 256
+partitions using the command:
+
+spark-submit --master yarn-client --num-executors 4 --executor-cores 4 --executor-memory 5g P5_bfs.py
+
+For the first run, the shortest path from Kevin_Bacon to Harvard_University is:
+
+[(3229511, (1, u'Marisa_Silver')), (2729536, (0, u'Kevin_Bacon')), (2152782, (2, u'Harvard_University'))]
+TIME 143.24584562110047
+
+Which is a list whose elements are of format (page index, (distance, page name)) 
+for easy verification by looking up page indices in the links file. The above can 
+be translated to the path:
+
+[u'Kevin_Bacon', u'Marisa_Silver', u'Harvard_University']
+
+Running the algorithm again for Kevin_Bacon, we get a different result, which is
+due to the parallel nature of Spark, but that can also be easily verified to be correct:
+[u'Kevin_Bacon', u'College_Bowl', u'Harvard_University']
+
+Next, the result from Harvard_University to Kevin_Bacon is:
+[u'Harvard_University', u'Natalie_Portman', u'Paris,_je_t'aime', u'Kevin_Bacon']
+
+Finally, for some interesting paths:
+[u'Rick_Rolled', u'Rickrolling', u'Paris_Hilton', u'Donald_Trump']
+[u'Donald_Trump', u'Palm_Beach,_Florida', u'James_Patterson', u'Cat_and_Mouse_(James_Patterson_novel)', u'Aids']
+
+So the next likely president is only 3 hops away from Rick_Rolled and 4 hops from Aids. 
+
+********************************************************************
+*************** CONNECTED COMPONENT SEARCH DISCUSSION **************
+********************************************************************
+
+***** Short answers *****
+
+Symmetric Graph
+
+Number of components: 559
+
+Top 5 components ordered by number of elements in the format of (node_id, element_count):
+[(1, 5709800), (1456392, 6), (3496289, 5), (1348450, 5), (5085598, 5)]
+
+***** BFS-SEARCH *****
+
+The connected component search can be done naively using BFS: we start from a 
+single node and search for its neighbors. This first iteration gives the first 
+connected component. Then, the algorithm finds the next node that hasn't been 
+touched by previous iterations and search for its neighbors again. Continuing 
+this process we should be able to find all components of the graph. The running
+time complexity is O(N * D) where N = # of nodes in the graph and D = diameter.
+
+***** MIN-SEARCH *****
+
+Using BFS works but could take a long time to complete searching, especially if
+there are many small components (i.e. with few elements). A better algorithm is
+to look at the structure of the connected components. If we were to label each
+connected component by the minimum ID of its nodes, then there's a way to mark
+each node's membership by setting its value to this ID:
+
+	1. Initialize each node's value to itself.
+	2. Each node sends its value to its neighbors.
+	3. Each node looks at the values it receives from the neighbors and sets
+	   its value to: self.value = min(self.value, min(values from neighbors))
+	4. Check if any node has its value changed, if so go back to step 2.
+
+The above algorithm has a running time of O(D) where D = diameter of the graph.
+
+***** LOG-DIAMETER-SEARCH *****
+
+A faster algorithm which takes O(log(D)) time to complete can be achieved with
+higher communication overhead. In Min-Search, each node only broadcast its value
+to its neighbors so in a sense the search only advances 1 hop in each iteration.
+By having each node sends its value AND its neighbor's values to all of its
+neighbors, the search can run exponentially faster. We can visualize this process
+with a simple graph that only has 5 nodes which are connected sequentially, i.e.
+its edges are [(1,[2]), (2,[1,3]), (3,[2,4]), (4, [3,5])], as below:
+
+	1. In the first iteration, node 1 sends (1,2) to node 2. Node 2 sends (1,2,3)
+	   to node 1 AND node 3, and so on. The graph is then updated to
+	   [(1,[1,2,3]), (2, [1,2,3,4]), (3, [1,2,3,4,5])], . . .
+	2. The second iteration will converge as soon as node 1 receives the values
+	   from node 3.
+
+Another way to think about this algorithm is that at each step, new edges are
+introduced to connect a node with the neighbors of its neighbors. Thus, the
+number of hops is reduced by a factor of 2 in each iteration which gives log(D)
+steps. Note that D = 4 in the sample graph above where 2 iterations are required.
+
+Below is the result on the Wikipedia graph:
+
+----- Symmetric Graph -----
+
+Converged after 10 iterations
+Most number of elements:
+[(1, 5709800), (1456392, 6), (3496289, 5), (1348450, 5), (5085598, 5)]
+Number of components:
+559
+Time: 2356.0449538230896
+
+Therefore, there are 559 components in the symmetric Wikipedia graph, with the
+largest component containing 5709800 nodes, the next few components only contain
+6 or 5 nodes.
+
+----- Dual Graph -----
+
