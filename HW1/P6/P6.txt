@@ -1,1 +1,12 @@
 # Your discussion here
+
+[[u'scraping', u"fathers'", u'gold.', u'Mine', u'own', u'desert.', u'Your', u'own', u'good', u'fortune?', u'remember', u'You', u'did', u'commit', u'you.', u'If', u'you', u'think', u'your', u'mother'], 
+[u'In', u'little', u'room', u'confining', u'mighty', u'men,', u'Mangling', u'by', u'starts', u'His', u'fretted', u'fortunes', u'give', u'him', u"o'er", u'the', u'very', u'wreck', u'that', u'we'], 
+[u'burn,', u'And', u'reason', u'flies', u'the', u'object', u'of', u'our', u'returned', u'fortune,', u'According', u'to', u'the', u'Duke', u'of', u'Norfolk,', u'Thomas', u'Mowbray?', u'have,', u'my'], [u'Christian-like', u'accord', u'In', u'their', u'embracement,', u'as', u'they', u'say,', u'to', u'hear', u'it.', u'No,', u'though', u'thou', u'do', u'it.', u'Possess', u'us,', u'possess', u'us;'], 
+[u'Leon.', u'Thine,', u'Claudio;', u'thine', u'say.', u'Pedro.', u'You', u'have', u'crafted', u'fair!', u'You', u'have', u'work', u'in', u'me', u'Upon', u'the', u'error', u'that', u'love'], 
+[u'and', u'beget', u'a', u'thousand:', u'here', u'will', u'be', u'bitter', u'with', u'me.', u'am', u'the', u'King', u'will', u'always', u'bear', u'himself', u'with', u'quarrelling,', u'Some'], 
+[u'door', u'without;', u'let', u'him', u'enter.', u'If', u'he', u'were', u'as', u'his.', u'am', u'your', u"sorrow's", u'nurse,', u'And', u'will', u'not', u'here', u'the', u"leaf's"], 
+[u'painted,', u'and', u'the', u'knaves,', u'you', u'need', u'not', u'fear,', u'provokes', u'me.', u'Nay,', u'nay,', u'Octavia,', u'not', u'only', u'die', u'the', u'death,', u'and', u'welcome!'], 
+[u'court.', u'To-morrow,', u'may', u'it', u'be?', u'You', u'must,', u'if', u'you', u'live,', u'draw', u'your', u'neck', u'out', u'of', u'the', u'buck!', u'Buck,', u'buck,', u'buck!'], 
+[u'is', u'sprung', u'up', u'An', u'heretic,', u'an', u'arch', u'so', u'hurried', u'the', u'blown', u'rose', u'may', u'they', u'fall', u'they', u'dash', u'themselves', u'to', u'pieces.']]
+

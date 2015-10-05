@@ -5,22 +5,45 @@ import time
 
 sc = pyspark.SparkContext(appName = "Spark1")
 
-yaxis = sc.parallelize([(ii/500)-2 for ii in range(0,2000)],10)
-xaxis = sc.parallelize([(ii/500)-2 for ii in range(0,2000)],10)
+yaxis = sc.parallelize([ii for ii in range(0,2000)],10)#.map(lambda x: (x,x))
+xaxis = sc.parallelize([ii for ii in range(0,2000)],10)#.map(lambda x: (x,x))
+#xaxis = xaxis.partitionBy(10,lambda x: int(np.floor(x/200)))
+#xaxis = xaxis.map(lambda x: x[0])
 
-#taxis = xaxis.mapPartitions(lambda x: [len(np.array(list(x)))]).collect()
-#print taxis
+image = xaxis.cartesian(yaxis).cache()
 
-image = xaxis.cartesian(yaxis)
+newImage = image.map(lambda x: ((x[1],x[0]),mandelbrot((x[0]/500)-2,(x[1]/500)-2))).cache()
 
-newImage = image.map(lambda x: [[x[0],x[1]],mandelbrot(x[0],x[1])]).cache()
-#print np.shape(newImage)
+#draw_image(newImage)
+workTime = sum_values_for_partitions(newImage).collect()
 
-draw_image(newImage)
-workTime = sum_values_for_partitions(newImage)
+plt.hist(workTime)
+plt.title('Default Worker Time Distribution')
+plt.xlabel('Number of Iterations')
+plt.ylabel('Count')
+plt.show()
 
-print workTime.collect()
 
 
+"""
 
+aa = sc.parallelize([ii for ii in range(0,10)],10).map(lambda x: (x,x))
+bb = sc.parallelize([ii for ii in range(0,10)],10).map(lambda x: (x,x))
+cc = aa.join(bb)
+print cc.glom().collect()
+
+
+aa = sc.parallelize([ii for ii in range(0,10)]).map(lambda x: (x,x)).partitionBy(10)
+bb = sc.parallelize([ii for ii in range(0,10)]).map(lambda x: (x,x)).partitionBy(10)
+cc = aa.join(bb)
+print len(cc.glom().collect())
+
+print yaxis.glom().collect()
+zaxis = sc.parallelize([ii for ii in range(0,2000)])
+zaxis = zaxis.map(lambda x: (x,x))
+zaxis = zaxis.partitionBy(10,lambda x: int(np.floor(x/200)))
+zaxis = zaxis.map(lambda x: x[1])
+print zaxis.glom().collect()
+
+"""
 
