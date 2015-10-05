@@ -1,1 +1,17 @@
-# Your discussion here
+# Part A:
+
+I used the bfs to compute one shortest paths. It worked locally in a decent amount of time (around 2/4 min) on the wikipedia dataset.
+
+The paths computed are the following (via the call to the main function shortest_path):
+
+Harvard_University —> University_of_Oregon' —> National_Lampoon's_Animal_House —> Kevin_Bacon
+
+Kevin_Bacon —> Marisa_Silver —> Harvard_University
+
+One optimization could be reached if we compute at the same time a bfs from the root to the target, and also from the target to the root. The second one implies that we reverse the graph (because it’s directed). The final criterion is when the bfs are meeting each other. This should be faster because each bfs will go less deep than in the main case. I wrote the code to reverse the graph but didn’t have time to compute the double bfs.
+
+# Part B:
+
+I wrote the connected_component algorithms and tried it locally on the Marvel dataset. It took me less than 15 seconds to find the connected components: 4 with larger at 6408 nodes.
+
+In the corresponding file, as I am using the algorithm ss_bfs3 I copied and pasted it for convenience when using in aws.

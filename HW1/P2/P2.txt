@@ -1,1 +1,7 @@
-# Your discussion here
+# Part B:
+
+I chose to repartition the tasks in a random way. The p2a_hist shows that only a few partitions contribute to the computation effort. So a random repartition enables to shuffle the data across the repartition and provides a better balance in term of work as we can see in p2bhist.
+
+This strategy induces a shuffle over all the network as main cost. Nevertheless, the data are not heavy in terms of memory here so this drawback is not very influent.
+
+Another strategy tested was to repartition with a new hash map function that was computing the angle to the center of the fractale, in order to have the computation equally distributed over the partitions. Nevertheless the time of computation was higher than for the random case as the hash map needs to be evaluated for each node.

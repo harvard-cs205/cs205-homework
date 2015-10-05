@@ -1,1 +1,27 @@
-# Your discussion here
+
+Explanation of the next word generation:
+
+For the second order Markov Chain. I chose to use a multinomial probability
+to keep a bias on the count.
+For exemple if we have for the current tuple:
+(w1,w2)
+
+and its value in the occurence graph is:
+[(w3, a), (w4, b), (w5, c)]
+Then we have the following marginal probability:
+p(w3|w1,w2) = a^2 / (a^2 + b^2 + c^2)
+p(w4|w1,w2) = b^2 / (a^2 + b^2 + c^2)
+p(w5|w1,w2) = c^2 / (a^2 + b^2 + c^2)
+
+Sample generated:
+
+creation. it true, Salerio? Hath all so long as live. Nay, told you enough of your most noble father. Gentlemen,
+Heaven hath through me restor'd the King of France our shrouds and tacklings? And, though unskilful, why not death on't,
+would adventure. Well then, the people, and The troop is past. Brother, my lord is cold And will, no doubt,
+my lord. Ham. mean, my lord? Ham. Why, let the world but you; Nor now my father hath no more
+to be of more grave aspect. think not on him that did debate this matter little Cupid's crafty arrow made,
+That millions of strange shapes, of habits, and of good fellowship come to him. Plantagenet, for all the world, man;
+see'st not? The lords are all supplied and fill'd, Her sweet perfections, with one consent praise new-born gawds, Though they
+themselves be bevel; their rank thoughts, my gentle cousin, were it but to raise up him. Ben. Come, knock and
+can; he'll speak with you. You fillip me o' th' tongue, Consuming it with your sprites; you're pow'rfull at it.
+Cold, cold, my girl? Even like stony image, cold and temperate, Unapt to toll and trouble in the world, it

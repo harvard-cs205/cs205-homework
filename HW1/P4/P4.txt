@@ -1,1 +1,19 @@
-# Your discussion here
+Graph:
+I chose an adjacency representation for my graph, i.e. each element of my red contains (Node, [list of neighbors]) the node and its neighbors as a list
+
+SS-BFS:
+
+I wrote two versions:
+The version 2 is working with 2 different adds and the version 3 only with one, this last version has been built for the connected_component algorithm.
+
+The diameter determines the number of iteration in the search, we can use instead the fact that our algorithm should end when there are no more new nodes to touch. It’s being done in my algorithms.
+
+Marvel Universe:
+
+Number of nodes touched (we subtract 1 for the count of the root)
+
+• ”CAPTAIN AMERICA”: 6 407
+• ”MISS THING/MARY”: 6
+• ”ORWELL”: 8
+
+
