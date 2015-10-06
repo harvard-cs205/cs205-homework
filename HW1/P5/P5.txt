@@ -1,5 +1,7 @@
 # Your discussion here
 
+The first part can be done on my local computer.
+
 Kevin Bacon to Harvard University:
 
 'Kevin_Bacon' -> 'Marisa_Silver' -> ‘Harvard_University'

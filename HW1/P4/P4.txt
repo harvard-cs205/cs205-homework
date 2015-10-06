@@ -2,12 +2,12 @@
 
 The output are showed as below:
 
-Number of nodes touched： 
+- Number of nodes touched 
 CAPTAIN AMERICA： 6408         
 MISS THING/MARRY： 7           
 ORWELL： 9             
 
-Diameter：
+- Diameter
 CAPTAIN AMERICA： 3         
 MISS THING/MARRY： 1           
 ORWELL： 1  
