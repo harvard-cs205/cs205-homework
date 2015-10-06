@@ -51,7 +51,7 @@ def create_update_accumulator():
 
 
 with open('source.csv', 'r') as infile:
-    characters = sc.parallelize(list(csv.reader(infile))).map(lambda x: (x[0].strip(), x[1].strip()))
+    characters = sc.parallelize(list(csv.reader(infile))).map(lambda x: (x[0], x[1]))
 
 # reduce by key with this function to max the flag, min the distance, and take the larger neighbors list
 collapse_nodes = lambda x, y: (max((x[0], y[0])), min(x[1], y[1]), larger(x[2], y[2]))
@@ -68,6 +68,7 @@ def bfs(source):
 
     def create_add_neighbors():
         accum = sc.accumulator(0)
+
         def add_neighbors(node):
             (node, (flag, dist, neighbors)) = node
             nodes = []
@@ -83,7 +84,7 @@ def bfs(source):
 
         return accum, add_neighbors
 
-    vertices = characters.map(lambda x: (x[1], [x[0]])).reduceByKey(lambda x, y: x + y).flatMap(get_edges).map(lambda x: (x[0], [x[1]])).reduceByKey(lambda x, y: x + y).map(initialize_nodes)
+    vertices = characters.map(lambda x: (x[1], [x[0]])).reduceByKey(lambda x, y: x + y).flatMap(get_edges).map(lambda x: (x[0], [x[1]])).reduceByKey(lambda x, y: x + y).map(initialize_nodes).cache()
     accum, add_neighbors = create_add_neighbors()
     # ("Node", (flag, dist, [neighbors]))
     dist = 0

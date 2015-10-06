@@ -7,6 +7,8 @@ findspark.init()
 import pyspark
 sc = pyspark.SparkContext()
 
+sc.setLogLevel('WARN')
+
 x = np.random.permutation(2000)
 y = np.random.permutation(2000)
 grid = sc.parallelize(x, 10).cartesian(sc.parallelize(y, 10))
@@ -18,4 +20,4 @@ plt.hist(partition_values)
 plt.xlabel('Number of Iterations')
 plt.ylabel('Number of Partitions')
 plt.title('Distribution of Partitions by Number of Iterations')
-plt.show()
+plt.savefig('P2b_hist.png')

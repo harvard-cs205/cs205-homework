@@ -1,9 +1,5 @@
 import csv
 
-
-import findspark
-findspark.init()
-
 import pyspark
 sc = pyspark.SparkContext()
 
@@ -50,8 +46,22 @@ def create_update_accumulator():
     return accum, update_accumulator
 
 
-with open('source.csv', 'r') as infile:
-    characters = sc.parallelize(list(csv.reader(infile))).map(lambda x: (x[0].strip(), x[1].strip()))
+links = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt')
+
+
+def parse_links(x):
+    """
+    Takes arg of form "source: n1 n2 n3 n4 n5" and returns
+    (source, [n1, n2, n3, n4, n5])
+    """
+    source, neighbors = x.split(': ')
+    source = int(source)
+    neighbors = [int(i) for i in neighbors.split(' ')]
+
+    return (source, neighbors)
+
+links = links.map(parse_links)
+
 
 # reduce by key with this function to max the flag, min the distance, and take the larger neighbors list
 def collapse_nodes(x, y):
@@ -68,7 +78,7 @@ def collapse_nodes(x, y):
     return (max((x[0], y[0])), min(x[1], y[1]), larger(x[2], y[2]), previous)
 
 
-def bfs(source):
+def bfs(source, target):
     def initialize_nodes(x):
         flag = 0
         dist = 9999
@@ -79,6 +89,7 @@ def bfs(source):
 
     def create_add_neighbors():
         accum = sc.accumulator(0)
+        found_target = sc.accumulator(0)
 
         def add_neighbors(node):
             (node, (flag, dist, neighbors, previous)) = node
@@ -86,6 +97,9 @@ def bfs(source):
             if flag == 1:
                 accum.add(1)
                 for neighbor in neighbors:
+                    # TODO: why doesn't this work?
+                    #if node == target:
+                    #    found_target.add(1)
                     nodes.append((neighbor, (1, dist + 1, [], node)))
                 nodes.append((node, (2, dist, neighbors, previous)))
             else:
@@ -93,10 +107,10 @@ def bfs(source):
 
             return nodes
 
-        return accum, add_neighbors
+        return accum, found_target, add_neighbors
 
-    vertices = characters.map(lambda x: (x[1], [x[0]])).reduceByKey(lambda x, y: x + y).flatMap(get_edges).map(lambda x: (x[0], [x[1]])).reduceByKey(lambda x, y: x + y).map(initialize_nodes)
-    accum, add_neighbors = create_add_neighbors()
+    vertices = links.map(initialize_nodes).cache()
+    accum, found_target, add_neighbors = create_add_neighbors()
     # ("Node", (flag, dist, [neighbors]))
     dist = 0
     old_num_ones = -1
@@ -107,9 +121,9 @@ def bfs(source):
     # 0 = have not touched
     # 1 = touched, need to add neighbors
     # 2 = have added all neighbors
-    while accum.value != old_num_ones:
+    while accum.value != old_num_ones and found_target.value == 0:
         old_num_ones = accum.value
-        accum, add_neighbors = create_add_neighbors()
+        accum, found_target, add_neighbors = create_add_neighbors()
         vertices = vertices.flatMap(add_neighbors).reduceByKey(collapse_nodes)
         vertices.count()
         dist += 1
@@ -117,22 +131,12 @@ def bfs(source):
     return vertices.filter(lambda x: x[1][0] == 2)
 
 
-def find_path(vertices, source, target):
+def find_path(source, target, vertices=None, path=None):
     """
     Vertex is of form (node, (flag, dist, [neighbors], previous))
     """
-    vertices = dict(vertices.collect())
-    path = [target]
-    last = target
-    while last != source:
-        last = vertices[last][3]
-        path.append(last)
-
-    return path[::-1]
-
-def find_path(vertices, source, target, path=None):
-    if path is None:
-        vertices = dict(vertices.collect())
+    if vertices is None:
+        vertices = dict(bfs(source, target).collect())
         path = [target]
 
     next = vertices[target][3]
@@ -140,4 +144,6 @@ def find_path(vertices, source, target, path=None):
     if next == source:
         return path[::-1]
     else:
-        return find_path(vertices, source, next, path)
+        return find_path(source, next, vertices, path)
+
+print find_path(2729536, 2152782)
