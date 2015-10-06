@@ -1,5 +1,4 @@
 1. Graph representation:
-
 My graph representation includes one entry per character, where each entry has the following format:
 (character name, [connected character #1, connected character #2, ...])
 i.e. the key is the character name, and the value is a list of all (directly) connected characters.
@@ -7,7 +6,6 @@ i.e. the key is the character name, and the value is a list of all (directly) co
 When loading the data to create the list, I clean up the data by removing quotation marks around both the character name and the comic book name. I also strip out trailing whitespace and aggregate characters with otherwise identical names (e.g. 'QUASAR DOPPELGANGER ' vs 'QUASAR DOPPELGANGER'). This results in a lower overall number of unique characters, as well as a potentially lower number of nodes touched during the breadth-first search (depending on the given start node).
 
 2. Search results:
-
 6403 touched nodes when starting from CAPTAIN AMERICA
 7 touched nodes when starting from MISS THING/MARY
 9 touched nodes when starting from ORWELL
