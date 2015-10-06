@@ -1,4 +1,9 @@
+import findspark
 from functools import partial
+
+findspark.find()
+findspark.init('/usr/local/opt/apache-spark/libexec')
+import pyspark
 
 #########################################################################
 # BFS function
@@ -20,20 +25,20 @@ def reduce_nodes(nodes_list):
 
 def update_graph(node, mc_graph, accum):
     # extract values from node for clarity
+    node = list((node[0], list(node[1])))
     character_name = node[0]
     adj_list = node[1][0]
     dist = node[1][1]
     is_used = node[1][2]
-    
-    mc_graph = mc_graph.value
+
+    # mc_graph = mc_graph.value
     result = []
 
     #if the node has been touched (dist < inf), use it to touch its adjacent nodes
     if dist < float("inf"):
         for i in adj_list:
             #Get the adjacent node
-            new_node = (i, mc_graph[i])
-
+            new_node = [i, list(mc_graph[i])]
             # Set distance if it is current min and append it to result list
             if new_node[1][1] > (dist + 1):
                 new_node[1][1] = (dist + 1)
@@ -46,7 +51,7 @@ def update_graph(node, mc_graph, accum):
     return result
 
 
-def BFS(MC_Graph, init_node):
+def BFS(MC_Graph, init_node, sc):
 
     # Transform MC_Graph (character_name, [adj_list]) to MC_Graph_bfs to 
     # perform BFS search, MC_Graph_bfs is in the following form:
@@ -62,14 +67,16 @@ def BFS(MC_Graph, init_node):
                                 if (x == init_node) 
                                 else (x, (y, float("inf"), False)))
 
+    print MC_Graph_bfs.filter(lambda (x, y): x == init_node).collect()
     # Convert MC_Graph_bfs to adictionary and broadcast it every worker
     # This is used for lookup during each update
     tmp = dict(MC_Graph_bfs.collect())
-    broadcast_graph = sc.broadcast(tmp)
+    #broadcast_graph = sc.broadcast(tmp)
 
     # Accumulator set to 0
     accum = sc.accumulator(0) 
     iterate_flag = True
+    iteration_count = 1
     # Perform BFS iteratively. Each iteration expands the search frontier by one hop.
     while iterate_flag:    
 
@@ -85,9 +92,9 @@ def BFS(MC_Graph, init_node):
         updated_nodes = MC_Graph_bfs.filter(lambda x: 
             x[1][2] == False).flatMap(
             partial(update_graph, 
-                mc_graph = broadcast_graph, accum = accum)).groupByKey().mapValues(reduce_nodes)
-                
-        # Since only a part of MC_Graph_bfs is updated each time, union the used and 
+                mc_graph = dict(MC_Graph_bfs.collect()), accum = accum)).groupByKey().mapValues(reduce_nodes)
+
+        # Since only a part of MC_Graph_bfs is updated each time, union the used and
         # unused nodes to get the most up-to-date gragh
         MC_Graph_bfs = MC_Graph_bfs.filter(lambda x: x[1][2] == True).union(updated_nodes)
 
@@ -95,7 +102,9 @@ def BFS(MC_Graph, init_node):
         if (accum.value == 0):
             iterate_flag = False
         else:
+            print 'In iteration ', iteration_count, ', ', accum.value, 'nodes discovered;\n'
             accum = sc.accumulator(0)
+            iteration_count = iteration_count + 1
       
     # get the number of touched nodes by counting the number of nodes with distance 
     # smaller than infinite  

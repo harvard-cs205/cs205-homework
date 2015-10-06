@@ -1,8 +1,10 @@
 from P2 import *
 import numpy as np
 import matplotlib.pyplot as plt
+import findspark
+findspark.find()
+findspark.init('/usr/local/opt/apache-spark/libexec')
 import pyspark
-
 # Your code here
 # Modification 1
 sc = pyspark.SparkContext()

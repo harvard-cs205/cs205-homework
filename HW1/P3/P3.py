@@ -1,3 +1,6 @@
+import findspark
+findspark.find()
+findspark.init('/usr/local/opt/apache-spark/libexec')
 import pyspark
 
 sc = pyspark.SparkContext()
@@ -22,4 +25,4 @@ result = sequence_num_RDD.join(sequence_words_RDD).map(lambda x: (x[0], x[1][0],
 #Extract and print the line from the RDD above with the largest number of valid anagrams.
 result = result.sortBy(lambda x: x[1], False)
 
-result.first()
+print result.first()

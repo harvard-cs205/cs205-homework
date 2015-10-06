@@ -1,5 +1,7 @@
+import findspark
+findspark.find()
+findspark.init('/usr/local/opt/apache-spark/libexec')
 import pyspark
-import re
 import copy
 
 sc = pyspark.SparkContext()
@@ -35,19 +37,21 @@ def multipleLines(line_count, word_count):
         lines = lines + '\n' + generateLine(word_count)
     return lines
 
-rawData = sc.textFile('pg100.txt')
-wlist = rawData.flatMap(lambda x: x.split(' ')).filter(lambda x: 
-	not x.isdigit()).filter(lambda x: 
-	not x.isupper()).filter(lambda x: 
-	x != '')
+if __name__ == '__main__':
 
-wlist_2 = wlist.collect()
-word_seq = []
-for i in xrange(len(wlist_2)-2):
-    word_seq.append(((wlist_2[i], wlist_2[i+1]),wlist_2[i+2]))
+    rawData = sc.textFile('pg100.txt')
+    wlist = rawData.flatMap(lambda x: x.split(' ')).filter(lambda x:
+        not x.isdigit()).filter(lambda x:
+        not x.isupper()).filter(lambda x:
+        x != '')
 
-resultRDD = sc.parallelize(word_seq).groupByKey().mapValues(lambda x: list(x)).mapValues(getWordCount).cache()
+    wlist_2 = wlist.collect()
+    word_seq = []
+    for i in xrange(len(wlist_2)-2):
+        word_seq.append(((wlist_2[i], wlist_2[i+1]),wlist_2[i+2]))
 
-Shakespeare_verse = multipleLines(10, 20)
+    resultRDD = sc.parallelize(word_seq).groupByKey().mapValues(lambda x: list(x)).mapValues(getWordCount).cache()
 
-print Shakespeare_verse
+    Shakespeare_verse = multipleLines(10, 20)
+
+    print Shakespeare_verse
