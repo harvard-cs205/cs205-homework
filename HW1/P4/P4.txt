@@ -1,1 +1,9 @@
 # Your discussion here
+
+The diameter implies the maximum number of steps our BFS would have to run. So, if a graph had a diameter of 10, that means the longest "shortest" path in the graph between two nodes is 10 and so if we had to run for anything longer than that, we would just be redundant or looking for a path between two unconnected nodes. 
+
+If a character does not have a defined distance (or in my case was just set to a very high integer), it means it was not explored during the course of the BFS, meaning that there is not a path from the source to the character (ie not in the same connected component)
+
+count of nodes Captain America Touches :  6408                                        
+count of nodes Miss Thing Touches :  7                                                
+count of nodes Orwell Touches :  9   
