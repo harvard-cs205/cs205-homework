@@ -1,5 +1,6 @@
 __author__ = 'xiaowen'
 import findspark
+
 findspark.init('/home/xiaowen/spark')
 import pyspark
 
@@ -50,3 +51,5 @@ h_to_k_path_names = get_paths_names(cln_pages, h_to_k)
 
 k_to_h = get_path(cln_links, k_id, h_id, numPartitions)
 k_to_h_path_names = get_paths_names(cln_pages, k_to_h)
+
+
