@@ -4,25 +4,7 @@ import pyspark
 import csv
 import numpy as np 
 
-
-sc = pyspark.SparkContext()
-sc.setLogLevel('WARN')
-source_reader = csv.reader(open("source.csv", 'rb'), delimiter=',')
-
-# readuce by key to get RDD with issue -> [super_hero list]
-issue_sh = sc.parallelize(list(source_reader), 100).map(lambda x: (x[1].strip(), [x[0].strip()])).reduceByKey(lambda x, y: x + y)
-
-def construct_edges(x):
-    i, s_list = x
-    l = len(s_list)
-    edges = []
-    for i in range(l):
-        for j in range(l):
-            if i != j: 
-                edges.append(((s_list[i], s_list[j]), None))
-    return edges
-
-def bfs(graph, source='ORWELL'):
+def bfs(graph, source, sc):
     # converts the input adjacency_list representation to one with distances 
     # and flag 
     def map_adj_list(x):
@@ -58,6 +40,9 @@ def bfs(graph, source='ORWELL'):
         def reducer(v1, v2):
             explored_flag1, d1, n_lst1 = v1
             explored_flag2, d2, n_lst2 = v2
+            # we take the max explored flag
+            # min distance
+            # concatenation of unique neighbors
             return max(explored_flag1, explored_flag2), min(d1, d2), list(set(n_lst1 + n_lst2))
 
         return acc, mapper, reducer 
@@ -69,15 +54,10 @@ def bfs(graph, source='ORWELL'):
         # same key 
         d_adj_list = d_adj_list.flatMap(mapper)
         # force evaluation so we increment the accumulator 
-        d_adj_list.count()
         # then expand the nodes that should be explored right now
         d_adj_list = d_adj_list.reduceByKey(reducer)  
+        d_adj_list.count()
     # could also filter for flag == 2 nodes 
     num_touched = d_adj_list.filter(lambda (n, (f, d, n_lst)): d < np.inf).count()
     return num_touched
-
-# construct the graph
-edges = issue_sh.flatMap(construct_edges).distinct().map(lambda x: (x[0][0], [x[0][1]]))
-adj_list = edges.reduceByKey(lambda x, y: x + y)
-print bfs(adj_list, "CAPTAIN AMERICA")
 
