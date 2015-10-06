@@ -1,7 +1,5 @@
-Note: I implemented an RDD-only version and an RDD/Python hybrid version.  
-The pure RDD version runs at about 0.4x speed of the hybrid version, with 10 partitions on a 4-core machine.  (293s vs 210s).  
-I've submitted both versions - would love to get feedback on why the pure Spark is slower!
- 
+Note: I implemented an RDD-only version and an RDD/normal-Python hybrid version.  
+The pure RDD version runs much faster (~15s) than the hybrid version (210s) (10 partitions on a 4-core machine), so I've only submitted the pure RDD solution in my final submission.
  
 Example generated phrases:
  

@@ -29,3 +29,7 @@ Report: Captain_America --> O_Captain!_My_Captain!
 Found target in 3 degrees from root!
 [u'Buttermilk_Channel', u'Walt_Whitman', u'O_Captain!_My_Captain!']
 Total time: 167.743580818
+
+
+*** Connected Components ***
+I didn't find a working implementation for this part of the assignment.
