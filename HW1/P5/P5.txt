@@ -1,1 +1,13 @@
-# Your discussion here
+From Harvard University to Kevin Bacon: each path takes 3 steps
+
+	[u'Harvard_University', u'Gilmore_Girls', u'Liza_Weil', u'Kevin_Bacon']
+	[u'Harvard_University', u'Jack_Lemmon', u'Rod_Steiger', u'Kevin_Bacon']
+	[u'Harvard_University', u'Cornell_University', u'Edmund_Bacon', u'Kevin_Bacon']
+
+From Kevin Bacon to Harvard University: each path takes 2 steps
+
+	[u'Kevin_Bacon', u'Time_(magazine)', u'Harvard_University']
+	[u'Kevin_Bacon', u'Marisa_Silver', u'Harvard_University']
+
+
+

@@ -1,1 +1,11 @@
-# Your discussion here
+CAPTAIN AMERICA: touched 6408 nodes
+MISS THING/MARY: touched 7 nodes
+ORWELL: touched 9 nodes
+
+Graph diameter:
+If the diameter of the graph is 10, we should never need to take more than 10 steps outwards from a source node to find all connected components to that source, as the largest distance between any nodes in the graph is 10.
+
+Undefined distances:
+If a character does not have a defined distance in our search, it means that the character is not accessible from our source node. This is possible because the graph is not completely connected.
+
+
