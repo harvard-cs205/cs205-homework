@@ -2,8 +2,8 @@ from pyspark import SparkContext
 from P4_bfs import *
 
 sc = SparkContext("local", "Marvel charater graph")
-accum = sc.accumulator(0)
 
+# read in marvel data
 marvel_csv = sc.textFile("source.csv")
 
 # parse and format into RDD
