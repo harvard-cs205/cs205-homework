@@ -1,24 +1,21 @@
 from pyspark import SparkContext
-from Queue import Queue
+from pyspark import AccumulatorParam
 
-MAX_DIAM = 10
+def rdd_bfs(root, graph, sc):
+    # set accumulator to keep track of visited nodes
+    class SetAccumulatorParam(AccumulatorParam):
+        def zero(self, initialValue):
+            return set()
+        def addInPlace(self, v1, v2):
+            return v1 | v2
 
-# takes a root node, graph as adjacency list RDD
-def rdd_bfs(root, graph):
-    # keep track of which nodes are on the current depth
+    visited = sc.accumulator(set(), SetAccumulatorParam());
     neigh_set = [root]
-    # keep track of distances of nodes visited
-    dist = {}
-    dist[root] = 0
+    while neigh_set:
+        curr_visited = set(list(visited.value))
+        # not doing any calls to collect, only using the accumulator
+        graph.filter(lambda (k, v): k in neigh_set).foreach(lambda (k, v): visited.add(set(v)))
+        neigh_set = visited.value - curr_visited
 
-    # use diam to limit depth of search
-    diam = 0
-    while neigh_set and diam < MAX_DIAM:
-        neighbor_graph = graph.filter(lambda (k, v): k in neigh_set)
-        neigh_list = neighbor_graph.flatMap(lambda (k, v): v).collect()
-        neigh_set = list(set(neigh_list).difference(set(dist.keys())))
-        diam += 1
-        for n in neigh_set:
-            dist[n] = diam
-
-    return dist
+    # only need nodes touched, not distances
+    return visited.value

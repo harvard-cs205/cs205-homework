@@ -22,11 +22,11 @@ marvel_graph = marvel_graph.reduceByKey(lambda x, y: x + y)
 marvel_graph = marvel_graph.map(lambda (k, v): (k, list(set(v))))
 
 # find distance dictionaries for some characters
-cap_dist = rdd_bfs("CAPTAIN AMERICA", marvel_graph)
-mary_dist = rdd_bfs("MISS THING/MARY", marvel_graph)
-orwl_dist = rdd_bfs("ORWELL", marvel_graph)
+cap_touch = rdd_bfs("CAPTAIN AMERICA", marvel_graph, sc)
+mary_touch = rdd_bfs("MISS THING/MARY", marvel_graph, sc)
+orwl_touch = rdd_bfs("ORWELL", marvel_graph, sc)
 
 # print number of nodes reachable from each character, within 10 steps
-print len(cap_dist)
-print len(mary_dist)
-print len(orwl_dist)
+print len(cap_touch)
+print len(mary_touch)
+print len(orwl_touch)
