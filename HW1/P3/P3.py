@@ -1,3 +1,5 @@
+from operator import add
+
 from P2 import *
 
 import findspark
@@ -11,7 +13,10 @@ def sort_letters(word):
     return ''.join(sorted(word))
 
 words = sc.textFile('EOWL_words.txt')
-anagrams = words.map(lambda word: word.lower().strip().strip('\n')).map(lambda word: (sort_letters(word), [word])).reduceByKey(lambda word1, word2: word1 + word2)
+
+# set key as string of sorted letters, then reduce by key to make a list
+# of all words per sorted combination of letters
+anagrams = words.map(lambda word: word.lower().strip().strip('\n')).map(lambda word: (sort_letters(word), [word])).reduceByKey(add)
 
 # print anagram with max words
-anagrams.sortBy(keyfunc=lambda (anagram, words): len(words), ascending=False).take(1)
+print anagrams.sortBy(keyfunc=lambda (anagram, words): len(words), ascending=False).take(1)
