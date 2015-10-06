@@ -1,5 +1,8 @@
 # Your discussion here
 
+For BFS:
+Here are the paths that the algorithm found!
+
 Kevin Bacon -> Harvard University
 [u'Kevin_Bacon', u'Six_degrees_of_separation', u'Harvard_University'], 
 [u'Kevin_Bacon', u'John_Lithgow', u'Harvard_University'], 
@@ -109,3 +112,6 @@ Harvard University -> Kevin Bacon (lots of paths!)
 [u'Harvard_University', u'2007', u'2007_in_film', u'Kevin_Bacon'], 
 [u'Harvard_University', u'The_Great_Debaters', u'2007_in_film', u'Kevin_Bacon'], 
 [u'Harvard_University', u'2008', u'Brad_Renfro', u'Kevin_Bacon']]
+
+For Connected Components:
+I ran my code on locally created test files, and it works! I ran it on AWS for some time, but I did not keep it running long enough to get the final answer for the Wikipedia graph, but the code will converge to the right answer I am continuing to try to work on this further. Please feel free to give me comments on how to potentially make the approach even faster.
