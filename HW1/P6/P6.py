@@ -62,10 +62,10 @@ if __name__ == '__main__':
 	shift_words_2 = index_words.map(lambda (id, word): (id-2, word))
 	joined_words = index_words.join(shift_words_1).join(shift_words_2)
 	word_mapping = joined_words.sortByKey() \
-															.map(lambda (id, ((word1, word2), word3)): ((word1, word2, word3), 1)) \
-															.reduceByKey(lambda x, y: x+y) \
-															.map(lambda ((word1, word2, word3), count): ((word1, word2), [(word3, count)])) \
-															.reduceByKey(lambda word_list1, word_list2: word_list1 + word_list2).cache()
+									.map(lambda (id, ((word1, word2), word3)): ((word1, word2, word3), 1)) \
+									.reduceByKey(lambda x, y: x+y) \
+									.map(lambda ((word1, word2, word3), count): ((word1, word2), [(word3, count)])) \
+									.reduceByKey(lambda word_list1, word_list2: word_list1 + word_list2).cache()
 
   # Get 10 samples of words and print sentences produced
 	samples = word_mapping.takeSample(False, 10)

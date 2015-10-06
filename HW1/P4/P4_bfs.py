@@ -88,9 +88,9 @@ def bfs(graph, source, sc):
 	#	Explode and combine the nodes until nodes are unreachable
 	while True:
 		distances = distances.flatMap(lambda x: explode_nodes(x, accum)) \
-													.reduceByKey(combine_nodes) \
-													.filter(lambda (node, info): info[2] != VISITED) \
-													.cache()
+								.reduceByKey(combine_nodes) \
+								.filter(lambda (node, info): info[2] != VISITED) \
+								.cache()
 		
 		# Apply transformations
 		distances.count()

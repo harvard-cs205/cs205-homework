@@ -140,9 +140,9 @@ def bfs(sc,graph, source, target):
 	#	Explode and combine the nodes until nodes are unreachable
 	while True:
 		distances = distances.flatMap(lambda x: explode_nodes(x, accum, target)) \
-													.reduceByKey(reduce_nodes) \
-													.filter(lambda (node, info): info[2] != VISITED) \
-													.cache()
+								.reduceByKey(reduce_nodes) \
+								.filter(lambda (node, info): info[2] != VISITED) \
+								.cache()
 		
 		# Apply transformations
 		distances.count()
@@ -152,3 +152,47 @@ def bfs(sc,graph, source, target):
 			break
 
 	return print_nodes(accum.value, target)
+
+# Construct path with path_names
+def get_path_names(path, page_names):
+	path_names = page_names.filter(lambda (id, name): id in path).collect()
+	path_with_names = []
+	for wiki_id1 in path:
+		for (wiki_id2, name) in path_names:
+			if wiki_id1 == wiki_id2:
+				path_with_names.append(name)
+				break
+	return path_with_names
+
+# Constructs links as node with edges
+def construct_node(line):
+	src, dests = line.split(': ')
+	dests = [int(to) for to in dests.split(' ')]
+	return (int(src), dests)
+
+if __name__ == '__main__':
+	sc = SparkContext(appName="P5")
+	sc.setLogLevel('WARN')
+
+	links = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt', 32)
+	page_names = sc.textFile('s3://Harvard-CS205/wikipedia/titles-sorted.txt', 32)
+	
+	neighbor_graph = links.map(construct_node)
+
+	page_names = page_names.zipWithIndex().map(lambda (n, id): (id+1, n))
+	page_names = page_names.sortByKey().cache()
+
+	neighbor_graph = neighbor_graph.partitionBy(64).cache()
+	Kevin_Bacon = page_names.filter(lambda (k, v): v == 'Kevin_Bacon')
+	assert Kevin_Bacon.count() == 1
+	Kevin_Bacon = Kevin_Bacon.collect()[0][0]
+
+	Harvard_University = page_names.filter(lambda (k, v): v == 'Harvard_University')
+	assert Harvard_University.count() == 1
+	Harvard_University = Harvard_University.collect()[0][0]
+
+	path1 = get_path_names(bfs(sc, neighbor_graph, Kevin_Bacon, Harvard_University), page_names)
+	path2 = get_path_names(bfs(sc, neighbor_graph, Harvard_University, Kevin_Bacon), page_names)
+	
+	print path1
+	print path2
