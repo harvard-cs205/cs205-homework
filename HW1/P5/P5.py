@@ -115,6 +115,8 @@ def bfs(source, target):
     dist = 0
     old_num_ones = -1
 
+    print "Set up done."
+
     # stop if number of non-explored nodes has not changed since last iteration
     # (stored in accumulator)
     # Flags:
@@ -122,6 +124,7 @@ def bfs(source, target):
     # 1 = touched, need to add neighbors
     # 2 = have added all neighbors
     while accum.value != old_num_ones and found_target.value == 0:
+        print "distance " + str(dist)
         old_num_ones = accum.value
         accum, found_target, add_neighbors = create_add_neighbors()
         vertices = vertices.flatMap(add_neighbors).reduceByKey(collapse_nodes)
@@ -135,6 +138,7 @@ def find_path(source, target, vertices=None, path=None):
     """
     Vertex is of form (node, (flag, dist, [neighbors], previous))
     """
+    print "finding path"
     if vertices is None:
         vertices = dict(bfs(source, target).collect())
         path = [target]
