@@ -1,3 +1,9 @@
+1. 
+
+The diameter is the maximum distance between any two nodes in a graph.  Since we are using BFS, each iteration we explore nodes at the next depth level (i.e. iteration 1 we explore depth 1, iteration 2 we explore all nodes that are distance 2 from source, ...).  Thus, diameter is an upper bound on the number of iterations in a BFS.  Note that once we stop discovering new nodes, the BFS will stop.  This happen before we complete diameter number of iterations part of the graph is unreachable from the source node or simply if all nodes are less than distance diameter away from the source.
+
+2.
+
 Count the number of nodes touched in each of the above searches and place these counts in
 your writeup. What does it mean if a character does not have a defined distance during the
 search?

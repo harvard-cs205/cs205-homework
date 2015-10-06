@@ -1,3 +1,8 @@
+
+# coding: utf-8
+
+# In[1]:
+
 import findspark
 findspark.init()
 from collections import Counter
@@ -5,6 +10,8 @@ import pyspark
 sc = pyspark.SparkContext(appName="Spark1")
 import numpy as np
 
+
+# In[2]:
 
 full_text = sc.textFile("./pg100.txt")
 #clean data
@@ -33,11 +40,14 @@ ugly_format_first_two_words = indexed_word_lists[0].join(indexed_word_lists[1]).
 nice_rdd = ugly_format_first_two_words.map(lambda (idx,val): (val[0],val[1]))
 
 
+# In[3]:
+
 #for each (first,second) key get list of (third_word, count) tuples
 nice_rdd = nice_rdd.reduceByKey(lambda a, b: a + b).mapValues(lambda val: val.items())
 
 
-#Generate Random phrases (x3)
+# In[4]:
+
 three_starts = nice_rdd.takeSample(True, 3,1)
 for random_words in three_starts:
     first,second = random_words[0]
@@ -60,3 +70,9 @@ for random_words in three_starts:
         vals = nice_rdd.map(lambda x: x).lookup(key)[0]
         num_words += 1
     print ''.join([word + ' ' for word in phrase[:-1]]+[phrase[-1]])
+
+
+# In[ ]:
+
+
+
