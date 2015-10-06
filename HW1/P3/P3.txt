@@ -1,1 +1,14 @@
 # Your discussion here
+('aelst',
+ 11,
+ ['least',
+  'leats',
+  'salet',
+  'slate',
+  'stale',
+  'steal',
+  'stela',
+  'taels',
+  'tales',
+  'teals',
+  'tesla'])
