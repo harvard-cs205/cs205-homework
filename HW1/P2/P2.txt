@@ -1,1 +1,7 @@
 # Your discussion here
+
+From the P2a_hist plot, we can see that most partitions are centered at about 1e6 which a few partitions take much larger amount of time. This means partitions take largely different amount of time - over 80% partitions are just doing less than 10% of the work. 
+
+On the other hand, in the P2b, I randomly repartition the task into 100 partitions in order to improve the partitioning strategy. And from the plot we can see the distribution is much more even now. That means now we have a more balanced load of work across workers. 
+
+However, the shuffling might cause more overhead in computation time, which I am thinking is the tradeoff.
