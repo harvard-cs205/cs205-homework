@@ -9,3 +9,13 @@ u'Harvard_University' -> u'2008' -> u'2008_in_film' -> u'Kevin_Bacon')
 
 u'Kevin_Bacon' -> u'College_Bowl' -> u'Harvard_University'
 
+
+For Connected Component part:
+
+My idea (work for small sample size, not super large) is
+1) links red zip with index, map to add visited flag;
+2) while filter visited is not empty:
+3)   map the index to the smallest index among itself and all its neighbors
+4)   for all the neighbors map this smallest index
+5)   visited set True
+6) return number of all unique connected components.
