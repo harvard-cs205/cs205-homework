@@ -113,10 +113,12 @@ def link_string_to_KV(s):
 
 split_list = linklist.map(link_string_to_KV).cache()
 
+# Extract the two types of graphs from the Wikipedia graph.
 both_sided = get_double_sided_only(split_list, num_Partitions)
 symmetrics = make_all_symettric(split_list, num_Partitions)
 
 print '\n\n\n\n\n\n\n\n\n\n\nCalculating connected components....\n\n'
+# Change symmetrics to both_sided to run this on the other graph extracted from the Wikipedia graph
 conn = connected_components(symmetrics, sc, num_Partitions)
 grouped = conn.map(lambda (node, component): (component, node)).groupByKey().cache()
 print 'Num components:'
