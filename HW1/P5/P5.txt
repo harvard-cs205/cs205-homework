@@ -1,2 +1,35 @@
 # Your discussion here
 
+Finding Directed Paths:
+
+The shortest distance path from Harvard University to Kevin Bacon has length 3, and an example is:
+Harvard_University (node id 2152782) -> University of Oregon (node id 5316170) 
+-> National_Lampoon's_Animal_House (node id 3554817) -> Kevin_Bacon (node id 2729536)
+(Takes 2 minutes to run)
+
+The shortest distance path from Kevin Bacon and Harvard University has length 2, and an example is:
+Kevin_Bacon -> Marisa_Silver (node id 3229511) -> Harvard_University
+(Takes 20 sec to run)
+
+Design decisions:
+
+Since my BFS implementation does not require any sort of joins or left/right outer joins on two or more
+RDDs, the information that the links dataset is roughly 10 times larger than the pages dataset was not
+incorporated too much. If it were, optimizations could be made where the combined RDD would inherit its
+"parent" partitioning of the links dataset, while the pages dataset would hash partition to that. This is
+because we want to minimize shuffling of the larger dataset.
+
+The greatest optimization in my code was the use of a custom accumulator class that contains a dictionary
+called visited. This accumulator maps already visited nodes to its immediate parent in the path from the
+source node, and is updated whenever a new node in our frontier on a certain iteration of BFS. Whenever a
+node is first visited in BFS, the parent from which it was visited would be its immediate parent in 
+shortest path (because we aren't dealing with negative lengths/variable lengths). Hence, we can take the
+existing keys in our accumulator dictionary to represent all visited nodes at a certain point in our BFS.
+BFS then ends when our destination node is found in our dictionary's keys.
+
+After BFS has terminated, we simply need to follow the path up from end to start, and all this information
+is stored in our accumulator.
+
+The best results on AWS was achieved when we partitioned the links dataset into 64 partitions, and used 
+2 executor/worker-node, 4 cores/executor and 4GB/executor, i.e. use spark-submit P5.py --num-executors 2 
+--executor-cores 4 --executor-memory 4G.

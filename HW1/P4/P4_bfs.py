@@ -1,27 +1,27 @@
-# Spark code implementing breadth first search, given a graph RDD and a character name, using the optimized 
-# version from the last part.
+from pyspark import AccumulatorParam
 
-def bfs(graph, start):
+# Set custom accumulator class for sets
+class AccumulatorParamSet(AccumulatorParam):
+	def zero(self, initialValue):
+		return set()
+	def addInPlace(self, v1, v2):
+		v1 |= v2
+		return v1
+
+# Conduct breadth first search on graph with source node start
+def bfs(graph, start, sc):
 	# Queue keeps track of nodes to be explored at each level of BFS
-	q = [start]
+	q = set([start])
 
-	# Distance dictionary keeps track of all distances of visited/seen nodes
-	dist = {}
-	dist[start] = 0
-	distFromSource = 0
-	diameter = 10
+	# Visited set keeps track of all visited nodes so far
+	visited = sc.accumulator(set(), AccumulatorParamSet())
 
-	while q and distFromSource < diameter:
-		# Finds nodes that are in search queue
-		nodesToExplore = graph.filter(lambda (k,v): k in q)
+	while q:
+		# Finds nodes that need to be explored
+		prevVisited = set(list(visited.value))
+		graph.filter(lambda (k,v): k in q).foreach(lambda (k,v): visited.add(v))
 
-		# Finds its neighbors
-		neighborSet = reduce(set.union, nodesToExplore.values().collect())
-		q = list(neighborSet.difference(dist.keys()))
+		# New nodes that need to be explored in next iteration
+		q = visited.value - prevVisited
 
-		# Update distances of already visited nodes 
-		distFromSource += 1
-		for node in q:
-			dist[node] = distFromSource
-
-	return dist
+	return visited.value
