@@ -103,7 +103,7 @@ def sym_wrapper(links):
     rdd_symmetric = rdd_symmetric.filter(lambda (x, y): len(y) > 0)
     return get_comp(rdd_symmetric)
 
-# build sparkcontext object
+
 sc = pyspark.SparkContext(appName="P5")
 links = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt')
 cln_links = (links
