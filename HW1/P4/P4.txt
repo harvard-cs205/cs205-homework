@@ -1,1 +1,20 @@
 # Your discussion here
+
+What does this diameter imply about the maximum number of steps in which your search must be executed?
+If the diameter of the graph is 10, that means that the longest shortest path between any
+two nodes in the graph is 10.  Since BFS finds shortest paths between a source node and every other node,
+and each iteration i of BFS explores paths of lengths i, this implies that BFS can run for at most 10
+iterations in this graph: this makes coding BFS easier, because we don't have to keep track of anything
+as a stop condition!
+
+If a character does not have a defined distance in the graph, this means that that character
+is unreachable, a.k.a. disconnected from the source character (different connected component).
+
+My graph representation was an adjacency list: an RDD which maps each character name to a list
+of characters with whom they have appeared in a comic.
+
+The number of touched nodes in the searches were:
+
+Captain America: 6408
+Miss thing/Mary: 7
+Orwell: 9
