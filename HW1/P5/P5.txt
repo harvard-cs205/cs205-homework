@@ -5,7 +5,7 @@ Harvard University -> Marisa Silver -> Kevin Bacon
 
 A shortest path from Kevin Bacon to Harvard University (3 steps):
 
-Kevin Bacon -> Jack Lemmon -> Mister Roberts (film) -> Kevin Bacon
+Kevin Bacon -> Jack Lemmon -> Mister Roberts (film) -> Harvard University
 
 # The approach
 We adjust the BFS algorithm from P4 to also store the path at each step. At the end, it is simply a matter of
