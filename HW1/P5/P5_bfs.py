@@ -1,23 +1,37 @@
 from pyspark import SparkContext
+from pyspark import AccumulatorParam
 
-MAX_DIAM = 10
+# set accumulator to keep track of visited nodes
+# will only update if have not seen that node before
+class DictAccumulatorParam(AccumulatorParam):
+    def zero(self, initialValue):
+        return initialValue
+    def addInPlace(self, v1, v2):
+        # TODO
+        for n in v2.keys():
+            if n not in v1.keys():
+                v1[n] = v2[n]
+        return v1
 
-# takes a root node, graph as adjacency list RDD
-def rdd_bfs(root, graph):
-    # keep track of which nodes are on the current depth
-    neigh_set = [root]
-    # keep track of distances of nodes visited
-    dist = {}
-    dist[root] = 0
+# converts list to dictionary, to pass to accumulator
+def list_to_dict(k, d):
+    temp = {}
+    for elt in set(d):
+        temp[elt] = k
+    return temp
 
-    # use diam to limit depth of search
-    diam = 0
-    while neigh_set and diam < MAX_DIAM:
-        neighbor_graph = graph.filter(lambda (k, v): k in neigh_set)
-        neigh_list = neighbor_graph.flatMap(lambda (k, v): v).collect()
-        neigh_set = list(set(neigh_list).difference(set(dist.keys())))
-        diam += 1
+def rdd_bfs(root, target, graph, sc):
+    prev = sc.accumulator({root: -1}, DictAccumulatorParam())
+    neigh_set = set([root])
+    while neigh_set:
+        curr_prev = set(prev.value.keys())
+        # not doing any calls to collect, only using the accumulator
+        graph.filter(lambda (k, v): k in neigh_set).foreach(lambda (k, v): prev.add(list_to_dict(k, v)))
+        # update to new nodes on the current frontier
+        neigh_set = set(prev.value.keys()) - curr_prev
+        # short circuit if found target node
         for n in neigh_set:
-            dist[n] = diam
-
-    return dist
+            if n == target:
+                return prev.value
+    # if not found, return empty dictionary
+    return {}

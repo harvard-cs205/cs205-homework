@@ -1,1 +1,10 @@
-# Your discussion here
+Path from Kevin Bacon to Harvard University:
+Kevin_Bacon
+Marisa_Silver
+Harvard_University
+
+Path from Harvard University to Kevin Bacon:
+Harvard_University
+University_of_Oregon
+National_Lampoon's_Animal_House
+Kevin_Bacon
