@@ -1,1 +1,9 @@
-# Your discussion here
+In the Mandelbrot image, we can see that some regions of the image are very dark, while others are very white. The white pixels are more expensive to compute (since they're represented by a larger pixel value, 255, than the black pixel value of 0). Because of this, it takes longer to compute the white pixels than the black pixels.
+
+If we look at the Mandelbrot image, we see that the edges are predominantly dark, while there is a large white structure in the center of the image. This structure means that pixel values in the center of the image are likely to be white/expensive. When we partition pixels by default, we group pixels with those nearby. Because this structure makes white pixels likely to be next to other white pixels, the default partitioning strategy leads to some very white partitions which take longer to compute.
+
+For the new partitioning strategy, I assigned pixels to partitions "randomly" by randomizing the lists which went into the Cartesian to create pixel values. This leads to a more even distribution of work across partitions.
+
+The results of this new partitioning were that the computation was faster, and the distribution of times was much more even (resembling a normal distribution rather than the lack-of-distribution from the first part.)
+
+The cost of a random partitioning is that we have a larger shuffle cost at the beginning of the computation. There are also tradeoffs in applications where pixels depend on neighboring pixels for values (for example, searching local neighborhoods in a graph). If we partition randomly, then we get the benefit of costly pixels being evenly distributed, at the price of not being able to minimize shuffles by exploiting local substructures.
