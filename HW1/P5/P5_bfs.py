@@ -2,7 +2,7 @@ from pyspark import SparkContext
 from pyspark import AccumulatorParam
 
 class SetAccumulator(AccumulatorParam):
-    # hash of nod to parent
+    # hash of node to parent
     def zero(self, initialValue):
         return {}
 

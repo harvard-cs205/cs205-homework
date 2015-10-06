@@ -38,4 +38,3 @@ graph = graph.partitionBy(16)
 characters = ['CAPTAIN AMERICA', 'MISS THING/MARY', 'ORWELL']
 for char in characters:
     print char + " " + str(ss_bfs(sc, graph, char))
-
