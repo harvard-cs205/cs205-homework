@@ -1,1 +1,10 @@
 # Your discussion here
+
+MISS THING/MARY: 7 nodes
+CAPTAIN AMERICA: 6403 nodes
+ORWELL: 9 nodes
+
+The diameter implies that the maximumum number of steps that we need to execute in the search is 10. 
+
+If a character does not have a distance after the search has terminated, that means that there are no paths through charcaters that appear in a comic with the source. I.e., the target has never been in an issue with anyone who is reachable from the source (by being in issues with the source, the sources neighbors, etc.). 
+
