@@ -1,3 +1,5 @@
+#I discussed the solution for this problem with Avery Faller.
+
 # import findspark
 # findspark.init()
 import pyspark
