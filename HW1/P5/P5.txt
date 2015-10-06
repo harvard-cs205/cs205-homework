@@ -1,1 +1,23 @@
-# Your discussion here
+From Harvard to Kevin Bacon:
+
+Start from root: 2152782
+Step: 1 ; New Nodes: 667 ; Total Nodes: 668 .
+Step: 2 ; New Nodes: 65900 ; Total Nodes: 66568 .
+Step: 3 ; New Nodes: 1100457 ; Total Nodes: 1167025 .
+Reach the end: 2729536
+The following path is found among all possible paths:
+[(0, 2152782), (1, 5141364), (2, 4497172), (3, 2729536)]
+[u'Harvard_University', u'Tommy_Lee_Jones', u'Screen_Actors_Guild_Award_for_Outstanding_Performance_by_a_Cast_in_a_Motion_Picture', u'Kevin_Bacon']
+
+
+From Kevin Bacon to Harvard:
+
+Start from root: 2729536
+Step: 1 ; New Nodes: 225 ; Total Nodes: 226 .
+Step: 2 ; New Nodes: 30495 ; Total Nodes: 30721 .
+Reach the end: 2152782
+The following path is found among all possible paths:
+[(0, 2729536), (1, 4625677), (2, 2152782)]
+[u'Kevin_Bacon', u'Six_degrees_of_separation', u'Harvard_University']
+
+Note: the link from Kevin Bacon to Harvard is an intersting one, because Kevin Bacon is famous (in the nerd's world) because of "six degree of separation" theory, which is found to be linked to Harvard too. The connection exists because one of the preliminary social network experiments was done at Harvard.
