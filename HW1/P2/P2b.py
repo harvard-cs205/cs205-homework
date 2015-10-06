@@ -2,7 +2,6 @@ from P2 import *
 
 # Your code here
 import findspark
-import os
 findspark.init('/home/xiaowen/spark')
 import pyspark
 

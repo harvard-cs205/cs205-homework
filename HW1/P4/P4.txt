@@ -1,1 +1,17 @@
 # Your discussion here
+My graph representation was a pair RDD where key is character
+and value is characters in the same book.
+
+Number of touched nodes
+'CAPTAIN AMERICA':
+6403 if all whitespaces in the character name  were stripped (which should be more accurate?)
+6408 if whitespaces were not stripped
+'MISS THING/MARY': 7
+'ORWELL': 9
+
+A defined diameter(n) is the maximum distance we could reach apart from the root node, which means
+the search process would stop if it already take n iterations or no new nodes could be touched.
+
+Untouched nodes are the nodes that are not connected to the root node. If we have a defined diameter,
+untouched nodes could also be the nodes of which the distance to the root node is larger than the
+defined diameter.
