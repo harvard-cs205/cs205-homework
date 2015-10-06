@@ -1,5 +1,6 @@
 # Your discussion here
 
+
 I tried two methods of partitioning using the partitionBy command. One
 was before the map of the pixels across the mandelbrot function, and one
 was after.  Comparing the histograms, you could see that the work was
