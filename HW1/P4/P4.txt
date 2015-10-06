@@ -1,1 +1,20 @@
-# Your discussion here
+## Graph representation
+* I represented the graph as an adjacency list. Each element of the RDD is of the form: `(node_name, (explored_flag, distance, [neighbors]), where:
+    * `node_name` is the node's stringname (e.g., "CAPTAIN AMERICA")
+    * `explored_flag` is either 0, 1, or 2 (initialized to 0) with the following meanings:
+        * 0 = node has not yet been reached
+        * 1 = node has been reached, but neighbors have not been marked as reached yet
+        * 2 = node has been reached and neighbors have been marked as reached
+    * `distance` is the min distance between the source and the node
+    * `[neighbors]` is a list of the stringnames of all of the node's neighbors
+
+## Number of nodes touched:
+    * CAPTAIN AMERICA = 6408
+    * MISS THING/MARY = 7
+    * ORWELL = 9
+
+## Questions
+* *What does this diameter imply about the maximum number of steps in which your search must be executed?*
+    * The diameter is the max distance between any two nodes in the graph. If the diameter is 10, this means the maximum number of steps for BFS to find its target must be 10.
+* *What does it mean if a character does not have a defined distance during the search?*
+    * This would mean that the character is not connected to the source node, so it was not reached during the search.

@@ -1,1 +1,3 @@
-# Your discussion here
+Since the color value (how "white" the pixel is) reflects how much computation was required, one can see just by looking at the Mandelbrot image that, since the white and black pixels are generally clustered together, a naive partitioning of the work that puts together pixels close to one another will result in just a few partitions doing most of the work. This is confirmed by the figure in P2a_hist.png, which shows about 15 partitions are doing almost all of the work, squandering much of the potential gains of parallelization.
+
+I decided to parition randomly. This had the benefits of distributing the work pretty evenly, as one can see in P2b_hist.png, which shows a roughly normal distribution, and as a result significantly speeding up the computation. The downsides of this approach are the up-front costs of shuffling the arrays.

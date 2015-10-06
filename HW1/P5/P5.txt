@@ -1,1 +1,3 @@
-# Your discussion here
+## Shortest Pathes:
+* Harvard_University -> 2008 -> 2008_in_film -> Kevin_Bacon
+* Kevin_Bacon -> John_Lithgow -> Harvard_University
