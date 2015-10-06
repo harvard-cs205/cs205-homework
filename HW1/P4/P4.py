@@ -1,3 +1,5 @@
+# Talked with Isadora Nun about strategy for this problem
+
 import findspark
 findspark.init()
 from pyspark import SparkContext, SparkConf

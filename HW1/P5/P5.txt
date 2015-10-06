@@ -6,3 +6,11 @@
 
 # Here is a shortest path between Margaret_Thatcher and Lizardfolk 
 [u'Margaret_Thatcher', u'2008', u'Gary_Gygax', u'Dungeons_&_Dragons_(TV_series)', u'Lizardfolk']
+
+# Uni-directional - links only need to exist in one direction to be counted
+Number of Components: 31,187 
+Largest component has 5,152,328 nodes (Lowest link id is 1)
+
+# Bi-directional - links need to exist in both directions to be counted
+Number of Components: 1,698,602 
+Largest component has 1,408,772 nodes (Lowest link id is 8453)
