@@ -61,9 +61,3 @@ for start in starts:
     word2 = start[0][1]
     print create_phrase(answer, word1, word2, 20)
     print
-
-
-
-
-
-
