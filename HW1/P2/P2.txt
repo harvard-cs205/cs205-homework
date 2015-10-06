@@ -1,3 +1,4 @@
 # Your discussion here
-**** FIX HISTOGRAMS
-As shown by the histogram from P2a, some partitions were doing far more work.  Though most partitions were 
+As shown by the histogram from P2a, a few partitions were doing roughly 8x more work than the 80% of the partitions.  Partitioning the data using spark's default hash paritioning (using 100 partitions) distributed work much more evenly over the workers, as shown by the histogram in P2b_hist.png.
+
+It is important to note that there is a tradeoff for the improve load balancing across partitions: the hash partitioning requires a costly shuffle (19.5 MB written).  The partitionBy() call partitions the elements based on the hash of each element's key. Elements are redistributed to workers corresponding to their designated partition.  In the original partitioning there is no shuffle, since the data is simply split into 100 partitions.
