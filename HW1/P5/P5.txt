@@ -1,1 +1,4 @@
 # Your discussion here
+
+['Harvard_University','Barack_Obama','Kevin_Bacon']
+[‘Kevin_Bacon’,’Barack_Obama’,’Harvard_University’]

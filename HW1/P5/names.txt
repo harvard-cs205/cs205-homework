@@ -1,0 +1,5 @@
+plot the 
+distribution 
+of senate seats 
+the republicans won 
+in your simulation

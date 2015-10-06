@@ -1,1 +1,11 @@
-# Your discussion here
+Setting a graph diameter of 10 implies that the graph will only find all nodes 
+with distance 10 or less from the source node. 
+
+”CAPTAIN AMERICA” - 6408 nodes 
+”MISS THING/MARY” - 7 nodes
+”ORWELL” - 9 nodes
+
+When a node does not have a defined distance, that means it was never touched
+by the search, i.e. it does not belong to the same connected component, and there
+is no connection between that node and the source.
+
