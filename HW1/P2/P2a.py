@@ -7,6 +7,9 @@ import pyspark
 
 sc = pyspark.SparkContext(appName="Spark2a")
 
+# make pyspark shut up
+sc.setLogLevel('WARN')
+
 imagei = sc.parallelize([x for x in range(2000)], 10)
 image = imagei.cartesian(imagei)
 

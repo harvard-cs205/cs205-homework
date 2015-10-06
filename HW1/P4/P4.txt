@@ -1,6 +1,13 @@
 # Your discussion here
 My graph representation was an rdd of edge tuples: (nodeA, nodeB)
-I first had an adjacency list but I found it hard to manipulate list values in spark so I switched to the edge tuple representation and it’s much faster.
+I first had an adjacency list but I found it hard and slow to manipulate list values in spark so I switched to the edge tuple representation and it’s much faster.
+
+Some optimizations to reduce shuffle costs:
+	- the join in my bfs for loop is done from the graph (graph.join(queue, N)) because the graph is a bigger rdd than the queue.
+	- I keep things co-partitioned whenever I can
+	- I reduce the size of my graph in every iteration by removing nodes I’ve already touched, which should make the joins much faster
+	- I mapValues instead of map whenever I can to avoid repartitioning
+The computation for all 3 roots runs in under 20 seconds on my local machine.
 
 for “CAPTAIN AMERICA”, the number of touched nodes was 6408 (if you include the source)
 for “MISS THING/MARY”, the number of touched nodes was 7 (if you include the source)
@@ -8,4 +15,4 @@ for “ORWELL”, the number of touched nodes was 9 (if you include the source)
 
 The diameter implies that the maximum number of steps in which my search has to be executed is at most the diameter, because there is no path longer than the diameter, so if I start at the source and put the neighbors of elements in the queue and never revisit them, then I will repeat this at most diameter times.
 
-If a character doesn’t have a defined distance during the search, then there is no path from the source character to this character.
+If a character doesn’t have a defined distance during the search, then there is no path from the source character to this character. This graph is made up of disconnected sub-graphs.

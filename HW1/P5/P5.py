@@ -103,9 +103,6 @@ Harvard_Id = Harvard_University[0][0]  # extract node id
 
 shortest_paths_from_Kevin_to_Harvard = shortest_paths(Kevin_Id, Harvard_Id, graph)
 print get_names_from_ids(shortest_paths_from_Kevin_to_Harvard, page_names)
-# print
-# print "BALLALALALALALALALAALALALALALAA"
-# print
 shortest_paths_from_Harvard_to_Kevin = shortest_paths(Harvard_Id, Kevin_Id, graph)
 print get_names_from_ids(shortest_paths_from_Harvard_to_Kevin, page_names)
 

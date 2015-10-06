@@ -9,7 +9,7 @@ sc = pyspark.SparkContext()
 # make pyspark shut up
 sc.setLogLevel('WARN')
 
-
+# returns [(Word3a, Count3a), (Word3b, Count3b), ...] given list of repeated words
 def getCounts(lst):
 	dct = {}
 	result = []
@@ -22,6 +22,7 @@ def getCounts(lst):
 		result.append((word, dct[word]))
 	return result
 
+# randomly picks a third word based on counts of each
 def getNextWord(word1, word2, rdd):
 	lstOfCounts = rdd.lookup((word1, word2))[0]
 	words = [word for (word, count) in lstOfCounts]
@@ -39,8 +40,10 @@ indexed_lines = lines.zipWithIndex()
 start = 173
 end = 124368
 
+# skip metadata text
 shakespeare_lines = indexed_lines.filter(lambda (u,v): v > start and v < end)
 words = shakespeare_lines.keys().flatMap(lambda line: line.split())
+# filter according to conditions
 filtered_words = words.filter(lambda word: not(word.isdigit())\
  					and not(word.isalpha() and word.isupper())\
  					and not(word[:-1].isalpha() and word[:-1].isupper and word[-1] == '.'))
