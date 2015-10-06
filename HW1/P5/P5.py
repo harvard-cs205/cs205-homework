@@ -1,52 +1,7 @@
-import csv
-
 import pyspark
 sc = pyspark.SparkContext()
 
 sc.setLogLevel('WARN')
-
-
-def larger(x, y):
-    """
-    Return larger of two lists. If tie, returns x.
-    """
-    if len(y) > len(x):
-        return y
-    else:
-        return x
-
-
-def get_edges(tup):
-    """
-    For (issue, list_of_heroes), returns a list with edges between all heroes, with no self-edges.
-    E.g.: (issue, [hero1, hero2, hero3]) would return:
-    [(hero1, hero2), (hero1, hero3), (hero2, hero1), (hero2, hero3), (hero3, hero1), (hero3, hero2)]
-    """
-    issue, heroes = tup
-    edges = set()
-    for i in xrange(len(heroes)):
-        for j in xrange(len(heroes)):
-            if i != j:
-                edges.add((heroes[i], heroes[j]))
-    return edges
-
-
-def create_update_accumulator():
-    accum = sc.accumulator(0)
-
-    def update_accumulator(tup):
-        """
-        Adds to accumulator if sees a False flag
-        """
-        key, (flag, dist, neighbors) = tup
-        if flag is False:
-            accum.add(1)
-        return tup
-
-    return accum, update_accumulator
-
-
-links = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt')
 
 
 def parse_links(x):
@@ -60,12 +15,32 @@ def parse_links(x):
 
     return (source, neighbors)
 
+
+links = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt')
 links = links.map(parse_links)
+index_to_title = sc.textFile('s3://Harvard-CS205/wikipedia/titles-sorted.txt').zipWithIndex().map(lambda x: (x[1] + 1, x[0])).cache()
+title_to_index = index_to_title.map(lambda x: (x[1], x[0])).cache()
 
 
-# reduce by key with this function to max the flag, min the distance, and take the larger neighbors list
+def larger(x, y):
+    """
+    Return larger of two lists. If tie, returns x.
+    For use in add_neighbors.
+    """
+    if len(y) > len(x):
+        return y
+    else:
+        return x
+
+
 def collapse_nodes(x, y):
-    # take the previous of the node with the smaller distance
+    """
+    Reducer that takes:
+        * Max of the flags
+        * Min of the distances
+        * Larger of the neighbors lists
+        * Previous of the node with the smaller distance
+    """
     if x[3] is None:
         previous = y[3]
     elif y[3] is None:
@@ -79,27 +54,64 @@ def collapse_nodes(x, y):
 
 
 def bfs(source, target):
+    """
+    Performs breadth-first search starting at source and ending once
+    target is found or all connected nodes have been touched.
+
+    Flags mean:
+    * 0 = node has not yet been reached
+    * 1 = node has been reached, but neighbors have not been marked as reached yet
+    * 2 = node has been reached and neighbors have been marked as reached
+
+    Vertices are of form (node, (flag, dist, [neighbors], previous))
+    """
+
     def initialize_nodes(x):
+        # initialize flag to 0
         flag = 0
+
+        # initialize distance to a high number
         dist = 9999
+
+        # initialize the source's flag to 1 and distance to 0
         if x[0] == source:
             flag = 1
             dist = 0
+
         return (x[0], (flag, dist, x[1], None))
 
+    vertices = links.map(initialize_nodes).cache()
+
     def create_add_neighbors():
-        accum = sc.accumulator(0)
+        """
+        Closure to create the mapper function with
+        accumulators in the proper scope.
+        """
+
         found_target = sc.accumulator(0)
+        accum = sc.accumulator(0)
 
         def add_neighbors(node):
+            """
+            Mapper that "activates" neighbors of nodes found in the previous
+            iteration.
+            """
+
             (node, (flag, dist, neighbors, previous)) = node
             nodes = []
             if flag == 1:
+
+                # increment accumulator
                 accum.add(1)
+
+                # if we've found the target, increment
+                # the found_target accumulator to stop
+                # the search
+                if node == target:
+                    found_target.add(1)
+
+                # add neighbors to RDD
                 for neighbor in neighbors:
-                    # TODO: why doesn't this work?
-                    #if node == target:
-                    #    found_target.add(1)
                     nodes.append((neighbor, (1, dist + 1, [], node)))
                 nodes.append((node, (2, dist, neighbors, previous)))
             else:
@@ -109,45 +121,38 @@ def bfs(source, target):
 
         return accum, found_target, add_neighbors
 
-    vertices = links.map(initialize_nodes).cache()
     accum, found_target, add_neighbors = create_add_neighbors()
-    # ("Node", (flag, dist, [neighbors]))
     dist = 0
     old_num_ones = -1
 
-    print "Set up done."
-
-    # stop if number of non-explored nodes has not changed since last iteration
-    # (stored in accumulator)
-    # Flags:
-    # 0 = have not touched
-    # 1 = touched, need to add neighbors
-    # 2 = have added all neighbors
     while accum.value != old_num_ones and found_target.value == 0:
-        print "distance " + str(dist)
-        old_num_ones = accum.value
         accum, found_target, add_neighbors = create_add_neighbors()
         vertices = vertices.flatMap(add_neighbors).reduceByKey(collapse_nodes)
         vertices.count()
         dist += 1
 
+    # return only nodes that we've touched and explored
     return vertices.filter(lambda x: x[1][0] == 2)
 
 
 def find_path(source, target, vertices=None, path=None):
     """
-    Vertex is of form (node, (flag, dist, [neighbors], previous))
+    Searches through the BFS results recursively, from the
+    target back to the source, and returns a list ordered
+    from source to target.
     """
-    print "finding path"
     if vertices is None:
+        source = title_to_index.lookup(source)[0]
+        target = title_to_index.lookup(target)[0]
         vertices = dict(bfs(source, target).collect())
         path = [target]
 
-    next = vertices[target][3]
-    path.append(next)
-    if next == source:
-        return path[::-1]
+    next_node = vertices[target][3]
+    path.append(next_node)
+    if next_node == source:
+        return [index_to_title.lookup(x)[0] for x in path[::-1]]
     else:
-        return find_path(source, next, vertices, path)
+        return find_path(source, next_node, vertices, path)
 
-print find_path(2729536, 2152782)
+print find_path("Harvard_University", "Kevin_Bacon")
+print find_path("Kevin_Bacon", "Harvard_University")
