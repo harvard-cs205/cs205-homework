@@ -3,6 +3,10 @@ import pyspark
 # num partitions (4 times the number of cores)
 N = 256
 
+# works a lot like bfs from part 4, but instead of keeping distance as value,
+# 	it instead keeps the path that led to this node
+#  	stops when there is some path that ends with the goal (all such shortest paths
+# 	will be found in the same iteration) and returns those paths.
 def shortest_paths(start, goal, graph):
 	visited = sc.parallelize([(start, 0)], N)
 	queue = sc.parallelize([(start, (start,))], N)
@@ -21,12 +25,15 @@ def shortest_paths(start, goal, graph):
 		paths = queue.values().filter(lambda x: x[-1] == goal).cache()
 	return paths.collect()
 
+# works a lot like BFS from part 4 but wraps it in a while loop until the graph
+# 	is empty of nodes (the graph is losing all nodes that have been touched at every iteration)
 def connected_components(root, graph):
 	# initialize queue and distances rdds
 	components = 0
 	biggest_component = 0
 	while not graph.isEmpty():
 		components += 1
+		print components
 		if components != 1:
 			root = graph.first()[0]
 		distances = queue = sc.parallelize([(root, 0)], N)
@@ -78,8 +85,8 @@ sc = pyspark.SparkContext()
 # make pyspark shut up
 sc.setLogLevel('WARN')
 
-# a lot of this code is taken from Professor's review session
-links = links = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt', 32)
+# some of this code is taken from Professor's review session
+links = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt', 32)
 page_names = sc.textFile('s3://Harvard-CS205/wikipedia/titles-sorted.txt', 32)
 
 page_names = page_names.zipWithIndex().map(lambda (n, id): (id + 1, n))
@@ -87,7 +94,7 @@ page_names = page_names.sortByKey().cache()
 
 neighbor_graph = links.map(link_string_to_KV)
 neighbor_graph = neighbor_graph.flatMapValues(lambda v: v)
-graph = neighbor_graph.partitionBy(256).cache()
+graph = neighbor_graph.partitionBy(N).cache()
 
 # find Kevin Bacon
 Kevin_Bacon = page_names.filter(lambda (K, V): V == 'Kevin_Bacon').collect()
@@ -107,9 +114,14 @@ shortest_paths_from_Harvard_to_Kevin = shortest_paths(Harvard_Id, Kevin_Id, grap
 print get_names_from_ids(shortest_paths_from_Harvard_to_Kevin, page_names)
 
 
+# build graphs for connected_components
+opposite_links = graph.map(lambda (u, v): (v, u)).partitionBy(N)
+symmetric_graph = graph.union(opposite_links).distinct().partitionBy(N).cache()
 
-# num_connected_components = connected_components(root, graph)
-# print num_connected_components
+intersection = graph.intersection(graph.map(lambda (u, v): (v, u))).partitionBy(N).cache()
+
+(num_connected_components, biggest_component) = connected_components(root, graph)
+print (num_connected_components, biggest_component)
 
 
 
