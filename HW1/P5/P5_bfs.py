@@ -1,3 +1,5 @@
+# Takes in a src node and a destination node, and returns an rdd of
+# every shortest path from src to dest in the graph.
 # Caution: if src is not connected to dest, this runs forever
 def find_all_shortest_paths(src, dest, graph, sc):
   accum = sc.accumulator(0)

@@ -16,6 +16,7 @@ rdd2 = np.arange(2000)
 rdd1 = sc.parallelize(rdd1, 10)
 rdd2 = sc.parallelize(rdd2, 10)
 
+# Create the pixels rdd
 pixels = rdd1.cartesian(rdd2)
 res = pixels.map(lambda a: (a,mandelbrot((a[1]/500.0) - 2,(a[0]/500.0) - 2)))
 draw_image(res)

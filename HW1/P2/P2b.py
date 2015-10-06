@@ -9,7 +9,6 @@ findspark.init()
 import pyspark
 sc = pyspark.SparkContext(appName="P2")
 
-# with better partitioning
 rdd1 = np.arange(2000)
 rdd2 = np.arange(2000)
 
@@ -18,7 +17,9 @@ rdd2 = sc.parallelize(rdd2, 10)
 
 pixels = rdd1.cartesian(rdd2)
 
+# Randomly shuffle the pixels data
 pixels = pixels.partitionBy(100)
+
 res = pixels.map(lambda a: (a,mandelbrot((a[1]/500.0) - 2,(a[0]/500.0) - 2)))
 draw_image(res)
 b = sum_values_for_partitions(res)

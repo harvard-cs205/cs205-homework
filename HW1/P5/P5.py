@@ -17,6 +17,8 @@ titles_rev = titles.map(lambda (k,v): (v, k))
 links = links.map(lambda line: (int(line.split(": ")[0]), map(int, line.split(": ")[1].split())))
 full_graph = links.flatMap(lambda (k, v): [(k, vl) for vl in v])
 
+# Short function to compute all shortest paths, and then convert those paths
+# from paths of integers to paths of corresponding names in the graph.
 def compute_shortest_paths_and_map(hu_num, kb_num, full_graph, sc):
   ret = find_all_shortest_paths(hu_num, kb_num, full_graph, sc)
   raw_nodes = ret.flatMap(lambda x: x).map(lambda x: (x, x))

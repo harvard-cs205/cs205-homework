@@ -1,3 +1,6 @@
+# Perform breadth first search starting at src_name in an adjacency list
+# rdd.  Returns an rdd which maps every node connected to src_name to its
+# distance from src_name.
 def bfs(adj_list_rdd, src_name, sc):
     accum = sc.accumulator(0)
     adj_list_rdd.cache()

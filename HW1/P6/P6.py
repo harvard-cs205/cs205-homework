@@ -10,6 +10,7 @@ f = open("pg100.txt")
 raw_text = f.read()
 output = raw_text.split()
 
+# Clean the words in accordance with the spec
 def cleanUp(word):
     is_word = False
     try:
@@ -25,6 +26,7 @@ def cleanUp(word):
             return False
     return True
 
+# Basic tests on cleanUp
 assert(cleanUp("lasjflks") == True)
 assert(cleanUp("JonAh") == True)
 assert(cleanUp("bllahsk28askldH") == True)
@@ -35,6 +37,7 @@ assert(cleanUp("AJSDFJKAK") == False)
 assert(cleanUp("AJSDFJKAK.") == False)
 assert(cleanUp("AJSDFAKSFIWEIEIEIEJKAK.") == False)
 
+# clean the data
 cleaned = filter(cleanUp, output)
 
 trigrams = []
@@ -44,7 +47,7 @@ for i in range(len(cleaned) - 2):
 shakespeare = sc.parallelize(trigrams)
 trigram_vals = shakespeare.map(lambda (w1, w2, w3): ((w1, w2), [(w3, 1)]))
 
-# input is a seq of word, count pairs, all of which are 1
+# Input is a sequence of (word, count) pairs
 def reduceFn(x, y):
     if x[0] == y[0]:
         return [(x[0], x[1] + y[1])]
@@ -62,10 +65,12 @@ def valMapper(seq):
         output.append((i[0], seqdict[i]))
     return output
 
+# Create the lists of trigrams
 trigram_vals = trigram_vals.reduceByKey(lambda a, b: a + b)
 mapped = trigram_vals.mapValues(valMapper)
 mapped = mapped.map(lambda x: x)
 
+# Draw a sample from a list of (next_word, count) pairs
 def draw_biased_sample(seq):
     seqsum = float(sum([x[1] for x in seq]))
     probs = [x[1]/seqsum for x in seq]
@@ -76,6 +81,7 @@ def draw_biased_sample(seq):
             break
     return seq[a][0]
 
+# Generate the random phrases!
 random_phrases = []
 for i in range(10):
     phrase = ""
