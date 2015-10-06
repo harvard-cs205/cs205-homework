@@ -40,13 +40,16 @@ def multipleLines(line_count, word_count):
 if __name__ == '__main__':
 
     rawData = sc.textFile('pg100.txt')
+
     wlist = rawData.flatMap(lambda x: x.split(' ')).filter(lambda x:
         not x.isdigit()).filter(lambda x:
         not x.isupper()).filter(lambda x:
         x != '')
 
     wlist_2 = wlist.collect()
+
     word_seq = []
+
     for i in xrange(len(wlist_2)-2):
         word_seq.append(((wlist_2[i], wlist_2[i+1]),wlist_2[i+2]))
 
