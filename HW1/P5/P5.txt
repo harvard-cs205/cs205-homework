@@ -1,1 +1,6 @@
 # Your discussion here
+The length of the shortest path from Kevin_Bacon to Harvard_University had length 3, going through the path: [u'Kevin_Bacon', u'College_Bowl', u'Harvard_University']
+
+The length of the shortest path from Harvard_University to Kevin_Bacon had length 4, going through the path: [u'Harvard_University', u'List_of_U.S._colleges_and_universities_by_endowment', u'July_8', u'Kevin_Bacon']
+
+
