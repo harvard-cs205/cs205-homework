@@ -1,1 +1,5 @@
 # Your discussion here
+
+This is my entry with the most words.  It matches with the value 11 as stated in the homework hint.
+
+('aerst', 11, ['arets', 'aster', 'rates', 'reast', 'resat', 'stare', 'stear', 'strae', 'tares', 'tears', 'teras'])

@@ -1,1 +1,12 @@
 # Your discussion here
+
+I tried two methods of partitioning using the partitionBy command. One
+was before the map of the pixels across the mandelbrot function, and one
+was after.  Comparing the histograms, you could see that the work was
+more evenly spread across the partitions in the partitionBy occurring
+after the .map() statement.  Both were improvements on the default
+partitioner though, which was very lopsided as can be seen in the png
+file. The partitionBy before map had higher counts at the two extremes,
+whereas the partitionBy after map had more of a bell shape to it.  The
+latter is preferred as we do not want to much time being spent in one
+partition doing high iterations in the mandelbrot function.
