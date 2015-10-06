@@ -34,7 +34,7 @@ book_to_characters = book_to_character.groupByKey(numPartitions = num_Partitions
 # Extract all pairs of characters that share a book.
 adjacent_heros = book_to_characters.flatMap(lambda (book, characters): get_pairs(characters)).distinct().partitionBy(num_Partitions)
 
-# Create the graph as an adjacency list
+# Create the graph as an adjacency list.
 graph = adjacent_heros.groupByKey().partitionBy(num_Partitions).cache()
 
 res1 = bfs(graph, 'CAPTAIN AMERICA', sc, num_Partitions)

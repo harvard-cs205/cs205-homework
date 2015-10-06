@@ -1,6 +1,7 @@
 def copartitioned(RDD1, RDD2):
     "check if two RDDs are copartitioned"
     return RDD1.partitioner == RDD2.partitioner
+
 def reducer(tup):
     left_val = tup[0]
     right_vals = tup[1]

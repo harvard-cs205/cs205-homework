@@ -1,12 +1,13 @@
-# Your code here
+# Ankit Gupta
+# CS 205
 import pyspark
 sc = pyspark.SparkContext(appName="Spark1")
 import numpy as np 
 import itertools
 
 
-# returns all orderings of a string
-# these are not necessarily all valid words
+# Returns all orderings of a string
+# These are not necessarily all valid words
 def get_anagrams(s):
 	return ["".join(perm) for perm in itertools.permutations(s)]
 

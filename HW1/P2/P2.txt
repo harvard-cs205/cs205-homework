@@ -5,4 +5,4 @@ Ultimately, we get different results from the two of these. Naturally, having an
 
 Looking at the graphs directly, we see that in the first part, most of the partitions have very little load, and a few of them have a ton of load (note the log scale). 
 
-However, in the second technique, we find that all of them have very close to the same load, and that load is much lower than the max load from the first part!
+However, in the second technique, we find that all of them have very close to the same load, and that load is much lower than the max load from the first part! This is very beneficial in a highly parallel problem like this one.

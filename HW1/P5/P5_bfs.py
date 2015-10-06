@@ -6,12 +6,12 @@
 # Implementation of BFS
 #
 # Note that I have kept some lines (commented out) to show how I tested this locally. Please ignore those if running on AWS.
-# I have included comments that explain what files I used to test this locally before on AWS. 
+# I have included comments that explain what files I used to test this locally before running the real one on AWS. 
 ##############
 
 # Comment out these lines when running on AWS
-import findspark
-findspark.init()
+#import findspark
+#findspark.init()
 
 import pyspark
 sc = pyspark.SparkContext(appName="Spark1")
@@ -58,7 +58,6 @@ def map_node_to_name(arr, reached_to_name):
 #   adj: The graph in adjacency list representation
 #   start_node: The node # where BFS is starting
 #   end_node: The node # where BFS is ending
-
 def get_paths(adj, start_node, sc, num_Partitions, end_node, indexed_titles):
     paths = bfs(adj, start_node, end_node, sc, num_Partitions)
     paths = paths.cache()
@@ -124,11 +123,12 @@ logger.LogManager.getLogger("akka").setLevel( logger.Level.ERROR )
 #titlelist = sc.textFile('../P5/generated_titles_10000_sorted.txt', 32)
 #linklist = sc.textFile('../P5/generated_links_2mil_sorted.txt', 32)
 #titlelist = sc.textFile('../P5/generated_titles_2mil_sorted.txt', 32)
-linklist = sc.textFile('../P5/links-simple-sorted.txt', 32)
-titlelist = sc.textFile('../P5/titles_sorted.txt', 32)
+#linklist = sc.textFile('../P5/links-simple-sorted.txt', 32)
+#titlelist = sc.textFile('../P5/titles_sorted.txt', 32)
+
 # Uncomment these when running on AWS!
-#linklist = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt', 32)
-#titlelist = sc.textFile('s3://Harvard-CS205/wikipedia/titles-sorted.txt', 32)
+linklist = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt', 32)
+titlelist = sc.textFile('s3://Harvard-CS205/wikipedia/titles-sorted.txt', 32)
 
 num_Partitions = 256
 numerical_titles = titlelist.zipWithIndex().cache()
@@ -142,29 +142,18 @@ nodes = graph.map(lambda (x,y): int(x), True)
 assert(copartitioned(graph, nodes))
 
 # Change these to be the appropriate start and end locations.
-#bacon = "Kevin_Bacon"
-#harvard = "Harvard_University"
-bacon = 'TITLE_a'
-harvard = 'TITLE_c'
+bacon = "Kevin_Bacon"
+harvard = "Harvard_University"
+
+# These were test titles for when running locally.
+#bacon = 'TITLE_a'
+#harvard = 'TITLE_c'
 
 bacon_node = numerical_titles.lookup(bacon)[0]
 harvard_node = numerical_titles.lookup(harvard)[0]
 
 print get_paths(graph, bacon_node, sc, num_Partitions, harvard_node, indexed_titles), '\n\n'
 print get_paths(graph, harvard_node, sc, num_Partitions, bacon_node, indexed_titles)
-
-#paths = bfs(graph, start_node, sc, num_Partitions, end_node)
-#paths = paths.cache()
-
-# Now that we have the paths, we need to get the actual names of the pages associated with those paths. 
-# Get the unique items that are reached, join that with the indexed_titles
-#names_touched = paths.flatMap(lambda x: x).distinct().map(lambda node: (node, node)).partitionBy(num_Partitions).join(indexed_titles).mapValues(lambda (x, y): y)
-
-# Extract a dictionary from the RDD, with key being the node #, and value being the name.
-#reached_to_name = names_touched.collectAsMap()
-# Convert the paths to named paths
-#named_paths = paths.map(lambda x: map_node_to_name(x, reached_to_name))
-#print named_paths.collect()
 
 
 
