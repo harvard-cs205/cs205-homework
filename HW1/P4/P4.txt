@@ -1,1 +1,13 @@
 # Your discussion here
+Graph Description - 
+The graph is stored in an RDD with every row representing one of the nodes in the graph. The node is the key and the value has two elements. The first element in the value is the distance (initially all set to -1) but updated with the distance every iteration. The second element in the value is a list with all the nodes that the key is directly connected to. 
+
+"MISS THING/MARY" - 7 nodes touched 
+"ORWELL" - 9 nodes touched
+"CAPTAIN AMERICA" - 6408 nodes touched
+
+What does this diameter imply about the maximum number of steps in which your search must be executed?
+- The diameter represents the maximum shortest path between any two nodes. This implies that irrespective of our starting node, we shouldnt have to search beyond ten steps to find the shortest path to all connected nodes. Hence, our algorithm iteration count is bound by the diameter.
+
+What does it mean if a character does not have a defined distance during the search?
+- If a character does not have a defined instance it means that the character's node is not connected to the starting node.
