@@ -7,6 +7,11 @@ import csv
 filename = "source.csv"
 sc = SparkContext("local", "P4")
 
+# Set up logger so as to be able to see output
+logger = sc._jvm.org.apache.log4j
+logger.LogManager.getLogger("org").setLevel( logger.Level.ERROR )
+logger.LogManager.getLogger("akka").setLevel( logger.Level.ERROR )
+
 # Function to find all pair permutations of a list of characters
 # Uses Python itertools library
 def permutePairs(charList):
@@ -32,10 +37,12 @@ comicRdd = sc.parallelize(revRows)
 charRdd = comicRdd.groupByKey().values()
 
 # Find all possible character permutations
+# ((char1, char2), (char1, char3), ...)
 graphUnfilteredEdges = charRdd.flatMap(permutePairs)
 
 # Group the character permutation pairs by first character 
 # and filter out duplicates using list set and cache rdd
+# ((char1, [char2, char3, ...]), (char2, [char1, char3, ...]), ...)
 graph = graphUnfilteredEdges.groupByKey().map(lambda (char, edges): (char, list(set(edges))))
 graph = graph.cache()
 
