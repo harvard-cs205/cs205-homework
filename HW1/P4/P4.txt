@@ -1,5 +1,6 @@
 # Your discussion here
 
+I use an adjacency list to represent the graph. It is a set of ordered pairs structured as (character x, np.array([neighbors of character x]))
 The graph diameter (10) implies that you only need to do 10 BFS iterations after the root/start node is set to distance 0. 
 This is because every node connected to the root node is at most a distance of 10 edges away from the root node.
 If a character does not have a defined distance during the search, it means no path exists between the root node and the 
