@@ -1,6 +1,8 @@
 # Your discussion here
 The graph for part a is scaled by 1e7, which is why it
-looks relatively clustered.  The graph for part b on the other hand is tightly
+looks relatively clustered: in fact the partitioning is quite poor:
+some partitions did 0 or close to 0 work, while other partitions did
+huge amounts of work.  The graph for part b on the other hand is tightly
 clustered around a small range of values just above 200,000. Thus we see that
 the solution of a random repartition via PartitionBy balances work *extremely* well.
 However, it does require a single full shuffle of all the data, which is costly,
