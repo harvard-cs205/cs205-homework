@@ -25,7 +25,7 @@ bWords = sc.textFile('B Words.csv').cache()
 bWords = bWords.map(lambda x: (1,x))
 bWords = bWords.groupByKey().mapValues(list)
 allWords = allWords.join(bWords)
-allWords = allWords.map(lambda x: (x[0],[item for sublist in x[1] for item in sublist]))
+allWords = allWords.map(lambda x: (x[0],[item for sublist in x[1] for item in sublist])) # read in data below
 fileNames = ['C Words.csv','D Words.csv','E Words.csv','F Words.csv','G Words.csv','H Words.csv','I Words.csv','J Words.csv','K Words.csv',\
 'L Words.csv','M Words.csv','N Words.csv','O Words.csv','P Words.csv','Q Words.csv','R Words.csv','S Words.csv','T Words.csv','U Words.csv',\
 'V Words.csv','W Words.csv','X Words.csv','Y Words.csv','Z Words.csv',]
@@ -38,12 +38,12 @@ for ii in range(0,24):
 
 allWords = sc.parallelize(allWords.map(lambda x: x[1]).collect()[0])
 print len(allWords.collect())
-allWords = allWords.map(lambda x: (''.join(sorted(x)),x))
-allWords = allWords.groupByKey().mapValues(list)
-allWords = allWords.map(lambda x: (x[0],len(x[1]),x[1]))
+allWords = allWords.map(lambda x: (''.join(sorted(x)),x)) # make an RDD where key is word in sorted order
+allWords = allWords.groupByKey().mapValues(list) # group by key to get anagrams
+allWords = allWords.map(lambda x: (x[0],len(x[1]),x[1])) # get desired output
 gramCount = allWords.map(lambda x: x[1])
 maxCount = gramCount.max()
-maxEntry = allWords.filter(lambda x: x[1] == maxCount)
+maxEntry = allWords.filter(lambda x: x[1] == maxCount) # get entry with most anagrams
 print maxEntry.collect()
 
 

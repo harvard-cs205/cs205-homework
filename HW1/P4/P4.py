@@ -17,13 +17,13 @@ comicFirst = comicL.groupByKey().mapValues(list).map(lambda x: (x[0],np.unique(x
 
 charAdj = comicL.join(comicFirst).map(lambda x: (x[1][0],x[1][1])).groupByKey().mapValues(list)
 charAdj = charAdj.map(lambda x: (x[0],np.array([item for sublist in x[1] for item in sublist])))
-charAdj = charAdj.map(lambda x: (x[0],np.unique(x[1][x[1] != x[0]]))).partitionBy(10).cache()
+charAdj = charAdj.map(lambda x: (x[0],np.unique(x[1][x[1] != x[0]]))).partitionBy(10).cache() # make adjacency list
 
 #startName = 'CAPTAIN AMERICA'
 #startName = 'MISS THING/MARY'
-startName = 'ORWELL'
+startName = 'ORWELL'  # root of BFS tree here
 
 componentSize = bfsSearch(startName, charAdj, sc)
 
-print componentSize
+print componentSize # print list of connected nodes at each BFS iteration
 
