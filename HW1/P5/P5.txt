@@ -1,9 +1,9 @@
 For this problem, it was simply necessary to modify the P4_bfs to account for storing full paths rather than simply marking states as visited. In addition, it was necessary in each search step to update the paths of every neighbor with the current character being examined. For the purposes of slight optimizations, I sorted page names by key, making the lookups significantly faster. 
 
-There were ultimately 6 paths of length 2 found from Kevin Bacon to Harvard University. Here was my favorite one:
+There were ultimately 6 paths of length 3 found from Kevin Bacon to Harvard University. Here was my favorite one:
 [u'Kevin_Bacon', u'Six_degrees_of_separation', u'Harvard_University']
 
-For Harvard to Kevin Bacon, the paths were length 3 instead, but there were far more of them (120 in all!) Here is one of those paths:
+For Harvard to Kevin Bacon, the paths were length 4 instead, but there were far more of them (120 in all!) Here is one of those paths:
 [u'Harvard_University', u'Hasty_Pudding_Woman_of_the_Year', u'1958', u'Kevin_Bacon']
 
 Was unable to complete the connected components problem for extra credit, so am unable to answer the CC questions
