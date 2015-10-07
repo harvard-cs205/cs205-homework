@@ -30,8 +30,8 @@ num_per_part_list = num_per_part.collect()
 
 #plot histogram
 plt.hist(num_per_part_list, color="black")
-plt.title("Compute per Partition")
-plt.xlabel("Compute (Effort)")
+plt.title("Computation per Partition Histogram")
+plt.xlabel("Iterations Count (Compute Effort)")
 plt.ylabel("Frequency")
 plt.savefig("P2b_hist.png")
 
