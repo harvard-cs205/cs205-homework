@@ -3,6 +3,7 @@ from P2 import *
 import pyspark
 import time
 
+
 sc = pyspark.SparkContext(appName = "Spark1")
 
 # Use default partitioning below
@@ -18,13 +19,19 @@ newImage = image.map(lambda x: ((x[1],x[0]),mandelbrot((x[0]/500)-2,(x[1]/500)-2
 
 # draw image and compute worker time of 100 workers below
 #draw_image(newImage)
+
+startTime = time.time()
 workTime = sum_values_for_partitions(newImage).collect()
+endTime = time.time()
 
 plt.hist(workTime)
 plt.title('Default Worker Time Distribution')
 plt.xlabel('Number of Iterations')
 plt.ylabel('Count')
 plt.show()
+
+print endTime - startTime
+
 
 
 

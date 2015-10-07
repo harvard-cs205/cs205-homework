@@ -3,6 +3,7 @@ from P2 import *
 import pyspark
 import time
 
+
 sc = pyspark.SparkContext(appName = "Spark1")
 
 baseList = np.array([ii for ii in range(0,2000)])
@@ -30,11 +31,12 @@ image = xaxis.cartesian(yaxis).cache()
 newImage = image.map(lambda x: [[x[1],x[0]],mandelbrot((x[0]/500)-2,(x[1]/500)-2)]).cache()
 
 #draw_image(newImage)
-
+startTime = time.time()
 workTime = sum_values_for_partitions(newImage).collect()
+endTime = time.time()
 
 plt.hist(workTime)
 plt.title('Custom Worker Time Distribution')
 plt.show()
 
-
+print endTime - startTime

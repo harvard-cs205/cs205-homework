@@ -15,4 +15,6 @@ The shuffling cost is high because the x and y value arrays are not copartitione
 the same random hashing for the x and y arrays, then there would be less randomness so less load partitioning at the 
 cost of less shuffling. 
 
- 
+I ran the code on AWS with 4 machines, one core each, and it took P2a 34 seconds and P2b 39 seconds. See aws 
+screenshots. Thus the difference is not as great but P2a is still faster. This means the compute imbalance between
+workers is not enough to offset the shuffling cost from P2b.
