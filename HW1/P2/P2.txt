@@ -1,1 +1,3 @@
-# Your discussion here
+In the first part, the partitioning strategy was to have adjacent points be on the same cluster. This is inefficient because if many points, all of which require a large amount of computation time, are all computed in the same RDD, then this will be slow. There will be RDD’s that are just sitting there, doing nothing while another one is still working. 
+
+Therefore, in the second part, I chose a randomized partitioning strategy, which we can see through the histogram, led to a normal distribution of the running times of each machine. This means that each machine had a good mix of long and short tasks, and thus the run-time was also less. 
