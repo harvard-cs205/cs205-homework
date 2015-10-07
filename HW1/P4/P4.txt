@@ -1,1 +1,27 @@
-# Your discussion here
+# Xingchi Dai
+
+Graph Representation:
+The original graph is represented as:
+[char,[neighborhoods]]
+This graph is adjacency lists. It is much more compact representation and easy to compute.
+
+In this problem, the graph is represented as:
+[char,(shortest_distance,[neighbors])]
+
+Before we reached the specific point, the distance is set to infinity. 
+
+After running the program, I got the result as follow:
+“CAPTAIN AMERICA”, counted the root node itself, there are 6408 nodes.
+“MISS THING/MARY”, counted the root node itself, there are 7 nodes
+“ORWELL”, counted the root node itself, there are 9 nodes. 
+
+
+What does the diameter mean?
+
+The diameter of the graph can be interpreted as how deep this graph is. So, in our problem, we starts from one node, and traverse level-by-level (breadth-first). After reach the level of the diameter, we will have reached every single nodes in the graph. 
+
+
+What does it mean if a character does not have a defined distance during the search?
+
+It means we haven’t reached to that node. In my program, for all those untouched nodes, the distance is set as infinity. 
+
