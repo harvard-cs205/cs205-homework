@@ -10,6 +10,7 @@ fs.init();
 import pyspark as py
 from collections import Counter
 import random
+import re
 
 
 #create sparkConf and a new Spark
@@ -18,10 +19,16 @@ conf = py.SparkConf().setAppName("CS205HW1")
 sc = py.SparkContext();
 
 #This function differentiate if the word is pure number or 
-#if the word is all CAP
+#if the word is all CAP and CAP + period
 #Then the RDD will filter out these words
 def filter_words(x):
-    return not (x.isdigit() or x.isupper());
+    num_format = re.compile("^[0-9]+$");
+    capital_foramt = re.compile('^[A-Z]+$');
+    capital_with_period = re.compile('^[A-Z]+\.$');
+    isnumber = re.match(num_format, x);
+    iscapital = re.match(capital_foramt, x);
+    iscapital_period = re.match(capital_with_period, x);
+    return ((isnumber) and (iscapital) and (iscapital_period));
 
 #The cut and the shift rdd functions are used for
 #truncating extra elements in one list
