@@ -1,5 +1,4 @@
 from P2 import *
-#In this problem, we reorder the original (i,j)
 import pyspark as py
 import matplotlib.pyplot as plt
 import random
@@ -15,11 +14,12 @@ series = range(2000);
 random.shuffle(series);
 #create a 2000 rdd, it has 10 partitions
 rdd1 = sc.parallelize(series,10);
-#get a 2000 * 2000 rdd
+#get a 2000 * 2000 rdd, after the cartesian, it will have 100 partitions
 rdd2 = rdd1.cartesian(rdd1);
 #map the function
 rdd2 = rdd2.map(lambda (x,y): ((x,y),mandelbrot(location(y),location(x))));
-draw_image(rdd2);# Draw the image to make sure it's correct
+# Draw the image to make sure it's correct
+draw_image(rdd2);
 #use this to produce an histogram for each paritition
 result = sum_values_for_partitions(rdd2);
 #collect data and plot it
