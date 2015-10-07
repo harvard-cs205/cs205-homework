@@ -1,13 +1,13 @@
-import findspark
-findspark.init()
+#import findspark
+#findspark.init()
 import pyspark
 
 from pyspark import SparkContext, SparkConf
 conf = SparkConf().setAppName("app").setMaster("local")
 sc = SparkContext(conf=conf)
 
-#links = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt')
-links = sc.textFile('links.txt')
+links = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt')
+#links = sc.textFile('links.txt')
 def expand_values((k, v)):
     res = list()
     for i in v:

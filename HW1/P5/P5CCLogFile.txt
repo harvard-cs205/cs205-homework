@@ -1,2 +1,0 @@
-Symmetric Graph: # of Connected Components is : 3	Max # of Elements is : 8
-Asymmetric Graph: # of Connected Components is: 4	Max # of Elements is : 6
