@@ -1,1 +1,10 @@
 # Your discussion here
+Use your code to compute one of the shortest paths from “Kevin Bacon” to “Harvard University”, and the reverse (Harvard to Mr. Bacon). Report these results in your writeup below
+
+The shortest path I found from Kevin to Harvard is as follows:
+['Kevin_Bacon', u'College_Bowl’, ‘Harvard_University’]
+
+The shortest path from Harvard_University to Kevin_Bacon was:
+['Harvard_University', u'Cornell_University', u'Edmund_Bacon', 'Kevin_Bacon']
+
+I really struggled on this problem as the code that I originally wrote for my BFS was just too computationally heavy, it would take forever to run! I got help from Patrick Kupier and this problem and he showed me a much simpler way to implement the BFS. Instead of having a flag bit for whether or not I’d seen a node (which required me to do many more filter, unions, and subtract by keys) I implemented this simpler method and everything worked fine. After weeks of struggling with this pset, I’m happy to say that it is over!
