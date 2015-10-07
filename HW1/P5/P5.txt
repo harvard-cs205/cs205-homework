@@ -1,4 +1,28 @@
 # Your discussion here
+I was able to do the shortest paths part on aws. 
+I wrote a connected components function that was basically repeated bfs (can be found in P5.py), it works quickly on the marvel graph, but I suspect it wouldn’t be fast enough to work on the wiki graph. 
+So then I tried to do the extra credit of the extra credit: connected components in log diameter iterations.
+
+I know how to do it and I’ve implemented it (in extraextracredit.py) but it’s unfortunately slow because I didn’t implement it in the most efficient way (although I’m sure it’s much faster than the previous connected components function). 
+
+My approach for the extra extra credit was this: 
+Initialize each node to have a value of a cluster containing itself and all of its neighbors.
+For every node, expand its cluster by unioning it with the clusters of all nodes in its cluster.
+Keep doing this until no clusters are changing anymore.
+At the end of this, collect the distinct clusters and count them, this will be the number of connected components. Take the largest cluster, this will be the largest connected component.
+
+Proof that this requires log(diameter) iterations:
+We can prove by induction that after i iterations, any two nodes at a distance of at most 2^i will be in the same cluster. 
+Base case: At the beginning, any two nodes with a distance of 2^0 = 1 of each other are in the same cluster (because we initialized the clusters to contain the node and its neighbors).
+Assume this is still true after i iterations. 
+Consider the case of nodes u, v, w where distance(u, v) = 2^i, distance(v, w) = 2^i, distance(u, w) = 2^(i+1). After i iterations, u and v are in the same cluster, v and w are int the same cluster. In the next step, all three of u, v, and w will be in the same cluster. 
+So we have proved that after 2^i iterations, any two nodes at a distance of at most 2^i will be in the same cluster. 
+The diameter of a graph is the largest distance between any two nodes. So if the diameter is d, those two nodes will take the longest time to be in the same cluster, but they will take just log(d) iterations. 
+So we can find the connected components in log(diameter) iterations.
+
+If I had a couple more hours I’m certain I can get this to work efficiently. 
+
+Shortest Paths:
 
 From Kevin Bacon to Harvard:
 5 shortest paths of 2 steps
@@ -130,7 +154,3 @@ From Harvard to Kevin Bacon:
  [u'Harvard_University', u'Boston,_Massachusetts', u'South_Boston,_Boston,_Massachusetts', u'Kevin_Bacon'],
  [u'Harvard_University', u'Tommy_Lee_Jones', u'Screen_Actors_Guild_Award_for_Outstanding_Performance_by_a_Cast_in_a_Motion_Picture', u'Kevin_Bacon'],
  [u'Harvard_University', u'September_16', u'July_8', u'Kevin_Bacon']]
-
-
-
-My connected components algorithm works quickly on the marvel graph, but not fast enough [YET!] on the wiki graph. Working on it now.
