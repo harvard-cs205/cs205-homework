@@ -5,15 +5,18 @@ import time
 
 sc = pyspark.SparkContext(appName = "Spark1")
 
+# Use default partitioning below
 yaxis = sc.parallelize([ii for ii in range(0,2000)],10)#.map(lambda x: (x,x))
 xaxis = sc.parallelize([ii for ii in range(0,2000)],10)#.map(lambda x: (x,x))
 #xaxis = xaxis.partitionBy(10,lambda x: int(np.floor(x/200)))
 #xaxis = xaxis.map(lambda x: x[0])
 
+# form image using cartesian command for cartesian product
 image = xaxis.cartesian(yaxis).cache()
 
 newImage = image.map(lambda x: ((x[1],x[0]),mandelbrot((x[0]/500)-2,(x[1]/500)-2))).cache()
 
+# draw image and compute worker time of 100 workers below
 #draw_image(newImage)
 workTime = sum_values_for_partitions(newImage).collect()
 
