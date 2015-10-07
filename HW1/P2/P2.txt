@@ -2,5 +2,6 @@
 The graph for part a is scaled by 1e7, which is why it
 looks relatively clustered.  The graph for part b on the other hand is tightly
 clustered around a small range of values just above 200,000. Thus we see that
-the solution of a random repartition balances work *extremely* well.  However,
-it does require a single full shuffle of all the data.
+the solution of a random repartition via PartitionBy balances work *extremely* well.
+However, it does require a single full shuffle of all the data, which is costly,
+but since it happens only once, this shouldn't in general be a problem.
