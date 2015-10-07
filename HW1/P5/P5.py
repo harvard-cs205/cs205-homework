@@ -75,7 +75,10 @@ def reconstruct(x,y):
 
 #in this function, we need to write the path into the file
 def write_into_the_file(source,path,file_name):
-    
+    result = [];
+    for entry in path:
+        result.append(source.lookup(int(entry))[0]);
+    result.reverse();
     final_path = "The path is: "
     for i in result:
         final_path = final_path + "".join(i) + "--->"
