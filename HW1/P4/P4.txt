@@ -1,1 +1,20 @@
 # Your discussion here
+
+MAXIMUM ITERATIONS
+Question: What does this diameter imply about the maximum number of steps in which your
+search must be executed?
+
+in the case of 10 nodes: 9!
+in general: (n-1)!
+
+maximum if all are connected to each other
+traversing your graph without going back to old nodes
+get first person, they have 9 edges to traverse, these 9 then have 8
+etc
+
+
+NO DEFINED DISTANCE
+Question: What does it mean if a character does not have a defined distance during the
+search?
+
+it means the node was untouched, it has not connections to start node
