@@ -1,1 +1,17 @@
 # Your discussion here
+Output:
+('CAPTAIN AMERICA', 'depth is:', 3, 'with # nodes:', 6408)
+('MISS THING/MARY', 'depth is:', 1, 'with # nodes:', 7)
+('ORWELL', 'depth is:', 1, 'with # nodes:', 9)
+
+1) What does this diameter imply about the maximum number of steps in which your search must be executed?
+
+The graph diameter is exactly what it’s name implies, it is the distance (or nodes) that we can traverse through the graph before we reach it’s maximum depth. The diameter implies the maximum number of steps to complete a depth full search from the parent node.		
+					
+2) What does it mean if a character does not have a defined distance during the search? 
+If a comic book character does not have a defined distance then he or she does not have many friends! To be more specific it means that he or she does not have any children in which they are connected to the parent node. This is completely possible when you have islanded nodes in a graph which are not connected and therefore isolated from a group of other nodes.
+
+		 	 	 					
+3) A description of your graph representation, and the number of touched nodes in each of the searches above. Also, discuss the two questions above (re. graph diameter, and untouched nodes). 
+				
+I choose to represent my hero graph in the following manner (k=hero, (v0=depth, v1=seen/processing/not seen). I referenced the following webpage (http://www.johnandcailin.com/blog/cailin/breadth-first-graph-search-using-iterative-map-reduce-algorithm) to further my understanding of the breadth first search (I highly recommend the article). Although this page offered no pseudo-code (or python for that matter), I was able to implement the concept of using a flag to highlight the nodes status. This made accessing the children nodes much quicker via the use of filters but it also added complexity when updating the flag (via unions and subtract by key) and adding back to the hero’s graph.
