@@ -1,5 +1,6 @@
 from pyspark import SparkContext
 from P4_bfs import ssBFS
+from P5_bfs_test import ssBFS2
 import itertools
 import csv
 
@@ -53,3 +54,4 @@ print countTouches(graph, "MISS THING/MARY", sc)
 print "ORWELL:"
 print countTouches(graph, "ORWELL", sc)
 
+print ssBFS2(graph, "MOBIUS", "SERGEI", sc)
