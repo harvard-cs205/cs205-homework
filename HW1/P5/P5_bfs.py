@@ -54,8 +54,8 @@ while newValue != oldValue:
 	bfsDistances = bfsDistances.map(updateDist).cache() # update distances (character,(prev,updatedDistance))
 	bfsDistances.count()
 	newValue = nNeighbors.value
-	currentTravel = bfsDistances.filter(lambda x: x[0] == targetID).collect()
-	currentTravel = currentTravel[0][1][1]
+	currentTravel = bfsDistances.filter(lambda x: x[0] == targetID).collect() # collect stored distance of target node to start node
+	currentTravel = currentTravel[0][1][1]                                    # stopping criteria is the same accumulator stopping point as in P4 but if target is found that's another stopping point
 	if  currentTravel != float('inf'):
 		print currentTravel
 		break
@@ -81,6 +81,7 @@ print counts
 bfsDistances = bfsDistances.partitionBy(30).cache() # (character,(prevNodes,updatedDistance))
 endNodes = sc.parallelize([targetID]).map(lambda x: (x,None)).partitionBy(30).cache()
 
+# recursive function for computing all paths
 def getPaths(endNodes): # endNodes = (currentNodes1, prevNodes1),(currentNodes1, prevNodes2),...
 	rev = endNodes.map(lambda x: (x[1],x[0])) # (prevNodes1, currentNodes1),(prevNodes2, currentNodes1)
 	firstValue = rev.map(lambda x: x[0]).distinct().collect()[0]
