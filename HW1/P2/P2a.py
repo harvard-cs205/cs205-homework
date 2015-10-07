@@ -1,7 +1,7 @@
 from P2 import *
-#import findspark; findspark.init();
 import pyspark as py
 import matplotlib.pyplot as plt
+
 def location(x):
 	return x/500.0 -2 ;
 
