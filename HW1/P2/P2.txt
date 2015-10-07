@@ -1,1 +1,11 @@
 # Your discussion here
+Discuss your choice in terms of (a) how well it balances work, and (b) its costs, particularly shuffle costs
+
+(1) Comments on the original implementation (Problem 2a)
+
+Looking at the histogram, especially P2a_hist, we realize that the Mandelbrot computation using the default partitioning strategy does not balance well. Almost 85 out of 100 partitions are not doing anything, while other 10-15 are doing the most work. This is because most of the work is done in a very short period of time, and there are slow tasks, which are known as “stragglers”, and they are causing the computation to have poor parallelism. Therefore, we want to load balance and split computation evenly across the partitions. 
+
+(2) Improved Partitioning Strategy
+
+I improved on the partitioning strategy just by using the repartition method, which randomly repartition the jobs across the partitions to avoid cluster effects. Looking at the histogram, we see that the work is much well balanced than before. However, because we are repartitioning, there is a shuffling cost to it. Using the original implementation, the collect methods takes 1.7 mins, while using the improved partitioning strategy, 11s is used for repartitioning/shuffling, and 1.5m for collecting. Therefore, the computing times in this case is not too different (it cuts down on stragglers, but you have to account for shuffling), but it does indeed more equally balance the work across partitions. 
+
