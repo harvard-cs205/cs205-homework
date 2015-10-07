@@ -1,1 +1,14 @@
 # Your discussion here
+
+Generated Shakespeare sentences:
+
+[u"ran when saw others run. Prince. Why, Percy kill'd myself, and serv'd against, the French, All clinquant, all in love?", 
+u"Both you and the plains about him; but he, to take this charm from off her life; Which, being suffer'd,", 
+u'heard him speak, Beating your officers, cursing yourselves, Opposing laws with strokes, and here you may most uprighteously do a', 
+u"direful hap betide that hated wretch That trembles under his shroud, The universal landlord. What's your will? Give us some", 
+u'mine, Kate, as have been, Or am mad, will not acknowledge it this night he meaneth with a matter. am', 
+u"now, perchance, both quake and change of man once think it? But you'll be laugh'd at. 'Tis government that makes", 
+u'hill. Break we our betters way. What comes the rascal knock upon your brows; Give sorrow leave awhile to stay,', 
+u'jointed to the purpose. Re-enter Antony. But here they might take a bond in men. Give me particulars. have said.', 
+u"peace!'- even thus he pass'd along. Alack, poor Richard! where rode he the good Queen's entreaty. 'At the Queen's' be't.", 
+u'By cruel cruel thee quite overthrown! love! life! not life, but love to Richard but even thus- For look you']
