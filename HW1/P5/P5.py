@@ -21,8 +21,8 @@ sc = py.SparkContext();
 
 #create a new CSV file
 #use the local files to run
-titles_rdd = sc.textFile("titles-sorted.txt");
-links_rdd = sc.textFile("links-simple-sorted.txt");
+titles_rdd = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt')
+links_rdd = sc.textFile('s3://Harvard-CS205/wikipedia/titles-sorted.txt')
 #this rdd is to use to check the id of one title
 titles_rdd = titles_rdd.zipWithIndex().map(lambda x: (x[0], x[1] + 1))
 #this rdd is to check the title of one idd
