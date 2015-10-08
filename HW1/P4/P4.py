@@ -5,6 +5,7 @@ import pyspark
 
 def preprocess_data( filename, sc ):
     textFile = sc.textFile( filename )
+    textFile.cache()
     textFile_pre_process = textFile.map( lambda x: ( x.split( "\"" )[3], x.split( "\"" )[1] ) ).partitionBy(num_of_partitions)
     issue_char_mapping = textFile_pre_process.mapValues( lambda y: [y] ).reduceByKey( lambda a, b: a + b, numPartitions = num_of_partitions )
     assert copartitioned( textFile_pre_process, issue_char_mapping )
