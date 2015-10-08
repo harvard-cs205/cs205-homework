@@ -1,0 +1,6 @@
+# Marvel Graphs
+
+# initiallizing spark
+from pyspark import SparkContext, SparkConf
+sc = SparkContext(conf=SparkConf())
+sc.setLogLevel("ERROR")

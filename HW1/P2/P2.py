@@ -1,5 +1,9 @@
+from pyspark import SparkContext, SparkConf
+sc = SparkContext()
+sc.setLogLevel("ERROR")
+
 import numpy as np
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
 def mandelbrot(x, y):
