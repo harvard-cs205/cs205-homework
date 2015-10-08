@@ -1,1 +1,9 @@
 # Your discussion here
+1) Kevin Bacon --> Harvard University
+[(2, ['2152782']), (1, [u'1124925', u'5114592', u'4625677', u'3229511', u'2578703']), (0, ['2729536'])]
+Kevin_Bacon --> ( College_Bowl, Time_(magazine), Six_degrees_of_separation, Marisa_Silver, John_Lithgow ) --> Harvard_University 
+
+2) Harvard University --> Kevin Bacon
+Harvard University --> Tommy_Lee_Jones --> Screen_Actors_Guild_Award_for_Outstanding_Performance_by_a_Cast_in_a_Motion_Picture --> Kevin_Bacon  
+
+
