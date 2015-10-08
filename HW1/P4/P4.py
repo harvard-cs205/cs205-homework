@@ -1,11 +1,5 @@
 # Marvel Graphs
 
-# initiallizing spark
-from pyspark import SparkContext, SparkConf
-sc = SparkContext(conf=SparkConf())
-sc.setLogLevel("ERROR")
-
-
 import csv
 from P4_bfs import *
 
