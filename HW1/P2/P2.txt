@@ -1,1 +1,12 @@
 # Your discussion here
+
+I can’t seem to get the function which is used to calculate the load on the partitions to work. The error message is: 
+
+“
+Exception: It appears that you are attempting to broadcast an RDD or reference an RDD from an action or transformation. RDD transformations and actions can only be invoked by the driver, not inside of other transformations; for example, rdd1.map(lambda x: rdd2.values.count() * x) is invalid because the values transformation and count action cannot be performed inside of the rdd1.map transformation. For more information, see SPARK-5063.
+“
+
+Which is fair enough. (Generally it would be nicer to have a *valid* example of the usage). Unfortunately I was not able to debug the code and remain mystified.
+
+
+Regarding the load balancing, regions of the coordinate system that take larger amounts of iterations should be divided up over relatively more partitions. Since the Mandelbrot set has large, continuous regions, it is reasonable to guess that computationally expensive points are surrounded by other computationally expensive points. One naive approach (that ignores the fact that we know something specific about the set) could be to do an initial coarse sampling of the domain, say at points (X,Y) at the center of sectors of the full plot. The total amount of iterations N could then be calculated pretty quickly. If, say, sector A takes a fraction of A/N of the total iterations, then we allocate A/N of the partitions to that sector during the full calculation.     
