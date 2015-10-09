@@ -31,12 +31,14 @@ def draw_image(rdd):
     im[I, J] = np.log(C + 1)  # log intensity makes it easier to see levels
     plt.imshow(im, cmap=cm.gray)
     plt.show()
+    plt.savefig("Mandelbrot", dpi=2000, facecolor='w', edgecolor='w')
 
-q = range(0,2000)
+q = range(0,4000)
 X = sc.parallelize(q,100)
 coordinates = X.flatMap(lambda x: [(x,y) for y in q]) # successfully creates pixel coordinates...
 
-data = coordinates.map(lambda x: (x,mandelbrot((x[1]/500.-2),(x[0]/500.-2))))
+data = coordinates.map(lambda x: (x,mandelbrot((x[1]/1000.-2),(x[0]/1000.-2))))
+draw_image(data)
 
 #draw_image(data) # this does indeed draw the mandelbrot set. takes a while.
 
