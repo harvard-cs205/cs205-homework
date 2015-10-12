@@ -3,6 +3,13 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 #from __future__ import division
 
+def quiet_logs(sc):
+    logger = sc._jvm.org.apache.log4j
+    logger.LogManager.getLogger("org").setLevel(logger.Level.WARN)
+    logger.LogManager.getLogger("akka").setLevel(logger.Level.WARN)
+    logger.LogManager.getLogger("amazonaws").setLevel(logger.Level.WARN)
+
+
 def mandelbrot(x, y):
     z = c = complex(x, y)
     iteration = 0
@@ -46,5 +53,3 @@ draw_image(data)
 # can't seem to make it work.
 
 #test test test
-
-
