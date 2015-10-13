@@ -1,1 +1,3 @@
 # Your discussion here
+My graph takes each character and for each comic issue it is in, it adds the other characters it shares with the issue. 
+This way, if you start at one character you can connect to all other characters within the same tree. If you cannot reach the other character, it means that from the starting character, there is no comic issue shared with the character being searched for. 

@@ -1,1 +1,5 @@
-# Your discussion here
+For part a, I chose to simply partition in sequential order. While for part b, I shuffled the order so that the partitions would be spread out randomly. 
+
+The sequential order does a poor job of balancing out work, as seen in the histogram. The jobs are mainly done by the first few partitions, and much less is done afterwards. This is reflected in how long it takes to compute the graph.
+
+The shuffled order, on the other hand, shows a much more gaussian distribution of partitions to iterations. It also took less time to calculate. This indicates that the word was much more balanced out, however the graph is no longer ordered, so it has to regroup after each shuffle which takes more overhead.
