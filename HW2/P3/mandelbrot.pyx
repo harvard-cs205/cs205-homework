@@ -1,3 +1,4 @@
+import numpy as np
 cimport numpy as np
 cimport cython
 import numpy
@@ -40,3 +41,31 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                         break
                     z = z * z + c
                 out_counts[i, j] = iter
+
+
+
+# An example using AVX instructions
+cpdef example_sqrt_8(np.float32_t[:] values):
+    cdef:
+        AVX.float8 avxval
+        float out_vals[8]
+        float [:] out_view = out_vals
+
+    assert values.shape[0] == 8
+
+    # Note that the order of the arguments here is opposite the direction when
+    # we retrieve them into memory.
+    avxval = AVX.make_float8(values[7],
+                             values[6],
+                             values[5],
+                             values[4],
+                             values[3],
+                             values[2],
+                             values[1],
+                             values[0])
+
+    avxval = AVX.sqrt(avxval)
+
+    AVX.to_mem(avxval, &(out_vals[0]))
+
+    return np.array(out_view)

@@ -33,3 +33,5 @@ typedef __m256 float8;
 #define greater_than(a, b)     _mm256_cmp_ps((a), (b), _CMP_GT_OS)
 //Helpers
 #define signs(a)               (_mm256_movemask_ps(a) & 255)
+
+#define to_mem(reg, mem)       _mm256_storeu_ps(mem, reg)
