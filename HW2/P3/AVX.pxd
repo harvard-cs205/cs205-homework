@@ -40,3 +40,6 @@ cdef extern from "AVX.h" nogil:
     # Helpers:
     #     This extracts the signs of each float into an 8-bit value.
     int signs(float8)
+
+    #     This copies the contents of the float8 into a memory location
+    void to_mem(float8, float *)
