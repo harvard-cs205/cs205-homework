@@ -1,1 +1,160 @@
-# Your discussion here
+Note that helper functions are stored in the "network_commands" python module in the directory above this one.
+I wanted to place all of my network code in the same place.
+
+###### Shortest path #######
+
+The shortest path between 'Harvard_University' and 'Kevin_Bacon' is of length 3. One example is
+
+[u'Harvard_University', u'Tommy_Lee_Jones', u'JFK_(film)', u'Kevin_Bacon']
+
+There are a ton of choices to use for the path, of course.
+
+For fun, I found the shortest path between 'Bob_Saget' and 'Satan'. There is a
+surprisingly short distance of 3 between the two. One such path is
+
+[u'Bob_Saget',
+ u'Musical_theatre',
+ u'South_Park:_Bigger,_Longer_&_Uncut',
+ u'Satan']
+
+which makes intuitive sense to me.
+
+##### Connected Components #####
+
+I have implemented an algorithm that will compute the number of connected components
+in O(D) iterations; I don't think it converges in O(log(D)), but maybe I somehow got O(log(D)) unknowingly. The
+algorithm works in a couple of steps:
+
+1. Assign each node in the graph a unique integer ID
+2. Pass the ID of each parent to their children
+3. If the ID passed to the child is smaller than the child's current ID, the child adopts the new ID
+4. Goto 2, repeat until the number of unique ID's converges to a constant value.
+
+The maximum amount of time it will take for one node to see the effect of another node is O(D) as the maximum
+number of nodes between two nodes is D and information propagates along one node per iteration.
+
+### Undirected Graph ###
+
+In the undirected graph, we assume every connection is symmetric, i.e. if a node points to another, they are connected.
+When we run our code, we find the following output:
+
+Beginning of Iteration 1
+Before update: 5710993 groups
+Beginning of Iteration 2
+Before update: 1343504 groups
+Beginning of Iteration 3
+Before update: 217823 groups
+Beginning of Iteration 4
+Before update: 10718 groups
+Beginning of Iteration 5
+Before update: 1674 groups
+Beginning of Iteration 6
+Before update: 1160 groups
+Beginning of Iteration 7
+Before update: 1124 groups
+Beginning of Iteration 8
+Before update: 1117 groups
+Beginning of Iteration 9
+Before update: 1115 groups
+Beginning of Iteration 10
+Before update: 1114 groups
+Beginning of Iteration 11
+Before update: 1113 groups
+Finished at end of iteration 11 !
+There are  1113  groups in the network.
+
+Our algorithm converges in 11 iterations, implying that the diameter of the graph is D ~ 11. To see the convergence
+of our algorithm vs. iteration, see "undirected_graph_components_vs_iteration.png." Our graph ultimately has 1113 groups.
+
+Within this graph, the largest connected component consists of 5709800 individuals. The next largest connected component
+only has 5 individuals! So basically, all nodes on wikipedia are connected if connections are symmetric! A histogram of
+the number of nodes per connected component can be seen in "undirected_num_nodes_per_component.png."
+
+### Directed Graph ###
+
+The directed graph is slightly more tricky; nodes are only connected if they both point to each other. Now, if a
+parent node points to only one child and the child does not point back, the parent node is connected to no other nodes!
+We consequently expect the number of connected components in the directed graph to be larger. We also expect that
+the diameter of the path D should be larger as nodes will have to take a more convoluted path to communicate with
+each other.
+
+We find:
+
+Beginning of Iteration 1
+Before update: 3768942 groups
+Beginning of Iteration 2
+Before update: 684749 groups
+Beginning of Iteration 3
+Before update: 283770 groups
+Beginning of Iteration 4
+Before update: 146466 groups
+Beginning of Iteration 5
+Before update: 102362 groups
+Beginning of Iteration 6
+Before update: 87096 groups
+Beginning of Iteration 7
+Before update: 81483 groups
+Beginning of Iteration 8
+Before update: 79314 groups
+Beginning of Iteration 9
+Before update: 78404 groups
+Beginning of Iteration 10
+Before update: 78036 groups
+Beginning of Iteration 11
+Before update: 77838 groups
+Beginning of Iteration 12
+Before update: 77731 groups
+Beginning of Iteration 13
+Before update: 77653 groups
+Beginning of Iteration 14
+Before update: 77582 groups
+Beginning of Iteration 15
+Before update: 77512 groups
+Beginning of Iteration 16
+Before update: 77448 groups
+Beginning of Iteration 17
+Before update: 77396 groups
+Beginning of Iteration 18
+Before update: 77377 groups
+Beginning of Iteration 19
+Before update: 77361 groups
+Beginning of Iteration 20
+Before update: 77353 groups
+Beginning of Iteration 21
+Before update: 77346 groups
+Beginning of Iteration 22
+Before update: 77340 groups
+Beginning of Iteration 23
+Before update: 77332 groups
+Beginning of Iteration 24
+Before update: 77316 groups
+Beginning of Iteration 25
+Before update: 77292 groups
+Beginning of Iteration 26
+Before update: 77289 groups
+Beginning of Iteration 27
+Before update: 77281 groups
+Beginning of Iteration 28
+Before update: 77277 groups
+Beginning of Iteration 29
+Before update: 77271 groups
+Beginning of Iteration 30
+Before update: 77269 groups
+Beginning of Iteration 31
+Before update: 77266 groups
+Beginning of Iteration 32
+Before update: 77259 groups
+Beginning of Iteration 33
+Before update: 77255 groups
+Beginning of Iteration 34
+Before update: 77249 groups
+Finished at end of iteration 34 !
+There are  77249  groups in the network.
+
+See the plot "directed_graph_components_vs_iteration.png" to see the convergence of my algorithm. Ultimately, we find
+77249 connected components.
+
+We also find that the largest group has 1977524 nodes in it. This is a significantly smaller number than the
+symmetric case. We also find that smaller groups of connected components occur frequently; a histogram
+of the number of nodes per group can be seen in "directed_num_nodes_per_component.png". Overall, this is what we
+would expect. The second largest connected component consists of 157 nodes.
