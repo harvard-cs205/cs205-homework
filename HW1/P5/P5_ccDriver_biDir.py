@@ -1,7 +1,6 @@
 from pyspark import SparkContext
 import numpy as np
 from itertools import chain
-from P5_bfs import *
 from P5_connected_component import *
 
 sc = SparkContext()
@@ -17,7 +16,7 @@ revLinks = linksFlat.map(lambda x: (x[1], x[0])).cache()
 
 
 #Truncate graph to only those wikipedia links that are bidirectional
-bidirLinks = linksFlat.intersection(revLinks).map(lambda x: (x[0],[x[1]])).reduceByKey(lambda x,y: x+y).partitionBy(128).cache()
+bidirLinks = linksFlat.intersection(revLinks).groupByKey().mapValues(list).partitionBy(256).cache()
 
 
 #Run connComp on both derived graphs

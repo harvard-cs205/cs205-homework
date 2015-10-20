@@ -1,7 +1,6 @@
 from pyspark import SparkContext
 import numpy as np
 from itertools import chain
-from P5_bfs import *
 from P5_connected_component import *
 
 sc = SparkContext()
@@ -15,7 +14,7 @@ linksFlat =links.map(lambda s: s.split(": ")).map(lambda s: (int(s[0]),s[1])).ma
 revLinks = linksFlat.map(lambda x: (x[1], x[0])).cache()
 
 #Create symmetric graph of wikipedia links
-symLinks = linksFlat.union(revLinks).map(lambda x: (x[0],[x[1]])).reduceByKey(lambda x, y: x+y).partitionBy(128).cache()
+symLinks = linksFlat.union(revLinks).groupByKey().mapValues(list).partitionBy(256).cache()
 
 
 connCOMPS_sym = P5_connected_component(symLinks, sc)
