@@ -5,7 +5,12 @@ import set_compiler
 set_compiler.install()
 
 import pyximport
-pyximport.install()
+
+pyximport.install(reload_support=True)
+
+# Annotate the file
+import subprocess
+subprocess.call(["cython","-a","parallel_vector.pyx"])
 
 import numpy as np
 from timer import Timer

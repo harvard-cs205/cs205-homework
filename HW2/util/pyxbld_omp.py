@@ -19,4 +19,5 @@ def make_ext(modname, pyxfilename):
                                          '-fopenmp',
                                          '-I{}'.format(np.get_include()),
                                          '-I.'],
-                     extra_link_args=extra_link_args)
+                     extra_link_args=extra_link_args
+                     )
