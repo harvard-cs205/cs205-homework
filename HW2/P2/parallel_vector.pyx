@@ -73,7 +73,7 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
     cdef:
         int idx, r
         omp_lock_t *locks = get_N_locks(counts.shape[0])
-        int source, destination
+        int source, destination, case
 
    ##########
    # Your code here
@@ -91,21 +91,33 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
                 source = src[idx]
                 destination = dest[idx]
 
-                # To avoid deadlock, always lock the less one first.
-                if source < destination:
+                # To avoid deadlock, always lock the smaller one first.
+                if source < destination: case = -1
+                elif source > destination: case=1
+                else: case=0
+
+                if case==-1:
                     acquire(&locks[source])
                     acquire(&locks[destination])
-                elif source > destination:
+                elif case==0:
+                    acquire(&locks[source])
+                elif case==1:
                     acquire(&locks[destination])
                     acquire(&locks[source])
-                else: # the two are equal
-                    acquire(&locks[destination])
+
                 if counts[src[idx]] > 0:
                     counts[destination] += 1
                     counts[source] -= 1
 
-                release(&locks[destination])
-                release(&locks[source])
+                # Now release in the appropriate order
+                if case==-1:
+                    release(&locks[source])
+                    release(&locks[destination])
+                elif case==0:
+                    release(&locks[source])
+                elif case==1:
+                    release(&locks[destination])
+                    release(&locks[source])
 
     free_N_locks(counts.shape[0], locks)
 
