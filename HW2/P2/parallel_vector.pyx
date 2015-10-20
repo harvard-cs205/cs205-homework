@@ -1,5 +1,5 @@
 # turn off bounds checking & wraparound for arrays
-#cython: boundscheck=True, wraparound=False
+#cython: boundscheck=False, wraparound=False
 
 ##################################################
 # setup and helper code
@@ -14,6 +14,8 @@ from libc.stdlib cimport malloc, free
 
 import numpy as np
 cimport numpy as np
+
+from libc cimport stdioj
 
 
 # lock helper functions
