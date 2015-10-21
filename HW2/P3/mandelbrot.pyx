@@ -33,8 +33,6 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     assert in_coords.shape[0] == out_counts.shape[0], "Input and output arrays must be the same size"
     assert in_coords.shape[1] == out_counts.shape[1],  "Input and output arrays must be the same size"
 
-    cdef AVX.float8 c
-
     cdef int num_cols_to_iterate = in_coords.shape[1]/8
     cdef int j_start, j_end
 
@@ -44,6 +42,9 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     cdef float *real_c
     cdef float *imag_c
 
+    cdef AVX.float8 real_c_float8
+    cdef AVX.float8 imag_c_float8
+
     with nogil:
         for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=1):
             for j in range(num_cols_to_iterate): # Parallelize via AVX here...do 8 at a time
@@ -52,8 +53,11 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                 if j_end >= in_coords.shape[1]:
                     j_end = in_coords.shape[1] - 1
 
-                real_c = &real_in_coords[i][j_start] # get pointers to the arrays
-                imag_c = &imag_in_coords[i][j_start]
+                real_c = &real_in_coords[i][0] # get pointers to the arrays
+                imag_c = &imag_in_coords[i][0]
+
+                real_c_float8 = array_to_float8(real_c, j_start, j_end)
+                imag_c_float8 = array_to_float8(imag_c, j_start, j_end)
 
                 # c = array_to_float8(in_coords[i, j_start:j_end])
                 # z = 0
@@ -63,12 +67,18 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                 #    z = z * z + c
                 #out_counts[i, j] = iter
 
-cdef AVX.float8 array_to_float8(float *c, int j_end) nogil:
+cdef AVX.float8 array_to_float8(float *c, int j_start, int j_end) nogil:
     cdef float *filled_array = <float *> malloc(8*sizeof(c))
 
-    cdef int i
-    for i in range(j_end):
-        filled_array[i] = c[i]
+    cdef int count = 0
+    cdef int j
+    for j in range(j_start, j_end):
+        filled_array[count] = c[j]
+        count += 1
+    # Fill in the rest of the zeros
+    while count < 8:
+        filled_array[count] = 0
+        count += 1
 
     cdef AVX.float8 f8 = AVX.make_float8(filled_array[7],
                            filled_array[6],
