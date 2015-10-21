@@ -41,9 +41,10 @@ if __name__ == '__main__':
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################
-    N_list = [1, 3, 5, 7, 9, 11, 15, 20]
+    N_list = [1, 2, 3, 4, 5, 7, 9, 11, 15, 20, 30, 40, 50, 100]
     t_list = []
     for N in N_list:
+        print N
         counts[:] = orig_counts
         with Timer() as t:
             move_data_medium_grained(counts, src, dest, 100, N)
@@ -52,7 +53,7 @@ if __name__ == '__main__':
         t_list.append(t.interval)
 
     plt.plot(N_list, t_list, marker='.', ls='-')
-    plt.xlabel('Number of Locks (N)')
+    plt.xlabel('N')
     plt.ylabel('Time elapsed')
     plt.title('Uncorrelated Data')
 
@@ -75,6 +76,7 @@ if __name__ == '__main__':
     counts[:] = orig_counts
     t_list = []
     for N in N_list:
+        print N
         with Timer() as t:
             move_data_medium_grained(counts, src, dest, 100, N)
         assert counts.sum() == total, "Wrong total after move_data_medium_grained"
@@ -82,7 +84,7 @@ if __name__ == '__main__':
         t_list.append(t.interval)
 
     plt.plot(N_list, t_list, marker='.', ls='-')
-    plt.xlabel('Number of Locks (N)')
+    plt.xlabel('N')
     plt.ylabel('Time elapsed')
     plt.title('Correlated Data')
 

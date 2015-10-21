@@ -139,7 +139,7 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
     # double-locking.
     ##########
 
-    print 'num_locks in pyx' , num_locks
+    print 'num_locks in pyx', num_locks
 
     with nogil:
         for r in prange(repeat, num_threads=4):
@@ -149,6 +149,14 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
 
                 source_lock = source/num_locks
                 dest_lock = destination/num_locks
+
+                # The last lock will have a couple extra...can't always divide equally with a given number of locks
+                if source_lock >= num_locks: # Should never be greater than num_locks
+                    source_lock = num_locks - 1
+                if dest_lock >= num_locks:
+                    dest_lock = num_locks - 1
+
+                with gil: print source_lock, dest_lock
 
                 if source_lock < dest_lock: case = -1
                 elif source_lock > dest_lock: case=1

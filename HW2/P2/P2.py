@@ -45,7 +45,7 @@ if __name__ == '__main__':
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################
-    N = 5
+    N = 33
     print 'Number of locks for medium:' , N
     counts[:] = orig_counts
     with Timer() as t:
