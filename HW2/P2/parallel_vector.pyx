@@ -1,5 +1,5 @@
 # turn off bounds checking & wraparound for arrays
-#cython: boundscheck=False, wraparound=False
+#cython: boundscheck=False, wraparound=False, cdivision=True
 
 ##################################################
 # setup and helper code
@@ -14,9 +14,6 @@ from libc.stdlib cimport malloc, free
 
 import numpy as np
 cimport numpy as np
-
-from libc cimport stdioj
-
 
 # lock helper functions
 cdef void acquire(omp_lock_t *l) nogil:
@@ -83,7 +80,7 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
    ##########
 
     with nogil:
-        for r in prange(repeat):
+        for r in prange(repeat, num_threads=4):
             # Everything in here is parallel...so we have to be very careful. We can easily cause deadlock...
             for idx in range(src.shape[0]):
                 # We need to lock here...but we can accidentally do terrible things. We need a lock on both
@@ -142,11 +139,11 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
     # double-locking.
     ##########
 
+    print 'num_locks in pyx' , num_locks
+
     with nogil:
-        for r in prange(repeat):
+        for r in prange(repeat, num_threads=4):
             for idx in range(src.shape[0]):
-
-
                 source = src[idx]
                 destination = dest[idx]
 
