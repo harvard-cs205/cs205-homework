@@ -1,0 +1,10 @@
+
+DESCRIPTION THREE SCALES OF LOCKING
+-----------------------------------
+The three scales of locking: fine, medium, and none (serial), show very different execution times. In the native
+implementation, the serial execution time is under 1 second, while fine-grained completes within 14 seconds, and
+medium-grained within 19 seconds.
+
+OPTIMIZATION OF N FOR MEDIUM GRAINED LOCKING
+--------------------------------------------
+
