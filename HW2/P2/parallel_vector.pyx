@@ -15,6 +15,8 @@ from libc.stdlib cimport malloc, free
 import numpy as np
 cimport numpy as np
 
+from libc cimport stdioj
+
 
 # lock helper functions
 cdef void acquire(omp_lock_t *l) nogil:

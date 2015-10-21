@@ -8,7 +8,7 @@ import pyximport
 
 pyximport.install(reload_support=True)
 
-# Annotate the file
+# Annotate the file to make sure things are optimized
 import subprocess
 subprocess.call(["cython","-a","parallel_vector.pyx"])
 
