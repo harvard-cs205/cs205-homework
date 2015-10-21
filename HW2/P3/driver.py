@@ -12,7 +12,7 @@ import mandelbrot
 from timer import Timer
 
 import matplotlib
-#TODO: Set qt4agg
+matplotlib.use('qt4agg')
 
 import pylab as plt
 import numpy as np
