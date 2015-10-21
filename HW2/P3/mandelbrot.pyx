@@ -18,7 +18,6 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                  int max_iterations=511):
     cdef:
        int i, j, iter
-       np.complex64_t z
 
        # To declare AVX.float8 variables, use:
        # cdef:
@@ -39,11 +38,11 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     cdef float[:, :] real_in_coords = np.real(in_coords)
     cdef float[:, :] imag_in_coords = np.imag(in_coords)
 
-    cdef float *real_c
-    cdef float *imag_c
+    cdef float *real_c, *imag_c
 
-    cdef AVX.float8 real_c_float8
-    cdef AVX.float8 imag_c_float8
+    cdef AVX.float8 real_c_float8, imag_c_float8
+
+    cdef AVX.float8 real_z_float8, imag_z_float8
 
     with nogil:
         for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=1):
@@ -59,13 +58,13 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                 real_c_float8 = array_to_float8(real_c, j_start, j_end)
                 imag_c_float8 = array_to_float8(imag_c, j_start, j_end)
 
-                # c = array_to_float8(in_coords[i, j_start:j_end])
-                # z = 0
-                #for iter in range(max_iterations):
-                #    if magnitude_squared(z) > 4:
-                #        break
-                #    z = z * z + c
-                #out_counts[i, j] = iter
+                real_z_float8 = AVX.float_to_float8(0)
+                imag_z_float8 = AVX.float_to_float8(0)
+                # for iter in range(max_iterations):
+                #     if magnitude_squared(z) > 4:
+                #         break
+                #     z = z * z + c
+                # out_counts[i, j] = iter
 
 cdef AVX.float8 array_to_float8(float *c, int j_start, int j_end) nogil:
     cdef float *filled_array = <float *> malloc(8*sizeof(c))
