@@ -1,11 +1,16 @@
 import platform
 import os.path
 
+
 def install():
     if platform.system() == 'Darwin':
         # most OSX machines now use clang-based compilers.
         # clang only recently got support for OpenMP.
         # search for a good compiler
+        if os.path.exists('/opt/intel/bin'):
+            os.environ['CC'] = '/opt/intel/bin/icc'
+            print("Compiling with Intel icc")
+            return
         if os.path.exists('/usr/local/bin/gcc'):
             os.environ['CC'] = '/usr/local/bin/gcc'
             print("Compiling with /usr/local/bin/gcc")
