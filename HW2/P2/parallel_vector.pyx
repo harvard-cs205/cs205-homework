@@ -66,6 +66,7 @@ cpdef move_data_serial(np.int32_t[:] counts,
                    counts[src[idx]] -= 1
 
 
+
 cpdef move_data_fine_grained(np.int32_t[:] counts,
                              np.int32_t[:] src,
                              np.int32_t[:] dest,
@@ -81,6 +82,8 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
    ##########
    with nogil:
        for r in range(repeat):
+        # INSIDE THIS LOOP, THINGS ARE NOW PARALLEL AND USING SHARED MEMORY, THUS WE MUST USE LOCKS
+        # TO PREVENT ILL POSED REQUESTS
            for idx in range(src.shape[0]):
                if counts[src[idx]] > 0:
                    counts[dest[idx]] += 1

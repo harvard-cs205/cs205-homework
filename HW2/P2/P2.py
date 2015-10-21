@@ -31,6 +31,8 @@ if __name__ == '__main__':
 
     # fine grained
     counts[:] = orig_counts
+
+    print src,dest
     with Timer() as t:
         move_data_fine_grained(counts, src, dest, 100)
     assert counts.sum() == total, "Wrong total after move_data_fine_grained"
