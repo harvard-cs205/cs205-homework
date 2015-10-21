@@ -14,3 +14,19 @@ serial: 0.21 seconds
 fine grained: 2.56 seconds
 medium grained: See "correlated_vs_N.png". Times range from 4 seconds to about 10 seconds depending on N.
 
+Let us now characterize the performance of each approach.
+
+1. Fine Grained
+
+a) Uncorrelated
+
+In the fine grained case, we have a lock for each element in the counts array. The idea here is that the overhead
+associated with grabbing, releasing, and waiting for a lock will be offset by the speedup of 4 simultaneous threads
+moving data around. Unfortunately, the fine grained uncorrelated code runs almost 10 times slower than the serial
+uncorrelated case! Evidently, the penalty of using locks is greater than the gain of using 4 simultaneous threads.
+
+b) Correlated
+
+The correlated fine-grained code runs *faster* than the uncorrelated code. This is surprising to me...naively, I would
+expect that if the source and destination are correlated when transferring data, there would be more contention for locks.
+This does not appear to be the case. #TODO: Figure out why this is
