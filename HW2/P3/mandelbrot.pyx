@@ -23,7 +23,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                  np.uint32_t [:, :] out_counts,
                  int max_iterations=511):
     cdef:
-       int i, j, iter
+       int i, j
 
        # To declare AVX.float8 variables, use:
        # cdef:
@@ -51,6 +51,10 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
 
     cdef AVX.float8 real_z_float8, imag_z_float8
     cdef AVX.float8 mag_squared
+    cdef AVX.float8 go_mask
+
+    cdef int go=1
+    cdef AVX.float8 iter
 
     with nogil:
         for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=1):
@@ -68,8 +72,14 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
 
                 real_z_float8 = AVX.float_to_float8(0)
                 imag_z_float8 = AVX.float_to_float8(0)
-                for iter in range(max_iterations):
+
+                # Need to iterate over 8 values at once...blahhhhh
+                iter = AVX.float_to_float8(0)
+                while go==1:
                     mag_squared = magnitude_squared_float8(real_z_float8, imag_z_float8)
+                    go_mask = AVX.less_than(mag_squared, AVX.float_to_float8(4))
+                    # If go, calculate z*z + c
+
                     # Now need to do procedural updates of the float8...bleh
                     #if magnitude_squared(z) > 4:
                     #    break
