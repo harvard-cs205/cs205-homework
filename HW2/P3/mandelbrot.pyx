@@ -5,10 +5,11 @@ import numpy
 cimport AVX
 from cython.parallel import prange
 from libc.stdlib cimport malloc, free
+from libc.stdio cimport printf, stdout, fprintf
 
 cimport openmp
 
-cdef int RIDICULOUS = -1000
+cdef float RIDICULOUS = -1000.
 
 
 cdef np.float64_t magnitude_squared(np.complex64_t z) nogil:
@@ -64,6 +65,9 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
 
     cdef AVX.float8 ridiculous_value = AVX.float_to_float8(RIDICULOUS)
 
+    print_float8(AVX.float_to_float8(69))
+
+    print 'before', np.asarray(out_counts).sum()
     with nogil:
         for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=1):
             for j in range(num_cols_to_iterate): # Parallelize via AVX here...do 8 at a time
@@ -89,7 +93,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                     not_go_mask = AVX.greater_than(mag_squared, AVX.float_to_float8(4))
 
                     if AVX.signs(not_go_mask) == 8:
-                        go = False
+                        go = 0
                         break
 
                     # Increment iter...we will adjust for improper goers in a second
@@ -113,9 +117,21 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
 
                 # Assign the iterations
                 assign_values_to_matrix(iter, &out_counts[i][0], j_start, j_end)
+    print 'after', np.asarray(out_counts).sum()
+
+cdef void print_float8(AVX.float8 f8) nogil:
+    cdef np.float32_t* iter_view = <float *> malloc(8*sizeof(np.float32_t))
+
+    AVX.to_mem(f8, iter_view)
+    cdef int i
+    for i in range(8):
+        printf('%f \n', iter_view[i])
+    printf('Done with float8')
+    printf('\n')
+    free(iter_view)
 
 cdef void assign_values_to_matrix(AVX.float8 iter, np.uint32_t *to_big_matrix, int j_start, int j_end) nogil:
-    cdef float* iter_view = <float *> malloc(8*sizeof(np.float_t))
+    cdef float* iter_view = <float *> malloc(8*sizeof(np.float32_t))
 
     AVX.to_mem(iter, iter_view)
 
