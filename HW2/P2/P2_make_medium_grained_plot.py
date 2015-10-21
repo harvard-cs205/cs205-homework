@@ -41,7 +41,7 @@ if __name__ == '__main__':
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################
-    N_list = [1, 2, 3, 4, 5, 7, 9, 11, 15, 20, 30, 40, 50, 100]
+    N_list = [1, 2, 3, 4, 5, 7, 9, 11, 15, 20, 30, 35, 40, 45, 50, 75, 100]
     t_list = []
     for N in N_list:
         print N

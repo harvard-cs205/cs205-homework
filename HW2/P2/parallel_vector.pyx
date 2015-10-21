@@ -156,8 +156,6 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
                 if dest_lock >= num_locks:
                     dest_lock = num_locks - 1
 
-                with gil: print source_lock, dest_lock
-
                 if source_lock < dest_lock: case = -1
                 elif source_lock > dest_lock: case=1
                 else: case=0

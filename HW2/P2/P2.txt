@@ -1,0 +1,16 @@
+>>Characterize the performance of each approach (coarse, medium, and fine-grained locking)
+on the two cases in P2.py: random data exchanges and correlated data exchanges.
+
+Let us list the running times of each scenario first.
+
+#### Uncorrelated ####
+serial: 0.20 seconds
+fine grained: 3.67 seconds
+medium grained: I plotted this as a function of N. See "uncorrelated_vs_N.png". Times range from 6.5 seconds to 17
+                seconds depending on N.
+
+#### Correlated ####
+serial: 0.21 seconds
+fine grained: 2.56 seconds
+medium grained: See "correlated_vs_N.png". Times range from 4 seconds to about 10 seconds depending on N.
+
