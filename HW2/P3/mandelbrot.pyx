@@ -176,7 +176,7 @@ cpdef mandelbrot_avx(np.complex64_t [:, :] in_coords,
 # An example using AVX instructions
 cpdef example_sqrt_8(np.float32_t[:] values):
     cdef:
-        AVX.float8 avxval
+        AVX.float8 avxval, tmp, mask
         float out_vals[8]
         float [:] out_view = out_vals
 
@@ -194,6 +194,12 @@ cpdef example_sqrt_8(np.float32_t[:] values):
             values[0])
 
     avxval = AVX.sqrt(avxval)
+
+    # mask will be true where 2.0 < avxval
+    mask = AVX.less_than(AVX.float_to_float8(2.0), avxval)
+
+    # invert mask and select off values, so should be 2.0 >= avxval
+    avxval = AVX.bitwise_andnot(mask, avxval)
 
     AVX.to_mem(avxval, &(out_vals[0]))
 
