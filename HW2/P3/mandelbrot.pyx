@@ -51,11 +51,14 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
 
     cdef AVX.float8 real_z_float8, imag_z_float8
     cdef AVX.float8 mag_squared
-    cdef AVX.float8 go_mask
+    cdef AVX.float8 not_go_mask
 
     cdef int go=1
     cdef AVX.float8 iter
     cdef AVX.float8 temp_z_real, temp_z_imag
+    cdef AVX.float8 to_subtract
+    cdef AVX.float8 decrementer = AVX.float_to_float8(-1)
+    cdef AVX.float8 ridiculous_value = AVX.float_to_float8(-1000)
 
     with nogil:
         for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=1):
@@ -75,29 +78,33 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                 imag_z_float8 = AVX.float_to_float8(0)
 
                 # Need to iterate over 8 values at once...blahhhhh
-                iter = AVX.float_to_float8(-1)
+                iter = AVX.float_to_float8(0)
                 while go==1:
-                    iter = AVX.add(iter, AVX.float_to_float8(1)) #Increment at beginning, like for loop
 
                     mag_squared = magnitude_squared_float8(real_z_float8, imag_z_float8)
-                    go_mask = AVX.less_than(mag_squared, AVX.float_to_float8(4))
-                    # If go, calculate z*z + c
+                    not_go_mask = AVX.greater_than(mag_squared, AVX.float_to_float8(4))
+
+                    if AVX.signs(not_go_mask) == 8:
+                        go = False
+                        break
+
+                    # Increment iter...we will adjust for improper goers in a second
+                    iter = AVX.add(iter, AVX.float_to_float8(1)) #Increment at beginning, like for loop
+                    # Subtract 1 from the ones that weren't supposed to go
+                    to_subtract = AVX.bitwise_and(not_go_mask, decrementer)
+                    iter = AVX.add(iter, to_subtract)
 
                     temp_z_real = do_mandelbrot_update_real(real_z_float8, imag_z_float8, real_c_float8)
                     temp_z_imag = do_mandelbrot_update_imag(real_z_float8, imag_z_float8, imag_c_float8)
 
-                    #updated_imag = AVX.bitwise_and(go_mask, imag_z_float8) # 0 if not go, original value if go
+                    real_z_float8 = temp_z_real
+                    imag_z_float8 = imag_z_float8
 
-                    # Do z*z + c
-                    # Real part is a**2 - b**2 + c
+                    # We need to make sure those that shouldn't go don't update anymore...we set their value to
+                    # something ridiculous such that the magnitude will always be greater than 4
+                    real_z_float8 = AVX.add(AVX.bitwise_and(not_go_mask, ridiculous_value), real_z_float8)
+                    imag_z_float8 = AVX.add(AVX.bitwise_and(not_go_mask, ridiculous_value), imag_z_float8)
 
-
-
-
-                    # Now need to do procedural updates of the float8...bleh
-                    #if magnitude_squared(z) > 4:
-                    #    break
-                    #z = z * z + c
                 #out_counts[i, j] = iter
 
 cdef AVX.float8 do_mandelbrot_update_real(AVX.float8 z_real, AVX.float8 z_imag, AVX.float8 c_real) nogil:
@@ -165,7 +172,8 @@ cpdef example_sqrt_8(np.float32_t[:] values):
     mask = AVX.less_than(AVX.float_to_float8(2.0), avxval)
 
     # invert mask and select off values, so should be 2.0 >= avxval
-    avxval = AVX.bitwise_andnot(mask, avxval)
+    avxval = AVX.bitwise_and(mask, mask)
+    #avxval = AVX.signs(mask)
 
     AVX.to_mem(avxval, &(out_vals[0]))
 
