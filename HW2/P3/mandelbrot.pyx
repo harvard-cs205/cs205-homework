@@ -111,9 +111,10 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                     imag_z_float8 = AVX.add(AVX.bitwise_and(not_go_mask, ridiculous_value),
                                             AVX.bitwise_andnot(not_go_mask, imag_z_float8))
 
-                #out_counts[i, j] = iter
+                # Assign the iterations
+                assign_values_to_matrix(iter, &out_counts[i][0], j_start, j_end)
 
-cdef void assign_values_to_matrix(AVX.float8 iter, int *to_big_matrix, int j_start, int j_finish) nogil:
+cdef void assign_values_to_matrix(AVX.float8 iter, np.uint32_t *to_big_matrix, int j_start, int j_end) nogil:
     cdef float* iter_view = <float *> malloc(8*sizeof(np.float_t))
 
     AVX.to_mem(iter, iter_view)
@@ -121,8 +122,8 @@ cdef void assign_values_to_matrix(AVX.float8 iter, int *to_big_matrix, int j_sta
     # Now assign appropriately
     cdef int j
     cdef int count = 0
-    for j in range(j_start, j_finish):
-        to_big_matrix[j] = <int> iter_view[count]
+    for j in range(j_start, j_end):
+        to_big_matrix[j] = <np.uint32_t> iter_view[count]
         count += 1
 
     free(iter_view)
