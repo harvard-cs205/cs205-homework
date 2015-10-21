@@ -1,1 +1,13 @@
 # Your discussion here
+
+The diameter implies that the two farthest connected things can be reached within 10 edges, so it would be no use to try to go further. In other words, all nodes in the graph that are connected are connected by less than 10 steps.
+
+
+CAPTAIN AMERICA: 6408 (1 + 1906 + 4463 + 38)
+MISS THING/MARY: 7 (1 + 6)
+ORWELL: 9 (1 + 8)
+
+My graph representation consists of pairs of characters and their neighbors, ie all the characters they touch, so having one character you would know all of the edges that stem out from that node in the graph.
+
+As expected, since Captain America is more popular than the other two characters, so he was able to reach more characters. For the other two, since they didn't reach popular enough characters and were unable to spread to many other nodes, we can assume that they are separate from the bigger graph containing Captain America. Not having a defined distance means the node could not be reached.
+

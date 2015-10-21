@@ -1,1 +1,4 @@
 # Your discussion here
+[(u'aerst',  
+	[u'arets',   u'aster',   u'rates',   u'reast',   u'resat',   u'stare',   
+	u'stear',   u'strae',   u'tares',   u'tears',   u'teras'])]

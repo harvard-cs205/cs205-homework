@@ -1,1 +1,3 @@
 # Your discussion here
+
+By partitioning randomly, I was able to distribute the long work more evenly, since as we saw in the picture, there are some spots with dense amounts of calculation required and some with very few. By randomly assigning instead of going in a set path, the work could be distributed more evenly. The change from the default partioning to the randomized one was pretty big in terms of time and compute amount. This goes to show the need to more evenly distribute work among the parallelized workers.
