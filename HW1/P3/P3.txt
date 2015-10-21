@@ -1,1 +1,6 @@
-# Your discussion here
+Assuming that we want the first one in alphabetical order, the single entry with the most anagrams is: 
+
+************ New Letter Sequence ****************
+Sorted Letter Sequence: aelst
+Number of Valid Anagrams: 11
+Words: least, leats, salet, slate, stale, steal, stela, taels, tales, teals, tesla, 
