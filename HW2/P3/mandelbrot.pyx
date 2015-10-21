@@ -5,6 +5,7 @@ import numpy
 cimport AVX
 from cython.parallel import prange
 
+cimport openmp
 
 cdef np.float64_t magnitude_squared(np.complex64_t z) nogil:
     return z.real * z.real + z.imag * z.imag
@@ -31,9 +32,10 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     assert in_coords.shape[0] == out_counts.shape[0], "Input and output arrays must be the same size"
     assert in_coords.shape[1] == out_counts.shape[1],  "Input and output arrays must be the same size"
 
+
     with nogil:
-        for i in range(in_coords.shape[0]):
-            for j in range(in_coords.shape[1]):
+        for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=12):
+           for j in range(in_coords.shape[1]):
                 c = in_coords[i, j]
                 z = 0
                 for iter in range(max_iterations):

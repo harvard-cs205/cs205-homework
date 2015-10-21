@@ -1,0 +1,20 @@
+The default code output:
+
+1074.69 Million Complex FMAs in 3.04275608063 seconds
+353.196613045 million Complex FMAs / second
+
+prange with one thread:
+1074.691142 Million Complex FMAs in 3.09189105034 seconds
+347.583768155 million Complex FMAs / second
+
+prange with two threads:
+1074.691142 Million Complex FMAs in 1.547093153 seconds
+694.651863668 million Complex FMAs / second
+
+prange with four threads:
+1074.691142 Million Complex FMAs in 0.777901887894 seconds,
+1381.5253038 million Complex FMAs / second
+
+prange with 12 threads (max):
+1074.691142 Million Complex FMAs in 0.296374082565 seconds
+3626.13064104 million Complex FMAs / second
