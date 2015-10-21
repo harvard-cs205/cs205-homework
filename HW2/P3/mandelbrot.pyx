@@ -55,6 +55,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
 
     cdef int go=1
     cdef AVX.float8 iter
+    cdef AVX.float8 temp_z_real, temp_z_imag
 
     with nogil:
         for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=1):
@@ -74,17 +75,45 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                 imag_z_float8 = AVX.float_to_float8(0)
 
                 # Need to iterate over 8 values at once...blahhhhh
-                iter = AVX.float_to_float8(0)
+                iter = AVX.float_to_float8(-1)
                 while go==1:
+                    iter = AVX.add(iter, AVX.float_to_float8(1)) #Increment at beginning, like for loop
+
                     mag_squared = magnitude_squared_float8(real_z_float8, imag_z_float8)
                     go_mask = AVX.less_than(mag_squared, AVX.float_to_float8(4))
                     # If go, calculate z*z + c
+
+                    temp_z_real = do_mandelbrot_update_real(real_z_float8, imag_z_float8, real_c_float8)
+                    temp_z_imag = do_mandelbrot_update_imag(real_z_float8, imag_z_float8, imag_c_float8)
+
+                    #updated_imag = AVX.bitwise_and(go_mask, imag_z_float8) # 0 if not go, original value if go
+
+                    # Do z*z + c
+                    # Real part is a**2 - b**2 + c
+
+
+
 
                     # Now need to do procedural updates of the float8...bleh
                     #if magnitude_squared(z) > 4:
                     #    break
                     #z = z * z + c
                 #out_counts[i, j] = iter
+
+cdef AVX.float8 do_mandelbrot_update_real(AVX.float8 z_real, AVX.float8 z_imag, AVX.float8 c_real) nogil:
+    '''Real part is a^2 - b^2 + c_real'''
+
+    cdef AVX.float8 a_squared = AVX.mul(z_real, z_real)
+    cdef AVX.float8 b_squared = AVX.mul(z_imag, z_imag)
+    cdef AVX.float8 a2_minus_b2 = AVX.sub(a_squared, b_squared)
+    return AVX.add(a2_minus_b2, c_real)
+
+cdef AVX.float8 do_mandelbrot_update_imag(AVX.float8 z_real, AVX.float8 z_imag, AVX.float8 c_imag) nogil:
+    '''Imaginary part is 2ab + c_imag'''
+
+    cdef AVX.float8 a_b = AVX.mul(z_real, z_imag)
+    cdef AVX.float8 two_a_b = AVX.mul(AVX.float_to_float8(2), a_b)
+    return AVX.add(two_a_b, c_imag)
 
 cdef AVX.float8 array_to_float8(float *c, int j_start, int j_end) nogil:
     cdef float *filled_array = <float *> malloc(8*sizeof(c))
