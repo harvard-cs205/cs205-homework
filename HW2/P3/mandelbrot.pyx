@@ -29,15 +29,6 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     cdef:
        int i, j
 
-       # To declare AVX.float8 variables, use:
-       # cdef:
-       #     AVX.float8 v1, v2, v3
-       #
-       # And then, for example, to multiply them
-       #     v3 = AVX.mul(v1, v2)
-       #
-       # You may find the numpy.real() and numpy.imag() fuctions helpful.
-
     assert in_coords.shape[1] % 8 == 0, "Input array must have 8N columns"
     assert in_coords.shape[0] == out_counts.shape[0], "Input and output arrays must be the same size"
     assert in_coords.shape[1] == out_counts.shape[1],  "Input and output arrays must be the same size"
@@ -93,7 +84,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                     mag_squared = magnitude_squared_float8(real_z_float8, imag_z_float8)
                     not_go_mask = AVX.greater_than(mag_squared, AVX.float_to_float8(4))
 
-                    if AVX.signs(not_go_mask) == 8:
+                    if AVX.signs(not_go_mask) == 255:
                         break
 
                     # Increment iter...we will adjust for improper goers in a second
@@ -105,15 +96,15 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                     temp_z_real = do_mandelbrot_update_real(real_z_float8, imag_z_float8, real_c_float8)
                     temp_z_imag = do_mandelbrot_update_imag(real_z_float8, imag_z_float8, imag_c_float8)
 
-                    printf('\n')
-                    printf('Original:\n')
-                    print_float8(real_z_float8)
-                    printf('Updated:\n')
-                    print_float8(temp_z_real)
-                    printf('\n')
+                    # printf('\n')
+                    # printf('Original:\n')
+                    # print_float8(real_z_float8)
+                    # printf('Updated:\n')
+                    # print_float8(temp_z_real)
+                    # printf('\n')
 
                     real_z_float8 = temp_z_real
-                    imag_z_float8 = imag_z_float8
+                    imag_z_float8 = temp_z_imag
 
                     # We need to make sure those that shouldn't go don't update anymore...we set their value to
                     # something ridiculous such that the magnitude will always be greater than 4 next iteration
