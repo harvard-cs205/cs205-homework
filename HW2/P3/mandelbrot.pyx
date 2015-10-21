@@ -11,6 +11,12 @@ cimport openmp
 cdef np.float64_t magnitude_squared(np.complex64_t z) nogil:
     return z.real * z.real + z.imag * z.imag
 
+cdef AVX.float8 magnitude_squared_float8(AVX.float8 z_real_float8, AVX.float8 z_imag_float8) nogil:
+    cdef AVX.float8 real_mag = AVX.mul(z_real_float8, z_real_float8)
+    cdef AVX.float8 imag_mag = AVX.mul(z_imag_float8, z_imag_float8)
+
+    return AVX.add(real_mag, imag_mag)
+
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cpdef mandelbrot(np.complex64_t [:, :] in_coords,
@@ -38,11 +44,13 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     cdef float[:, :] real_in_coords = np.real(in_coords)
     cdef float[:, :] imag_in_coords = np.imag(in_coords)
 
-    cdef float *real_c, *imag_c
+    cdef float *real_c
+    cdef float *imag_c
 
     cdef AVX.float8 real_c_float8, imag_c_float8
 
     cdef AVX.float8 real_z_float8, imag_z_float8
+    cdef AVX.float8 mag_squared
 
     with nogil:
         for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=1):
@@ -60,11 +68,13 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
 
                 real_z_float8 = AVX.float_to_float8(0)
                 imag_z_float8 = AVX.float_to_float8(0)
-                # for iter in range(max_iterations):
-                #     if magnitude_squared(z) > 4:
-                #         break
-                #     z = z * z + c
-                # out_counts[i, j] = iter
+                for iter in range(max_iterations):
+                    mag_squared = magnitude_squared_float8(real_z_float8, imag_z_float8)
+                    # Now need to do procedural updates of the float8...bleh
+                    #if magnitude_squared(z) > 4:
+                    #    break
+                    #z = z * z + c
+                #out_counts[i, j] = iter
 
 cdef AVX.float8 array_to_float8(float *c, int j_start, int j_end) nogil:
     cdef float *filled_array = <float *> malloc(8*sizeof(c))
