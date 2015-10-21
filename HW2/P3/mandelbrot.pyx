@@ -57,15 +57,15 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     cdef AVX.float8 mag_squared
     cdef AVX.float8 not_go_mask
 
-    cdef int go=1
+    cdef int go
     cdef AVX.float8 iter
     cdef AVX.float8 temp_z_real, temp_z_imag
     cdef AVX.float8 to_subtract
     cdef AVX.float8 decrementer = AVX.float_to_float8(-1)
 
     cdef AVX.float8 ridiculous_value = AVX.float_to_float8(RIDICULOUS)
-
-    print_float8(AVX.float_to_float8(69))
+    cdef AVX.float8 max_iterations_f8 = AVX.float_to_float8(max_iterations)
+    cdef AVX.float8 over_max_iterations
 
     print 'before', np.asarray(out_counts).sum()
     with nogil:
@@ -87,13 +87,13 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
 
                 # Need to iterate over 8 values at once...blahhhhh
                 iter = AVX.float_to_float8(0)
-                while go==1:
+
+                while True:
 
                     mag_squared = magnitude_squared_float8(real_z_float8, imag_z_float8)
                     not_go_mask = AVX.greater_than(mag_squared, AVX.float_to_float8(4))
 
                     if AVX.signs(not_go_mask) == 8:
-                        go = 0
                         break
 
                     # Increment iter...we will adjust for improper goers in a second
@@ -105,15 +105,29 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                     temp_z_real = do_mandelbrot_update_real(real_z_float8, imag_z_float8, real_c_float8)
                     temp_z_imag = do_mandelbrot_update_imag(real_z_float8, imag_z_float8, imag_c_float8)
 
+                    printf('\n')
+                    printf('Original:\n')
+                    print_float8(real_z_float8)
+                    printf('Updated:\n')
+                    print_float8(temp_z_real)
+                    printf('\n')
+
                     real_z_float8 = temp_z_real
                     imag_z_float8 = imag_z_float8
 
                     # We need to make sure those that shouldn't go don't update anymore...we set their value to
                     # something ridiculous such that the magnitude will always be greater than 4 next iteration
+
                     real_z_float8 = AVX.add(AVX.bitwise_and(not_go_mask, ridiculous_value),
                                             AVX.bitwise_andnot(not_go_mask, real_z_float8))
                     imag_z_float8 = AVX.add(AVX.bitwise_and(not_go_mask, ridiculous_value),
                                             AVX.bitwise_andnot(not_go_mask, imag_z_float8))
+
+                    # Check that you are not equal to the maximum number of iterations
+                    over_max_iterations = AVX.greater_than(iter, max_iterations_f8)
+                    # One is over the max iteration...and we increment each time, so if one is over we are done!
+                    if AVX.signs(over_max_iterations) > 0:
+                        break
 
                 # Assign the iterations
                 assign_values_to_matrix(iter, &out_counts[i][0], j_start, j_end)
