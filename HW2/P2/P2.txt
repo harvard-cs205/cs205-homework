@@ -1,0 +1,5 @@
+ideas: serial is the fastest because we aren't really doing any computation and the locking overhead causes an increase in time
+medium is slower than fine-grained in general because with medium-grained locking you run into more issues where one thread is waiting for another to
+finish, but you have less locks and (although not in this case) generally will have less complicated code
+
+massive slowdown for medium-grained locking in the correlated case if you have <10 locks because then there will be many collisions

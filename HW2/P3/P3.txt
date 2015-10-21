@@ -1,0 +1,7 @@
+1 Thread: 1074.691142 Million Complex FMAs in 3.29253911972 seconds, 326.401935686 million Complex FMAs / second
+2 Threads: 1074.691142 Million Complex FMAs in 1.65547919273 seconds, 649.172243733 million Complex FMAs / second
+4 Threads: 1074.691142 Million Complex FMAs in 0.85275387764 seconds, 1260.25946077 million Complex FMAs / second
+
+These results are to be expected. First, the number of Complex FMA's stays constant when varying the number of threads. This is a way (in addition to the output image) to see that the parallelization is working. The task stays the same, so the overall level of computation should take the same too.
+
+Next, computing the Mandelbrot set is clearly an "embarssingly parallel" problem, i.e., the computation at [i, j] is totally independent of the computation at [i', j'] if i != i' or j != j' (or both). Thus, wee see that doubling the number of threads essentially halves the computation time (with some noise), and quadrupling the number of threads divides the computation time by four.
