@@ -8,6 +8,9 @@ from libc.stdlib cimport malloc, free
 
 cimport openmp
 
+cdef int RIDICULOUS = -1000
+
+
 cdef np.float64_t magnitude_squared(np.complex64_t z) nogil:
     return z.real * z.real + z.imag * z.imag
 
@@ -58,7 +61,8 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     cdef AVX.float8 temp_z_real, temp_z_imag
     cdef AVX.float8 to_subtract
     cdef AVX.float8 decrementer = AVX.float_to_float8(-1)
-    cdef AVX.float8 ridiculous_value = AVX.float_to_float8(-1000)
+
+    cdef AVX.float8 ridiculous_value = AVX.float_to_float8(RIDICULOUS)
 
     with nogil:
         for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=1):
@@ -101,11 +105,27 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                     imag_z_float8 = imag_z_float8
 
                     # We need to make sure those that shouldn't go don't update anymore...we set their value to
-                    # something ridiculous such that the magnitude will always be greater than 4
-                    real_z_float8 = AVX.add(AVX.bitwise_and(not_go_mask, ridiculous_value), real_z_float8)
-                    imag_z_float8 = AVX.add(AVX.bitwise_and(not_go_mask, ridiculous_value), imag_z_float8)
+                    # something ridiculous such that the magnitude will always be greater than 4 next iteration
+                    real_z_float8 = AVX.add(AVX.bitwise_and(not_go_mask, ridiculous_value),
+                                            AVX.bitwise_andnot(not_go_mask, real_z_float8))
+                    imag_z_float8 = AVX.add(AVX.bitwise_and(not_go_mask, ridiculous_value),
+                                            AVX.bitwise_andnot(not_go_mask, imag_z_float8))
 
                 #out_counts[i, j] = iter
+
+cdef void assign_values_to_matrix(AVX.float8 iter, int *to_big_matrix, int j_start, int j_finish) nogil:
+    cdef float* iter_view = <float *> malloc(8*sizeof(np.float_t))
+
+    AVX.to_mem(iter, iter_view)
+
+    # Now assign appropriately
+    cdef int j
+    cdef int count = 0
+    for j in range(j_start, j_finish):
+        to_big_matrix[j] = <int> iter_view[count]
+        count += 1
+
+    free(iter_view)
 
 cdef AVX.float8 do_mandelbrot_update_real(AVX.float8 z_real, AVX.float8 z_imag, AVX.float8 c_real) nogil:
     '''Real part is a^2 - b^2 + c_real'''
@@ -130,9 +150,9 @@ cdef AVX.float8 array_to_float8(float *c, int j_start, int j_end) nogil:
     for j in range(j_start, j_end):
         filled_array[count] = c[j]
         count += 1
-    # Fill in the rest of the zeros
+    # Fill in the rest with ridiculous values so you know they are garbage
     while count < 8:
-        filled_array[count] = 0
+        filled_array[count] = RIDICULOUS
         count += 1
 
     cdef AVX.float8 f8 = AVX.make_float8(filled_array[7],
@@ -172,7 +192,7 @@ cpdef example_sqrt_8(np.float32_t[:] values):
     mask = AVX.less_than(AVX.float_to_float8(2.0), avxval)
 
     # invert mask and select off values, so should be 2.0 >= avxval
-    avxval = AVX.bitwise_and(mask, mask)
+    avxval = AVX.bitwise_and(mask, avxval)
     #avxval = AVX.signs(mask)
 
     AVX.to_mem(avxval, &(out_vals[0]))
