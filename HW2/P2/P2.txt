@@ -30,3 +30,30 @@ b) Correlated
 The correlated fine-grained code runs *faster* than the uncorrelated code. This is surprising to me...naively, I would
 expect that if the source and destination are correlated when transferring data, there would be more contention for locks.
 This does not appear to be the case. #TODO: Figure out why this is
+
+2. Medium Grained
+
+a) Uncorrelated
+
+Now, there are less locks; a single lock controls access to multiple array elements. Naively, this could be a good
+choice as it will lessen the penalty of assigning many locks. This hypothesis relies on the fact that there will not
+be much waiting for locks.
+
+See plot "uncorrelated_vs_N.png". Strangely, when N=1, we record a time of roughly 9 seconds. N=1 corresponds to the
+fine-grained case where we recorded a time of roughly 2.56 seconds; evidently the overhead associated with assigning
+locks is large (i.e. doing division and addition). #TODO: Figure out why this is too
+
+Regardless, the trends we see in the plot make sense; there is a peak in time around N=3; the combination of many locks
+and increased contention for locks must create this. After N=3, the time elapsed falls off rapidly and reaches a minimum
+at approximately N=30. This must be the sweet spot between assigning and maintaining many locks and contention. As
+expected, as N is increased further, the time elapsed increases, likely as a result of increased contention for locks.
+Strangely, as N grows even larger, there appears to be a slight dip in the time elapsed; I am not exactly sure what causes
+this; it could be due to stochastic fluctuations in the execution of the code.
+
+I think the takeaway message here is that fine-grained and coarse-grained locking are rarely ideal; a medium-grained,
+balanced locking technique is generally the best as illustrated by this plot.
+
+b) Correlated
+
+The beginning of the "correlated_vs_N.png" plot makes sense. Since data is correlated...no I'm confused.
+#TODO Figure this out!
