@@ -64,5 +64,3 @@ pixels have finished. Hence, the speedup in each set of 8 is limited by the slow
 Interestingly, the speedup for 12 threads with and without AVX is about the same.
 This hints that we have "saturated" the code with parallel processors; adding additional cores or AVX techniques will
 not necessarily help speed up the code.
-
-
