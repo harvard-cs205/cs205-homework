@@ -1,0 +1,6 @@
+For both correlated and uncorrelated, serial is an order of magnitude faster than any version of locking. This suggests that the expense of creating, using, and destroying locks outweighs their benefits. This makes sense because the problem is not memory-limited, the type of problems that locks help.
+Serial is slightly faster uncorrelated than correlated at 0.470490217209 seconds and 0.563049077988 seconds, respectively. Though the exact difference varied, the trend was consistent over several runs.
+Fine-grained locking is faster correlated than uncorrelated at 3.96625208855 seconds and 5.60650491714 seconds, respectively. Though the exact difference varied, the trend was consistent over several runs.
+Please reference medium_hist.png for discussions of medium-grained locking.
+For all values of N, medium-grained locking shows about the same difference between correlated and uncorrelated as does fine-grained locking.
+The best value of N appears to be 1, in which case the medium-grained locking case degenerates to the fine-grained locking case. Sharing of locks generally seems to slow down the operation. However, after a certain point, as the number of locks approaches 1, it begins to resemble the serial case (with an extra lock) and begins to speed up again.
