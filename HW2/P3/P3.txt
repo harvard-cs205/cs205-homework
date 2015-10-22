@@ -1,7 +1,9 @@
-The default code output:
+#### Default Serial ####
 
 1074.69 Million Complex FMAs in 3.04275608063 seconds
 353.196613045 million Complex FMAs / second
+
+##### prange alone ####
 
 prange with one thread:
 1074.691142 Million Complex FMAs in 3.09189105034 seconds
@@ -18,3 +20,22 @@ prange with four threads:
 prange with 12 threads (max):
 1074.691142 Million Complex FMAs in 0.296374082565 seconds
 3626.13064104 million Complex FMAs / second
+
+
+#### prange and AVX ####
+
+prange with one thread:
+1075.239963 Million Complex FMAs in 0.948863983154 seconds
+1133.18661272 million Complex FMAs / second
+
+prange with two threads:
+1075.239963 Million Complex FMAs in 0.752876996994 seconds
+1428.17481115 million Complex FMAs / second
+
+prange with four threads:
+1075.239963 Million Complex FMAs in 0.476514101028 seconds
+2256.47039758 million Complex FMAs / second
+
+prange with 12 threads (max):
+1075.239963 Million Complex FMAs in 0.317208051682 seconds
+3389.69946475 million Complex FMAs / second
