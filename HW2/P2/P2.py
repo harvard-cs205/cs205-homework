@@ -10,6 +10,7 @@ pyximport.install()
 import numpy as np
 from timer import Timer
 from parallel_vector import move_data_serial, move_data_fine_grained, move_data_medium_grained, time_locks_fine_grained, time_locks_medium_grained
+import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
     ########################################
@@ -20,6 +21,10 @@ if __name__ == '__main__':
     dest = np.random.randint(1000, size=1000000).astype(np.int32)
 
     total = orig_counts.sum()
+    uncorrelated_lock_times = []
+    uncorrelated_times = []
+    correlated_lock_times = []
+    correlated_times = []
 
     # serial move
     counts = orig_counts.copy()
@@ -33,6 +38,7 @@ if __name__ == '__main__':
     with Timer() as t:
         time_locks_fine_grained(orig_counts, src, dest, 100)
     print ("Time for locks fine uncorrelated: {} seconds".format(t.interval))
+    uncorrelated_lock_times.append(t.interval)
 
     # fine grained
     counts[:] = orig_counts
@@ -40,24 +46,26 @@ if __name__ == '__main__':
         move_data_fine_grained(counts, src, dest, 100)
     assert counts.sum() == total, "Wrong total after move_data_fine_grained"
     print("Fine grained uncorrelated: {} seconds".format(t.interval))
+    uncorrelated_times.append(t.interval)    
     
     ########################################
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################
-    N_arr = [10,100,1000]
+    N_arr = [5,10,20,50,100]
     counts[:] = orig_counts
     for N in N_arr:
         #lock timing
         with Timer() as t:
             time_locks_medium_grained(orig_counts, src, dest, 100, N)
         print ("Time for locks medium uncorrelated: N={},  {} seconds".format(N, t.interval))
+        uncorrelated_lock_times.append(t.interval)        
         
         with Timer() as t:
             move_data_medium_grained(counts, src, dest, 100, N)
         assert counts.sum() == total, "Wrong total after move_data_medium_grained"
         print("Medium uncorrelated: N={}, {} seconds".format(N, t.interval))
-
+        uncorrelated_times.append(t.interval)
     ########################################
     # Now use correlated data movement
     ########################################
@@ -78,6 +86,7 @@ if __name__ == '__main__':
     with Timer() as t:
         time_locks_fine_grained(orig_counts, src, dest, 100)
     print ("Time for locks fine correlated: {} seconds".format(t.interval))
+    correlated_lock_times.append(t.interval)
 
     # fine grained
     counts[:] = orig_counts
@@ -85,6 +94,7 @@ if __name__ == '__main__':
         move_data_fine_grained(counts, src, dest, 100)
     assert counts.sum() == total, "Wrong total after move_data_fine_grained"
     print("Fine grained correlated: {} seconds".format(t.interval))
+    correlated_times.append(t.interval)
 
     ########################################
     # You should explore different values for the number of locks in the medium
@@ -96,9 +106,18 @@ if __name__ == '__main__':
         with Timer() as t:
             time_locks_medium_grained(orig_counts, src, dest, 100, N)
         print ("Time for locks medium correlated: N={},  {} seconds".format(N, t.interval))
-                
+        correlated_lock_times.append(t.interval)
         
         with Timer() as t:
             move_data_medium_grained(counts, src, dest, 100, N)
         assert counts.sum() == total, "Wrong total after move_data_medium_grained"
         print("Medium correlated: N={}, {} seconds".format(N, t.interval))
+        correlated_times.append(t.interval)
+        
+    N_arr = [1] + N_arr
+    plt.plot(N_arr, uncorrelated_lock_times)
+    plt.plot(N_arr, uncorrelated_times)
+    plt.plot(N_arr, correlated_lock_times)
+    plt.plot(N_arr, correlated_times)
+    plt.legend(['Uncorr lock times', 'Uncorr times', 'Corr lock times', 'Corr times'], loc='upper left')
+    plt.show()
