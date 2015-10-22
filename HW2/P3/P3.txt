@@ -1,3 +1,5 @@
+I will list the performance for each case below.
+
 #### Default Serial ####
 
 1074.69 Million Complex FMAs in 3.04275608063 seconds
@@ -39,3 +41,8 @@ prange with four threads:
 prange with 12 threads (max):
 1075.239963 Million Complex FMAs in 0.317208051682 seconds
 3389.69946475 million Complex FMAs / second
+
+#TODO: Figure out why I have the slight difference in FMA totals
+
+############ Summary ##########################
+

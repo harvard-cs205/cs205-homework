@@ -64,7 +64,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     cdef AVX.float8 over_max_iterations
 
     with nogil:
-        for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=12):
+        for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=1):
             for j in range(num_cols_to_iterate): # Parallelize via AVX here...do 8 at a time
                 j_start = 8*j
                 j_end = 8*(j+1)
@@ -214,5 +214,10 @@ cpdef example_sqrt_8(np.float32_t[:] values):
     #avxval = AVX.signs(mask)
 
     AVX.to_mem(avxval, &(out_vals[0]))
+
+    # TEST CODE FOR ME
+    cdef AVX.float8 test = AVX.float_to_float8(-1)
+    cdef AVX.float8 potato = AVX.less_than(test, AVX.float_to_float8(0))
+    printf('%d \n', AVX.signs(potato))
 
     return np.array(out_view)
