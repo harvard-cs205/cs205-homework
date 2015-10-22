@@ -46,3 +46,6 @@ prange with 12 threads (max):
 
 ############ Summary ##########################
 
+See the plot "timing_vs_technique.png". For 1, 2, and 4 threads we see behavior
+we expect. For 1 thread vs. serial code, the threaded code runs slightly slower
+due to the overhead of threading.
