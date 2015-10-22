@@ -13,9 +13,10 @@ cdef np.float64_t magnitude_squared(np.complex64_t z) nogil:
 @cython.wraparound(False)
 cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                  np.uint32_t [:, :] out_counts,
-                 int max_iterations=511):
+                 int max_iterations=511,
+                 int num_threads=1):
     cdef:
-       int i, j, iter
+       int i, j, iter, nt = num_threads
        np.complex64_t c, z
 
        # To declare AVX.float8 variables, use:
@@ -32,7 +33,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     assert in_coords.shape[1] == out_counts.shape[1],  "Input and output arrays must be the same size"
 
     with nogil:
-        for i in range(in_coords.shape[0]):
+        for i in prange(in_coords.shape[0], num_threads=nt, schedule="static", chunksize=1):
             for j in range(in_coords.shape[1]):
                 c = in_coords[i, j]
                 z = 0
@@ -47,7 +48,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
 # An example using AVX instructions
 cpdef example_sqrt_8(np.float32_t[:] values):
     cdef:
-        AVX.float8 avxval
+        AVX.float8 avxval, tmp, mask
         float out_vals[8]
         float [:] out_view = out_vals
 
@@ -65,6 +66,12 @@ cpdef example_sqrt_8(np.float32_t[:] values):
                              values[0])
 
     avxval = AVX.sqrt(avxval)
+
+    # mask will be true where 2.0 < avxval
+    mask = AVX.less_than(AVX.float_to_float8(2.0), avxval)
+
+    # invert mask and select off values, so should be 2.0 >= avxval
+    avxval = AVX.bitwise_andnot(mask, avxval)
 
     AVX.to_mem(avxval, &(out_vals[0]))
 

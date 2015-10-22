@@ -1,0 +1,7 @@
+
+MULTITHREADING EXPERIMENT
+-------------------------
+In the graph P3_experiment_multithreading.png we see the execution times for 1, 2 and 4 threads. On my 2-core machine
+ we see that the execution time for 2 threads is substantially faster thant for 1 thread. 4 Threads, however, barely
+ makes a difference, since the 4 threads have to share 2 cores.
+

@@ -12,6 +12,7 @@ import mandelbrot
 from timer import Timer
 
 import pylab as plt
+import seaborn as sns
 import numpy as np
 
 
@@ -28,11 +29,30 @@ def make_coords(center=(-0.575 - 0.575j),
 if __name__ == '__main__':
     in_coords, out_counts = make_coords()
 
-    with Timer() as t:
-        mandelbrot.mandelbrot(in_coords, out_counts, 1024)
-    seconds = t.interval
+    #############################
+    # Multithreading experiment #
+    #############################
 
-    print("{} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
+    threadcount = [1, 2, 4]
 
-    plt.imshow(np.log(out_counts))
+    execution_times = []
+
+    for n in threadcount:
+        with Timer() as t:
+            mandelbrot.mandelbrot(in_coords, out_counts, 1024, num_threads=n)
+        seconds = t.interval
+        execution_times += [seconds]
+
+        print("{} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
+
+        # plt.imshow(np.log(out_counts))
+        # plt.show()
+
+    sns.set_style("darkgrid")
+    f, ax = plt.subplots(1)
+    plt.plot(threadcount, execution_times)
+    plt.xlabel('N')
+    plt.ylabel('Time (sec.)')
+    plt.title('Execution time for 1, 2 and 4 threads')
+    ax.set_ylim(0,)
     plt.show()
