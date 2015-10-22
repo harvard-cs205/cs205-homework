@@ -36,11 +36,11 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     cdef int num_cols_to_iterate = in_coords.shape[1]/8
     cdef int j_start, j_end
 
-    cdef float[:, :] real_in_coords = np.real(in_coords)
-    cdef float[:, :] imag_in_coords = np.imag(in_coords)
+    cdef np.float64_t[:, :] real_in_coords = np.real(in_coords)
+    cdef np.float64_t[:, :] imag_in_coords = np.imag(in_coords)
 
-    cdef float *real_c
-    cdef float *imag_c
+    cdef np.float64_t *real_c
+    cdef np.float64_t *imag_c
 
     cdef AVX.float8 real_c_float8, imag_c_float8
 
@@ -58,14 +58,13 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     cdef AVX.float8 max_iterations_f8 = AVX.float_to_float8(max_iterations)
     cdef AVX.float8 over_max_iterations
 
-    print 'before', np.asarray(out_counts).sum()
     with nogil:
         for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=1):
             for j in range(num_cols_to_iterate): # Parallelize via AVX here...do 8 at a time
                 j_start = 8*j
                 j_end = 8*(j+1)
-                if j_end >= in_coords.shape[1]:
-                    j_end = in_coords.shape[1] - 1
+                if j_end > in_coords.shape[1]:
+                    j_end = in_coords.shape[1]
 
                 real_c = &real_in_coords[i][0] # get pointers to the arrays
                 imag_c = &imag_in_coords[i][0]
@@ -84,7 +83,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                     mag_squared = magnitude_squared_float8(real_z_float8, imag_z_float8)
                     not_go_mask = AVX.greater_than(mag_squared, AVX.float_to_float8(4))
 
-                    if AVX.signs(not_go_mask) == 255:
+                    if AVX.signs(not_go_mask) == 255: #255 happens to be when all are true
                         break
 
                     # Increment iter...we will adjust for improper goers in a second
@@ -95,13 +94,6 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
 
                     temp_z_real = do_mandelbrot_update_real(real_z_float8, imag_z_float8, real_c_float8)
                     temp_z_imag = do_mandelbrot_update_imag(real_z_float8, imag_z_float8, imag_c_float8)
-
-                    # printf('\n')
-                    # printf('Original:\n')
-                    # print_float8(real_z_float8)
-                    # printf('Updated:\n')
-                    # print_float8(temp_z_real)
-                    # printf('\n')
 
                     real_z_float8 = temp_z_real
                     imag_z_float8 = temp_z_imag
@@ -122,10 +114,9 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
 
                 # Assign the iterations
                 assign_values_to_matrix(iter, &out_counts[i][0], j_start, j_end)
-    print 'after', np.asarray(out_counts).sum()
 
 cdef void print_float8(AVX.float8 f8) nogil:
-    cdef np.float32_t* iter_view = <float *> malloc(8*sizeof(np.float32_t))
+    cdef np.float64_t* iter_view = <np.float64_t *> malloc(8*sizeof(np.float64_t))
 
     AVX.to_mem(f8, iter_view)
     cdef int i
@@ -136,7 +127,7 @@ cdef void print_float8(AVX.float8 f8) nogil:
     free(iter_view)
 
 cdef void assign_values_to_matrix(AVX.float8 iter, np.uint32_t *to_big_matrix, int j_start, int j_end) nogil:
-    cdef float* iter_view = <float *> malloc(8*sizeof(np.float32_t))
+    cdef np.float64_t* iter_view = <np.float64_t *> malloc(8*sizeof(np.float64_t))
 
     AVX.to_mem(iter, iter_view)
 
@@ -164,8 +155,8 @@ cdef AVX.float8 do_mandelbrot_update_imag(AVX.float8 z_real, AVX.float8 z_imag, 
     cdef AVX.float8 two_a_b = AVX.mul(AVX.float_to_float8(2), a_b)
     return AVX.add(two_a_b, c_imag)
 
-cdef AVX.float8 array_to_float8(float *c, int j_start, int j_end) nogil:
-    cdef float *filled_array = <float *> malloc(8*sizeof(c))
+cdef AVX.float8 array_to_float8(np.float64_t *c, int j_start, int j_end) nogil:
+    cdef np.float64_t *filled_array = <np.float64_t *> malloc(8*sizeof(c))
 
     cdef int count = 0
     cdef int j
