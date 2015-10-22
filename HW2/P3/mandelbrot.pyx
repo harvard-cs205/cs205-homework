@@ -37,6 +37,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     cdef int j_start, j_end
 
     cdef float[:, :] real_in_coords = np.real(in_coords)
+    # If you don't specify C ordering, which is what I expected, *terrible* things happen.
     real_in_coords = np.array(real_in_coords, order='C')
     cdef float[:, :] imag_in_coords = np.imag(in_coords)
     imag_in_coords = np.array(imag_in_coords, order='C')
