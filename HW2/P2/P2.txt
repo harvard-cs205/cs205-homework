@@ -3,8 +3,13 @@ DESCRIPTION THREE SCALES OF LOCKING
 -----------------------------------
 The three scales of locking: fine, medium, and none (serial), show very different execution times. In the native
 implementation, the serial execution time is under 1 second, while fine-grained completes within 14 seconds, and
-medium-grained within 19 seconds.
+medium-grained within 19 seconds. Locking apparently introduces an overhead (creating and destroying the locks), and
+in the case of medium-grained locking also introduces a sizable waiting overhead (threads waiting on locks to be
+released).
 
 OPTIMIZATION OF N FOR MEDIUM GRAINED LOCKING
 --------------------------------------------
-
+By choosing values of N from 1 to 2^5 I studied a whole range of N's. The execution time for these values of N is
+available in P2_experiment_N.png. What becomes apparent in this graph is that higher values of N are correlated with
+higher execution times. In both the correlated as in the uncorrelated cases, a value of N = 1 had the best
+performance. This is the exact same case as fine-grained locking, since for N = 1 every index gets its own lock.
