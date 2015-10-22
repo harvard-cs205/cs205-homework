@@ -1,1 +1,3 @@
-# Your discussion here
+# Discussion of the results and tradeoffs.
+
+In this exercise, I implemented 2 different parallel algorithms using 100 partitions. The first has unbalanced load as most of the iterations per partition are low in the spots where the Mandlebrot is black. Therefore, in the second algorithm, when we randomly hash all of the Cartesian coordinates in to 1 of the 100 partitions, we see that the partitions have similar iterations since the heavy-iterations (white pixels of the plot) are more evenly distributed throughout the 100 partitions.

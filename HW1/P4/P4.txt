@@ -1,1 +1,29 @@
-# Your discussion here
+Number of nodes touched excluding root node
+(+1 if counting root node)
+Orwell: 8
+Miss Thing/Mary: 6
+Captain America: 6407
+
+If a character does not have a defined distance during the search means that the character does not share an edge to another character. It is disjoined from the rest of the graph.
+
+A description of your graph representation, and the number of touched nodes in each of the searches above. Also, discuss the two questions above (re. graph diameter, and untouched nodes).
+
+For my graph, I use a RDD to store (character, list of characters sharing an edge []).
+
+Here is the output of characters that appeared with 'ORWELL'
+graph.lookup('ORWELL')
+[[u'OSWALD',
+  u'HOFFMAN',
+  u'NILES, SEN. CATHERIN',
+  u'FAGIN',
+  u'ASHER, MICHAEL',
+  u'LUDLUM, ROSS',
+  u'ASHER, MICHAEL',
+  u'OSWALD',
+  u'HOFFMAN',
+  u'ASHER, DONNA',
+  u'FAGIN',
+  u'ASHER, CARL',
+  u'LUDLUM, ROSS']]
+
+

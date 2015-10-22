@@ -1,1 +1,4 @@
 # Your discussion here
+Directed path
+Harvard_University -> 1998 -> 1958 -> Kevin_Bacon
+Kevin_Bacon -> College_Bowl _> Harvard_University
