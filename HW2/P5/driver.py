@@ -11,7 +11,7 @@ pyximport.install()
 import numpy as np
 from timer import Timer
 import matplotlib
-matplotlib.use('qt4agg')
+matplotlib.use('Qt4agg')
 import matplotlib.pyplot as plt
 from animator import Animator
 from physics import update, preallocate_locks
@@ -20,8 +20,8 @@ def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
 if __name__ == '__main__':
-    num_balls = 500
-    radius = 0.01
+    num_balls = 10000
+    radius = 0.002
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 

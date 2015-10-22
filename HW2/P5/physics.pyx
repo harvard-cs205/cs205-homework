@@ -5,6 +5,7 @@ from libc.math cimport sqrt
 from libc.stdint cimport uintptr_t
 cimport cython
 from omp_defs cimport omp_lock_t, get_N_locks, free_N_locks, acquire, release
+from cython.parallel cimport prange
 
 # Useful types
 ctypedef np.float32_t FLOAT
@@ -98,12 +99,16 @@ cpdef update(FLOAT[:, ::1] XY,
     assert XY.shape[0] == V.shape[0]
     assert XY.shape[1] == V.shape[1] == 2
 
+    cdef int chunksize=2500
+    cdef int num_threads = 4
+
     with nogil:
         # bounce off of walls
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
-        for i in range(count):
+
+        for i in prange(count, num_threads=num_threads, schedule='static', chunksize=chunksize):
             for dim in range(2):
                 if (((XY[i, dim] < R) and (V[i, dim] < 0)) or
                     ((XY[i, dim] > 1.0 - R) and (V[i, dim] > 0))):
@@ -113,7 +118,7 @@ cpdef update(FLOAT[:, ::1] XY,
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
-        for i in range(count):
+        for i in prange(count, num_threads=num_threads, schedule='static', chunksize=chunksize):
             sub_update(XY, V, R, i, count, Grid, grid_spacing)
 
         # update positions
@@ -121,7 +126,7 @@ cpdef update(FLOAT[:, ::1] XY,
         # SUBPROBLEM 1: parallelize this loop over 4 threads (with static
         #    scheduling).
         # SUBPROBLEM 2: update the grid values.
-        for i in range(count):
+        for i in prange(count, num_threads=num_threads, schedule='static', chunksize=chunksize):
             for dim in range(2):
                 XY[i, dim] += V[i, dim] * t
 

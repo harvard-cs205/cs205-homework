@@ -32,10 +32,10 @@ class Animator(object):
         ax.get_yaxis().set_visible(False)
         ax.set_axis_bgcolor('black')
         plt.draw()
-        plt.pause(0.0001)
+        plt.pause(10.**-6.)
 
     def update(self, positions):
         self.circles.set_offsets(positions)
         plt.draw()
-        plt.pause(0.0001)
+        plt.pause(10.**-6.)
 
