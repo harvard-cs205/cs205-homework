@@ -46,6 +46,23 @@ prange with 12 threads (max):
 
 ############ Summary ##########################
 
-See the plot "timing_vs_technique.png". For 1, 2, and 4 threads we see behavior
+See the plot "timing_vs_technique_scaled.png". For 1, 2, and 4 threads we see behavior
 we expect. For 1 thread vs. serial code, the threaded code runs slightly slower
-due to the overhead of threading.
+due to the overhead of threading. When we we add two threads, we get a speedup
+of approximately 2. When we have 4 threads, we get a speedup of approximately 4. Interestingly,
+when we use 12 threads (the number of effective cores my computer has), we find a speedup of
+about 10, indicating that the execution speed does not scale perfectly with the number of cores. This could
+be due to a bottleneck in the code (i.e. with an infinite number of cores, we would only see a speedup of about
+10x), or could represent the cost associated with creating and maintaining additional parallel jobs.
+
+When we add AVX and threading, the results are more unexpected. Naively, since we operate on 8 numbers at once,
+we would expect the speed with N threads relative to serial code to be roughly 8N. Instead, with
+1 thread, we speedup of about 3x, 2 threads ~ 4x, 4 threads ~6.5x, and 12 threads ~ 10x. The reason for this imperfect
+scaling is likely that when we are operating on 8 numbers at once, we do not stop operating on them until *all*
+pixels have finished. Hence, the speedup in each set of 8 is limited by the slowest pixel.
+
+Interestingly, the speedup for 12 threads with and without AVX is about the same.
+This hints that we have "saturated" the code with parallel processors; adding additional cores or AVX techniques will
+not necessarily help speed up the code.
+
+
