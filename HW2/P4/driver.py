@@ -37,6 +37,7 @@ class Row_Handler():
 
 
     def go(self):
+        print 'Go!' , self.row_num
         go_cond_1 = True
         if self.above_handler is not None:
             go_cond_1 = (self.i == self.above_handler.i)
@@ -44,9 +45,11 @@ class Row_Handler():
         if self.below_handler is not None:
             go_cond_2 = (self.i == self.below_handler.i)
         if go_cond_1 and go_cond_2:
-            self.above_handler.row_lock.acquire()
+            if self.above_handler is not None:
+                self.above_handler.row_lock.acquire()
             self.row_lock.acquire()
-            self.below_handler.acquire()
+            if self.below_handler is not None:
+                self.below_handler.row_lock.acquire()
 
             # Do stuff
             filtering.median_3x3_row(self.tmpA, self.tmpB, self.row_num)
@@ -59,9 +62,11 @@ class Row_Handler():
 
             self.i += 1
 
-            self.above_handler.row_lock.release()
+            if self.above_handler is not None:
+                self.above_handler.row_lock.release()
             self.row_lock.release()
-            self.below_handler.release()
+            if self.below_handler is not None:
+                self.below_handler.row_lock.release()
 
             # Give other threads a chance to grab locks and update
             self.i_updated.set()
@@ -71,11 +76,19 @@ class Row_Handler():
 
     def wait(self):
         """Wait until one of your neighbors updates their iteration"""
-        OrEvent(self.above_handler.i_updated, self.below_handler.i_updated).wait()
+        if self.above_handler is None:
+            print 'Waiting for below handler to update...' , self.row_num
+            self.below_handler.i_updated.wait()
+            print 'Below handler updated!' , self.row_num
+        elif self.below_handler is None:
+            print 'Waiting for above handler to update...' , self.row_num
+            self.above_handler.i_updated.wait()
+            print 'Above handler updated!' , self.row_num
+        else:
+            print 'Waiting for above or below to update...' , self.row_num
+            OrEvent(self.above_handler.i_updated, self.below_handler.i_updated).wait()
+            print 'Below or Above handler updated!' , self.row_num
         self.go()
-
-    def done(self):
-        print 'Done!'
 
 def py_median_3x3(image, iterations=10, num_threads=1):
     ''' repeatedly filter with a 3x3 median '''
@@ -89,21 +102,21 @@ def py_median_3x3(image, iterations=10, num_threads=1):
 
     # Add neighbors
     for i in range(len(handler_list)):
-        if i == 0:
+        if i != len(handler_list) - 1:
             handler_list[i].below_handler =handler_list[i + 1]
-        elif i == len(handler_list) - 1:
-            handler_list[i]
+        if i != 0:
+            handler_list[i].above_handler = handler_list[i -1]
 
     # The handlers must each be updated ten times...if we had a thread for each handler we would be all set...
     # we can probably subdivide the jobs up.
 
     pool = ThreadPool(num_threads)
     for handler in handler_list:
-        pool.add_task(handler.go())
+        pool.add_task(handler.go)
 
     pool.wait_completion()
 
-    return handler_list[0].tmpA
+    return tmpA
 
 def numpy_median(image, iterations=10):
     ''' filter using numpy '''
