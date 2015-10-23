@@ -1,1 +1,7 @@
-# Your discussion here
+###### Discussion ######
+
+One shortest path generated from Kevin_Bacon to Harvard_University:
+
+Kevin_Bacon->Marisa_Silver->Harvard_University
+
+As we can see, the distance is 3. This problem takes me a long time in debugging. I was running the program locally, and each time it took a long time until the system caught a bug and crashed.
