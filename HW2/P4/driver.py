@@ -18,7 +18,7 @@ import threading
 from or_event import OrEvent
 
 class Row_Handler():
-    def __init__(self, row_num, tmpA, tmpB):
+    def __init__(self, row_num, tmpA, tmpB, num_iterations=10):
         self.i = 0
 
         self.row_num = row_num
@@ -32,6 +32,7 @@ class Row_Handler():
 
         self.tmpA = tmpA
         self.tmpB = tmpB
+        self.num_iterations = num_iterations
 
 
     def go(self):
@@ -58,8 +59,7 @@ class Row_Handler():
             # Give other threads a chance to grab locks and update
             self.i_updated.set()
             self.i_updated.clear()
-
-        else:
+        elif self.i != self.num_iterations: # you are not done yet!
             self.wait()
 
     def wait(self):
@@ -67,14 +67,21 @@ class Row_Handler():
         OrEvent(self.above_handler.i_updated, self.below_handler.i_updated).wait()
         self.go()
 
-
-
-
+    def done(self):
+        print 'Done!'
 
 def py_median_3x3(image, iterations=10, num_threads=1):
     ''' repeatedly filter with a 3x3 median '''
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
+
+    # Create all row_handlers
+    handlers = []
+    for cur_row in image.shape[0]:
+        handlers.append(Row_Handler(cur_row, tmpA, tmpB, num_iterations=iterations))
+
+    # The handlers must each be updated ten times...if we had a thread for each handler we would be all set...
+    # we can probably subdivide the jobs up.
 
     for i in range(iterations):
         filtering.median_3x3(tmpA, tmpB, 0, 1)
