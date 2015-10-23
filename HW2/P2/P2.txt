@@ -1,0 +1,16 @@
+Here is the output of the baseline cases that were provided for us.
+_______________________________________________
+Serial uncorrelated: 0.267842054367 seconds
+Fine grained uncorrelated: 6.47482514381 seconds
+Medium grained uncorrelated: 8.69643497467 seconds
+
+
+Serial correlated: 0.375657081604 seconds
+Fine grained correlated: 7.62986898422 seconds
+Medium grained correlated: 11.0682179928 seconds
+—————————————————————————————————————————————————
+
+
+I included a plot summarizing my exploration of the number of adjacent items that fall under the same lock.
+
+What I found is that as I increase the number of points, the code takes longer and longer to run. This is due to increased stalling for each thread as more indices fall under a single lock. In the correlated case, the best distribution of points to lock should be approximately 20 since no point is more than 10 away from it’s source or destination. So the furthest a point would need to be moved in total is 20. I however do not see that result in my output. Perhaps my implementation of assigning locks or the processes my computer is running in the background have affected my performance (much more than I considered would happen). I cannot justifiably claim any one value of N being a better choice than another due the demonstrated inconsistencies in my P2.png… One result that I can suggest is that N is between 2 and 10 as those runtimes were by far the fastest in my experimentation.
