@@ -19,16 +19,16 @@ from or_event import OrEvent
 from threadpool import ThreadPool
 
 class Row_Handler():
-    def __init__(self, row_num, tmpA, tmpB, num_iterations=10):
+    def __init__(self, row_num, row_lock, tmpA, tmpB, num_iterations=10):
         self.i = 0
 
         self.row_num = row_num
+        self.row_lock = row_lock
 
         self.above_handler = None
         self.below_handler = None
 
         # Run when you are ready to go!
-        self.row_lock = threading.Lock()
         self.i_updated = threading.Event()
 
         self.tmpA = tmpA
@@ -36,7 +36,7 @@ class Row_Handler():
         self.num_iterations = num_iterations
 
 
-    def go(self):
+    def go(self): # Locks only depend on above you
         print 'Go!' , self.row_num
         go_cond_1 = True
         if self.above_handler is not None:
@@ -45,11 +45,13 @@ class Row_Handler():
         if self.below_handler is not None:
             go_cond_2 = (self.i == self.below_handler.i)
         if go_cond_1 and go_cond_2:
-            if self.above_handler is not None:
-                self.above_handler.row_lock.acquire()
+            print 'Acquring my own lock!' , self.row_num
             self.row_lock.acquire()
-            if self.below_handler is not None:
-                self.below_handler.row_lock.acquire()
+            if self.above_handler is not None:
+                print 'Acquiring upper lock!', self.row_num
+                self.above_handler.row_lock.acquire()
+
+            print 'Running the median filter', self.row_num
 
             # Do stuff
             filtering.median_3x3_row(self.tmpA, self.tmpB, self.row_num)
@@ -62,11 +64,11 @@ class Row_Handler():
 
             self.i += 1
 
-            if self.above_handler is not None:
-                self.above_handler.row_lock.release()
+            print 'Releasing my own lock'
             self.row_lock.release()
-            if self.below_handler is not None:
-                self.below_handler.row_lock.release()
+            if self.above_handler is not None:
+                print 'Releasing upper lock'
+                self.above_handler.row_lock.release()
 
             # Give other threads a chance to grab locks and update
             self.i_updated.set()
@@ -97,15 +99,18 @@ def py_median_3x3(image, iterations=10, num_threads=1):
 
     # Create all row_handlers
     handler_list = []
+    row_lock = threading.Lock() # Assign neighbors all the same lock
     for cur_row in range(image.shape[0]):
-        handler_list.append(Row_Handler(cur_row, tmpA, tmpB, num_iterations=iterations))
+        handler_list.append(Row_Handler(cur_row, row_lock, tmpA, tmpB, num_iterations=iterations))
+        if (cur_row - 2) % 3 == 0:
+            row_lock = threading.Lock()
 
     # Add neighbors
     for i in range(len(handler_list)):
         if i != len(handler_list) - 1:
-            handler_list[i].below_handler =handler_list[i + 1]
+            handler_list[i].below_handler =handler_list[i+1]
         if i != 0:
-            handler_list[i].above_handler = handler_list[i -1]
+            handler_list[i].above_handler = handler_list[i-1]
 
     # The handlers must each be updated ten times...if we had a thread for each handler we would be all set...
     # we can probably subdivide the jobs up.
