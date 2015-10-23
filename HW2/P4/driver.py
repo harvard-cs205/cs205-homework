@@ -15,6 +15,43 @@ import filtering
 from timer import Timer
 import threading
 
+class Row_Handler():
+    def __init__(self, row_num, tmpA, tmpB):
+        self.i = 0
+
+        self.row_num = row_num
+
+        self.above_handler = None
+        self.below_handler = None
+
+        # Run when you are ready to go!
+        self.row_lock = threading.Lock()
+
+        self.tmpA = tmpA
+        self.tmpB = tmpB
+
+
+    def go(self):
+        if (self.i == self.above_handler.i) and (self.i == self.below_handler.i):
+            self.above_handler.row_lock.acquire()
+            self.row_lock.acquire()
+            self.below_handler.acquire()
+
+            # Do stuff
+            filtering.median_3x3_row(self.tmpA, self.tmpB, self.row_num)
+            # Swap tmpA and tmpB; doesn't recreate arrays, just swaps pointers!
+            potatoA = self.tmpA
+            potatoB = self.tmpB
+
+            self.tmpA = potatoB
+            self.tmpB = potatoA
+
+            self.above_handler.row_lock.release()
+            self.row_lock.release()
+            self.below_handler.release()
+
+
+
 def py_median_3x3(image, iterations=10, num_threads=1):
     ''' repeatedly filter with a 3x3 median '''
     tmpA = image.copy()
