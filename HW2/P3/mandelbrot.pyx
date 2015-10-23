@@ -61,7 +61,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
         avx_4 = AVX.float_to_float8(4.0)
         avx_0 = AVX.float_to_float8(0.0)
         avx_2 = AVX.float_to_float8(2.0)
-        for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=2):
+        for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=4):
             for j in range(in_coords.shape[1]/8):
                 c_real = AVX.make_float8(in_coords_real[i,j*8+7],
                                          in_coords_real[i,j*8+6],

@@ -3,3 +3,14 @@ Prange rows:
 threads = 1: 1074.656613 Million Complex FMAs in 5.59425115585 seconds, 192.10017267 million Complex FMAs / second
 threads = 2: 1074.656613 Million Complex FMAs in 2.80311083794 seconds, 383.379992848 million Complex FMAs / second
 threads = 4: 1074.656613 Million Complex FMAs in 1.43997621536 seconds, 746.301641329 million Complex FMAs / second
+
+Prange rows + AVX:
+
+threads = 1: 1074.656613 Million Complex FMAs in 13.521146059 seconds, 79.4796985631 million Complex FMAs / second
+threads = 2: 1074.656613 Million Complex FMAs in 19.2771539688 seconds, 55.747680116 million Complex FMAs / second
+threads = 4: 1074.656613 Million Complex FMAs in 24.4317700863 seconds, 43.9860316794 million Complex FMAs / second
+
+We see expected speedup with respect to threads in the prange case.
+We see a slowdown from going with just prange to prange+avx for the same number of threads - this could possibly be due to the fact that the work is unbalanced similar to our last assignment in spark. In this case, for every 8 numbers you're running the iterations over the max of each of those 8 numbers. For example if the # of iterations for the 8 numbers was (1,1,1,1,1,1,1,1024), we would require 1024 iterations but only 1031 iterations serially. The overhead from moving the numbers to AVX, doing the bit manipulations, then writing to memory may be causing the additional time.
+
+We also see increasing times as threads increase in the AVX implementation - this is rather surprising.
