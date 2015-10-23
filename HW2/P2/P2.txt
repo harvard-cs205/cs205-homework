@@ -1,0 +1,25 @@
+UNCORRELATED
+Serial: 0.29356098175 seconds
+Fine grained: 7.5262658596 seconds
+Medium grained:
+	N=1: 9.9695s
+	N=2: 9.0019s
+	N=3: 11.4857s
+	N=5: 10.5355s
+	N=10: 10.8579s
+	N=20: 13.5001s
+
+CORRELATED
+Serial: 0.291272878647 seconds
+Fine grained: 6.4775159359 seconds
+Medium grained:
+	N=1: 8.2061s
+	N=2: 9.6735s
+	N=3: 9.0187s
+	N=5: 9.4141s
+	N=10: 11.1763s
+	N=20: 6.913s
+
+Most of these values between correlated and uncorrelated are pretty similar, with the exception of N=20 for the medium grain.  This makes sense, as in the correlated data almost all of the src/dest values are within a 10-point spread of each other.  Locking bins of N=20 will then almost always assign the same lock to both dest[idx] and src[idx].  That means we only have to acquire and release one lock instead of two in these cases - over many iterations we'll see a decent performance gain, due to the lower overhead of only having to lock once per round.  
+
+We may be able to attribute the smaller (but still noticeable) speedup in the fine-grained scenario to the same basic idea - it's more likely that src[idx] and dest[idx] will be exactly the same in the correlated case, and so we probably hit more single-lock iterations than in the uncorrelated setup.
