@@ -5,16 +5,15 @@ import numpy
 cimport AVX
 from cython.parallel import prange
 
+@cython.boundscheck(False)
 cdef void counts_to_output(AVX.float8 results, np.uint32_t [:, :] out_counts, int i, int j) nogil:
     cdef:
         float out_vals[8]
         np.uint32_t [:] out_np
         int idx
     AVX.to_mem(results, &(out_vals[0]))
-    with gil:
-        out_np = np.array(out_vals, dtype='uint32')
-        for idx in range(out_np.shape[0]):
-            out_counts[i, j*8 + idx] = out_np[idx]
+    for idx in range(8):
+        out_counts[i, j*8 + idx] = <unsigned int>out_vals[idx]
             
 cdef void print_AVX(AVX.float8 x, int index=7, int include_below = 1) nogil:
     cdef:

@@ -6,11 +6,11 @@ threads = 4: 1074.656613 Million Complex FMAs in 1.43997621536 seconds, 746.3016
 
 Prange rows + AVX:
 
-threads = 1: 1074.656613 Million Complex FMAs in 13.521146059 seconds, 79.4796985631 million Complex FMAs / second
-threads = 2: 1074.656613 Million Complex FMAs in 19.2771539688 seconds, 55.747680116 million Complex FMAs / second
-threads = 4: 1074.656613 Million Complex FMAs in 24.4317700863 seconds, 43.9860316794 million Complex FMAs / second
+threads = 1: 1074.656613 Million Complex FMAs in 0.749855995178 seconds, 1433.15065814 million Complex FMAs / second
+threads = 2: 1074.656613 Million Complex FMAs in 0.383849859238 seconds, 2799.6795808 million Complex FMAs / second
+threads = 4: 1074.656613 Million Complex FMAs in 0.200419902802 seconds, 5362.02541753 million Complex FMAs / second
 
-We see expected speedup with respect to threads in the prange case.
-We see a slowdown from going with just prange to prange+avx for the same number of threads - this could possibly be due to the fact that the work is unbalanced similar to our last assignment in spark. In this case, for every 8 numbers you're running the iterations over the max of each of those 8 numbers. For example if the # of iterations for the 8 numbers was (1,1,1,1,1,1,1,1024), we would require 1024 iterations but only 1031 iterations serially. The overhead from moving the numbers to AVX, doing the bit manipulations, then writing to memory may be causing the additional time.
+We see as increasing threads in the non-AVX case, the speedup is about as expected. Going from no AVX -> AVX was pretty close to 8x speedup but performance decreased as you increased the threads in terms of FMAs/second. Attached plot showing the values vs. limit. You won't get exactly an 8x speedup because the work isn't evenly distributed. For every 8 indices you'll loop through the max iteration over them. In the worst case you could have a 8-tuple of (0,0,0,0,0,0,0,1023) in which case for all 8 of them you'd have to loop through 1024 times - the same as if you did it serially. 
 
-We also see increasing times as threads increase in the AVX implementation - this is rather surprising.
+P3_noAVX - using the 1 thread performance as a benchmark compares threads 2,4 performance vs. thread 1 FMAs/second * N
+P3_AVX - compares no AVX performance * 8 vs. AVX performance for each thread
