@@ -15,6 +15,8 @@ import filtering
 from timer import Timer
 import threading
 
+from or_event import OrEvent
+
 class Row_Handler():
     def __init__(self, row_num, tmpA, tmpB):
         self.i = 0
@@ -26,6 +28,7 @@ class Row_Handler():
 
         # Run when you are ready to go!
         self.row_lock = threading.Lock()
+        self.i_updated = threading.Event()
 
         self.tmpA = tmpA
         self.tmpB = tmpB
@@ -46,9 +49,25 @@ class Row_Handler():
             self.tmpA = potatoB
             self.tmpB = potatoA
 
+            self.i += 1
+
             self.above_handler.row_lock.release()
             self.row_lock.release()
             self.below_handler.release()
+
+            # Give other threads a chance to grab locks and update
+            self.i_updated.set()
+            self.i_updated.clear()
+
+        else:
+            self.wait()
+
+    def wait(self):
+        """Wait until one of your neighbors updates their iteration"""
+        OrEvent(self.above_handler.i_updated, self.below_handler.i_updated).wait()
+        self.go()
+
+
 
 
 
