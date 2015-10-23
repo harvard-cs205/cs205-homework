@@ -16,6 +16,7 @@ from timer import Timer
 import threading
 
 from or_event import OrEvent
+from threadpool import ThreadPool
 
 class Row_Handler():
     def __init__(self, row_num, tmpA, tmpB, num_iterations=10):
@@ -36,7 +37,13 @@ class Row_Handler():
 
 
     def go(self):
-        if (self.i == self.above_handler.i) and (self.i == self.below_handler.i):
+        go_cond_1 = True
+        if self.above_handler is not None:
+            go_cond_1 = (self.i == self.above_handler.i)
+        go_cond_2 = True
+        if self.below_handler is not None:
+            go_cond_2 = (self.i == self.below_handler.i)
+        if go_cond_1 and go_cond_2:
             self.above_handler.row_lock.acquire()
             self.row_lock.acquire()
             self.below_handler.acquire()
@@ -76,19 +83,27 @@ def py_median_3x3(image, iterations=10, num_threads=1):
     tmpB = np.empty_like(tmpA)
 
     # Create all row_handlers
-    handlers = []
-    for cur_row in image.shape[0]:
-        handlers.append(Row_Handler(cur_row, tmpA, tmpB, num_iterations=iterations))
+    handler_list = []
+    for cur_row in range(image.shape[0]):
+        handler_list.append(Row_Handler(cur_row, tmpA, tmpB, num_iterations=iterations))
+
+    # Add neighbors
+    for i in range(len(handler_list)):
+        if i == 0:
+            handler_list[i].below_handler =handler_list[i + 1]
+        elif i == len(handler_list) - 1:
+            handler_list[i]
 
     # The handlers must each be updated ten times...if we had a thread for each handler we would be all set...
     # we can probably subdivide the jobs up.
 
-    for i in range(iterations):
-        filtering.median_3x3(tmpA, tmpB, 0, 1)
-        # swap direction of filtering
-        tmpA, tmpB = tmpB, tmpA
+    pool = ThreadPool(num_threads)
+    for handler in handler_list:
+        pool.add_task(handler.go())
 
-    return tmpA
+    pool.wait_completion()
+
+    return handler_list[0].tmpA
 
 def numpy_median(image, iterations=10):
     ''' filter using numpy '''
