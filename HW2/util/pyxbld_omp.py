@@ -11,12 +11,13 @@ if platform.system() == 'Darwin':
 def make_ext(modname, pyxfilename):
     from distutils.extension import Extension
     return Extension(name=modname,
-                     sources=[pyxfilename],
+                     sources=[pyxfilename],                    
                      extra_compile_args=['-Wno-unused-function',
                                          '-std=gnu99',
                                          '-Ofast',
                                          '-march=native',
                                          '-fopenmp',
                                          '-I{}'.format(np.get_include()),
-                                         '-I.'],
+                                         '-I.',
+                                         '-mavx'],
                      extra_link_args=extra_link_args)
