@@ -28,11 +28,15 @@ def make_coords(center=(-0.575 - 0.575j),
 if __name__ == '__main__':
     in_coords, out_counts = make_coords()
 
-    with Timer() as t:
-        mandelbrot.mandelbrot(in_coords, out_counts, 1024)
-    seconds = t.interval
+    """in_coords = np.asarray([0.2 + 0.5j, 0.2 + 0.5j, 0.2 + 0.5j, 0.2 + 0.5j, 0.2 + 0.5j, 0.2 + 0.5j, 0.2 + 0.5j, 0.2 + 0.5j]).astype(np.complex64).reshape(1,8)
+    out_counts = np.zeros_like(in_coords, dtype=np.uint32)
+    print in_coords.shape"""
+    for threads in [1, 2, 4]:
+        with Timer() as t:
+            mandelbrot.mandelbrot(in_coords, out_counts, threads, 1024)
+        seconds = t.interval
 
-    print("{} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
-
-    plt.imshow(np.log(out_counts))
-    plt.show()
+        print("{} threads: {} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(threads, out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
+        #print out_counts[19:20, 12:20], out_counts[2000:2001, 2000:2008], out_counts[3500:3501, 3500:3508]
+        plt.imshow(np.log(out_counts))
+        plt.show()

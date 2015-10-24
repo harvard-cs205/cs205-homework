@@ -1,0 +1,4 @@
+Without instruction-level parallelism, performance improves by a factor of ~1.5 every time the number of threads doubles. In one particular run, the results were:
+1 thread: 1074.677197 Million Complex FMAs in 5.29419898987 seconds, 202.991462742 million Complex FMAs / second
+2 threads: 1074.677197 Million Complex FMAs in 3.12350106239 seconds, 344.061735704 million Complex FMAs / second
+4 threads: 1074.677197 Million Complex FMAs in 2.17260909081 seconds, 494.648209633 million Complex FMAs / second
