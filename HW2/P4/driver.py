@@ -66,7 +66,7 @@ if __name__ == '__main__':
     assert np.all(from_cython == from_numpy)
 
     with Timer() as t:
-        new_image = py_median_3x3(input_image, 10, 8)
+        new_image = py_median_3x3(input_image, 10, 4)
 
     pylab.figure()
     pylab.imshow(new_image[1200:1800, 3000:3500])
