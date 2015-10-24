@@ -15,7 +15,7 @@ import filtering
 from timer import Timer
 import threading
 
-def py_median_3x3(image, iterations=10, num_threads=1):
+def py_median_3x3Old(image, iterations=10, num_threads=2):
     ''' repeatedly filter with a 3x3 median '''
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
@@ -27,9 +27,28 @@ def py_median_3x3(image, iterations=10, num_threads=1):
 
     return tmpA
 
+def py_median_3x3(image, iterations=10, num_threads=2):
+    ''' repeatedly filter with a 3x3 median '''
+    tmpA = image.copy()
+    tmpB = np.empty_like(tmpA)
+    
+    for i in range(iterations):
+        threads = []
+        for nt in range(num_threads):
+            threads.append(threading.Thread(target=filtering.median_3x3,args=(tmpA, tmpB, nt, num_threads)))
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+        # swap direction of filtering
+        tmpA, tmpB = tmpB, tmpA
+
+    return tmpA
+
 def numpy_median(image, iterations=10):
     ''' filter using numpy '''
     for i in range(iterations):
+
         padded = np.pad(image, 1, mode='edge')
         stacked = np.dstack((padded[:-2,  :-2], padded[:-2,  1:-1], padded[:-2,  2:],
                              padded[1:-1, :-2], padded[1:-1, 1:-1], padded[1:-1, 2:],
