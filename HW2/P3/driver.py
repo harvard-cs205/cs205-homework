@@ -2,6 +2,8 @@ import sys
 import os.path
 sys.path.append(os.path.join('..', 'util'))
 
+import pstats, cProfile
+
 import set_compiler
 set_compiler.install()
 
@@ -18,25 +20,50 @@ import numpy as np
 # create coordinates, along with output count array
 def make_coords(center=(-0.575 - 0.575j),
                 width=0.0025,
-                count=96):
+                count=4000):
 #count =4000 originally
     x = np.linspace(start=(-width / 2), stop=(width / 2), num=count)
     xx = center + (x + 1j * x[:, np.newaxis]).astype(np.complex64)
-    return xx, np.zeros_like(xx, dtype=np.uint32)
-
+#Used for mandelbrotOld
+    #return xx, np.zeros_like(xx, dtype=np.uint32)
+#Used for mandelBrot2
+    return xx, np.zeros_like(xx, dtype=np.float32)
 
 if __name__ == '__main__':
     in_coords, out_counts = make_coords()
+    
+    in_coordsReal = np.real(in_coords)
+    in_coordsImag = np.imag(in_coords)
     with Timer() as t:
-       mandelbrot.mandelbrot2(in_coords, out_counts, 1024)
+       mandelbrot.mandelbrot2(in_coordsReal,in_coordsImag, out_counts, 1024)
     seconds = t.interval
-    for idx,i in enumerate(out_counts):
-        for idx2,j in enumerate(i):
-            if j==0:
-                print 'index [',idx,'][',idx2,']=0'
-    print("{} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
+    print("Mandelbrot AVX {} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
     plt.imshow(np.log(out_counts))
     plt.show()
+
+
+    # with Timer() as t:
+    #    mandelbrot.mandelbrotOld(in_coords, out_counts, 1024)
+    # seconds = t.interval
+    # print("Serial Mandelbrot{} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
+    # plt.imshow(np.log(out_counts))
+    # plt.show()
+
+    
+    cProfile.runctx("mandelbrot.mandelbrot2(in_coordsReal,in_coordsImag, out_counts, 1024)", globals(), locals(), "Profile.prof")
+    s = pstats.Stats("Profile.prof")
+    s.strip_dirs().sort_stats("time").print_stats()
+
+    # a=np.array([[1,1,1],[1,1,1]])
+    # print 'before a',a
+    # mandelbrot.test3(a)
+    # print 'after a',a
+
+    #t = np.array([1+1j]*10,dtype=np.uint32)
+    # t = np.array([1]*10,dtype=np.uint32)
+    # print 'before t=',t
+    # mandelbrot.test2(t)
+    # print 'after t=',t
 
     # with Timer() as t:
     #     mandelbrot.mandelbrot(in_coords, out_counts, 1024)

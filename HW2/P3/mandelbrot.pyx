@@ -9,35 +9,34 @@ from cython.parallel import prange
 
 cdef np.float64_t magnitude_squared(np.complex64_t z) nogil:
 	return z.real * z.real + z.imag * z.imag
+   
 
-
-
-
-
-
+@cython.nonecheck(False)
 @cython.boundscheck(False)
+@cython.initializedcheck(False)
 @cython.wraparound(False)
-#cpdef mandelbrot2(np.complex64_t[:, :] in_coordsReal,
-#				 np.float32_t[:, :] out_counts,
-#				 int max_iterations=511):
 cpdef mandelbrot2(np.float32_t[:, :] in_coordsReal,
 				 np.float32_t[:,:] in_coordsImag,
 				 np.float32_t[:, :] out_counts,
 				 int max_iterations=511):
+	#np.complex64_t c, z
 	cdef:
 		int i, j, k, iter, si, toWriteValLength, nt = 8,interval=8
-		np.complex64_t c, z
-		AVX.float8 toWrite, mask, creal, cimag, zreal,zrealtmp, zimag,zimagtmp,mag,
+		AVX.float8 toWrite, mask, creal, cimag, zreal,zrealtmp, zimag,zimagtmp,mag,four,maxIter,two,zrealsqr,zimagsqr,oldMask
 		float iszero[8]
 		float toWriteVal[8]
 		float notAnum
 		#np.float32_t toWriteVal[8]
-	assert in_coordsReal.shape[1] % 8 == 0, "Input array must have 8N columns"
-	assert in_coordsReal.shape[0] == out_counts.shape[0], "Input and output arrays must be the same size"
-	assert in_coordsReal.shape[1] == out_counts.shape[1],  "Input and output arrays must be the same size"
+	#assert in_coordsReal.shape[1] % 8 == 0, "Input array must have 8N columns"
+	#assert in_coordsReal.shape[0] == out_counts.shape[0], "Input and output arrays must be the same size"
+	#assert in_coordsReal.shape[1] == out_counts.shape[1],  "Input and output arrays must be the same size"
 	
 	notAnum = float('nan')
 	with nogil:
+		four = AVX.float_to_float8(4.0)
+		maxIter = AVX.float_to_float8(max_iterations)
+		two = AVX.float_to_float8(2.0)
+		
 		for i in xrange(in_coordsReal.shape[0]):
 		#divide total iterations by 8
 			for j in prange(in_coordsReal.shape[1]/8, schedule='static', chunksize=1, num_threads=nt):#for j in xrange(in_coordsReal.shape[1]/8):
@@ -54,60 +53,61 @@ cpdef mandelbrot2(np.float32_t[:, :] in_coordsReal,
 				toWrite = AVX.float_to_float8(max_iterations)
 				zreal = AVX.float_to_float8(0.0)
 				zimag = AVX.float_to_float8(0.0)	
+				oldMask = AVX.float_to_float8(0.0)
 				for iter in xrange(max_iterations):
-				#Compute magnitude
-					mag =AVX.add(AVX.mul(zreal,zreal),AVX.mul(zimag,zimag))
-				#Mask those greater than 4
-					mask = AVX.greater_than(mag,AVX.float_to_float8(4.0))
-				#Save iter to toWrite array for those greater than 4
-					toWrite = AVX.add(AVX.bitwise_and(mask,AVX.float_to_float8(iter)),AVX.sub(toWrite,AVX.bitwise_and(mask,AVX.float_to_float8(max_iterations))))
-					AVX.to_mem(toWrite, &(toWriteVal[0]))	
-				#Get data less than or equal to 4
-					zreal = AVX.bitwise_andnot(mask,zreal)
-					zimag = AVX.bitwise_andnot(mask,zimag)
-					creal = AVX.bitwise_andnot(mask,creal)
-					cimag = AVX.bitwise_andnot(mask,cimag)
-					
-				#IF zreal==[0..0] and zimag==[0..0] and iter != 0 then break	
-					if iter!= 0:
-						AVX.to_mem(AVX.less_than(AVX.float_to_float8(0),zreal), &(iszero[0]))
-						if (iszero[0]!=notAnum and iszero[1]!=notAnum and iszero[2]!=notAnum and iszero[3]!=notAnum and iszero[4]!=notAnum and iszero[5]!=notAnum and iszero[6]!=notAnum and iszero[7]!=notAnum):
-							AVX.to_mem(AVX.greater_than(AVX.float_to_float8(0),zreal), &(iszero[0]))
-							if (iszero[0]!=notAnum and iszero[1]!=notAnum and iszero[2]!=notAnum and iszero[3]!=notAnum and iszero[4]!=notAnum and iszero[5]!=notAnum and iszero[6]!=notAnum and iszero[7]!=notAnum):
-								break
+					#Compute magnitude
+					zrealsqr = AVX.mul(zreal,zreal)
+					zimagsqr = AVX.mul(zimag,zimag)
+					mag =AVX.add(zrealsqr,zimagsqr)
 
-				#Compute z=z*z+c for real/complex parts separately
-					zrealtmp = AVX.add(AVX.sub(AVX.mul(zreal,zreal),AVX.mul(zimag,zimag)),creal)
-					zimagtmp = AVX.add(AVX.mul(AVX.float_to_float8(2.0),AVX.mul(zreal,zimag)),cimag)
-					zreal=zrealtmp
-					zimag=zimagtmp
+					
+					mask = AVX.greater_than(AVX.bitwise_andnot(oldMask,mag),four)
+					oldMask = AVX.bitwise_or(mask,oldMask)
+
+					#Mask those greater than 4
+					#mask = AVX.greater_than(mag,four)
+
+					#Save current iteration count to toWrite array for those greater than 4
+					#We will write toWrite to out_counts later
+					toWrite = AVX.add(AVX.bitwise_and(mask,AVX.float_to_float8(iter)),AVX.sub(toWrite,AVX.bitwise_and(mask,maxIter)))
+
+					
+					#Get data less than or equal to 4 by notting the mask obtained earlier
+					#zreal = AVX.bitwise_andnot(mask,zreal)
+					#zimag = AVX.bitwise_andnot(mask,zimag)
+					#creal = AVX.bitwise_andnot(mask,creal)
+					#cimag = AVX.bitwise_andnot(mask,cimag)
+					
+				
+					#This checks if all greater than 4, but not checking is actually faster!
+					#if iter!= 0:
+					#	AVX.to_mem(AVX.less_than(AVX.float_to_float8(0),zreal), &(iszero[0]))
+					#	if (iszero[0]!=notAnum and iszero[1]!=notAnum and iszero[2]!=notAnum and iszero[3]!=notAnum and iszero[4]!=notAnum and iszero[5]!=notAnum and iszero[6]!=notAnum and iszero[7]!=notAnum):
+					#		AVX.to_mem(AVX.greater_than(AVX.float_to_float8(0),zreal), &(iszero[0]))
+					#		if (iszero[0]!=notAnum and iszero[1]!=notAnum and iszero[2]!=notAnum and iszero[3]!=notAnum and iszero[4]!=notAnum and iszero[5]!=notAnum and iszero[6]!=notAnum and iszero[7]!=notAnum):
+					#			break
+
+					#Compute z=z*z+c for real/complex parts separately
+					zrealtmp = AVX.add(AVX.sub(zrealsqr,zimagsqr),creal)
+					zimagtmp = AVX.fmadd(two,AVX.mul(zreal,zimag),cimag)
+					#zreal = AVX.bitwise_andnot(mask,zrealtmp)
+					#zimag = AVX.bitwise_andnot(mask,zimagtmp)
+					#creal = AVX.bitwise_andnot(mask,creal)
+					#cimag = AVX.bitwise_andnot(mask,cimag)
+
+					#zrealtmp = AVX.add(AVX.sub(AVX.mul(zreal,zreal),AVX.mul(zimag,zimag)),creal)
+					#zimagtmp = AVX.add(AVX.mul(two,AVX.mul(zreal,zimag)),cimag)
+					zreal = zrealtmp
+					zimag = zimagtmp
+					
+				AVX.to_mem(toWrite, &(toWriteVal[0]))	
 			#Write the toWrite array to out_counts
+			#Write it backwards because when calling to_mem(a,b), a=[1,2,3] will be written to b as [3,2,1]
 				for k in xrange(interval-1,-1,-1):
 					out_counts[i,si+interval-1-k] = toWriteVal[k]
 
-	
-#cdef inline int checkZero(float [:]iszero):
-#	return np.count_nonzero(iszero)
 
-#cpdef test3(np.uint32_t [:,:]c):
-#	cdef np.uint32_t [:] n
-#	n = np.array([99,99])
-#	c[1,0:2]=n#
 
-#cpdef test2(np.uint32_t[:] out_counts):
-#	cdef:
-#		int idx,i,a
-#		AVX.float8 b
-#		np.float32_t toWriteVal[8]
-#	with nogil:
-#		#a = toWriteVal.shape[0]
-#		for i in range(out_counts.shape[0]-1,0,-1):
-#			if i==4:
-#				break
-#			with gil:
-#				out_counts[i] = np.log(99)
-#		b = AVX.float_to_float8(1)
-			
 
 # An example using AVX instructions
 #cpdef test(np.complex64_t[:, :] values):
