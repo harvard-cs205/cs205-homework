@@ -1,0 +1,57 @@
+The time cost for each kind of locks
+
+uncorrelated:
+Serial uncorrelated: 0.248707056046 seconds
+Fine grained uncorrelated: 3.11893010139 seconds
+
+Test of different N
+N=1: Medium grained uncorrelated: 3.85906195641 seconds
+N=2: Medium grained uncorrelated: 3.88029098511 seconds
+N=3: Medium grained uncorrelated: 4.01839804649 seconds
+N=4: Medium grained uncorrelated: 4.17053103447 seconds
+N=5: Medium grained uncorrelated: 4.30107188225 seconds
+N=6: Medium grained uncorrelated: 4.45836687088 seconds
+N=7: Medium grained uncorrelated: 4.60945701599 seconds
+N=8: Medium grained uncorrelated: 4.70427918434 seconds
+N=9: Medium grained uncorrelated: 5.10378813744 seconds
+N=10: Medium grained uncorrelated: 5.46179199219 seconds
+N=11: Medium grained uncorrelated: 5.57250285149 seconds
+N=12: Medium grained uncorrelated: 5.65977406502 seconds
+N=13: Medium grained uncorrelated: 5.87058401108 seconds
+N=14: Medium grained uncorrelated: 5.79717206955 seconds
+N=15: Medium grained uncorrelated: 5.80261802673 seconds
+N=16: Medium grained uncorrelated: 5.78598880768 seconds
+N=17: Medium grained uncorrelated: 5.99507689476 seconds
+N=18: Medium grained uncorrelated: 6.03169298172 seconds
+N=19: Medium grained uncorrelated: 6.04190206528 seconds
+N=20: Medium grained uncorrelated: 6.36297917366 seconds
+
+
+correlated:
+Serial correlated: 0.286067962646 seconds
+Fine grained correlated: 3.07231998444 seconds
+
+Test of different N
+1: Medium grained correlated: 3.68328309059 seconds
+2: Medium grained correlated: 3.88002109528 seconds
+3: Medium grained correlated: 3.99223709106 seconds
+4: Medium grained correlated: 4.13937282562 seconds
+5: Medium grained correlated: 4.88273310661 seconds
+6: Medium grained correlated: 4.50365996361 seconds
+7: Medium grained correlated: 4.62043905258 seconds
+8: Medium grained correlated: 4.73243880272 seconds
+9: Medium grained correlated: 4.90554404259 seconds
+10: Medium grained correlated: 4.89908099174 seconds
+11: Medium grained correlated: 5.16300606728 seconds
+12: Medium grained correlated: 5.18326497078 seconds
+13: Medium grained correlated: 5.33823108673 seconds
+14: Medium grained correlated: 5.56587696075 seconds
+15: Medium grained correlated: 5.47097802162 seconds
+16: Medium grained correlated: 5.56202292442 seconds
+17: Medium grained correlated: 5.87076282501 seconds
+18: Medium grained correlated: 5.90089893341 seconds
+19: Medium grained correlated: 5.86296510696 seconds
+20: Medium grained correlated: 5.83240604401 seconds
+
+We can find in general correlated data exchange is a bit faster, and among the three parallel stratigies the serial version is the fastest, and then fine-grained, the medium-grain is the slowest. My experiment of different N for medium-grained shows the smaller N results in faster result. It matches the result that fine-grained is the fastest becasue with smaller N in medium-grained, the lock strategy is more similair to fine-grained, which is faster.
+There is no good value N for medium-grain since the fine-grained is faster. It means in this operation, more locks for each element results in better performance. But the overhead to make thread is still larger than the performance improvement, so the serial version is still the fastest.
