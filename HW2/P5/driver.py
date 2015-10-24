@@ -45,6 +45,7 @@ if __name__ == '__main__':
     # -1 if no object.  We don't worry about overlapping objects, and just
     # store one of them.
     grid_spacing = radius / np.sqrt(2.0)
+    print grid_spacing
     grid_size = int((1.0 / grid_spacing) + 1)
     grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
     grid[(positions[:, 0] / grid_spacing).astype(int),
@@ -67,7 +68,7 @@ if __name__ == '__main__':
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
-                   radius, grid_size, locks_ptr,
+                   radius, grid_spacing, locks_ptr,
                    physics_step)
 
         # udpate our estimate of how fast the simulator runs

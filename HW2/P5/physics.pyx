@@ -128,7 +128,7 @@ cpdef update(FLOAT[:, ::1] XY,
     assert XY.shape[1] == V.shape[1] == 2
 
     cdef int chunksize=100
-    cdef int num_threads = 4
+    cdef int num_threads = 1
 
     cdef int before_xgrid, before_ygrid, after_xgrid, after_ygrid
 
@@ -156,8 +156,9 @@ cpdef update(FLOAT[:, ::1] XY,
         #    scheduling).
         # SUBPROBLEM 2: update the grid values.
         for i in prange(count, num_threads=num_threads, schedule='static', chunksize=chunksize):
-            before_xgrid = <int>(XY[i, 0]/grid_spacing)
-            before_ygrid = <int>(XY[i, 1]/grid_spacing)
+
+            before_xgrid = <int>(XY[i, 0])
+            before_ygrid = <int>(XY[i, 1])
             for dim in range(2):
                 XY[i, dim] += V[i, dim] * t
             # Based on the new position, update the grid...
@@ -167,6 +168,7 @@ cpdef update(FLOAT[:, ::1] XY,
             if (before_xgrid != after_xgrid) or (before_ygrid != after_ygrid):
                 Grid[before_xgrid, before_ygrid] = -1
                 Grid[after_xgrid, after_ygrid] = i
+                printf('wakakakakkakakkaka')
 
 
 def preallocate_locks(num_locks):
