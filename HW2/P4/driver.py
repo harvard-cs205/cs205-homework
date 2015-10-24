@@ -33,6 +33,8 @@ class Worker(threading.Thread):
 
 def py_median_3x3(image, iterations=10, num_threads=1):
     ''' repeatedly filter with a 3x3 median '''
+    print 'Num threads:' , num_threads
+
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
 
@@ -74,16 +76,26 @@ if __name__ == '__main__':
     pylab.title('before - zoom')
 
     # verify correctness
-    from_cython = py_median_3x3(input_image, 2, 5)
+    num_threads_to_use = 4
+
+    print 'Checking solution...'
+    # Check with the appropriate number of threads
+    from_cython = py_median_3x3(input_image, 2, num_threads_to_use)
     from_numpy = numpy_median(input_image, 2)
     assert np.all(from_cython == from_numpy)
+    print 'Check passed! Now running timed code...'
 
-    with Timer() as t:
-        new_image = py_median_3x3(input_image, 10, 8)
+    time_list = []
+    for i in range(10):
+        with Timer() as t:
+            new_image = py_median_3x3(input_image, 10, num_threads_to_use)
+        time_list.append(t.interval)
+
+    time_list = np.array(time_list)
 
     pylab.figure()
     pylab.imshow(new_image[1200:1800, 3000:3500])
     pylab.title('after - zoom')
 
-    print("{} seconds for 10 filter passes.".format(t.interval))
+    print("{} seconds for 10 filter passes averaged over 10 runs.".format(time_list.mean()))
     pylab.show()

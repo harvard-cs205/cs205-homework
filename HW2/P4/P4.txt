@@ -1,0 +1,13 @@
+Let's compare the performance in each scenario.
+
+Num threads: 1
+4.41142241955 seconds for 10 filter passes averaged over 10 runs.
+
+Num threads: 2
+2.53045721054 seconds for 10 filter passes averaged over 10 runs.
+
+Num threads: 3
+2.89352252483 seconds for 10 filter passes averaged over 10 runs.
+
+Num threads: 4
+2.20505132675 seconds for 10 filter passes averaged over 10 runs.
