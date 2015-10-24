@@ -16,6 +16,8 @@ import matplotlib.pyplot as plt
 from animator import Animator
 from physics import update, preallocate_locks
 
+from morton import zenumerate
+
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
@@ -50,6 +52,12 @@ if __name__ == '__main__':
     grid[(positions[:, 0] / grid_spacing).astype(int),
          (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
 
+    # Create a good sorting solution using morton indexing
+    print 'Creating morton index...'
+    sorting_order = list(zenumerate((grid_size, grid_size)))
+    sorting_order = np.array(sorting_order, dtype=np.int)
+    print 'Done!'
+
     # A matplotlib-based animator object
     animator = Animator(positions, radius * 2)
 
@@ -83,3 +91,11 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+            good_order = grid[sorting_order[:, 0], sorting_order[:, 1]]
+            good_order = good_order[good_order != -1]
+
+            # We sort everything based on the good order
+            positions = positions[good_order]
+            velocities = velocities[good_order]
+            # Need to update the grid now...ugh
+
