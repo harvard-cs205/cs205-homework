@@ -31,7 +31,7 @@ def morton_grid(grid_size):
 
 if __name__ == '__main__':
     num_balls, radius = 10000, 0.002
-    # num_balls, radius = 200, 0.08
+    # num_balls, radius = 200, 0.01
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -95,11 +95,22 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+            '''
+            # stack the current pos label with its Morton priority together
+            pos_mrt_dstack = np.dstack((grid, morton_order)).reshape((grid_size*grid_size, 2))
+            # filter out those -1
+            pos_mrt_dstack = filter(lambda x: x[0] != np.iinfo(np.uint32).max, pos_mrt_dstack)
+            # sort by morton order
+            pos_mrt_dstack = np.array(sorted(pos_mrt_dstack, cmp=lambda x, y: x[1] - y[1]))
+            # get the new order of each position
+            new_posindex = pos_mrt_dstack[:, 0]
+            ''' 
+            positions = positions[new_posindex, :]
             new_posindex = morton_order[(positions[:, 0] / grid_spacing).astype(int),
                                         (positions[:, 1] / grid_spacing).astype(int)]
+            
             new_posindex = np.argsort(new_posindex)
-            positions = positions[new_posindex, :]
             velocities = velocities[new_posindex, :]
-
+            
             grid[(positions[:, 0] / grid_spacing).astype(int),
                 (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
