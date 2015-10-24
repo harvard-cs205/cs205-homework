@@ -6,3 +6,10 @@ With one thread, we get roughly 12 fps. With 4 threads, we get roughly
 should speed us up N times. The overhead must be gigantic here; we are likely doing expensive operations
 at inappropriate times as we have not implemented locks. Qualitatively, the behavior of the simulation
 still looks correct, however.
+
+>>Spatial Decomposition
+
+Spatial decomposition *dramatically* increases the FPS of our simulation. With one thread, we get
+about 700 fps, while with four threads we find something like 800-900fps. Adding additional threads
+does not seem to have a gigantic impact, surprisingly. It is not surprising that we see large
+speedups here, as our algorithm changed from O(N^2) to O(N) when N=10^4.

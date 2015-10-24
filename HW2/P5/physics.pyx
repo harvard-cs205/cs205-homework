@@ -74,8 +74,8 @@ cdef void sub_update(FLOAT[:, ::1] XY,
 
     # Get list of all objects within 2 grid squares of you
 
-    cdef int center_xgrid = <UINT>(XY[i, 0]/grid_spacing)
-    cdef int center_ygrid = <UINT>(XY[i, 1]/grid_spacing)
+    cdef int center_xgrid = <int>(XY[i, 0]/grid_spacing)
+    cdef int center_ygrid = <int>(XY[i, 1]/grid_spacing)
 
     cdef int distance_to_check = 2
     cdef int xmax = center_xgrid + distance_to_check
@@ -97,7 +97,7 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     for r in range(balls_to_check.shape[0]):
         for c in range(balls_to_check.shape[1]):
             j = balls_to_check[r, c]
-            if j > i:
+            if j > i: # Only collide with balls with a greater index to avoid double counting
                 XY2 = &(XY[j, 0])
                 V2 = &(V[j, 0])
                 if overlapping(XY1, XY2, R):
@@ -126,8 +126,8 @@ cpdef update(FLOAT[:, ::1] XY,
     assert XY.shape[0] == V.shape[0]
     assert XY.shape[1] == V.shape[1] == 2
 
-    cdef int chunksize=100
-    cdef int num_threads = 1
+    cdef int chunksize=2500
+    cdef int num_threads = 4
 
     cdef int before_xgrid, before_ygrid, after_xgrid, after_ygrid
 
