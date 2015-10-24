@@ -4,7 +4,7 @@ cimport cython
 import numpy
 cimport AVX
 from cython.parallel import prange
-
+from cython.parallel import parallel
 
 cdef np.float64_t magnitude_squared(np.complex64_t z) nogil:
     return z.real * z.real + z.imag * z.imag
@@ -18,6 +18,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
        int i, j, iter
        np.complex64_t c, z
 
+       AVX.float8 coor, z_avx
        # To declare AVX.float8 variables, use:
        # cdef:
        #     AVX.float8 v1, v2, v3
@@ -31,11 +32,29 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     assert in_coords.shape[0] == out_counts.shape[0], "Input and output arrays must be the same size"
     assert in_coords.shape[1] == out_counts.shape[1],  "Input and output arrays must be the same size"
 
-    with nogil:
-        for i in range(in_coords.shape[0]):
-            for j in range(in_coords.shape[1]):
-                c = in_coords[i, j]
-                z = 0
+    with nogil, parallel(num_threads = 1):
+        for i in prange(in_coords.shape[0], schedule='static', chunksize=1):
+            for j in range(in_coords.shape[1]/8):
+
+                # Note that the order of the arguments here is opposite the direction when
+                # we retrieve them into memory.
+                avxval = AVX.make_float8(in_coords[i, j*8+7],
+                                         in_coords[i, j*8+6],
+                                         in_coords[i, j*8+5],
+                                         in_coords[i, j*8+4],
+                                         in_coords[i, j*8+3],
+                                         in_coords[i, j*8+2],
+                                         in_coords[i, j*8+1],
+                                         in_coords[i, j*8])
+
+                z_avx = AVX.make_float8(0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0)
                 for iter in range(max_iterations):
                     if magnitude_squared(z) > 4:
                         break
