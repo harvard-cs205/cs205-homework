@@ -1,0 +1,6 @@
+
+
+without AVX, testing perfomance of mandelbrot with various thread choices:
+with 4 threads, 1.45sec
+with 2 threads, 2.93sec
+with 1 thread, 6.09sec

@@ -54,39 +54,49 @@ cpdef move_data_serial(np.int32_t[:] counts,
                        np.int32_t[:] src,
                        np.int32_t[:] dest,
                        int repeat):
-   cdef:
-       int idx, r
+    cdef:
+        int idx, r
 
-   assert src.size == dest.size, "Sizes of src and dest arrays must match"
-   with nogil:
-       for r in range(repeat):
-           for idx in range(src.shape[0]):
-               if counts[src[idx]] > 0:
-                   counts[dest[idx]] += 1
-                   counts[src[idx]] -= 1
+    assert src.size == dest.size, "Sizes of src and dest arrays must match"
+    with nogil:
+        for r in range(repeat):
+            for idx in range(src.shape[0]):
+                if counts[src[idx]] > 0:
+                    counts[dest[idx]] += 1
+                    counts[src[idx]] -= 1
 
 
 cpdef move_data_fine_grained(np.int32_t[:] counts,
                              np.int32_t[:] src,
                              np.int32_t[:] dest,
                              int repeat):
-   cdef:
-       int idx, r
-       omp_lock_t *locks = get_N_locks(counts.shape[0])
+    cdef:
+        int idx, r, a, b
+        omp_lock_t *locks = get_N_locks(counts.shape[0])
 
-   ##########
-   # Your code here
-   # Use parallel.prange() and a lock for each element of counts to parallelize
-   # data movement.  Be sure to avoid deadlock, and double-locking.
-   ##########
-   with nogil:
-       for r in range(repeat):
-           for idx in range(src.shape[0]):
-               if counts[src[idx]] > 0:
-                   counts[dest[idx]] += 1
-                   counts[src[idx]] -= 1
-
-   free_N_locks(counts.shape[0], locks)
+    ##########
+    # Your code here
+    # Use parallel.prange() and a lock for each element of counts to parallelize
+    # data movement.  Be sure to avoid deadlock, and double-locking.
+    ##########
+    with nogil:
+        for r in range(repeat):
+            for idx in prange(src.shape[0],num_threads=4):
+                #to avoid deadlock, acquire locks in order of index every time
+                a=max([src[idx],dest[idx]])
+                b=min([src[idx],dest[idx]])
+                #if dest[idx]=src[idx],counts remains unchanged, so only do
+                #something if src and dest are different. Prevents double-lock
+                if a!=b: 
+                    #first acquire lock a, then b, where a>b
+                    omp_set_lock(&(locks[a]))
+                    omp_set_lock(&(locks[b]))
+                    if counts[src[idx]] > 0:                    
+                        counts[dest[idx]] += 1
+                        counts[src[idx]] -= 1
+                    omp_unset_lock(&(locks[b]))
+                    omp_unset_lock(&(locks[a]))
+    free_N_locks(counts.shape[0], locks)
 
 
 cpdef move_data_medium_grained(np.int32_t[:] counts,
@@ -94,22 +104,43 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
                                np.int32_t[:] dest,
                                int repeat,
                                int N):
-   cdef:
-       int idx, r
-       int num_locks = (counts.shape[0] + N - 1) / N  # ensure enough locks
-       omp_lock_t *locks = get_N_locks(num_locks)
-
+    cdef:
+        int idx, r, a, b, l1, l2
+        int num_locks = (counts.shape[0] + N - 1) / N  # ensure enough locks
+        omp_lock_t *locks = get_N_locks(num_locks)
    ##########
    # Your code here
    # Use parallel.prange() and a lock for every N adjacent elements of counts
    # to parallelize data movement.  Be sure to avoid deadlock, as well as
    # double-locking.
    ##########
-   with nogil:
-       for r in range(repeat):
-           for idx in range(src.shape[0]):
-               if counts[src[idx]] > 0:
-                   counts[dest[idx]] += 1
-                   counts[src[idx]] -= 1
+    with nogil:
+            for r in range(repeat):
+                for idx in prange(src.shape[0],num_threads=4):
+                    #to avoid deadlock, acquire locks in order of index every time
+                    l1=src[idx]/N
+                    l2=dest[idx]/N
+                    # with gil:
+                    #     print('l1='+str(l1)+' ')
+                    #     print('l2='+str(l2)+' ')
+                    a=max([l1,l2])
+                    b=min([l1,l2])
+                    if a!=b: 
+                        #first acquire lock a, then b, where a>b
+                        omp_set_lock(&(locks[a]))
+                        omp_set_lock(&(locks[b]))
+                        if counts[src[idx]] > 0:                    
+                            counts[dest[idx]] += 1
+                            counts[src[idx]] -= 1
+                        omp_unset_lock(&(locks[b]))
+                        omp_unset_lock(&(locks[a]))
+                    #this time, since each lock covers a range of counts, we can't
+                    #just do nothing when the two locks to be acquired are the same
+                    else: 
+                        omp_set_lock(&(locks[a]))
+                        if counts[src[idx]] > 0:                    
+                            counts[dest[idx]] += 1
+                            counts[src[idx]] -= 1
+                        omp_unset_lock(&(locks[a]))
 
-   free_N_locks(num_locks, locks)
+    free_N_locks(num_locks, locks)
