@@ -11,3 +11,29 @@ Num threads: 3
 
 Num threads: 4
 2.20505132675 seconds for 10 filter passes averaged over 10 runs.
+
+>>Your writeup comparing 1, 2, and 4-way parallel performance, and discussion
+of your implementation choices to control cooperation between threads.
+
+The method I use to control cooperation between threads is relatively straightforwards. If we have N threads, the nth
+thread processes every Nth line starting with n. Within a single
+iteration, each thread can update their assigned rows independently of the other threads, as they take information from
+the input image, act on it, and put the filtered data into the output image. To avoid problems, we must avoid updating
+the input image until each thread has finished transforming data from the input image to the output image. To wait
+until each thread is done using the input image, we simply use thread_n.join() on each thread. Once we have waited for
+each thread to complete, we take the output filtered image and use it as an input for the next iteration. My
+technique does not create any buffers, i.e. I use tmpA and tmpB as is.
+
+See the plots "time_vs_threads.png" and "speedup_vs_threads.png" for a summary of how my parallelization technique
+performed. With 2 and 3 threads, we obtain a speedup of approximately 1.5, and with 4 threads we obtain
+a speedup of approximately 2.0. Adding additional cores does not seem to efficiently speed up our code; naively,
+we expect that N cores will speed up our code by a factor of N. Instead, we are seeing something like N cores gives
+us a speedup of 0.5N. This inefficiency could be created by two effects:
+
+1) Our code to create parallelism comes at a high cost, i.e. python threads require a lot of computational overhead
+2) Different rows take vastly different amounts of time to complete; each thread is not appropriately load balanced
+
+2 seems unlikely as I expect the work per pixel to be roughly the same for a simple median filter. I expect that
+the inefficiency is caused by 1), as python threading is likely much slower than C threading. Instead of
+creating and controlling threads in python, we should simply parallelize the inner loop in cython with prange; I bet
+that would create much more efficient speedups.
