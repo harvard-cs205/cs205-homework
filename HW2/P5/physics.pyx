@@ -6,6 +6,7 @@ from libc.stdint cimport uintptr_t
 cimport cython
 from omp_defs cimport omp_lock_t, get_N_locks, free_N_locks, acquire, release
 from cython.parallel cimport prange
+from libc.stdio cimport printf
 
 # Useful types
 ctypedef np.float32_t FLOAT
@@ -70,18 +71,44 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     ############################################################
     # SUBPROBLEM 2: use the grid values to reduce the number of other
     # objects to check for collisions.
-    for j in range(count):
-        if j != i:
-            XY2 = &(XY[j, 0])
-            V2 = &(V[j, 0])
-            if overlapping(XY1, XY2, R):
-                # SUBPROBLEM 4: Add locking
-                if not moving_apart(XY1, V1, XY2, V2):
-                    collide(XY1, V1, XY2, V2)
 
-                # give a slight impulse to help separate them
-                for dim in range(2):
-                    V2[dim] += eps * (XY2[dim] - XY1[dim])
+    # Get list of all objects within 2 grid squares of you
+
+    cdef int center_xgrid = <UINT>(XY[i, 0]/grid_spacing)
+    cdef int center_ygrid = <UINT>(XY[i, 1]/grid_spacing)
+
+    cdef int distance_to_check = 2
+    cdef int xmax = center_xgrid + distance_to_check
+    if xmax >= Grid.shape[0]:
+        xmax = Grid.shape[0] - 1
+    cdef int xmin = center_xgrid - distance_to_check
+    if xmin < 0:
+        xmin = 0
+    cdef int ymax = center_ygrid + distance_to_check
+    if ymax >= Grid.shape[0]:
+        ymax = Grid.shape[1] - 1
+    cdef int ymin = center_ygrid - distance_to_check
+    if ymin < 0:
+        ymin = 0
+
+    cdef UINT[:, :] balls_to_check = Grid[xmin:xmax, ymin:ymax]
+
+    cdef int r, c
+    for r in range(balls_to_check.shape[0]):
+        for c in range(balls_to_check.shape[1]):
+            j = balls_to_check[r, c]
+            if j > i:
+                printf('%d \t %d \n',i, j)
+                XY2 = &(XY[j, 0])
+                V2 = &(V[j, 0])
+                if overlapping(XY1, XY2, R):
+                    # SUBPROBLEM 4: Add locking
+                    if not moving_apart(XY1, V1, XY2, V2):
+                        collide(XY1, V1, XY2, V2)
+
+                    # give a slight impulse to help separate them
+                    for dim in range(2):
+                        V2[dim] += eps * (XY2[dim] - XY1[dim])
 
 cpdef update(FLOAT[:, ::1] XY,
              FLOAT[:, ::1] V,
