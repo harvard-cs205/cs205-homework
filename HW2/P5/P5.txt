@@ -3,5 +3,6 @@ discuss the reasons for any performance difference.
 
 With one thread, we get roughly 12 fps. With 4 threads, we get roughly
 16 fps. This is a very small speedup; we naively expect that N cores
-should speed us up N times. The overhead must be gigantic here.
-#TODO: Expand on this
+should speed us up N times. The overhead must be gigantic here; we are likely doing expensive operations
+at inappropriate times as we have not implemented locks. Qualitatively, the behavior of the simulation
+still looks correct, however.

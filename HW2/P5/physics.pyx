@@ -102,12 +102,13 @@ cpdef update(FLOAT[:, ::1] XY,
     cdef int chunksize=2500
     cdef int num_threads = 4
 
+    cdef int before_xgrid, before_ygrid, after_xgrid, after_ygrid
+
     with nogil:
         # bounce off of walls
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
-
         for i in prange(count, num_threads=num_threads, schedule='static', chunksize=chunksize):
             for dim in range(2):
                 if (((XY[i, dim] < R) and (V[i, dim] < 0)) or
@@ -127,8 +128,17 @@ cpdef update(FLOAT[:, ::1] XY,
         #    scheduling).
         # SUBPROBLEM 2: update the grid values.
         for i in prange(count, num_threads=num_threads, schedule='static', chunksize=chunksize):
+            before_xgrid = <int>(XY[i, 0]/grid_spacing)
+            before_ygrid = <int>(XY[i, 1]/grid_spacing)
             for dim in range(2):
                 XY[i, dim] += V[i, dim] * t
+            # Based on the new position, update the grid...
+            after_xgrid = <int>(XY[i, 0]/grid_spacing)
+            after_ygrid = <int>(XY[i, 1]/grid_spacing)
+
+            if (before_xgrid != after_xgrid) or (before_ygrid != after_ygrid):
+                Grid[before_xgrid, before_ygrid] = -1
+                Grid[after_xgrid, after_ygrid] = i
 
 
 def preallocate_locks(num_locks):
