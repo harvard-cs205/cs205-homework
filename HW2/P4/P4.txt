@@ -34,6 +34,9 @@ us a speedup of 0.5N. This inefficiency could be created by two effects:
 2) Different rows take vastly different amounts of time to complete; each thread is not appropriately load balanced
 
 2 seems unlikely as I expect the work per pixel to be roughly the same for a simple median filter. I expect that
-the inefficiency is caused by 1), as python threading is likely much slower than C threading. Instead of
-creating and controlling threads in python, we should simply parallelize the inner loop in cython with prange; I bet
+the inefficiency is caused by 1, as python threading is likely much slower than C threading. Instead of
+creating and controlling threads in python, we should simply parallelize the outer loop in cython with prange; I bet
 that would create much more efficient speedups.
+
+Note that the asynchronous filter was extremely hard to program; I took a stab at it and did not successfully
+complete it.
