@@ -98,7 +98,6 @@ cdef void sub_update(FLOAT[:, ::1] XY,
         for c in range(balls_to_check.shape[1]):
             j = balls_to_check[r, c]
             if j > i:
-                printf('%d \t %d \n',i, j)
                 XY2 = &(XY[j, 0])
                 V2 = &(V[j, 0])
                 if overlapping(XY1, XY2, R):
@@ -168,8 +167,6 @@ cpdef update(FLOAT[:, ::1] XY,
             if (before_xgrid != after_xgrid) or (before_ygrid != after_ygrid):
                 Grid[before_xgrid, before_ygrid] = -1
                 Grid[after_xgrid, after_ygrid] = i
-                printf('wakakakakkakakkaka')
-
 
 def preallocate_locks(num_locks):
     cdef omp_lock_t *locks = get_N_locks(num_locks)
