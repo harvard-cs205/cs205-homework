@@ -70,17 +70,18 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     ############################################################
     # SUBPROBLEM 2: use the grid values to reduce the number of other
     # objects to check for collisions.
-    for j in range(i + 1, count):
-        XY2 = &(XY[j, 0])
-        V2 = &(V[j, 0])
-        if overlapping(XY1, XY2, R):
-            # SUBPROBLEM 4: Add locking
-            if not moving_apart(XY1, V1, XY2, V2):
-                collide(XY1, V1, XY2, V2)
+    for j in range(count):
+        if j != i:
+            XY2 = &(XY[j, 0])
+            V2 = &(V[j, 0])
+            if overlapping(XY1, XY2, R):
+                # SUBPROBLEM 4: Add locking
+                if not moving_apart(XY1, V1, XY2, V2):
+                    collide(XY1, V1, XY2, V2)
 
-            # give a slight impulse to help separate them
-            for dim in range(2):
-                V2[dim] += eps * (XY2[dim] - XY1[dim])
+                # give a slight impulse to help separate them
+                for dim in range(2):
+                    V2[dim] += eps * (XY2[dim] - XY1[dim])
 
 cpdef update(FLOAT[:, ::1] XY,
              FLOAT[:, ::1] V,
@@ -90,7 +91,7 @@ cpdef update(FLOAT[:, ::1] XY,
              uintptr_t locks_ptr,
              float t):
     cdef:
-        int count = XY.shape[0]
+        int count = XY.shape[0] # Number of particles
         int i, j, dim
         FLOAT *XY1, *XY2, *V1, *V2
         # SUBPROBLEM 4: uncomment this code.
@@ -99,7 +100,7 @@ cpdef update(FLOAT[:, ::1] XY,
     assert XY.shape[0] == V.shape[0]
     assert XY.shape[1] == V.shape[1] == 2
 
-    cdef int chunksize=2500
+    cdef int chunksize=100
     cdef int num_threads = 4
 
     cdef int before_xgrid, before_ygrid, after_xgrid, after_ygrid
