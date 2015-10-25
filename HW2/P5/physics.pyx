@@ -159,11 +159,31 @@ cpdef update(FLOAT[:, ::1] XY,
         for i in prange(count, num_threads=num_threads, schedule='static', chunksize=chunksize):
             before_xgrid = <int>(XY[i, 0]/grid_spacing)
             before_ygrid = <int>(XY[i, 1]/grid_spacing)
+
+            # Make sure the before values are not out of bounds...
+            if before_xgrid >= Grid.shape[0]:
+                before_xgrid = Grid.shape[0] - 1
+            if before_xgrid < 0:
+                before_xgrid = 0
+            if before_ygrid >= Grid.shape[1]:
+                before_ygrid = Grid.shape[1] - 1
+            if before_ygrid < 0:
+                before_ygrid = 0
+
             for dim in range(2):
                 XY[i, dim] += V[i, dim] * t
             # Based on the new position, update the grid...
             after_xgrid = <int>(XY[i, 0]/grid_spacing)
             after_ygrid = <int>(XY[i, 1]/grid_spacing)
+            # Need to make sure you are not out of bounds
+            if after_xgrid >= Grid.shape[0]:
+                after_xgrid = Grid.shape[0] - 1
+            if after_xgrid < 0:
+                after_xgrid = 0
+            if after_ygrid >= Grid.shape[1]:
+                after_ygrid = Grid.shape[1] - 1
+            if after_ygrid < 0:
+                after_ygrid = 0
 
             if (before_xgrid != after_xgrid) or (before_ygrid != after_ygrid):
 

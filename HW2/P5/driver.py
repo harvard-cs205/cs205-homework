@@ -24,8 +24,8 @@ def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
 if __name__ == '__main__':
-    num_balls = 500
-    radius = 0.01
+    num_balls = 10**4
+    radius = 0.002
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -87,6 +87,8 @@ if __name__ == '__main__':
         total_time += t.interval
 
         frame_count += 1
+
+        ball_indices = np.arange(num_balls)
         if total_time > anim_step:
             animator.update(positions)
             print("{} simulation frames per second".format(frame_count / total_time))
@@ -96,15 +98,18 @@ if __name__ == '__main__':
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
 
-            positions_in_grid = (positions/grid_spacing).astype(np.int)
-            logical_positions = grid_size*positions_in_grid[:, 0] + positions_in_grid[:, 1]
+            # We cannot unravel the grid to sort, as overlapping elements will be missed! We need to sort on position
+            # unfortunately.
+            positions_in_grid = grid.ravel()
+            to_keep = positions_in_grid != UINT32_MAX
+            positions_in_grid = positions_in_grid[positions_in_grid != UINT32_MAX]
+            logical_positions = index_array[to_keep]
+            # Make sure the positions in grid are not outside the grid
             order_fixer = np.argsort(zordered_indices[logical_positions])
 
             # Now index based on the new order
             positions = positions[order_fixer]
-            print len(positions)
             velocities = velocities[order_fixer]
             # Based on the new positions, update the grid
-            #grid[(positions[:, 0] / grid_spacing).astype(int),
-            #     (positions[:, 1] / grid_spacing).astype(int)] = good_order
-
+            ordered_grid_positions = positions_in_grid[order_fixer]
+            grid[ordered_grid_positions/grid_size, ordered_grid_positions % grid_size] = ball_indices
