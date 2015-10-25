@@ -16,12 +16,43 @@ speedups here, as our algorithm changed from O(N^2) to O(N) when N=10^4.
 
 >>Spatially Coherent Sorting
 
-I use Morton ordering, borrowing from a package written by the Lawrence Livermore National Lab
-(see morton.py).
+I use Morton order to sort the positions by utilizing an excellent module written by the Lawrence Livermore National Lab
+(see morton.py). Reading about Morton order on Wikipedia, "Morton order maps multidimensional data
+to one dimension while preserving the locality of the data points." Our strategy is consequently to take
+the 2d position data and sort it based on Morton order; this way, points close in space are close in memory. It is
+slightly confusing to do this. We begin by creating an index matrix, looking something like
+
+[[0, 1, 2],
+ [3, 4, 5],
+ [6, 7, 8]
+ ]
+
+This matrix is analagous to where our particles are located in the grid, i.e. rows can be interpreted as the y axis and
+columns can be interpreted as the x axis. We then sort the grid via morton order, returning
+something like
+
+[[0, 2, 6],
+ [1, 3, 7],
+ [4, 5, 8]
+ ]
+
+This tells us that element 0 in the original matrix should be given a value of 0 when sorting,
+1 in the original matrix has a value of 2, and 2 has a value of 6, etc.
+
+Every iteration, we take the position of the particles, assign them an appropriate morton-ordered value, and then sort
+the resulting 1d array. In other words, our position data looks like
+
+[[x1, y1], --> [Morton ordering value,
+[x2, y2],  --> Morton ordering value,
+[x3, y3]]  --> Morton ordering value]
+
+and we sort the positions based on their morton ordering value. We updated the velocities and grid based on the sorting
+as well.
 
 With one thread, we average about 600fps which is not fantastic relative to the old performance.
 With four threads, we average about 800-900 fps. We do not see any significant speedups due to this
-technique, unfortunately. Perhaps the overhead of sorting is too high.
+technique, unfortunately. Perhaps the overhead of sorting is too high. Perhaps Morton sorting was not an ideal choice
+for this problem.
 
 #TODO: Figure out why this is
 
@@ -32,4 +63,4 @@ four threads, we average about 700 fps. Locking likely slows done the code sligh
 each thread cannot enter the collision code simultaneously for a given particle; if that particle is
 colliding with something else, another thread cannot collide it with another particle. This makes sense
 physically; collisions should be handled individually and should not be interrupted by other threads.
-Locking consequently slightly decreases speed but makes our simulation much more realistic.
+Locking consequently slightly decreases speed but makes our simulation more realistic.
