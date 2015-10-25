@@ -1,6 +1,10 @@
-
-
 without AVX, testing perfomance of mandelbrot with various thread choices:
 with 4 threads, 1.45sec
 with 2 threads, 2.93sec
 with 1 thread, 6.09sec
+
+With AVX,
+1 thread:
+1074.94829 Million Complex FMAs in 1.04734301567 seconds, 1026.35743392 million Complex FMAs / second
+4 threads: 
+1074.94829 Million Complex FMAs in 0.358380079269 seconds, 2999.46440157 million Complex FMAs / second

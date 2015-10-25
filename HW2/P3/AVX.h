@@ -25,6 +25,7 @@ typedef __m256 float8;
 #define sqrt(val)             _mm256_sqrt_ps(val)
 #define mul(a, b)             _mm256_mul_ps((a), (b))
 #define add(a, b)             _mm256_add_ps((a), (b))
+#define sub(a, b)             _mm256_sub_ps((a), (b))
 #define div(a, b)             _mm256_div_ps((a), (b))
 //Bitwise
 #define bitwise_and(a, b)     _mm256_and_ps((a), (b))
