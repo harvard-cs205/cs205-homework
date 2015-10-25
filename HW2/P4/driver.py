@@ -56,7 +56,7 @@ def median_worker(thread_num, iterations, tmpA, tmpB, locks, calc_count, swap_co
             locks[thread_num].notifyAll()
             #print "{}: Calculated {}".format(thread_num, i)
         
-        #can't copy until neighbor threads have calculated to the right iteration
+        #can't swap until neighbor threads have calculated to the right iteration
         #if they haven't been calculated yet, wait on the corresponding locks until notified
         for j in neighbor_threads:
             if j != thread_num:
@@ -73,7 +73,7 @@ def median_worker(thread_num, iterations, tmpA, tmpB, locks, calc_count, swap_co
                 tmpA[j],tmpB[j] = tmpB[j],tmpA[j]
             swap_count[thread_num] +=1
             locks[thread_num].notifyAll()
-            #print "{}: Copied {}".format(thread_num, i)
+            #print "{}: Swapped {}".format(thread_num, i)
 
 def numpy_median(image, iterations=10):
     ''' filter using numpy '''
