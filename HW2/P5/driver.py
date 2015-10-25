@@ -56,7 +56,7 @@ if __name__ == '__main__':
 
     # Create a good sorting solution using morton indexing
     print 'Creating morton index...grid size is' , grid_size
-    index_array = np.arange(grid_size*grid_size)
+    index_array = np.arange(grid_size*grid_size, dtype=np.int)
     index_matrix = index_array.reshape((grid_size, grid_size))
     zorder(index_matrix)
     zordered_indices = index_matrix.ravel()
@@ -95,15 +95,16 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
-            good_order = grid[sorting_order[:, 0], sorting_order[:, 1]]
-            # TODO: Figure out why balls are lost!
-            good_order = good_order[good_order != UINT32_MAX]
 
-            # We sort everything based on the good order
-            positions = positions[good_order]
+            positions_in_grid = (positions/grid_spacing).astype(np.int)
+            logical_positions = grid_size*positions_in_grid[:, 0] + positions_in_grid[:, 1]
+            order_fixer = np.argsort(zordered_indices[logical_positions])
+
+            # Now index based on the new order
+            positions = positions[order_fixer]
             print len(positions)
-            velocities = velocities[good_order]
-            # print good_order
-            grid[(positions[:, 0] / grid_spacing).astype(int),
-                 (positions[:, 1] / grid_spacing).astype(int)] = good_order
+            velocities = velocities[order_fixer]
+            # Based on the new positions, update the grid
+            #grid[(positions[:, 0] / grid_spacing).astype(int),
+            #     (positions[:, 1] / grid_spacing).astype(int)] = good_order
 
