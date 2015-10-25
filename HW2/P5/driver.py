@@ -56,8 +56,10 @@ if __name__ == '__main__':
 
     # Create a good sorting solution using morton indexing
     print 'Creating morton index...grid size is' , grid_size
-    sorting_order = list(zenumerate((grid_size, grid_size)))
-    sorting_order = np.array(sorting_order, dtype=np.int)
+    index_array = np.arange(grid_size*grid_size)
+    index_matrix = index_array.reshape((grid_size, grid_size))
+    zorder(index_matrix)
+    zordered_indices = index_matrix.ravel()
     print 'Done!'
 
     # A matplotlib-based animator object
@@ -101,7 +103,7 @@ if __name__ == '__main__':
             positions = positions[good_order]
             print len(positions)
             velocities = velocities[good_order]
-            grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
+            # print good_order
             grid[(positions[:, 0] / grid_spacing).astype(int),
-                 (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
+                 (positions[:, 1] / grid_spacing).astype(int)] = good_order
 
