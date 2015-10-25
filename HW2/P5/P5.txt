@@ -18,7 +18,8 @@ speedups here, as our algorithm changed from O(N^2) to O(N) when N=10^4.
 
 I use Morton order to sort the positions by utilizing an excellent module written by the Lawrence Livermore National Lab
 (see morton.py). Reading about Morton order on Wikipedia, "Morton order maps multidimensional data
-to one dimension while preserving the locality of the data points." Our strategy is consequently to take
+to one dimension while preserving the locality of the data points." It basically uses a multi-dimensional fractal that
+efficiently maps data from N dimensions to one while preserving data locality in N dimensions. Our strategy is consequently to take
 the 2d position data and sort it based on Morton order; this way, points close in space are close in memory. It is
 slightly confusing to do this. We begin by creating an index matrix, looking something like
 
