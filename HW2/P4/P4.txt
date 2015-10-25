@@ -1,0 +1,14 @@
+The multithreading process is as follows:
+
+Each thread n has their neighbors n-1 and n+1 (wraps around so if n=0 then n-1 is the last thread, vice versa for n+1 in the last thread's case).
+
+There are two stages - calculation of the medians and swapping tmpA/tmpB.
+The calculation stage at iteration i for thread n cannot happen until n's neighbors have copied iteration i-1
+The swapping stage at iteration i for thread n cannot happen until n's neighbors have calculated iteration i-1
+I check these using three lists - condition objects, iteration count for calcs, iteration count for swaps
+When a thread n either calculates or swaps it updates the respective list and does a notifyAll on it's condition object.
+Prior to doing any calculation/swap it checks that the respective neighbor indices in the lists are satisfied, if not it'll wait on the neighbor's condition object.
+
+Note this process should satisfy the extra credit as each thread is only waiting on it's neighbors not any others.
+
+I've included a P4_plot.png to show the calculation time for threads = [1,2,4,8]. 2 threads doesn't have much speedup as the two threads are neighbors so the overhead of waiting/notifying between the two may exceed the parallelized calculation. As the threads increase the speedup is more pronounced.
