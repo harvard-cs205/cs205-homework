@@ -16,14 +16,16 @@ import matplotlib.pyplot as plt
 from animator import Animator
 from physics import update, preallocate_locks
 
-from morton import zenumerate
+from morton import zenumerate, zorder
+
+UINT32_MAX = 4294967295
 
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
 if __name__ == '__main__':
-    num_balls = 10000
-    radius = 0.002
+    num_balls = 500
+    radius = 0.01
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -53,7 +55,7 @@ if __name__ == '__main__':
          (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
 
     # Create a good sorting solution using morton indexing
-    print 'Creating morton index...'
+    print 'Creating morton index...grid size is' , grid_size
     sorting_order = list(zenumerate((grid_size, grid_size)))
     sorting_order = np.array(sorting_order, dtype=np.int)
     print 'Done!'
@@ -92,10 +94,13 @@ if __name__ == '__main__':
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
             good_order = grid[sorting_order[:, 0], sorting_order[:, 1]]
-            good_order = good_order[good_order != -1]
+
+            good_order = good_order[good_order != UINT32_MAX]
 
             # We sort everything based on the good order
             positions = positions[good_order]
             velocities = velocities[good_order]
-            # Need to update the grid now...ugh
+            grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
+            grid[(positions[:, 0] / grid_spacing).astype(int),
+                 (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
 

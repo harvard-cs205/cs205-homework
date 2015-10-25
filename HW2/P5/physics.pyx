@@ -1,4 +1,4 @@
-#cython: boundscheck=False, wraparound=False
+#cython: boundscheck=True, wraparound=False
 
 cimport numpy as np
 from libc.math cimport sqrt
@@ -11,6 +11,8 @@ from libc.stdio cimport printf
 # Useful types
 ctypedef np.float32_t FLOAT
 ctypedef np.uint32_t UINT
+
+cdef int UINT32_MAX = 4294967295
 
 cdef inline int overlapping(FLOAT *x1,
                             FLOAT *x2,
@@ -97,7 +99,7 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     for r in range(balls_to_check.shape[0]):
         for c in range(balls_to_check.shape[1]):
             j = balls_to_check[r, c]
-            if j > i: # Only collide with balls with a greater index to avoid double counting
+            if (j > i) and (j!= UINT32_MAX): # Only collide with balls with a greater index to avoid double counting
                 XY2 = &(XY[j, 0])
                 V2 = &(V[j, 0])
                 if overlapping(XY1, XY2, R):
@@ -165,7 +167,7 @@ cpdef update(FLOAT[:, ::1] XY,
 
             if (before_xgrid != after_xgrid) or (before_ygrid != after_ygrid):
 
-                Grid[before_xgrid, before_ygrid] = -1
+                Grid[before_xgrid, before_ygrid] = UINT32_MAX
                 Grid[after_xgrid, after_ygrid] = i
 
 def preallocate_locks(num_locks):
