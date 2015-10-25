@@ -94,11 +94,12 @@ if __name__ == '__main__':
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
             good_order = grid[sorting_order[:, 0], sorting_order[:, 1]]
-
+            # TODO: Figure out why balls are lost!
             good_order = good_order[good_order != UINT32_MAX]
 
             # We sort everything based on the good order
             positions = positions[good_order]
+            print len(positions)
             velocities = velocities[good_order]
             grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
             grid[(positions[:, 0] / grid_spacing).astype(int),
