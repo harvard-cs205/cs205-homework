@@ -52,7 +52,7 @@ as well.
 With one thread, we average about 600fps which is not fantastic relative to the old performance.
 With four threads, we average about 800-900 fps. We do not see any significant speedups due to this
 technique, unfortunately. Perhaps the overhead of sorting is too high. Perhaps Morton sorting was not an ideal choice
-for this problem.
+for this problem. Regardless, I think it's cool.
 
 #TODO: Figure out why this is
 
