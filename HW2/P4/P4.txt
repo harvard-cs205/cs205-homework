@@ -25,4 +25,6 @@ waiting on it's neighbors not any others.
 I've included a P4_plot.png to show the calculation time for threads = [1,2,4,8]. 
 2 threads doesn't have much speedup as the two threads are neighbors so the overhead
 of waiting/notifying between the two may exceed the parallelized calculation. As 
-the threads increase the speedup is more pronounced.
+the threads increase the speedup is more pronounced. You'll never get the optimal
+speedup though because of the dependency of each thread waiting on its neighbor
+threads finishing the prior iteration
