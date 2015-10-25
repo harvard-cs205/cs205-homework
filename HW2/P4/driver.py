@@ -31,11 +31,14 @@ def py_median_3x3(image, iterations=10, num_threads=1):
 
     #create events
     events=[[threading.Event() for i in range(iterations)] for j in range(num_threads)]
-
+    threads=[]
     for threadidx in range(num_threads):
         th=threading.Thread(target=apply_py_median,args=(tmpA, tmpB, iterations, threadidx,num_threads,events))
+        threads.append(th)
         th.daemon = True # exit even when this thread is alive
         th.start()
+    for threadidx in range(num_threads):
+        threads[threadidx].join()
     return tmpA
 
 def apply_py_median(tmpA, tmpB, iterations, threadidx,num_threads,events):
@@ -45,17 +48,23 @@ def apply_py_median(tmpA, tmpB, iterations, threadidx,num_threads,events):
         if iter > 0: #don't wait for first iteration
             if threadidx > 0: #lower thread edge
                 events[threadidx - 1][iter - 1].wait() 
-            #events[threadidx][iter - 1].wait() #this is probably unnecessary
+            events[threadidx][iter - 1].wait() #this is probably unnecessary
             if threadidx < num_threads - 1: #upper thread edge
                 events[threadidx + 1][iter - 1].wait()
-
+        #print('Thread {}, Iteration {} of {}'.format(threadidx,iter,iterations))
         #do filter
+        tmpB=np.zeros_like(tmpA)
+        print('Before filter: Iter {}, tmpA[10,10]={}, tmpB[10,10]={}'.format(iter,tmpA[300,300],tmpB[300,300]))            
         filtering.median_3x3(tmpA, tmpB, threadidx, num_threads)
-        
+        print('After filter: Iter {}, tmpA[10,10]={}, tmpB[10,10]={}'.format(iter,tmpA[300,300],tmpB[300,300]))            
         # swap direction of filtering, but make sure we only do it for the elements that were just filtered from this thread
-        for i in range(threadidx,tmpA.shape[0],num_threads):
-            tmpA[i,:], tmpB[i,:] = tmpB[i,:], tmpA[i,:]  
-
+        # for i in range(threadidx,tmpA.shape[0],num_threads):
+        #     tmpA[i,:], tmpB[i,:] = tmpB[i,:], tmpA[i,:]
+        #     if i==10:
+                # print('Iter {}, tmpA[10,10]={}'.format(iter,tmpA[10,10]))
+        tmpA = tmpB
+        
+        #print('completed')
         #mark current event as done
         events[threadidx][iter].set()
 
@@ -85,18 +94,19 @@ if __name__ == '__main__':
 
 
     # verify correctness
-    from_cython = py_median_3x3(input_image, 2, 1)
-    from_numpy = numpy_median(input_image, 2)
-    assert np.all(from_cython == from_numpy)
+    # from_cython = py_median_3x3(input_image, 2, 1)
+    # from_numpy = numpy_median(input_image, 2)
+    # assert np.all(from_cython == from_numpy)
     #threads_to_try=[1,2,4,8]
     #for num_threads in threads_to_try:
-    num_threads=8
-    with Timer() as t:
-        new_image = py_median_3x3(input_image, 10, num_threads)
+    num_threads=1
+    for passes in [10]:
+        with Timer() as t:
+            new_image = py_median_3x3(input_image, passes, num_threads)
 
-    #pylab.figure()
-    #pylab.imshow(new_image[1200:1800, 3000:3500])
-    #pylab.title('after - zoom')
+        pylab.figure()
+        pylab.imshow(new_image[1200:1800, 3000:3500])
+        pylab.title('{} passes - zoom'.format(passes))
 
-    print("{} seconds for 10 filter passes and {} threads.".format(t.interval,num_threads))
-    #pylab.show()
+        print("{} seconds for {} filter passes and {} threads.".format(t.interval,passes,num_threads))
+    pylab.show()
