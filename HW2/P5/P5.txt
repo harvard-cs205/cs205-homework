@@ -13,3 +13,16 @@ Spatial decomposition *dramatically* increases the FPS of our simulation. With o
 about 700 fps, while with four threads we find something like 800-900fps. Adding additional threads
 does not seem to have a gigantic impact, surprisingly. It is not surprising that we see large
 speedups here, as our algorithm changed from O(N^2) to O(N) when N=10^4.
+
+>>Spatially Coherent Sorting
+
+I use Morton ordering, borrowing from a package written by the Lawrence Livermore National Lab
+(see morton.py).
+
+With one thread, we average about 600fps which is not fantastic relative to the old performance.
+With four threads, we average about 800-900 fps. We do not see any significant speedups due to this
+technique, unfortunately. Perhaps the overhead of sorting is too high.
+
+#TODO: Figure out why this is
+
+>> Locking
