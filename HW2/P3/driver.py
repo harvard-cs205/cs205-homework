@@ -28,9 +28,6 @@ def make_coords(center=(-0.575 - 0.575j),
 if __name__ == '__main__':
     in_coords, out_counts = make_coords()
 
-    """in_coords = np.asarray([0.2 + 0.5j, 0.2 + 0.5j, 0.2 + 0.5j, 0.2 + 0.5j, 0.2 + 0.5j, 0.2 + 0.5j, 0.2 + 0.5j, 0.2 + 0.5j]).astype(np.complex64).reshape(1,8)
-    out_counts = np.zeros_like(in_coords, dtype=np.uint32)
-    print in_coords.shape"""
     for threads in [1, 2, 4]:
         with Timer() as t:
             mandelbrot.mandelbrot(in_coords, out_counts, threads, 1024)

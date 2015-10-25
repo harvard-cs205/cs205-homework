@@ -2,3 +2,15 @@ Without instruction-level parallelism, performance improves by a factor of ~1.5 
 1 thread: 1074.677197 Million Complex FMAs in 5.29419898987 seconds, 202.991462742 million Complex FMAs / second
 2 threads: 1074.677197 Million Complex FMAs in 3.12350106239 seconds, 344.061735704 million Complex FMAs / second
 4 threads: 1074.677197 Million Complex FMAs in 2.17260909081 seconds, 494.648209633 million Complex FMAs / second
+
+Note: instruction-level parallelism results below were calculated with the modified formula of magnitude^2 >= 4 because the appearance of NaNs foiled attempts to compare magnitude^2 > 4. This should explain the small difference in the number of Complex FMAs performed.
+With instruction-level parallelism, performance improves by a factor of ~1.4 every time the number of threads doubles. In one particular run, the results were:
+1 thread: 1074.94829 Million Complex FMAs in 0.878337144852 seconds, 1223.84473468 million Complex FMAs / second
+2 threads: 1074.94829 Million Complex FMAs in 0.543131113052 seconds, 1979.16905176 million Complex FMAs / second
+4 threads: 1074.94829 Million Complex FMAs in 0.421036958694 seconds, 2553.09722294 million Complex FMAs / second
+
+Interestingly, in both cases, initial runs showed significantly slower results for 4 threads. Without instruction-level parallelism, this occurred once and was not replicable. With instruction-level parallelism, this occurred during the first 3 runs, with a specific instance of: 
+4 threads: 1074.94829 Million Complex FMAs in 2.90435004234 seconds, 370.116643768 million Complex FMAs / second
+I am unsure what would cause such behavior.
+
+With the exception of the unexplained initial behavior, more threads is faster and with instruction-level paralleism is faster by a factor of ~6.
