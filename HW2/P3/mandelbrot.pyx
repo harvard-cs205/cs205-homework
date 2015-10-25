@@ -5,7 +5,6 @@ import numpy
 cimport AVX
 from cython.parallel import prange
 
-@cython.boundscheck(False)
 cdef void counts_to_output(AVX.float8 results, np.uint32_t [:, :] out_counts, int i, int j) nogil:
     cdef:
         float out_vals[8]
