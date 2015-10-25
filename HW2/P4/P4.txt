@@ -1,0 +1,6 @@
+P4 notes
+Timings for various threads. For 4 threads and fewer, speed scales with number of threads. 
+3.98132801056 seconds for 10 filter passes and 1 threads.
+2.02897191048 seconds for 10 filter passes and 2 threads.
+1.21367812157 seconds for 10 filter passes and 4 threads.
+1.04813599586 seconds for 10 filter passes and 8 threads.

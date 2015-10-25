@@ -44,7 +44,4 @@ cpdef median_3x3(FLOAT[:, :] input_image,
                     output_image[i, j] = median9(GETPIX(input_image, i-1, j-1), GETPIX(input_image, i-1, j), GETPIX(input_image, i-1, j+1),
                                                  GETPIX(input_image, i,   j-1), GETPIX(input_image, i,   j), GETPIX(input_image, i,   j+1),
                                                  GETPIX(input_image, i+1, j-1), GETPIX(input_image, i+1, j), GETPIX(input_image, i+1, j+1))
-                    if i==300 and j==300:
-                        with gil:
-                            print('input={}, output={}'.format(input_image[i,j],output_image[i,j]))
             i += step

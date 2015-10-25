@@ -53,16 +53,15 @@ def apply_py_median(tmpA, tmpB, iterations, threadidx,num_threads,events):
                 events[threadidx + 1][iter - 1].wait()
         #print('Thread {}, Iteration {} of {}'.format(threadidx,iter,iterations))
         #do filter
-        tmpB=np.zeros_like(tmpA)
-        print('Before filter: Iter {}, tmpA[10,10]={}, tmpB[10,10]={}'.format(iter,tmpA[300,300],tmpB[300,300]))            
+        #tmpB=np.zeros_like(tmpA)
+        #print('Before filter: Iter {}, tmpA[10,10]={}, tmpB[10,10]={}'.format(iter,tmpA[300,300],tmpB[300,300]))            
         filtering.median_3x3(tmpA, tmpB, threadidx, num_threads)
-        print('After filter: Iter {}, tmpA[10,10]={}, tmpB[10,10]={}'.format(iter,tmpA[300,300],tmpB[300,300]))            
+        #print('After filter: Iter {}, tmpA[10,10]={}, tmpB[10,10]={}'.format(iter,tmpA[300,300],tmpB[300,300]))            
         # swap direction of filtering, but make sure we only do it for the elements that were just filtered from this thread
-        # for i in range(threadidx,tmpA.shape[0],num_threads):
-        #     tmpA[i,:], tmpB[i,:] = tmpB[i,:], tmpA[i,:]
-        #     if i==10:
+        for i in range(threadidx,tmpA.shape[0],num_threads):
+            tmpA[i,:], tmpB[i,:] = tmpB[i,:], tmpA[i,:]
+            #if i==10:
                 # print('Iter {}, tmpA[10,10]={}'.format(iter,tmpA[10,10]))
-        tmpA = tmpB
         
         #print('completed')
         #mark current event as done
@@ -94,13 +93,13 @@ if __name__ == '__main__':
 
 
     # verify correctness
-    # from_cython = py_median_3x3(input_image, 2, 1)
-    # from_numpy = numpy_median(input_image, 2)
-    # assert np.all(from_cython == from_numpy)
-    #threads_to_try=[1,2,4,8]
+    from_cython = py_median_3x3(input_image, 2, 1)
+    from_numpy = numpy_median(input_image, 2)
+    assert np.all(from_cython == from_numpy)
+    threads_to_try=[1,2,4,8]
     #for num_threads in threads_to_try:
-    num_threads=1
-    for passes in [10]:
+    passes=10
+    for num_threads in threads_to_try:
         with Timer() as t:
             new_image = py_median_3x3(input_image, passes, num_threads)
 
