@@ -38,10 +38,10 @@ cpdef median_3x3(FLOAT[:, :] input_image,
     assert input_image.shape[1] == output_image.shape[1], "median requires same size images for input and output"
 
     with nogil:
-        i = offset
+        i = offset#start row
         while i < input_image.shape[0]:
             for j in range(input_image.shape[1]):  # columns
                     output_image[i, j] = median9(GETPIX(input_image, i-1, j-1), GETPIX(input_image, i-1, j), GETPIX(input_image, i-1, j+1),
                                                  GETPIX(input_image, i,   j-1), GETPIX(input_image, i,   j), GETPIX(input_image, i,   j+1),
                                                  GETPIX(input_image, i+1, j-1), GETPIX(input_image, i+1, j), GETPIX(input_image, i+1, j+1))
-            i += step
+            i += step #when threaded, this should be num_threads
