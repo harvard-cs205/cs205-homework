@@ -100,16 +100,18 @@ if __name__ == '__main__':
 
             # We cannot unravel the grid to sort, as overlapping elements will be missed! We need to sort on position
             # unfortunately.
-            positions_in_grid = grid.ravel()
-            to_keep = positions_in_grid != UINT32_MAX
-            positions_in_grid = positions_in_grid[positions_in_grid != UINT32_MAX]
-            logical_positions = index_array[to_keep]
-            # Make sure the positions in grid are not outside the grid
+
+            positions_in_grid = (positions/grid_spacing).astype(np.int)
+            # Adjust the positions in grid, so that you are not actually outside the grid
+            positions_in_grid[positions_in_grid >= grid_size] = grid_size -1
+            positions_in_grid[positions_in_grid < 0] = 0
+            logical_positions = grid_size*positions_in_grid[:, 0] + positions_in_grid[:, 1]
             order_fixer = np.argsort(zordered_indices[logical_positions])
 
             # Now index based on the new order
             positions = positions[order_fixer]
             velocities = velocities[order_fixer]
+
             # Based on the new positions, update the grid
             ordered_grid_positions = positions_in_grid[order_fixer]
-            grid[ordered_grid_positions/grid_size, ordered_grid_positions % grid_size] = ball_indices
+            grid[ordered_grid_positions[:, 0], ordered_grid_positions[:, 1]] = ball_indices
