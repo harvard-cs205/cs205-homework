@@ -59,7 +59,8 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                      float R,
                      int i, int count,
                      UINT[:, ::1] Grid,
-                     float grid_spacing) nogil:
+                     float grid_spacing,
+                     omp_lock_t *locks) nogil:
     cdef:
         FLOAT *XY1, *XY2, *V1, *V2
         int j, dim
@@ -105,7 +106,12 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                 if overlapping(XY1, XY2, R):
                     # SUBPROBLEM 4: Add locking
                     if not moving_apart(XY1, V1, XY2, V2):
+                        # Always acquire the smaller lock first
+                        acquire(&(locks[i]))
+                        acquire(&(locks[j]))
                         collide(XY1, V1, XY2, V2)
+                        release(&(locks[i]))
+                        release(&(locks[j]))
 
                     # give a slight impulse to help separate them
                     for dim in range(2):
@@ -123,12 +129,12 @@ cpdef update(FLOAT[:, ::1] XY,
         int i, j, dim
         FLOAT *XY1, *XY2, *V1, *V2
         # SUBPROBLEM 4: uncomment this code.
-        # omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
+        omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
 
     assert XY.shape[0] == V.shape[0]
     assert XY.shape[1] == V.shape[1] == 2
 
-    cdef int chunksize=2500
+    cdef int chunksize=1000
     cdef int num_threads = 4
 
     cdef int before_xgrid, before_ygrid, after_xgrid, after_ygrid
@@ -149,7 +155,7 @@ cpdef update(FLOAT[:, ::1] XY,
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
         for i in prange(count, num_threads=num_threads, schedule='static', chunksize=chunksize):
-            sub_update(XY, V, R, i, count, Grid, grid_spacing)
+            sub_update(XY, V, R, i, count, Grid, grid_spacing, locks)
 
         # update positions
         #
@@ -186,7 +192,6 @@ cpdef update(FLOAT[:, ::1] XY,
                 after_ygrid = 0
 
             if (before_xgrid != after_xgrid) or (before_ygrid != after_ygrid):
-
                 Grid[before_xgrid, before_ygrid] = UINT32_MAX
                 Grid[after_xgrid, after_ygrid] = i
 

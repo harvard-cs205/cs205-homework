@@ -47,7 +47,7 @@ if __name__ == '__main__':
     #
     # Each square in the grid stores the index of the object in that square, or
     # -1 if no object.  We don't worry about overlapping objects, and just
-    # store one of them.
+    # store one of them. EXCEPT -1 TURNS INTO UINT_MAX...
     grid_spacing = radius / np.sqrt(2.0)
     grid_size = int((1.0 / grid_spacing) + 1)
     grid = - np.ones((grid_size, grid_size), dtype=np.uint32)

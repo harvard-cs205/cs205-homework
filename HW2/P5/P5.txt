@@ -26,3 +26,10 @@ technique, unfortunately. Perhaps the overhead of sorting is too high.
 #TODO: Figure out why this is
 
 >> Locking
+
+With locking, one thread, and our previous improvements we average about 500 fps. With locking and
+four threads, we average about 700 fps. Locking likely slows done the code slightly as
+each thread cannot enter the collision code simultaneously for a given particle; if that particle is
+colliding with something else, another thread cannot collide it with another particle. This makes sense
+physically; collisions should be handled individually and should not be interrupted by other threads.
+Locking consequently slightly decreases speed but makes our simulation much more realistic.
