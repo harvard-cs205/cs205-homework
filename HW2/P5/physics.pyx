@@ -9,7 +9,7 @@ from cython.parallel import parallel, prange
 
 # Useful types
 ctypedef np.float32_t FLOAT
-ctypedef np.uint32_t UINT
+ctypedef np.uint32_t UINT    
 
 cdef inline int overlapping(FLOAT *x1,
                             FLOAT *x2,
@@ -78,9 +78,9 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     
     for j in range(grid_x+1, grid_x+3):
         for k in range(grid_y+1, grid_y+4-(j-grid_x)):
-            if j < grid_size and k < grid_size and Grid[j][k] < count:
-                XY2 = &(XY[Grid[j][k], 0])
-                V2 = &(V[Grid[j][k], 0])
+            if j < grid_size and k < grid_size and Grid[j,k] < count:
+                XY2 = &(XY[Grid[j,k], 0])
+                V2 = &(V[Grid[j,k], 0])
                 if overlapping(XY1, XY2, R):
                     # SUBPROBLEM 4: Add locking
                     if not moving_apart(XY1, V1, XY2, V2):
@@ -140,13 +140,13 @@ cpdef update(FLOAT[:, ::1] XY,
             if XY[i,0]>=0 and XY[i,0]<=1 and XY[i,1]>=0 and XY[i,1]<=1:
                 grid_x = <unsigned int>(XY[i,0]/grid_spacing)
                 grid_y = <unsigned int>(XY[i,1]/grid_spacing)
-                Grid[grid_x][grid_y] = -1
+                Grid[grid_x, grid_y] = -1
             for dim in range(2):
                 XY[i, dim] += V[i, dim] * t
             if XY[i,0]>=0 and XY[i,0]<=1 and XY[i,1]>=0 and XY[i,1]<=1:
                 grid_x = <unsigned int>(XY[i,0]/grid_spacing)
                 grid_y = <unsigned int>(XY[i,1]/grid_spacing)
-                Grid[grid_x][grid_y] = i
+                Grid[grid_x, grid_y] = i
 
 
 def preallocate_locks(num_locks):
