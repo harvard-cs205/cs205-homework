@@ -5,6 +5,7 @@ import numpy
 cimport AVX
 from cython.parallel import prange
 
+cimport openmp
 
 cdef np.float64_t magnitude_squared(np.complex64_t z) nogil:
     return z.real * z.real + z.imag * z.imag
@@ -35,7 +36,7 @@ cpdef mandelbrot_avx(np.complex64_t [:, :] in_coords,
     cdef AVX.float8 z_r
     cdef AVX.float8 z_i
 
-    cdef AVX.float z_r_temp1, z_r_temp2, z_r_temp3, z_i_temp
+    cdef AVX.float8 z_r_temp1, z_r_temp2, z_r_temp3, z_i_temp1
 
     print "size of r_coords",r_coords.size
     print "size of i_coords",i_coords.size
