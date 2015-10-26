@@ -1,6 +1,6 @@
 cimport numpy as np
-cimport cython
 import numpy
+cimport cython
 cimport AVX
 from cython.parallel import prange
 
@@ -10,33 +10,78 @@ cdef np.float64_t magnitude_squared(np.complex64_t z) nogil:
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
+
+cdef void print_complex_AVX(AVX.float8 real,
+                             AVX.float8 imag) nogil:
+    cdef:
+        float real_parts[8]
+        float imag_parts[8]
+        int i
+
+    AVX.to_mem(real, &(real_parts[0]))
+    AVX.to_mem(imag, &(imag_parts[0]))
+    with gil:
+        for i in range(8):
+            print("    {}: {}, {}".format(i, real_parts[i], imag_parts[i]))
+
+cdef void counts_to_output(AVX.float8 counts, np.uint32_t [:, :] out_counts,
+                  int i, int j, int max_iterations) nogil:
+  cdef:
+    float tmp_counts[8]
+    int k
+
+  AVX.to_mem(counts, &(tmp_counts[0]))
+
+  for k in range(8):
+    out_counts[i, j+k] = <np.uint32_t> tmp_counts[k]
+
 cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                  np.uint32_t [:, :] out_counts,
                  int max_iterations=511):
-    cdef:
-       int i, j, iter
-       np.complex64_t c, z
 
-       # To declare AVX.float8 variables, use:
-       # cdef:
-       #     AVX.float8 v1, v2, v3
-       #
-       # And then, for example, to multiply them
-       #     v3 = AVX.mul(v1, v2)
-       #
-       # You may find the numpy.real() and numpy.imag() fuctions helpful.
+    cdef:
+       int i, j, k, iter
+       np.float64_t [8] nextr, nexti
+       float [:, :] reals, imags
+       AVX.float8 re, im, mag_sq, mask, z_re, z_im, z_re_new, counts
 
     assert in_coords.shape[1] % 8 == 0, "Input array must have 8N columns"
     assert in_coords.shape[0] == out_counts.shape[0], "Input and output arrays must be the same size"
     assert in_coords.shape[1] == out_counts.shape[1],  "Input and output arrays must be the same size"
 
+    reals = numpy.real(in_coords)
+    imags = numpy.imag(in_coords)
+
     with nogil:
-        for i in range(in_coords.shape[0]):
-            for j in range(in_coords.shape[1]):
-                c = in_coords[i, j]
-                z = 0
-                for iter in range(max_iterations):
-                    if magnitude_squared(z) > 4:
-                        break
-                    z = z * z + c
-                out_counts[i, j] = iter
+      for i in prange(in_coords.shape[0], num_threads=4, schedule='static', chunksize=1):
+        for j in xrange(0, in_coords.shape[1], 8):
+          re = AVX.make_float8(reals[i, j+7],
+            reals[i, j+6],
+            reals[i, j+5], 
+            reals[i, j+4],
+            reals[i, j+3],
+            reals[i, j+2],
+            reals[i, j+1],
+            reals[i, j])
+          im = AVX.make_float8(imags[i, j+7],
+            imags[i, j+6],
+            imags[i, j+5], 
+            imags[i, j+4],
+            imags[i, j+3],
+            imags[i, j+2],
+            imags[i, j+1],
+            imags[i, j])
+
+          z_re = AVX.float_to_float8(0.)
+          z_im = AVX.float_to_float8(0.)
+          counts = AVX.float_to_float8(0.)
+
+          for iter in range(max_iterations):
+            z_re_new = AVX.add(AVX.sub(AVX.mul(z_re, z_re), AVX.mul(z_im, z_im)), re)
+            z_im = AVX.fmadd(AVX.mul(z_re, z_im), AVX.float_to_float8(2.), im)
+            z_re = z_re_new
+            mag_sq = AVX.add(AVX.mul(z_re, z_re), AVX.mul(z_im, z_im))
+            mask = AVX.less_than(mag_sq, AVX.float_to_float8(4.))
+            counts = AVX.add(counts, AVX.bitwise_and(mask, AVX.float_to_float8(1.)))
+
+          counts_to_output(counts, out_counts, i, j, max_iterations)
