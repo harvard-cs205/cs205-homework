@@ -1,0 +1,21 @@
+--- Multithreading ---
+
+For now we just compare the code efficiency when only the rows parallelized with a prange.
+
+1 thread:
+
+1074.656613 Million Complex FMAs in 4.0765440464 seconds, 263.619526925 million Complex FMAs / second
+
+2 threads:
+
+1074.656613 Million Complex FMAs in 2.06194496155 seconds, 521.185886646 million Complex FMAs / second
+
+4 threads:
+
+1074.656613 Million Complex FMAs in 1.10520887375 seconds, 972.356120662 million Complex FMAs / second
+
+Because this problem is embarassingly parallel, multitheading reduces the run time: 2 threads divides the run time by 2, 4 threads divide the run time by 4.
+
+
+
+-- Instruction-level Parallelism --

@@ -12,3 +12,4 @@ import numpy as np
 from mandelbrot import example_sqrt_8
 
 print example_sqrt_8(np.arange(8, dtype=np.float32))
+ 
