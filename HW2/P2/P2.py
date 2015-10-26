@@ -41,7 +41,7 @@ if __name__ == '__main__':
     # grained locking
     ########################################
     N = 10
-    counts[:] = orig_counts
+    counts[:] = orig_counts 
     with Timer() as t:
         move_data_medium_grained(counts, src, dest, 100, N)
     assert counts.sum() == total, "Wrong total after move_data_medium_grained"
