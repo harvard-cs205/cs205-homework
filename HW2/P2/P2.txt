@@ -1,0 +1,41 @@
+General considerations:
+
+The code that is being parallelized has an impact on how the locks need to be applied and, consequently, the runtime implications of different locking mechanisms. In this case, there are no dependencies between the update to counts[dest[idx]] and counts[src[idx]], as they are simply being increased or decreased by 1. For this reason the locks can be applied for each operation in turn, i.e.
+
+acquire(&locks[dest[idx]]) # Acquire lock for index from dest array
+counts[dest[idx]] += 1 # Update value
+release(&locks[dest[idx]]) # Release lock
+
+acquire(&locks[src[idx]]) # Acquire lock for index from src array
+counts[src[idx]] -= 1 # Update value
+release(&locks[src[idx]]) # Release lock
+
+If, instead, there had been dependencies between the two updates (e.g. swapping the values), then both locks would have had to be acquired and then released together. This would have most likely resulted in further increases in runtime as more locks would have been outstanding at any point in time.
+
+Different approaches to parallelizing code:
+
+I tested two versions of the code: one with the prange on the outer loop and another with the prange on the inner loop.  I observed a small but consistent speed-up when applying the prange to the outer loop.  For example:
+
+Outer loop prange:
+Fine grained uncorrelated: 5.99801206589 seconds
+Fine grained correlated: 5.79382395744 seconds
+
+Inner loop prange:
+Fine grained uncorrelated: 6.11928009987 seconds
+Fine grained correlated: 5.95828485489 seconds
+
+A potential reason for the difference is the overhead associated with the two approaches, as the outer loop iterates over range(100), while the inner loop iterates over a much larger range of 1m. As commented by Ray on Piazza, the difference may also be related to cache/memory access patterns, or access to shared resources.
+
+Ultimately, I applied the prange to the inner loop, as per the problem specification.
+
+Comparing results:
+
+- 3 locking scales: Overall, the serial code was significantly faster than both the fine-grained and medium-grained locking, for both random and correlated data exchanges. This is due to the fact that the operations being parallelized are bound by bandwidth, not compute, and so are slowed down by the locking.
+
+- N for medium-grained locking: The medium-grained locking appears to have a slight computational overhead compared to the fine-grained locking (as identifying the correct lock involves a calculation); this shows up in a higher runtime even for N=1.  Generally speaking, the runtime increases as a function of N, as more and more of the elements in counts become unavailable with each lock that is acquired. On this basis, the optimal value of N for medium-grained locking is N=1 (for both random and correlated exchanges), but fine-grained locking is the optimal overall approach.
+
+The graphs P2_random.png and P2_correlated.png show runtimes for values of N between 1 and 20, and confirm the fact that fine-grained locking is the preferred approach for these calculations.
+
+- Random vs correlated exchanges: The code for the correlated exchanges runs consistently faster for both the fine-grained and the medium-grained approaches. This could be due to the fact that there is a relatively high chance of both source and dest pointing to the same index in counts in the correlated case. In this case, the code would end up releasing and then immediately re-acquiring the same lock, as opposed to having to wait for it to be released by another thread.
+
+There also appears to be a higher dispersion in run-times for the random exchanges than the correlated exchanges; this is also visible in the same graphs. This behavior is likely to be due to the same reason, i.e. individual threads in the correlated case are more likely to need the same lock for both src and dest, which would result in them releasing and re-acquiring the same lock without having to wait for other threads.

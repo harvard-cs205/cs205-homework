@@ -14,7 +14,7 @@ def make_ext(modname, pyxfilename):
                      sources=[pyxfilename],
                      extra_compile_args=['-Wno-unused-function',
                                          '-std=gnu99',
-                                         '-Ofast', '-mavx',
+                                         '-Ofast',
                                          '-march=native',
                                          '-fopenmp',
                                          '-I{}'.format(np.get_include()),
