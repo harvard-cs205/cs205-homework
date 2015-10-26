@@ -1,0 +1,24 @@
+# I found the following links extremely useful along with the usual assistance on Piazza:
+https://software.intel.com/en-us/articles/introduction-to-intel-advanced-vector-extensions
+http://nullprogram.com/blog/2015/07/10/
+#I found these when searching the terms: "how to increment float8 using AVX mask" and "Converting complex valued arithmetic operations to AVX intrinsics"
+—————————————————————————————————————————————
+Results without instruction-level parallelism:
+With 1-thread:
+1074.656613 Million Complex FMAs in 4.27125787735 seconds, 251.601903668 million Complex FMAs / second
+
+With 2-threads:
+1074.656613 Million Complex FMAs in 1.99094009399 seconds, 539.773454883 million Complex FMAs / second
+
+With 4-threads:
+1074.656613 Million Complex FMAs in 1.34426903725 seconds, 799.435665945 million Complex FMAs / second
+———————————————————————————————————————————
+Results with instruction-level parallelism:
+With 1-thread:
+1074.94829 Million Complex FMAs in 0.887264966965 seconds, 1211.53018548 million Complex FMAs / second
+
+With 2-threads:
+1074.94829 Million Complex FMAs in 0.438961029053 seconds, 2448.84675143 million Complex FMAs / second
+
+With 4-threads:
+1074.94829 Million Complex FMAs in 0.264523029327 seconds, 4063.72289299 million Complex FMAs / second
