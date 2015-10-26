@@ -26,13 +26,32 @@ def make_coords(center=(-0.575 - 0.575j),
 
 
 if __name__ == '__main__':
+
     in_coords, out_counts = make_coords()
+    # test_coords = in_coords.astype(np.float32)
+
+    # test_coords_in = in_coords
+    # test_coords_out = out_counts
+    #test = mandelbrot.example_sqrt_8(test_coords_in, test_coords_out)
 
     with Timer() as t:
-        mandelbrot.mandelbrot(in_coords, out_counts, 1024)
+        mandelbrot.mandelbrot(in_coords, out_counts)
     seconds = t.interval
 
     print("{} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
 
     plt.imshow(np.log(out_counts))
     plt.show()
+    
+    # print 'test', test
+
+    
+    # with Timer() as t:
+    #     mandelbrot.mandelbrot(in_coords, out_counts, 1024)
+    # seconds = t.interval
+
+
+    # plt.imshow(np.log(out_counts))
+    # plt.show()
+    
+
