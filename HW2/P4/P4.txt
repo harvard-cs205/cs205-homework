@@ -1,0 +1,8 @@
+As seen below, the time drops ~70% of the previous time as the number of threads doubles. Thus performance improves. Below are times for one specific run.
+1 thread: 13.4405992031 seconds for 10 filter passes.
+2 threads: 10.1129519939 seconds for 10 filter passes.
+4 threads: 6.63748192787 seconds for 10 filter passes.
+
+To coordinate threads, I used one event per thread per iteration, for a total of threads*iterations events. I had hoped to use one event per thread, but I could not figure out how to time clear() correctly; clearing at the end of an iteration of the loop worked most of the time but sometimes came too late, messing up the results. Therefore, I used enough events such that I never had to call clear().
+
+I set() the event corresponding to a given thread and iteration as soon as its computation completes. Then, I wait() until all of the events for all of the threads in a given iteration have been set() before proceeding to the next iteration.
