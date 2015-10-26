@@ -1,0 +1,11 @@
+Multithreading:
+
+1074.656613M CFMAs in:
+
+5.98635601997s, 179.517658057M CFMAs/s [1 threads]
+
+2.773416996  s, 387.484685696M CFMAs/s [2 threads]
+
+1.61921191216s, 663.691148103M CFMAs/s [4 threads]
+
+For each doubling of the thread count, we see about a 50% reduction in processing time (not quite 50%, but close).
