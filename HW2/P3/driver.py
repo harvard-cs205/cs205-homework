@@ -27,12 +27,35 @@ def make_coords(center=(-0.575 - 0.575j),
 
 if __name__ == '__main__':
     in_coords, out_counts = make_coords()
+    # with Timer() as t:
+    #     mandelbrot.mandelbrot_nothread(in_coords, out_counts, 1024)
+    # seconds = t.interval
+
+    # print("{} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
+
+    # with Timer() as t:
+    #     mandelbrot.mandelbrot_thread(in_coords, out_counts, 4, 1024)
+    # seconds = t.interval
+
+    # print("{} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
+
+    # with Timer() as t:
+    #     mandelbrot.mandelbrot(in_coords, out_counts, 2, 1024)
+    # seconds = t.interval
+
+    # print("{} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
+
+    # with Timer() as t:
+    #     mandelbrot.mandelbrot(in_coords, out_counts, 4, 1024)
+    # seconds = t.interval
+
+    # print("{} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
 
     with Timer() as t:
-        mandelbrot.mandelbrot(in_coords, out_counts, 1024)
+        mandelbrot.mandelbrot_avx(in_coords, out_counts, 4, 1024)
     seconds = t.interval
 
     print("{} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
 
     plt.imshow(np.log(out_counts))
-    plt.show()
+    #plt.show()
