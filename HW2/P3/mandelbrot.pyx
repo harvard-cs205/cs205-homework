@@ -35,6 +35,7 @@ cpdef mandelbrot_avx(np.complex64_t [:, :] in_coords,
     
     cdef AVX.float8 z_r
     cdef AVX.float8 z_i
+    cdef AVX.float8 z_2
 
     cdef AVX.float8 z_r_temp1, z_r_temp2, z_r_temp3, z_i_temp1
 
@@ -42,7 +43,7 @@ cpdef mandelbrot_avx(np.complex64_t [:, :] in_coords,
     print "size of i_coords",i_coords.size
 
     cdef int avx_range=in_coords.shape[1]/8 #assuming that the shape is divisible by 8 AVX computations
-
+    
     for i in prange(in_coords.shape[0],nogil=True ,num_threads=nthreads, schedule='static', chunksize=1):
         for j in range(avx_range):
             
@@ -54,23 +55,17 @@ cpdef mandelbrot_avx(np.complex64_t [:, :] in_coords,
             
             z_r=AVX.float_to_float8(0.0)
             z_i=AVX.float_to_float8(0.0)
+            z_2=AVX.float_to_float8(2.0)
 
             for iter in range(max_iterations):
                 z_r_temp1=AVX.mul(z_r,z_r)
                 z_r_temp2=AVX.mul(z_i,z_i)
-                z_r_temp3=AVX.add(z_r_temp1,z_r_temp2)
+                z_r_temp3=AVX.sub(z_r_temp1,z_r_temp2)
                 z_r=AVX.add(z_r_temp3,c_real)
 
+                z_i_temp1=AVX.mul(z_r,z_i)
+                z_i=AVX.fmadd(z_i_temp1, z_2, c_imag)
 
-                z_i_temp1=AVX.fmadd(z_r, z_i, c_imag)
-
-
-
-
-            # c_real = make_float8(np.real(in_coords[i,ind1]),np.real(in_coords[i,ind2]),np.real(in_coords[i,ind3]),
-            #     np.real(in_coords[i,ind4]),np.real(in_coords[i,ind5]),np.real(in_coords[i,ind6]))
-            # c_imag = make_float8(np.imag(in_coords[i,ind1]),np.imag(in_coords[i,ind2]),np.imag(in_coords[i,ind3]),
-            #     np.imag(in_coords[i,ind4]),np.imag(in_coords[i,ind5]),np.imag(in_coords[i,ind6]))
             c = in_coords[i, j]
             z = 0
             for iter in range(max_iterations):
