@@ -103,12 +103,13 @@ if __name__ == '__main__':
             #create new array of sorted positions
             positions_new = positions[positions_index]
             velocities_new = velocities[positions_index]
-            #set old positions to 0 on grid
-            grid[(positions[:, 0] / grid_spacing).astype(int),
-                 (positions[:, 1] / grid_spacing).astype(int)] = -1
+            #set old positions to -1 on grid
+            grid[:, :] = -1
             #set new values to positions/velocities
             positions = positions_new
             velocities = velocities_new
             #assign new grid positions
-            grid[(positions[:, 0] / grid_spacing).astype(int),
-                 (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
+            for i in range(num_balls):
+                if positions[i,0]>=0 and positions[i,1]>=0 and positions[i,0]<=1 and positions[i,1]<=1:
+                    grid[(positions[i,0] / grid_spacing).astype(int),
+                         (positions[i,1] / grid_spacing).astype(int)] = i

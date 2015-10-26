@@ -56,7 +56,8 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                      float R,
                      int i, int count,
                      UINT[:, ::1] Grid,
-                     float grid_spacing) nogil:
+                     float grid_spacing,
+                     omp_lock_t *locks) nogil:
     cdef:
         FLOAT *XY1, *XY2, *V1, *V2
         int j, k, dim
@@ -64,6 +65,7 @@ cdef void sub_update(FLOAT[:, ::1] XY,
         float eps = 1e-5
 
     # SUBPROBLEM 4: Add locking
+    acquire(&(locks[i]))
     XY1 = &(XY[i, 0])
     V1 = &(V[i, 0])
     #############################################################
@@ -79,6 +81,7 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     for j in range(grid_x+1, grid_x+3):
         for k in range(grid_y+1, grid_y+4-(j-grid_x)):
             if j < grid_size and k < grid_size and Grid[j,k] < count:
+                acquire(&(locks[Grid[j,k]]))
                 XY2 = &(XY[Grid[j,k], 0])
                 V2 = &(V[Grid[j,k], 0])
                 if overlapping(XY1, XY2, R):
@@ -89,9 +92,9 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                     # give a slight impulse to help separate them
                     for dim in range(2):
                         V2[dim] += eps * (XY2[dim] - XY1[dim])
+                release(&(locks[Grid[j,k]]))
+    release(&(locks[i]))
     
-    
-
 cpdef update(FLOAT[:, ::1] XY,
              FLOAT[:, ::1] V,
              UINT[:, ::1] Grid,
@@ -106,7 +109,7 @@ cpdef update(FLOAT[:, ::1] XY,
         int num_threads = 4
         FLOAT *XY1, *XY2, *V1, *V2
         # SUBPROBLEM 4: uncomment this code.
-        # omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
+        omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
 
     assert XY.shape[0] == V.shape[0]
     assert XY.shape[1] == V.shape[1] == 2
@@ -129,7 +132,7 @@ cpdef update(FLOAT[:, ::1] XY,
         # scheduling.
 
         for i in prange(count, schedule='static', num_threads=num_threads):
-            sub_update(XY, V, R, i, count, Grid, grid_spacing)
+            sub_update(XY, V, R, i, count, Grid, grid_spacing, locks)
         
         # update positions
         #

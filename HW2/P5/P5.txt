@@ -4,4 +4,4 @@ The other loop gives the roughly double speedup that we saw - it's more work tha
 
 Adding the Grid component improved fps dramatically - ~1250 fps for the single thread and 2700 fps for 4 threads.
 Adding the ordering of the positions gave an additional 150 fps to the single thread and 500 fps for 4 threads.
-
+Adding the locking before accessing any positions/velocities reduced the 4 thread fps to 2200, so about a 1000 fps decrease
