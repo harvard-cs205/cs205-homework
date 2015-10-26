@@ -20,17 +20,21 @@ if __name__ == '__main__':
     dest = np.random.randint(1000, size=1000000).astype(np.int32)
 
     total = orig_counts.sum()
+    ##print total, len(orig_counts)
 
     # serial move
     counts = orig_counts.copy()
+    ##print counts.max(), len(counts)
     with Timer() as t:
         move_data_serial(counts, src, dest, 100)
     assert counts.sum() == total, "Wrong total after move_data_serial"
     print("Serial uncorrelated: {} seconds".format(t.interval))
+    ##print counts.sum(), len(counts)
     serial_counts = counts.copy()
 
     # fine grained
     counts[:] = orig_counts
+
     with Timer() as t:
         move_data_fine_grained(counts, src, dest, 100)
     assert counts.sum() == total, "Wrong total after move_data_fine_grained"
