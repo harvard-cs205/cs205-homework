@@ -79,10 +79,10 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
     # Use parallel.prange() and a lock for each element of counts to parallelize
     # data movement.  Be sure to avoid deadlock, and double-locking.
     ##########
-    for r in prange(repeat, nogil=True, num_threads=4):
+    for r in range(repeat):
       # IN HERE EVERYTHING IS PARALLELIZED AND WE MUST BE CAREFUL
       # FOR DEADLOCKS AND DOUBLE LOCKS
-        for idx in range(src.shape[0]):
+        for idx in prange(src.shape[0], nogil=True, num_threads=4):
             if src[idx]<dest[idx]:
                 #THIS PART MAKES SURE THAT IT IS IN ORDER AND AVOIDS
                 #DEADLOCKING
@@ -140,8 +140,8 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
     # to parallelize data movement.  Be sure to avoid deadlock, as well as
     # double-locking.
     ##########
-    for r in prange(repeat, nogil=True, num_threads=4):
-        for idx in range(src.shape[0]):
+    for r in range(repeat):
+        for idx in prange(src.shape[0], nogil=True, num_threads=4):
             src_lk=src[idx]/num_locks
             dest_lk=dest[idx]/num_locks
 
