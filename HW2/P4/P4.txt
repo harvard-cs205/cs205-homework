@@ -1,0 +1,23 @@
+These statistics were produced using the default 10 passes. It appears that using two threads corresponds to a 2x speed increase over one thread, but the increase is not linear for more threads.
+
+# threads              # seconds
+------------------------------------
+1                      3.72529792786
+2                      1.81259489059
+4                      1.68594789505
+
+
+I did the extra credit, as described below.
+
+I used an array events[] of num_threads*num_iterations event variables to control thread cooperation. It has an event for each thread i finishing iteration n, and looks like:
+
+[thr0 iter1, thr0 iter2, ..., thr0 iter k, thr1 iter1, ..., thrN iterK]
+
+Before starting on iteration i, thread n waits for the events corresponding to (thread n-1, iteration i-1) and (thread n+1, iteration i+1) to be true (it doesn’t have to wait for (thread n, iteration i-1) because each thread does its iterations in sequence). After finishing the iteration, it sets the event corresponding to (thread n, iteration i) to true. Thus, thread n only has to wait for threads n-1, n, and n+1 to finish iteration i-1 to start.
+
+Unfortunately, the size of events[] scales with num_iterations*num_threads, but unless the number of threads and/or the number of iterations is very large, this shouldn’t be a problem.
+
+The broader program structure is very simple:
+(1) start threads
+(2) each thread does the specified number of iterations, waiting as needed
+(3) wait for all threads to finish
