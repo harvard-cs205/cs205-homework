@@ -1,0 +1,17 @@
+Multithreading
+thread = 1
+avg: 9.14044702681
+std: 0.373354406061
+threads = 4
+avg: 12.6323963585
+std: 1.73063584529
+
+Spatial decomposition
+thread = 1
+avg: 544.102407698
+std: 65.5169305126
+threads = 4
+avg: 499.49717424
+std: 128.358476809
+
+
