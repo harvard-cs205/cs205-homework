@@ -38,6 +38,7 @@ cdef extern from "AVX.h" nogil:
     float8 bitwise_and(float8, float8) 
     # This version inverts its first argument before the and
     float8 bitwise_andnot(float8 mask, float8 val)
+    float8 bitwise_or(float8, float8) 
     # Helpers:
     #     This extracts the signs of each float into an 8-bit value.
     int signs(float8)

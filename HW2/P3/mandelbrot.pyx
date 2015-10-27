@@ -54,53 +54,39 @@ cpdef mandelbrot2(np.float32_t[:, :] in_coordsReal,
 				zreal = AVX.float_to_float8(0.0)
 				zimag = AVX.float_to_float8(0.0)	
 				oldMask = AVX.float_to_float8(0.0)
+
 				for iter in xrange(max_iterations):
 					#Compute magnitude
 					zrealsqr = AVX.mul(zreal,zreal)
 					zimagsqr = AVX.mul(zimag,zimag)
 					mag =AVX.add(zrealsqr,zimagsqr)
 
-					
 					mask = AVX.greater_than(AVX.bitwise_andnot(oldMask,mag),four)
 					oldMask = AVX.bitwise_or(mask,oldMask)
 
+					#Old version, uncomment this and zreal,zimag,creal,cimag bitwise_andnot below
 					#Mask those greater than 4
 					#mask = AVX.greater_than(mag,four)
 
 					#Save current iteration count to toWrite array for those greater than 4
 					#We will write toWrite to out_counts later
 					toWrite = AVX.add(AVX.bitwise_and(mask,AVX.float_to_float8(iter)),AVX.sub(toWrite,AVX.bitwise_and(mask,maxIter)))
-
-					
-					#Get data less than or equal to 4 by notting the mask obtained earlier
-					#zreal = AVX.bitwise_andnot(mask,zreal)
-					#zimag = AVX.bitwise_andnot(mask,zimag)
-					#creal = AVX.bitwise_andnot(mask,creal)
-					#cimag = AVX.bitwise_andnot(mask,cimag)
-					
-				
-					#This checks if all greater than 4, but not checking is actually faster!
-					#if iter!= 0:
-					#	AVX.to_mem(AVX.less_than(AVX.float_to_float8(0),zreal), &(iszero[0]))
-					#	if (iszero[0]!=notAnum and iszero[1]!=notAnum and iszero[2]!=notAnum and iszero[3]!=notAnum and iszero[4]!=notAnum and iszero[5]!=notAnum and iszero[6]!=notAnum and iszero[7]!=notAnum):
-					#		AVX.to_mem(AVX.greater_than(AVX.float_to_float8(0),zreal), &(iszero[0]))
-					#		if (iszero[0]!=notAnum and iszero[1]!=notAnum and iszero[2]!=notAnum and iszero[3]!=notAnum and iszero[4]!=notAnum and iszero[5]!=notAnum and iszero[6]!=notAnum and iszero[7]!=notAnum):
-					#			break
+		
 
 					#Compute z=z*z+c for real/complex parts separately
 					zrealtmp = AVX.add(AVX.sub(zrealsqr,zimagsqr),creal)
 					zimagtmp = AVX.fmadd(two,AVX.mul(zreal,zimag),cimag)
+					zreal = zrealtmp
+					zimag = zimagtmp
+
+					#Uncomment if using old version
 					#zreal = AVX.bitwise_andnot(mask,zrealtmp)
 					#zimag = AVX.bitwise_andnot(mask,zimagtmp)
 					#creal = AVX.bitwise_andnot(mask,creal)
 					#cimag = AVX.bitwise_andnot(mask,cimag)
-
-					#zrealtmp = AVX.add(AVX.sub(AVX.mul(zreal,zreal),AVX.mul(zimag,zimag)),creal)
-					#zimagtmp = AVX.add(AVX.mul(two,AVX.mul(zreal,zimag)),cimag)
-					zreal = zrealtmp
-					zimag = zimagtmp
 					
 				AVX.to_mem(toWrite, &(toWriteVal[0]))	
+				
 			#Write the toWrite array to out_counts
 			#Write it backwards because when calling to_mem(a,b), a=[1,2,3] will be written to b as [3,2,1]
 				for k in xrange(interval-1,-1,-1):
@@ -108,6 +94,13 @@ cpdef mandelbrot2(np.float32_t[:, :] in_coordsReal,
 
 
 
+#This checks if all greater than 4, but not checking is actually faster!
+#if iter!= 0:
+#	AVX.to_mem(AVX.less_than(AVX.float_to_float8(0),zreal), &(iszero[0]))
+#	if (iszero[0]!=notAnum and iszero[1]!=notAnum and iszero[2]!=notAnum and iszero[3]!=notAnum and iszero[4]!=notAnum and iszero[5]!=notAnum and iszero[6]!=notAnum and iszero[7]!=notAnum):
+#		AVX.to_mem(AVX.greater_than(AVX.float_to_float8(0),zreal), &(iszero[0]))
+#		if (iszero[0]!=notAnum and iszero[1]!=notAnum and iszero[2]!=notAnum and iszero[3]!=notAnum and iszero[4]!=notAnum and iszero[5]!=notAnum and iszero[6]!=notAnum and iszero[7]!=notAnum):
+#			break
 
 # An example using AVX instructions
 #cpdef test(np.complex64_t[:, :] values):

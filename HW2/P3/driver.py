@@ -50,9 +50,9 @@ if __name__ == '__main__':
     # plt.show()
 
     
-    cProfile.runctx("mandelbrot.mandelbrot2(in_coordsReal,in_coordsImag, out_counts, 1024)", globals(), locals(), "Profile.prof")
-    s = pstats.Stats("Profile.prof")
-    s.strip_dirs().sort_stats("time").print_stats()
+    # cProfile.runctx("mandelbrot.mandelbrot2(in_coordsReal,in_coordsImag, out_counts, 1024)", globals(), locals(), "Profile.prof")
+    # s = pstats.Stats("Profile.prof")
+    # s.strip_dirs().sort_stats("time").print_stats()
 
     # a=np.array([[1,1,1],[1,1,1]])
     # print 'before a',a

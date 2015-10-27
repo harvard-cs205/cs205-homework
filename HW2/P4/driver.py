@@ -1,3 +1,4 @@
+#Kevin Qi
 import sys
 import os.path
 sys.path.append(os.path.join('..', 'util'))
@@ -27,7 +28,7 @@ def py_median_3x3Old(image, iterations=10, num_threads=2):
 
     return tmpA
 
-def py_median_3x3(image, iterations=10, num_threads=2):
+def py_median_3x3(image, iterations=10, num_threads=4):
     ''' repeatedly filter with a 3x3 median '''
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
@@ -76,7 +77,7 @@ if __name__ == '__main__':
     assert np.all(from_cython == from_numpy)
 
     with Timer() as t:
-        new_image = py_median_3x3(input_image, 10, 8)
+        new_image = py_median_3x3(input_image, 10, 4)
 
     pylab.figure()
     pylab.imshow(new_image[1200:1800, 3000:3500])

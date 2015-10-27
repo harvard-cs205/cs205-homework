@@ -7,7 +7,7 @@ set_compiler.install()
 
 import pyximport
 pyximport.install()
-
+import pdb
 import numpy as np
 from timer import Timer
 from animator import Animator
@@ -17,8 +17,8 @@ def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
 if __name__ == '__main__':
-    num_balls = 10000
-    radius = 0.002
+    num_balls = 500#10000
+    radius = 0.01#0.002
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -32,7 +32,7 @@ if __name__ == '__main__':
             break
         positions[mask, :] = np.random.uniform(0 + radius, 1 - radius,
                                                (num_close_to_center, 2)).astype(np.float32)
-
+    #pdb.set_trace()
     velocities = np.random.uniform(-0.25, 0.25,
                                    (num_balls, 2)).astype(np.float32)
 
@@ -43,9 +43,10 @@ if __name__ == '__main__':
     # store one of them.
     grid_spacing = radius / np.sqrt(2.0)
     grid_size = int((1.0 / grid_spacing) + 1)
-    grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
-    grid[(positions[:, 0] / grid_spacing).astype(int),
-         (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
+    #grid = -np.ones((grid_size, grid_size),dtype=np.uint32)# dtype=np.uint32
+    #grid = np.negative(np.ones((grid_size, grid_size),dtype=np.uint32))
+    grid = np.negative(np.ones((grid_size, grid_size),dtype=np.int32))
+    grid[(positions[:, 0] / grid_spacing).astype(int), (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
 
     # A matplotlib-based animator object
     animator = Animator(positions, radius * 2)
@@ -60,12 +61,12 @@ if __name__ == '__main__':
     # SUBPROBLEM 4: uncomment the code below.
     # preallocate locks for objects
     locks_ptr = preallocate_locks(num_balls)
-
+    toCheck = np.zeros((12,2),dtype=np.int32)
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
                    radius, grid_size, locks_ptr,
-                   physics_step)
+                   physics_step, grid_spacing,toCheck)
 
         # udpate our estimate of how fast the simulator runs
         physics_step = 0.9 * physics_step + 0.1 * t.interval
@@ -80,3 +81,7 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+
+
+
+
