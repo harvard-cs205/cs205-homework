@@ -1,11 +1,101 @@
-Multithreading:
+No Multithreading:
+1074.657M CFMAs in: 
 
-1074.656613M CFMAs in:
+	5.605 s, 191.730 CFMAs/s
 
-5.98635601997s, 179.517658057M CFMAs/s [1 threads]
 
-2.773416996  s, 387.484685696M CFMAs/s [2 threads]
+Multithreading WITHOUT Instruction-Level:
+1074.657M CFMAs in:
 
-1.61921191216s, 663.691148103M CFMAs/s [4 threads]
+	5.986s, 179.518M CFMAs/s [1 threads]
+
+	2.773s, 387.485M CFMAs/s [2 threads]
+
+	1.619s, 663.691M CFMAs/s [4 threads]
 
 For each doubling of the thread count, we see about a 50% reduction in processing time (not quite 50%, but close).
+
+
+Multithreading WITH Instruction-Level (AVX):
+923.223M CFMAs in: 
+
+	0.723s, 1276.306M CFMAs/s [1 threads] ... 7.12x speedup from non-AVX
+
+	0.344s, 2681.590M CFMAs/s [2 threads] ... 6.93x speedup from non-AVX
+
+	0.237s, 3889.225M CFMAs/s [4 threads] ... 5.88x speedup from non-AVX
+
+Using AVX gives about a 6-7x speed boost.  As the number of threads goes up, we see a slight decrease in speed gains over the non-AVX counterparts - this is expected as overhead increases with more threads (cache overuse, etc).  The number of CFMAs drops a bit too - this was also observed in Piazza @395.  The argument there was that the NaN->Inf adjustment isn't technically the same set of computations...not sure if this is the reason or not, but it's close enough so that I'm not too concerned about the difference.
+
+
+There are two lengthy comments in my mandelbrot.pyx file, I've reprinted them below.  
+The first addresses the Inf->NaN workaround (see Piazza @413). 
+The second addresses operations on complex numbers.
+
+*******
+The way we use lt_eval to check for stopping, as well as to increment, is a little confusing.
+There are lots of ands/andnot shennanigans, mainly due to the Inf->NaN issue noted in Piazza @413.
+Here's an example of what happens:
+
+We arrive at a point where an Inf and a NaN are going to be combined by z1 (real) and z2 (imag):
+Z1:
+	[             nan   1.07974923e+19   7.14108400e+07  -2.52881387e+04
+	  -6.27973572e+02   6.01599789e+00  -3.91640902e+00  -1.02400398e+00]
+
+Z2:
+	[            -inf  -8.63728671e+18   1.70362976e+08   1.69796938e+05
+	   2.76288062e+03  -6.29116859e+01  -2.45457911e+00  -4.54195887e-01]
+
+magnitude_squared:
+	[             nan   1.91188564e+38   3.41230513e+16   2.94704906e+10
+	   8.02786050e+06   3.99407227e+03   2.13632183e+01   1.25487804e+00]
+
+Note that in our magnitude_squared float 8, 
+AVX slots 1 through 6 (zero-indexed) are already above the threshold of 4.  
+Actually, slot 0 is too, as it got to NaN by being really big.
+So we need to keep iterating only on slot 7, and we want to stop counting on the others.
+
+But NaN will always return false, no matter what it's compared to. So we don't want to 
+compare mag_sq > 4, because the NaN should come out as True, but it will return False.
+
+Since it's going to be NaN anyway, we can just flip the comparison to mag_sq < 4. NaN still
+doesn't care what we're comparing to, but at least it gives us the right answer considering it's 
+actualy a big number gone wrong.  With mag_sq < 4, we get this for our float8:
+
+	[  0.   0.   0.   0.   0.   0.   0.  nan] 
+	(0 = false, nan = True)
+
+Now we have the correct comparison results.  NaN here is (weirdly) a synonym for -1, which
+is (equally weirdly) a synonym for True. Fine. When the entire float8 above is 0, we can 
+stop iterating. To see if we need to keep iterating, we can check the signed bits of each 
+slot with andnot(-1). In this case, bitwise_andnot gives 127, which makes sense as the last
+slot is worth 128 (255-128=127). And we can update our count tracker by using and(1), which
+in this case gives the float8 to add to our running count as:
+
+	[ 0.  0.  0.  0.  0.  0.  0.  1.]
+
+Which is what we want.  This is a roundabout way of getting what we want, but it works.
+
+
+*******
+Operations on Complex Numbers:
+
+On each iteration, we want to perform the update:
+
+	z = z * z + c
+
+But we don't have an explicitly-typed complex number to work with.
+Addition and multiplication of complex numbers can be performed using the real-valued
+coefficients: 
+
+	a, b, x, y 
+	for c = a + bi
+		z = x + yi
+
+	Multiplication:
+	c * c = (a + bi)(a + bi)
+		  = (a * a - b * b) + 2(a * b)i
+
+	Addition:
+	z + c = (x + yi) + (a + bi)
+		  = (x + a) + (y + b)i
