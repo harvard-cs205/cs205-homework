@@ -54,41 +54,58 @@ cpdef move_data_serial(np.int32_t[:] counts,
                        np.int32_t[:] src,
                        np.int32_t[:] dest,
                        int repeat):
-   cdef:
-       int idx, r
+    cdef:
+        int idx, r
 
-   assert src.size == dest.size, "Sizes of src and dest arrays must match"
-   with nogil:
-       for r in range(repeat):
-           for idx in range(src.shape[0]):
-               if counts[src[idx]] > 0:
-                   counts[dest[idx]] += 1
-                   counts[src[idx]] -= 1
+    assert src.size == dest.size, "Sizes of src and dest arrays must match"
+    with nogil:
+        for r in range(repeat):
+            for idx in range(src.shape[0]):
+                if counts[src[idx]] > 0:
+                    counts[dest[idx]] += 1
+                    counts[src[idx]] -= 1
 
-
+# Move data in parallel with Fine Grained Locks
 cpdef move_data_fine_grained(np.int32_t[:] counts,
                              np.int32_t[:] src,
                              np.int32_t[:] dest,
                              int repeat):
-   cdef:
-       int idx, r
-       omp_lock_t *locks = get_N_locks(counts.shape[0])
+    cdef:
+        int idx, r
+        omp_lock_t *locks = get_N_locks(counts.shape[0])
 
-   ##########
-   # Your code here
-   # Use parallel.prange() and a lock for each element of counts to parallelize
-   # data movement.  Be sure to avoid deadlock, and double-locking.
-   ##########
-   with nogil:
-       for r in range(repeat):
-           for idx in range(src.shape[0]):
-               if counts[src[idx]] > 0:
-                   counts[dest[idx]] += 1
-                   counts[src[idx]] -= 1
+    ##########
+    # Your code here
+    # Use parallel.prange() and a lock for each element of counts to parallelize
+    # data movement.  Be sure to avoid deadlock, and double-locking.
+    ##########
+    with nogil:
+        for r in prange(repeat):
+            for idx in range(src.shape[0]):
+                if src[idx] < dest[idx]:
+                    acquire(&(locks[src[idx]]))
+                    acquire(&(locks[dest[idx]]))
+                elif src[idx] == dest[idx]:
+                    acquire(&(locks[src[idx]]))
+                else:
+                    acquire(&(locks[dest[idx]]))
+                    acquire(&(locks[src[idx]]))
+                
+                if counts[src[idx]] > 0:
+                    counts[dest[idx]] += 1
+                    counts[src[idx]] -= 1
 
-   free_N_locks(counts.shape[0], locks)
+                if src[idx] == dest[idx]:
+                    release(&(locks[src[idx]]))
+                else:
+                    release(&(locks[dest[idx]]))
+                    release(&(locks[src[idx]]))
+
+    # Destroy the locks at the end
+    free_N_locks(counts.shape[0], locks)
 
 
+# Move data in parallel with Medium Grained Locks
 cpdef move_data_medium_grained(np.int32_t[:] counts,
                                np.int32_t[:] src,
                                np.int32_t[:] dest,

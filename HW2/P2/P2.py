@@ -20,7 +20,8 @@ if __name__ == '__main__':
     dest = np.random.randint(1000, size=1000000).astype(np.int32)
 
     total = orig_counts.sum()
-
+    print "Original Total", total
+    
     # serial move
     counts = orig_counts.copy()
     with Timer() as t:
@@ -33,6 +34,7 @@ if __name__ == '__main__':
     counts[:] = orig_counts
     with Timer() as t:
         move_data_fine_grained(counts, src, dest, 100)
+    print counts.sum()
     assert counts.sum() == total, "Wrong total after move_data_fine_grained"
     print("Fine grained uncorrelated: {} seconds".format(t.interval))
 
@@ -44,6 +46,7 @@ if __name__ == '__main__':
     counts[:] = orig_counts
     with Timer() as t:
         move_data_medium_grained(counts, src, dest, 100, N)
+    print counts.sum()
     assert counts.sum() == total, "Wrong total after move_data_medium_grained"
     print("Medium grained uncorrelated: {} seconds".format(t.interval))
 
