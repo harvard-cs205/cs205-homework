@@ -47,8 +47,6 @@ if __name__ == '__main__':
     # store one of them.
     grid_spacing = radius / np.sqrt(2.0)
     grid_size = int((1.0 / grid_spacing) + 1)
-    #grid = -np.ones((grid_size, grid_size),dtype=np.uint32)# dtype=np.uint32
-    #grid = np.negative(np.ones((grid_size, grid_size),dtype=np.uint32))
     grid = np.negative(np.ones((grid_size, grid_size),dtype=np.int32))
     grid[(positions[:, 0] / grid_spacing).astype(int), (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
 
@@ -63,13 +61,14 @@ if __name__ == '__main__':
     frame_count = 0
 
 
-    
+        
 
     # SUBPROBLEM 4: uncomment the code below.
     # preallocate locks for objects
     #locks_ptr = preallocate_locks(num_balls)
     locks_ptr = 0
     toCheck = np.zeros((12,2),dtype=np.int32)
+
     # cProfile.runctx("update(positions, velocities, grid,\
     #                radius, grid_size, locks_ptr,\
     #                physics_step, grid_spacing,toCheck)", globals(), locals(), "Profile.prof")
@@ -83,7 +82,7 @@ if __name__ == '__main__':
                    physics_step, grid_spacing,toCheck,
                    originalXPos=(positions[:, 0] / grid_spacing).astype(np.int32),
                    originalYPos=(positions[:, 1] / grid_spacing).astype(np.int32),
-                   nt=1)
+                   nt=4)
 
         # udpate our estimate of how fast the simulator runs
         physics_step = 0.9 * physics_step + 0.1 * t.interval
@@ -91,7 +90,15 @@ if __name__ == '__main__':
 
         frame_count += 1
         if total_time > anim_step:
+            #sortedIndices = np.lexsort((positions[:,1],positions[:,0]))
+            sortedIndices = np.argsort(positions[:,0])
+            for idx,i in enumerate(sortedIndices):
+                grid[(positions[i][0]/grid_spacing).astype(int),(positions[i][1]/grid_spacing).astype(int)] = idx
+            positions = positions[sortedIndices]
+            velocities = velocities[sortedIndices]
             animator.update(positions)
+            
+
             print("{} simulation frames per second".format(frame_count / total_time))
             frame_count = 0
             total_time = 0
