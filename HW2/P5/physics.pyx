@@ -1,10 +1,10 @@
-#cython: boundscheck=True, wraparound=False
-
+#cython: boundscheck=False, wraparound=False, initializedcheck=False, cdivision=True
+import numpy as np
 cimport numpy as np
 from libc.math cimport sqrt
 from libc.stdint cimport uintptr_t
 cimport cython
-from omp_defs cimport omp_lock_t, get_N_locks, free_N_locks, acquire, release
+#from omp_defs cimport omp_lock_t, get_N_locks, free_N_locks, acquire, release
 from cython.parallel import prange
 
 # Useful types
@@ -19,6 +19,7 @@ cdef inline int overlapping(FLOAT *x1,
         float dx = x1[0] - x2[0]
         float dy = x1[1] - x2[1]
     return (dx * dx + dy * dy) < (4 * R * R)
+
 
 
 cdef inline int moving_apart(FLOAT *x1, FLOAT *v1,
@@ -67,7 +68,9 @@ cdef void sub_update(FLOAT[:, ::1] XY,
         int i, j, dim, gridx, gridy
         float eps = 1e-5
         INT currentBallInGrid,tmpBallIndex
+        int overlapping2[12][2]
         #np.int32_t [:,:] overlapping #At most 12 balls to check for overlap for each ball
+
     
         
     # SUBPROBLEM 4: Add locking
@@ -83,50 +86,55 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     for i in range(grid_size):
         for j in range(grid_size):
             currentBallInGrid = Grid[i,j]
-            #with gil:
-            #    print 'currentBallInGrid=',currentBallInGrid
+            
             if currentBallInGrid != -1:#True if contains index of ball
                 XY1 = &(XY[currentBallInGrid, 0])
                 V1 = &(V[currentBallInGrid, 0])
             else: 
                 continue
-            #with gil:
-            #    print 'Entering for loop overlapping, overlappint.shape[0]=',overlapping.shape[0]
-#             Suppose plus sign(+) is current index into grid
+            
+#            Suppose plus sign(+) is current index into grid
 #            Then we look at positions marked x, rest are marked %
 #               |% % + x x   
 #               |x x x x x   
 #               |x x x x x   
-            with gil:
-                overlapping[0:2] = np.array([[i,j+1],[i,j+2]]) 
-                overlapping[2:7] = np.array([[i+1,j-2],[i+1,j-1],[i+1,j],[i+1,j+1],[i+1,j+2]])
-                overlapping[7:12] = np.array([[i+2,j-2],[i+2,j-1],[i+2,j],[i+2,j+1],[i+2,j+2]])
-#            overlapping[0,0]=i
-#            overlapping[0,1]=j+1
-#            overlapping[1,0]=i
-#            overlapping[1,1]=j+2
-#            overlapping[2,0]=i+1
-#            overlapping[2,1]=j-2
-#            overlapping[3,0]=i+1
-#            overlapping[3,1]=j-1
-#            overlapping[4,0]=i+1
-#            overlapping[4,1]=j
-#            overlapping[5,0]=i+1
-#            overlapping[5,1]=j+1
-#            overlapping[6,0]=i+1
-#            overlapping[6,1]=j+2
-#            overlapping[7,0]=i+2
-#            overlapping[7,1]=j-2
-#            overlapping[8,0]=i+2
-#            overlapping[8,1]=j-1
-#            overlapping[9,0]=i+2
-#            overlapping[9,1]=j
-#            overlapping[10,0]=i+2
-#            overlapping[10,1]=j+1
-#            overlapping[11,0]=i+2
-#            overlapping[11,1]=j+2
+            overlapping2[0][0] = i
+            overlapping2[0][1] = j+1
+            overlapping2[1][0] = i
+            overlapping2[1][1] = j+2
+            overlapping2[2][0] = i+1
+            overlapping2[2][1] = j-2
+            overlapping2[3][0] = i+1
+            overlapping2[3][1] = j-1
+            overlapping2[4][0] = i+1
+            overlapping2[4][1] = j
+            overlapping2[5][0] = i+1
+            overlapping2[5][1] = j+1
+            overlapping2[6][0] = i+1
+            overlapping2[6][1] = j+2
+            overlapping2[7][0] = i+2
+            overlapping2[7][1] = j-2
+            overlapping2[8][0] = i+2
+            overlapping2[8][1] = j-1
+            overlapping2[9][0] = i+2
+            overlapping2[9][1] = j
+            overlapping2[10][0] = i+2
+            overlapping2[10][1] = j+1
+            overlapping2[11][0] = i+2
+            overlapping2[11][1] = j+2
+            
+#            with gil:
+#                try:
+#                    overlapping[0:2] = np.array([[i,j+2]]) 
+#                    overlapping[2:7] = np.array([[i+1,j-2],[i+1,j-1],[i+1,j],[i+1,j+1],[i+1,j+2]])
+#                    overlapping[7:12] = np.array([[i+2,j-2],[i+2,j-1],[i+2,j],[i+2,j+1],[i+2,j+2]])
+#                except:
+#                    pass
 
-            for i in range(overlapping.shape[0]):
+
+
+            #for i in range(overlapping.shape[0]):
+            for i in range(12):
                 gridx = overlapping[i,0]
                 gridy = overlapping[i,1]
 
@@ -144,17 +152,6 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                         for dim in range(2):
                             V2[dim] += eps * (XY2[dim] - XY1[dim])    
                        
-
-#    for j in range(i + 1, count):
-#        XY2 = &(XY[j, 0])
-#        V2 = &(V[j, 0])
-#        if overlapping(XY1, XY2, R):
-#            # SUBPROBLEM 4: Add locking
-#            if not moving_apart(XY1, V1, XY2, V2):
-#                collide(XY1, V1, XY2, V2)
-#            # give a slight impulse to help separate them
-#            for dim in range(2):
-#                V2[dim] += eps * (XY2[dim] - XY1[dim])
 
 
 
@@ -199,7 +196,8 @@ cpdef update(FLOAT[:, ::1] XY,
              float R,
              int grid_size, 
              uintptr_t locks_ptr,
-             float t, float grid_spacing, INT[:,:] toCheck):
+             float t, float grid_spacing, INT[:,:] toCheck,
+             INT[:] originalXPos,INT[:] originalYPos,int nt):
     cdef:
         int count = XY.shape[0]
         int i, j, dim, roundedPositionX, roundedPositionY
@@ -207,47 +205,39 @@ cpdef update(FLOAT[:, ::1] XY,
         # SUBPROBLEM 4: uncomment this code.
         # omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
 
-    assert XY.shape[0] == V.shape[0]
-    assert XY.shape[1] == V.shape[1] == 2
+    #assert XY.shape[0] == V.shape[0]
+    #assert XY.shape[1] == V.shape[1] == 2
 
     with nogil:
         # bounce off of walls
-        #for i in prange(count, schedule='static', chunksize=count/4,num_threads=4):
-        for i in range(count):
+        for i in prange(count, schedule='static', chunksize=count/4,num_threads=nt):
+        #for i in range(count):
             for dim in range(2):
                 if (((XY[i, dim] < R) and (V[i, dim] < 0)) or
                     ((XY[i, dim] > 1.0 - R) and (V[i, dim] > 0))):
                     V[i, dim] *= -1
-
-
-
         # bounce off of each other
-        #for i in prange(count,schedule='static',chunksize=count/4,num_threads=4):
-        #for i in range(count):
-        #    sub_updateOld(XY, V, R, i, count, Grid, grid_size)
-        
-
-
-
-
         sub_update(XY, V, R, count, Grid, grid_size,toCheck)
 
         # update positions
-        # SUBPROBLEM 2: update the grid values.
-        
-        #for i in prange(count,schedule='static',chunksize=count/4,num_threads=4):
-        for i in range(count):
+        for i in prange(count,schedule='static',chunksize=count/4,num_threads=nt):
+        #for i in range(count):
             for dim in range(2):
                 XY[i, dim] += V[i, dim] * t
-        
-        for i in range(XY.shape[0]):
-            roundedPositionX = int(XY[i,0]/grid_spacing)
-            roundedPositionY = int(XY[i,1]/grid_spacing)
+
+        # SUBPROBLEM 2: update the grid values.
+        #for i in range(count):
+        for i in prange(count,schedule='static',chunksize=count/4,num_threads=nt):
+            Grid[originalXPos[i],originalYPos[i]] = -1
+        #for i in range(count):
+        for i in prange(count,schedule='static',chunksize=count/4,num_threads=nt):
+            roundedPositionX = <int>(XY[i,0]/grid_spacing)
+            roundedPositionY = <int>(XY[i,1]/grid_spacing)
             if roundedPositionX >= 0 and roundedPositionY >= 0 and roundedPositionX < grid_size and roundedPositionY < grid_size:
                 Grid[roundedPositionX,roundedPositionY] = i
-            #Grid[(XY[:, 0] / grid_spacing).astype(int), (XY[:, 1] / grid_spacing).astype(int)] = np.arange(XY.shape[0])
+           
 
-def preallocate_locks(num_locks):
-    cdef omp_lock_t *locks = get_N_locks(num_locks)
-    assert 0 != <uintptr_t> <void *> locks, "could not allocate locks"
-    return <uintptr_t> <void *> locks
+#def preallocate_locks(num_locks):
+#    cdef omp_lock_t *locks = get_N_locks(num_locks)
+#    assert 0 != <uintptr_t> <void *> locks, "could not allocate locks"
+#    return <uintptr_t> <void *> locks

@@ -5,20 +5,24 @@ sys.path.append(os.path.join('..', 'util'))
 import set_compiler
 set_compiler.install()
 
+import pstats, cProfile
+
 import pyximport
 pyximport.install()
 import pdb
 import numpy as np
 from timer import Timer
 from animator import Animator
-from physics import update, preallocate_locks
+from physics import update#, preallocate_locks
 
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
 if __name__ == '__main__':
-    num_balls = 500#10000
-    radius = 0.01#0.002
+    #num_balls = 500
+    num_balls = 10000
+    #radius = 0.01
+    radius = 0.002
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -58,15 +62,28 @@ if __name__ == '__main__':
 
     frame_count = 0
 
+
+    
+
     # SUBPROBLEM 4: uncomment the code below.
     # preallocate locks for objects
-    locks_ptr = preallocate_locks(num_balls)
+    #locks_ptr = preallocate_locks(num_balls)
+    locks_ptr = 0
     toCheck = np.zeros((12,2),dtype=np.int32)
+    # cProfile.runctx("update(positions, velocities, grid,\
+    #                radius, grid_size, locks_ptr,\
+    #                physics_step, grid_spacing,toCheck)", globals(), locals(), "Profile.prof")
+    # s = pstats.Stats("Profile.prof")
+    # s.strip_dirs().sort_stats("time").print_stats()
+
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
                    radius, grid_size, locks_ptr,
-                   physics_step, grid_spacing,toCheck)
+                   physics_step, grid_spacing,toCheck,
+                   originalXPos=(positions[:, 0] / grid_spacing).astype(np.int32),
+                   originalYPos=(positions[:, 1] / grid_spacing).astype(np.int32),
+                   nt=1)
 
         # udpate our estimate of how fast the simulator runs
         physics_step = 0.9 * physics_step + 0.1 * t.interval
