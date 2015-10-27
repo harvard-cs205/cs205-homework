@@ -16,8 +16,16 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                  int max_iterations=511,
                  int num_threads=1):
     cdef:
-       int i, j, iter, nt = num_threads
+       int i, j, l, iteration
+       float k, sum
+       float[8] mask_mem, counts_mem
        np.complex64_t c, z
+       AVX.float8 reals, imags, z_real, z_imag, counts, magnitudes_squared, greater4, mask, current_count
+
+       int nt = num_threads
+       AVX.float8 compare4 = AVX.float_to_float8(4.0)
+       AVX.float8 compare0 = AVX.float_to_float8(0.0)
+
 
        # To declare AVX.float8 variables, use:
        # cdef:
@@ -34,14 +42,68 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
 
     with nogil:
         for i in prange(in_coords.shape[0], num_threads=nt, schedule="static", chunksize=1):
-            for j in range(in_coords.shape[1]):
-                c = in_coords[i, j]
-                z = 0
-                for iter in range(max_iterations):
-                    if magnitude_squared(z) > 4:
+            for j in range(0, in_coords.shape[1], 8):
+                # c = in_coords[i, j]
+                reals = AVX.make_float8(in_coords[i, j].real, in_coords[i, j+1].real, in_coords[i, j+2].real,
+                                        in_coords[i, j+3].real, in_coords[i, j+4].real, in_coords[i, j+5].real,
+                                        in_coords[i, j+6].real, in_coords[i, j+7].real)
+
+                imags = AVX.make_float8(in_coords[i, j].imag, in_coords[i, j+1].imag, in_coords[i, j+2].imag,
+                                        in_coords[i, j+3].imag, in_coords[i, j+4].imag, in_coords[i, j+5].imag,
+                                        in_coords[i, j+6].imag, in_coords[i, j+7].imag)
+                # z = 0
+                z_real = AVX.float_to_float8(0.0)
+                z_imag = AVX.float_to_float8(0.0)
+
+                counts = AVX.float_to_float8(0.0)
+
+                for iteration in range(max_iterations):
+
+                    # if magnitude_squared(z) > 4
+
+                    magnitudes_squared = AVX.mul(z_real, z_real)
+                    magnitudes_squared = AVX.fmadd(z_imag, z_imag, magnitudes_squared)
+
+                    greater4 = AVX.greater_than(magnitudes_squared, compare4)
+
+                    with gil:
+                        print "here now 1"
+
+                    # Mask to add counts to those bigger than magnitude 4 and a 0 count
+                    mask = AVX.bitwise_andnot(AVX.greater_than(counts, compare0), greater4)
+
+                    # Update count
+                    current_count = AVX.float_to_float8(<float> iteration)
+                    counts = AVX.add(AVX.bitwise_and(mask, current_count), counts)
+
+                    # Check if done
+                    sum = 0.0
+                    AVX.to_mem(mask, mask_mem)
+                    for k in mask_mem:
+                        sum = sum + k
+
+                    # Break if done
+                    if sum == -8.0:
                         break
-                    z = z * z + c
-                out_counts[i, j] = iter
+
+                    # z = z * z + c
+                    z_real = AVX.fmadd(z_real, z_real, z_real)
+                    z_real = AVX.fmadd(z_imag, z_imag, z_real)
+                    z_imag = AVX.fmadd(z_imag, z_real, z_imag)
+                    z_imag = AVX.fmadd(z_real, z_imag, z_imag)
+                    z_real = AVX.add(reals, z_real)
+                    z_imag = AVX.add(imags, z_imag)
+
+                # Store result
+                AVX.to_mem(counts, counts_mem)
+                out_counts[i, j] = <np.uint32_t> counts_mem[0]
+                out_counts[i, j+1] = <np.uint32_t> counts_mem[1]
+                out_counts[i, j+2] = <np.uint32_t> counts_mem[2]
+                out_counts[i, j+3] = <np.uint32_t> counts_mem[3]
+                out_counts[i, j+4] = <np.uint32_t> counts_mem[4]
+                out_counts[i, j+5] = <np.uint32_t> counts_mem[5]
+                out_counts[i, j+6] = <np.uint32_t> counts_mem[6]
+                out_counts[i, j+7] = <np.uint32_t> counts_mem[7]
 
 
 

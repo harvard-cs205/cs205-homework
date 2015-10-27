@@ -1,4 +1,4 @@
-from stdlib cimport malloc, free
+from libc.stdlib cimport malloc, free
 
 from openmp cimport omp_lock_t, \
     omp_init_lock, omp_destroy_lock, \

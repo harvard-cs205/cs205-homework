@@ -98,6 +98,7 @@ if __name__ == '__main__':
     uncorrelated_times = []
     correlated_times = []
 
+    # Run uncorrelated a few times
     for N in Ns:
         counts[:] = orig_counts
         with Timer() as t:
@@ -111,6 +112,7 @@ if __name__ == '__main__':
     dest[dest >= 1000] -= 1000
     dest = dest.astype(np.int32)
 
+    # Run correlated a few times
     for N in Ns:
         counts[:] = orig_counts
         with Timer() as t:
@@ -119,6 +121,7 @@ if __name__ == '__main__':
         print("Medium grained correlated: {} seconds".format(t.interval))
         correlated_times += [t.interval]
 
+    # Make graph
     sns.set_style("darkgrid")
     f, ax = plt.subplots(1)
     plt.plot(Ns, uncorrelated_times, label="Uncorrelated")

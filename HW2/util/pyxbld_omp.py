@@ -4,9 +4,9 @@ import os.path
 
 # extra_link_args = ['-fopenmp']
 # # work around problems on OSX with bad linkers
-# if platform.system() == 'Darwin':
-#     if os.path.exists('/usr/local/lib/libiomp5.dylib'):
-#         extra_link_args += ['-L/usr/local/lib', '-liomp5']
+# # if platform.system() == 'Darwin':
+# #     if os.path.exists('/usr/local/lib/libiomp5.dylib'):
+# #         extra_link_args += ['-L/usr/local/lib', '-liomp5']
 #
 #
 # def make_ext(modname, pyxfilename):
@@ -29,9 +29,10 @@ def make_ext(modname, pyxfilename):
                      sources=[pyxfilename],
                      extra_compile_args=['-Wno-unused-function',
                                          '-std=gnu99',
-                                         '-O3',
+                                         '-Ofast',
                                          '-mtune=core2',
                                          '-openmp',
+                                         '-xHost',
                                          '-I{}'.format(np.get_include()),
                                          '-I.'],
-                     extra_link_args=['-xhost', '-L/usr/local/lib', '-liomp5'])
+                     extra_link_args=['-openmp'])
