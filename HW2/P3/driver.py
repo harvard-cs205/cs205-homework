@@ -21,9 +21,9 @@ import numpy as np
 def make_coords(center=(-0.575 - 0.575j),
                 width=0.0025,
                 count=4000):
-#count =4000 originally
     x = np.linspace(start=(-width / 2), stop=(width / 2), num=count)
     xx = center + (x + 1j * x[:, np.newaxis]).astype(np.complex64)
+    #return xx, np.zeros_like(xx, dtype=np.float32)
 #Used for mandelbrotOld
     #return xx, np.zeros_like(xx, dtype=np.uint32)
 #Used for mandelBrot2
@@ -54,23 +54,4 @@ if __name__ == '__main__':
     # s = pstats.Stats("Profile.prof")
     # s.strip_dirs().sort_stats("time").print_stats()
 
-    # a=np.array([[1,1,1],[1,1,1]])
-    # print 'before a',a
-    # mandelbrot.test3(a)
-    # print 'after a',a
 
-    #t = np.array([1+1j]*10,dtype=np.uint32)
-    # t = np.array([1]*10,dtype=np.uint32)
-    # print 'before t=',t
-    # mandelbrot.test2(t)
-    # print 'after t=',t
-
-    # with Timer() as t:
-    #     mandelbrot.mandelbrot(in_coords, out_counts, 1024)
-    # seconds = t.interval
-
-    # print("{} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
-
-    # plt.imshow(np.log(out_counts))
-    # plt.show()
-    
