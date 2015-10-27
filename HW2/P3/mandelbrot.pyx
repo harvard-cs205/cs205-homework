@@ -84,7 +84,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                     iter_count = AVX.float_to_float8(iter)
                     magnitude = AVX.add(AVX.mul(z_real, z_real), AVX.mul(z_imag, z_imag))
                     #get intersection of magnitude > 4 and values that are 0 in results
-                    iter_mask = AVX.bitwise_andnot(AVX.less_than(avx_0, results), AVX.greater_than(magnitude, avx_4))
+                    iter_mask = AVX.bitwise_andnot(AVX.less_than(avx_0, results), AVX.bitwise_andnot(AVX.less_than(magnitude, avx_4), AVX.greater_than(avx_4, avx_0)))
                     #update iter_count to have values where iter_max is 1
                     iter_count = AVX.bitwise_and(iter_count, iter_mask)
                     #update results with iter_count
