@@ -1,0 +1,31 @@
+prange both
+Serial uncorrelated: 0.366847991943 seconds
+Fine grained uncorrelated: 11.4782061577 seconds
+Medium grained uncorrelated: 9.15710091591 seconds
+Serial correlated: 0.374253034592 seconds
+Fine grained correlated: 10.2018518448 seconds
+Medium grained correlated: 8.15717101097 seconds
+
+prange outer
+Serial uncorrelated: 0.349769830704 seconds
+Fine grained uncorrelated: 3.61705183983 seconds
+Medium grained uncorrelated: 5.71030211449 seconds
+Serial correlated: 0.369374990463 seconds
+Fine grained correlated: 3.02818202972 seconds
+Medium grained correlated: 3.85956192017 seconds
+
+prange inner
+Serial uncorrelated: 0.365405082703 seconds
+Fine grained uncorrelated: 3.75502991676 seconds
+Medium grained uncorrelated: 6.37942194939 seconds
+Serial correlated: 0.361652851105 seconds
+Fine grained correlated: 3.24329900742 seconds
+Medium grained correlated: 5.10531115532 seconds
+
+no prange
+Serial uncorrelated: 0.364362955093 seconds
+Fine grained uncorrelated: 14.3340740204 seconds
+Medium grained uncorrelated: 23.52146101 seconds
+Serial correlated: 0.427134990692 seconds
+Fine grained correlated: 12.5259819031 seconds
+Medium grained correlated: 15.0710399151 seconds
