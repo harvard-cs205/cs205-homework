@@ -20,7 +20,5 @@ Adding multi-threading:
 Adding instruction-level parallelism:
 
 1 thread: 1075.239961 Million Complex FMAs in 5.62158823013 seconds, 191.269783019 million Complex FMAs / second
-
 2 threads: 1075.239961 Million Complex FMAs in 0.680310964584 seconds, 1580.51246706 million Complex FMAs / second
-
 4 threads: 1075.239961 Million Complex FMAs in 0.529093027115 seconds, 2032.23234081 million Complex FMAs / second
