@@ -10,6 +10,14 @@ cimport openmp
 cdef np.float64_t magnitude_squared(np.complex64_t z) nogil:
     return z.real * z.real + z.imag * z.imag
 
+# FUNCTION COMPUTING THE MAGNITUDE OF A COMPLEX FLOAT 8 Z, THIS
+# RETUNS ANOTHER FLOAT8 VARIABLE AND OPARATES IN PARALLEL WITHOUT GIL
+cdef AVX.float8 z_mag(AVX.float8 z_r, AVX.float8 z_i) nogil:
+    cdef AVX.float8 z_r_mag = AVX.mul(z_r,z_r)
+    cdef AVX.float8 z_i_mag = AVX.mul(z_i,z_i)
+    cdef AVX.float8 z_mag_squ = AVX.add(z_r_mag, z_i_mag)
+    return AVX.sqrt(z_mag_squ)
+
 @cython.boundscheck(False)
 @cython.wraparound(False)
 
@@ -25,19 +33,40 @@ cpdef mandelbrot_avx(np.complex64_t [:, :] in_coords,
     assert in_coords.shape[0] == out_counts.shape[0], "Input and output arrays must be the same size"
     assert in_coords.shape[1] == out_counts.shape[1],  "Input and output arrays must be the same size"
 
-    cdef AVX.float8 c_real, c_imag
-    cdef AVX.float8 z_mag
 
-    cdef int j_s
+
+    cdef AVX.float8 c_real, c_imag
+
+    cdef int j_s, ii
 
     cdef float[:,:] r_coords = np.real(in_coords)
     cdef float[:,:] i_coords = np.imag(in_coords)
     
     cdef AVX.float8 z_r
     cdef AVX.float8 z_i
+
+    cdef AVX.float8 z_r_mag
+  
+    cdef AVX.float8 z_mag_squ 
+    
+    cdef AVX.float8 z_magnitude
+
     cdef AVX.float8 z_2
+    z_2=AVX.float_to_float8(2.0)
+
+    cdef AVX.float8 not_go_mask
 
     cdef AVX.float8 z_r_temp1, z_r_temp2, z_r_temp3, z_i_temp1
+
+    cdef AVX.float8 mask
+
+    cdef AVX.float8 iter_float8
+
+    cdef AVX.float8 z_4,z_1
+    z_4=AVX.float_to_float8(4.0)
+    z_1=AVX.float_to_float8(1)
+
+    cdef AVX.float8 iter_0=AVX.float_to_float8(0)
 
     print "size of r_coords",r_coords.size
     print "size of i_coords",i_coords.size
@@ -55,25 +84,32 @@ cpdef mandelbrot_avx(np.complex64_t [:, :] in_coords,
             
             z_r=AVX.float_to_float8(0.0)
             z_i=AVX.float_to_float8(0.0)
-            z_2=AVX.float_to_float8(2.0)
 
-            for iter in range(max_iterations):
+            iter_float8=iter_0
+
+            for ii in range(max_iterations):
                 z_r_temp1=AVX.mul(z_r,z_r)
                 z_r_temp2=AVX.mul(z_i,z_i)
-                z_r_temp3=AVX.sub(z_r_temp1,z_r_temp2)
-                z_r=AVX.add(z_r_temp3,c_real)
+                z_r=AVX.sub(z_r_temp1,z_r_temp2)
+                z_r=AVX.add(z_r,c_real)
 
                 z_i_temp1=AVX.mul(z_r,z_i)
                 z_i=AVX.fmadd(z_i_temp1, z_2, c_imag)
 
-            c = in_coords[i, j]
-            z = 0
-            for iter in range(max_iterations):
-                if magnitude_squared(z) > 4:
+                z_r_mag = AVX.mul(z_r,z_r)
+                z_mag_squ = AVX.fmadd(z_i, z_i, z_r_mag)
+
+                z_magnitude=AVX.sqrt(z_mag_squ)
+
+                not_go_mask=AVX.less_than(z_4,z_magnitude)
+                if AVX.signs(not_go_mask) ==255:
                     break
+
+                mask = AVX.mul(AVX.less_than(z_magnitude, z_4),z_1)
+                iter_float8 = AVX.add(iter_float8,mask)
+
+            #AVX.to_mem(iter_float8, &(out_counts[i,j_s]))
                 
-                z = z * z + c
-            out_counts[i, j] = iter
 
 
 cpdef mandelbrot_thread(np.complex64_t [:, :] in_coords,
