@@ -29,13 +29,10 @@ if __name__ == '__main__':
     in_coords, out_counts = make_coords()
 
     # define the number of threads
-    n_threads = 1
+    n_threads = 4
 
-    # Create an array of indexes with [[0,..,7],[8,..,15],[...3999]]
+    # define the number of blocks of 8 floats vector per rows
     n_elem = len(in_coords[0,:]) / 8
-    sliced = np.arange(in_coords.shape[1], dtype = np.uint32)
-    sliced = sliced.reshape(-1,8)
-
 
     with Timer() as t:
         mandelbrot.mandelbrot_multrithreads_ILP(in_coords, out_counts, n_threads, n_elem,1024 )

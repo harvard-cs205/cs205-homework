@@ -10,36 +10,6 @@ cdef np.float64_t magnitude_squared(np.complex64_t z) nogil:
 	return z.real * z.real + z.imag * z.imag
 
 
-cdef AVX.float8 update_z_real(AVX.float8 z_real, 
-			AVX.float8 z_imag, AVX.float8 c_real) nogil:
-
-	# update z: z = z^2 + Re(c)
-	# with z^2 = x^2 - y^2 + i 2xy where z = x+iy
-
-	# x_s = x^2 + Re(c)
-	cdef AVX.float8 x_s = AVX.fmadd(z_real, z_real, c_real)
-	# y_s = y^2
-	cdef AVX.float8 y_s = AVX.mul(z_imag, z_imag)
-
-	return AVX.sub(x_s,y_s)
-
-cdef void iter_to_mem(AVX.float8 iter_float8, 
-						np.uint32_t *to_big_matrix,
-						int slice_start,
-						int slice_end) nogil:
-	cdef float *iter_view = <float *> malloc(8*sizeof(float))
-
-	AVX.to_mem(iter_float8, iter_view)
-
-	# Now assign appropriately
-	cdef int j
-	cdef int count = 0
-	for j in range(slice_start, slice_end):
-		to_big_matrix[j] = <np.uint32_t> iter_view[count]
-		count += 1
-
-	free(iter_view)
-
 @cython.boundscheck(False)
 @cython.wraparound(False)
 
@@ -50,29 +20,33 @@ cpdef mandelbrot_multrithreads_ILP(np.complex64_t [:, :] in_coords,
 				int n_elem,
 				int max_iterations=511):
 	cdef:
-		int i, j,m_8,j_m,k, iter
+		int i, j,m_8,j_m,k, iterations
 		np.complex64_t c, z
 		AVX.float8 c_real, c_imag, iter_float8, z_mag
 		AVX.float8 mask, mag_check, z_float8_real, z_float8_imag, z_float8_real_new
+		AVX.float8 four_float8, two_float8, one_float8, zero_float8
 
-	assert in_coords.shape[1] % 8 == 0, "Input array must have 8N columns"
-	assert in_coords.shape[0] == out_counts.shape[0], "Input and output arrays must be the same size"
-	assert in_coords.shape[1] == out_counts.shape[1],  "Input and output arrays must be the same size"
+	four_float8 = AVX.float_to_float8(4.0)
+	two_float8 = AVX.float_to_float8(2.0)
+	one_float8 = AVX.float_to_float8(1.0)
+	zero_float8 = AVX.float_to_float8(0.0)
+
 
 	# parallize the rows with prange
-	#for i in prange(in_coords.shape[0], nogil = True, schedule = 'static', chunksize =1,
-	# 				num_threads = n_threads):
-	# # keep unparallelized for testing
-	for i in range(in_coords.shape[0]):
+	for i in prange(in_coords.shape[0], nogil = True, schedule = 'static', chunksize =1,
+	 				num_threads = n_threads):
 
+
+		# there are n_elem = 4000/8 = 500 vectors of 8 values per rows
 		for m_8 in range(n_elem):
 
-			z_float8_real = AVX.float_to_float8(0.0)
-			z_float8_imag = AVX.float_to_float8(0.0)
-			iter_float8 = AVX.float_to_float8(0.0)
+			z_float8_real = zero_float8
+			z_float8_imag = zero_float8
+			iter_float8 = zero_float8
 
-			# generate avxval distinguishing real and imaginary parts
-
+			# store 8 adjacent values of the matrix in_coords into AVX
+    		# Note that the order of the arguments here is opposite the direction when
+    		# we retrieve them into memory.
 			c_real = AVX.make_float8(in_coords[i, m_8*8 + 7].real,
 										in_coords[i, m_8*8 + 6].real,
 										in_coords[i, m_8*8 + 5].real,
@@ -89,44 +63,43 @@ cpdef mandelbrot_multrithreads_ILP(np.complex64_t [:, :] in_coords,
 										in_coords[i, m_8*8 + 2].imag,
 										in_coords[i, m_8*8 + 1].imag,
 										in_coords[i, m_8*8 + 0].imag)
+			# now iterate and count teh number of iterations
+			for iterations in range(max_iterations):
 
-			for iter in range(max_iterations):
-
-				# find magnitude of z
+				# find the squared magnitude of z
+				# |z|^2 = x^2 + y^2 where z = x + iy
 				z_mag = AVX.add(AVX.mul(z_float8_real,z_float8_real),AVX.mul(z_float8_imag,z_float8_imag))
 
-				# if the magnitude of all the 8 float >4 stop iterating	
-				if AVX.signs(AVX.less_than(AVX.float_to_float8(4.0), z_mag)) == 255:
-					break				
-
-				# update z: Re(z) = x^2 -y^2 + Re(c)
-				#z_float8_real_new = update_z_real(z_float8_real,z_float8_imag, c_real)
+				# if the magnitude of all the 8 floats > 4 then stop iterating		
+				if not AVX.signs(AVX.less_than(z_mag,four_float8)):
+					break		
 
 				# update z: z = z^2 + Re(c)
+
 				# with z^2 = x^2 - y^2 + i 2xy where z = x+iy
-				z_float8_real_new = AVX.sub(AVX.fmadd(z_float8_real, z_float8_real, c_real), AVX.mul(z_float8_imag, z_float8_imag))
+				z_float8_real_new = AVX.sub(AVX.fmadd(z_float8_real, z_float8_real, c_real),
+													 AVX.mul(z_float8_imag, z_float8_imag))
 
 
 				# Im(z) = 2xy + Im(c)
-				z_float8_imag = AVX.fmadd(AVX.mul(z_float8_real,AVX.float_to_float8(2)) ,z_float8_imag,c_imag)
+				z_float8_imag = AVX.fmadd(AVX.mul(z_float8_real,two_float8) ,z_float8_imag,c_imag)
 				z_float8_real = z_float8_real_new
 
 
-				# mask will be true where 4.0 < avxval
-				mask = AVX.less_than(z_mag, AVX.float_to_float8(4.0))
+				# mask will be true where |z|^2 < 4
+				mask = AVX.less_than(z_mag, four_float8)
 
 				# create mask with 1 if true and 0 if wrong
-				mask = AVX.bitwise_and(mask, AVX.float_to_float8(1.0))
+				mask = AVX.bitwise_and(mask, one_float8)
 
 
-				# update iter_float8
+				# update iter_float8: add +1 when |z|^2 < 4 and +0 when |z|^2 > 4
 				iter_float8 = AVX.add(iter_float8,mask)
 
 				
-				# Assign the iterations
-				#iter_to_mem(iter_float8,&out_counts[i,0], m_8*8, m_8*8+8)
+				# Assign the iterations to out_counts
 				for k in range(8):
-					out_counts[i,m_8+k]= <np.uint32_t> ((<np.float32_t*> &iter_float8)[k])			
+					out_counts[i,m_8*8+k]= <np.uint32_t> ((<np.float32_t*> &iter_float8)[k])			
 			
 
 cpdef mandelbrot(np.complex64_t [:, :] in_coords,
