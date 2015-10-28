@@ -9,9 +9,6 @@ from libc.stdio cimport printf, stdout, fprintf
 
 cimport openmp
 
-cdef float RIDICULOUS = -1000.
-
-
 cdef float magnitude_squared(np.complex64_t z) nogil:
     return z.real * z.real + z.imag * z.imag
 
@@ -51,25 +48,21 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
 
     cdef AVX.float8 real_z_float8, imag_z_float8
     cdef AVX.float8 mag_squared
-    cdef AVX.float8 not_go_mask
 
-    cdef int go
     cdef AVX.float8 iter
     cdef AVX.float8 temp_z_real, temp_z_imag
-    cdef AVX.float8 to_subtract
-    cdef AVX.float8 decrementer = AVX.float_to_float8(-1)
 
-    cdef AVX.float8 ridiculous_value = AVX.float_to_float8(RIDICULOUS)
     cdef AVX.float8 max_iterations_f8 = AVX.float_to_float8(max_iterations)
     cdef AVX.float8 over_max_iterations
+    cdef AVX.float8 to_add, go_mask
 
     with nogil:
-        for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=1):
+        for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=12):
             for j in range(num_cols_to_iterate): # Parallelize via AVX here...do 8 at a time
                 j_start = 8*j
                 j_end = 8*(j+1)
-                if j_end > in_coords.shape[1]:
-                    j_end = in_coords.shape[1]
+                if j_end >= in_coords.shape[1]:
+                    j_end = in_coords.shape[1] - 1
 
                 real_c = &real_in_coords[i][0] # get pointers to the arrays
                 imag_c = &imag_in_coords[i][0]
@@ -84,32 +77,22 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                 iter = AVX.float_to_float8(0)
 
                 while True:
-
                     mag_squared = magnitude_squared_float8(real_z_float8, imag_z_float8)
-                    not_go_mask = AVX.greater_than(mag_squared, AVX.float_to_float8(4))
+                    go_mask = AVX.less_than(mag_squared, AVX.float_to_float8(4))
 
-                    if AVX.signs(not_go_mask) == 255: #255 happens to be when all are true
+                    if AVX.signs(go_mask) == 0: #0 is when all are false
                         break
 
                     # Increment iter...we will adjust for improper goers in a second
-                    iter = AVX.add(iter, AVX.float_to_float8(1)) #Increment at beginning, like for loop
+                    to_add = AVX.bitwise_and(go_mask, AVX.float_to_float8(1))
+                    iter = AVX.add(iter, to_add) #Only add to those that were supposed to go
                     # Subtract 1 from the ones that weren't supposed to go
-                    to_subtract = AVX.bitwise_and(not_go_mask, decrementer)
-                    iter = AVX.add(iter, to_subtract)
 
                     temp_z_real = do_mandelbrot_update_real(real_z_float8, imag_z_float8, real_c_float8)
                     temp_z_imag = do_mandelbrot_update_imag(real_z_float8, imag_z_float8, imag_c_float8)
 
                     real_z_float8 = temp_z_real
                     imag_z_float8 = temp_z_imag
-
-                    # We need to make sure those that shouldn't go don't update anymore...we set their value to
-                    # something ridiculous such that the magnitude will always be greater than 4 next iteration
-
-                    real_z_float8 = AVX.add(AVX.bitwise_and(not_go_mask, ridiculous_value),
-                                            AVX.bitwise_andnot(not_go_mask, real_z_float8))
-                    imag_z_float8 = AVX.add(AVX.bitwise_and(not_go_mask, ridiculous_value),
-                                            AVX.bitwise_andnot(not_go_mask, imag_z_float8))
 
                     # Check that you are not equal to the maximum number of iterations
                     over_max_iterations = AVX.greater_than(iter, max_iterations_f8)
@@ -170,7 +153,7 @@ cdef AVX.float8 array_to_float8(float *c, int j_start, int j_end) nogil:
         count += 1
     # Fill in the rest with ridiculous values so you know they are garbage
     while count < 8:
-        filled_array[count] = RIDICULOUS
+        filled_array[count] = -9999
         count += 1
 
     cdef AVX.float8 f8 = AVX.make_float8(filled_array[7],

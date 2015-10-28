@@ -40,7 +40,7 @@ prange with four threads:
 
 prange with 12 threads (max):
 1075.239963 Million Complex FMAs in 0.317208051682 seconds
-3389.69946475 million Complex FMAs / second
+3615.84459467 million Complex FMAs / second
 
 #TODO: Figure out why I have the slight difference in FMA totals
 
