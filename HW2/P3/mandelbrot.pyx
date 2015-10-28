@@ -68,14 +68,10 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
 cpdef mandelbrot_AVX(np.complex64_t [:,:] in_coords, np.uint32_t [:,:] out_counts):
 
     cdef:
-        np.float32_t vals[8] #holding for tests and display
-        np.float32_t [:] out_view = vals
-        AVX.float8 tmp_real, tmp_img, z, c, mask, thresh, xx, yy, real, two, img1, img, mag, ones, counts, new_ones, xx_mul, yy_mul, xy_sub, z_mag_real, z_mag_img, z_mag, z_real, z_img, xy_2_mul, two_xy_mul
+        AVX.float8 tmp_real, tmp_img, z, c, mask, thresh, xx, yy, real, two, img1, img, mag, ones, counts, new_ones, xx_mul, yy_mul, xy_sub, z_mag_real, z_mag_img, z_mag, z_real, z_img, xy_2_mul, two_xy_mul, xy_mul
         int i, j, it, max_iterations, k
         np.float32_t [:,:] coords_1 
         np.float32_t [:,:] coords_2 
-        #np.float32_t [:,:] z_real
-        #np.float32_t [:,:] z_img 
 
     max_iterations=511
     thresh = AVX.make_float8(4,4,4,4,4,4,4,4)
@@ -83,7 +79,8 @@ cpdef mandelbrot_AVX(np.complex64_t [:,:] in_coords, np.uint32_t [:,:] out_count
     coords_1 = np.real(in_coords)
     coords_2 = np.imag(in_coords)
 
-    for j in range(in_coords.shape[0]):
+    #for j in range(in_coords.shape[0]):
+    for j in prange(in_coords.shape[0], nogil=True, num_threads=8, schedule=static):
       for i in range(0, in_coords.shape[1], 8):
 
         tmp_real = AVX.make_float8(coords_1[j, i],coords_1[j, i+1],coords_1[j, i+2],coords_1[j, i+3],coords_1[j, i+4],coords_1[j, i+5],coords_1[j, i+6],coords_1[j, i+7])
@@ -108,8 +105,6 @@ cpdef mandelbrot_AVX(np.complex64_t [:,:] in_coords, np.uint32_t [:,:] out_count
           new_ones = AVX.bitwise_and(ones, mask)
           counts = AVX.add(new_ones, counts)
 
-          AVX.to_mem(counts, &(vals[0])) #pointer to the first memory address
-
           #z_real = x^2 - y^2 + x
           #z_img = 2xyi + y
           xx_mul = AVX.mul(z_real, z_real) # x^2
@@ -130,10 +125,6 @@ cpdef mandelbrot_AVX(np.complex64_t [:,:] in_coords, np.uint32_t [:,:] out_count
 
 
         
-        #for k in range(8):
-          #out_vals[j,i+k] = <np.uint32_t>((<np.float32_t*>&c)[k]) #np.uint32_t
-
-    #return np.array(out_vals), np.array(out_view)
 
 
 
