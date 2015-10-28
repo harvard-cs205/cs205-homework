@@ -1,5 +1,5 @@
 import matplotlib
-matplotlib.use('Qt4Agg')
+matplotlib.use('TKagg')
 import matplotlib.pyplot as plt
 from matplotlib.collections import EllipseCollection
 import numpy as np
@@ -32,11 +32,8 @@ class Animator(object):
         ax.get_yaxis().set_visible(False)
         ax.set_axis_bgcolor('black')
         plt.draw()
-        plt.pause(10.**-6.)
 
     def update(self, positions):
         self.circles.set_offsets(positions)
         self.circles.set_color(self.colors)
         plt.draw()
-        plt.pause(10.**-6.)
-

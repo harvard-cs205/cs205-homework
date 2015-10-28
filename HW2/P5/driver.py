@@ -11,7 +11,7 @@ pyximport.install()
 import numpy as np
 from timer import Timer
 import matplotlib
-matplotlib.use('Qt4agg')
+matplotlib.use('TKagg')
 import matplotlib.pyplot as plt
 from animator import Animator
 from physics import update, preallocate_locks
@@ -63,7 +63,7 @@ if __name__ == '__main__':
     zordered_indices = index_matrix.ravel()
 
     assert set(zordered_indices) == set(index_array) # Make sure the set of all values has not been changed
-
+    print 'Morton assertion passed!'
     print 'Done!'
 
     # A matplotlib-based animator object
