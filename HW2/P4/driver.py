@@ -21,19 +21,34 @@ def py_median_3x3(image, iterations=10, num_threads=1):
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
 
-    for i in range(iterations):
-        for j in range(0, image.shape[0], num_threads):
-            threads = []
-            out = [0]*num_threads
-            for n in range(num_threads):
-                threads += [Thread(name='{}'.format(n), target=filtering.median_3x3,
-                                   args=(tmpA[j+n-1: j-1, j+n+2: j+2], tmpB[j+n-1: j-1, j+n+2: j+2], 0, 1))]
-            map(lambda t: t.start(), threads)
-            map(lambda t: t.join(), threads)
-            for n in range(num_threads):
-                tmpB[j] = out[n]
+    width = tmpA.shape[0]
+    height = tmpA.shape[1]
 
+    for i in xrange(iterations):
 
+        # Loop over rows
+        for j in xrange(0, image.shape[0], num_threads):
+
+            # Loop over elements
+            for k in xrange(image.shape[1]):
+                threads = []
+                out = [0] * num_threads
+
+                # Tell every thread what to do in this row
+                for n in xrange(num_threads):
+                    if k+n+1 <= width and j+1 <= height and k+n-1 >= 0 and j-1 >= 0:
+                        in_arg = tmpA[k+n-1:k+n+2, j-1:j+2]
+                        out[n] = in_arg.copy()
+                        t = Thread(name='{}'.format(n), target=filtering.median_3x3, args=(in_arg, out[n], 0, 1))
+                        t.start()
+                        threads += [t]
+                map(lambda t: t.join(), threads)
+
+                # Save result for this iteration in tmpB
+                for n in xrange(len(out)):
+                    if k+n+1 <= width and j+1 <= height and k+n-1 >= 0 and j-1 >= 0:
+                        # print out[n]
+                        tmpB[k+n, j] = out[n][1, 1]
         # swap direction of filtering
         tmpA, tmpB = tmpB, tmpA
 
@@ -66,8 +81,8 @@ if __name__ == '__main__':
 
     # verify correctness
     from_cython = py_median_3x3(input_image, 2, 5)
-    #from_numpy = numpy_median(input_image, 2)
-    #assert np.all(from_cython == from_numpy)
+    from_numpy = numpy_median(input_image, 2)
+    assert np.all(from_cython == from_numpy)
 
     with Timer() as t:
         new_image = py_median_3x3(input_image, 10, 8)
