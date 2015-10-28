@@ -23,13 +23,13 @@ cdef AVX.float8 update_z_real(AVX.float8 z_real,
 
 	return AVX.sub(x_s,y_s)
 
-cdef void iter_to_mem(AVX.float8 iter, 
+cdef void iter_to_mem(AVX.float8 iter_float8, 
 						np.uint32_t *to_big_matrix,
 						int slice_start,
 						int slice_end) nogil:
 	cdef float *iter_view = <float *> malloc(8*sizeof(float))
 
-	AVX.to_mem(iter, iter_view)
+	AVX.to_mem(iter_float8, iter_view)
 
 	# Now assign appropriately
 	cdef int j
@@ -53,7 +53,7 @@ cpdef mandelbrot_multrithreads_ILP(np.complex64_t [:, :] in_coords,
 		int i, j,m_8,j_m, iter
 		np.complex64_t c, z
 		AVX.float8 c_real, c_imag, iter_float8, z_mag
-		AVX.float8 mask, mag_check, z_float8_real, z_float8_imag
+		AVX.float8 mask, mag_check, z_float8_real, z_float8_imag, z_float8_real_new
 		float out_vals[8]
 		float [:] out_view = out_vals
 
@@ -105,9 +105,10 @@ cpdef mandelbrot_multrithreads_ILP(np.complex64_t [:, :] in_coords,
 
 
 				# update z: Re(z) = x^2 -y^2 + Re(c)
-				z_float8_real = update_z_real(z_float8_real,z_float8_imag, c_real)
+				z_float8_real_new = update_z_real(z_float8_real,z_float8_imag, c_real)
 				# Im(z) = 2xy + Im(c)
 				z_float8_imag = AVX.fmadd(AVX.mul(z_float8_real,AVX.float_to_float8(2)) ,z_float8_imag,c_imag)
+				z_float8_real = z_float8_real_new
 
 
 				# mask will be true where 4.0 < avxval
