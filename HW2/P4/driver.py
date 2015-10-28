@@ -27,6 +27,22 @@ def py_median_3x3(image, iterations=10, num_threads=1):
 
     return tmpA
 
+def py_median_3x3_2(image, iterations=10, num_threads=1):
+    ''' repeatedly filter with a 3x3 median '''
+    tmpA = image.copy()
+    tmpB = np.empty_like(tmpA)
+
+    for threadidx in range(4):
+        th = threading.Thread(target=filtering.median_3x3,
+                              args=(threadidx, stdout_lock))
+
+    for i in range(iterations):
+        filtering.median_3x3(tmpA, tmpB, 0, 1)
+        # swap direction of filtering
+        tmpA, tmpB = tmpB, tmpA
+
+    return tmpA
+
 def numpy_median(image, iterations=10):
     ''' filter using numpy '''
     for i in range(iterations):
@@ -37,6 +53,26 @@ def numpy_median(image, iterations=10):
         image = np.median(stacked, axis=2)
 
     return image
+
+
+def py_median_3x3_threading(image, iterations=10, num_threads=8):
+    ''' repeatedly filter with a 3x3 median
+        using threading
+     '''
+    
+    N = num_threads
+    tmpA = image.copy()
+    tmpB = np.empty_like(tmpA)
+    for i in range(iterations):  
+        for n in range(num_threads):
+            th = threading.Thread(target=filtering.median_3x3, args=(tmpA, tmpB, n, N))
+            th.start()
+        th.join()
+        tmpA, tmpB = tmpB, tmpA
+        
+        
+        
+    return tmpA
 
 
 if __name__ == '__main__':
@@ -52,16 +88,33 @@ if __name__ == '__main__':
     pylab.title('before - zoom')
 
     # verify correctness
-    from_cython = py_median_3x3(input_image, 2, 5)
+    from_cython = py_median_3x3_threading(input_image, 2, 5)
     from_numpy = numpy_median(input_image, 2)
-    assert np.all(from_cython == from_numpy)
+    assert np.all(from_cython == from_numpy), "Not equal to numpy"
 
     with Timer() as t:
-        new_image = py_median_3x3(input_image, 10, 8)
+        new_image_threading = py_median_3x3_threading(input_image, 10, 8)
+
+    with Timer() as tt:
+        new_image_no_threading = py_median_3x3(input_image, 10, 1)
+
+    assert np.all(new_image_threading == new_image_no_threading), "not equal to non-threading version"
 
     pylab.figure()
-    pylab.imshow(new_image[1200:1800, 3000:3500])
+    pylab.imshow(new_image_threading[1200:1800, 3000:3500])
     pylab.title('after - zoom')
 
-    print("{} seconds for 10 filter passes.".format(t.interval))
+    print("{} seconds for 10 filter passes with threading.".format(t.interval))
+    print("{} seconds for 10 filter passes without threading.".format(tt.interval))
+
     pylab.show()
+
+
+
+
+
+
+
+
+
+
