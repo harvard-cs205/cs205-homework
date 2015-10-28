@@ -4,7 +4,7 @@ cimport numpy as np
 from libc.math cimport sqrt
 from libc.stdint cimport uintptr_t
 cimport cython
-from cython.parallel import parallel, prange
+from cython.parallel import parallel, prange, threadid
 from omp_defs cimport omp_lock_t, get_N_locks, free_N_locks, acquire, release
 
 from libc.stdio cimport printf
@@ -18,15 +18,18 @@ ctypedef np.uint32_t UINT
 cdef enum:
     NO_INDEX = 4294967295
 
-cdef inline void cuttail(int *XY,
-                         int grid_size) nogil:
+cdef inline int cuttail(FLOAT XY,
+                        float grid_spacing,
+                        int grid_size) nogil:
     cdef:
-        int dim
-    for dim in range(2):
-        if XY[dim] < 0:
-            XY[dim] = 0
-        elif XY[dim] >= grid_size:
-            XY[dim] = grid_size - 1
+        int gridpos = int(XY/grid_spacing)
+    if gridpos < 0:
+        return 0
+    elif gridpos >= grid_size:
+        return grid_size - 1
+    else:
+        return gridpos
+
     
 cdef inline int overlapping(FLOAT *x1,
                             FLOAT *x2,
@@ -74,7 +77,8 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                      int i, int count,
                      UINT[:, ::1] Grid,
                      float grid_spacing,
-                     int grid_size) nogil:
+                     int grid_size,
+                     omp_lock_t *locks) nogil:
     cdef:
         FLOAT *XY1, *XY2, *V1, *V2
         int j, dim
@@ -84,6 +88,7 @@ cdef void sub_update(FLOAT[:, ::1] XY,
         int gs = 3 # the size of the circle we are going to search
 
     # SUBPROBLEM 4: Add locking
+    acquire(&locks[i])
     XY1 = &(XY[i, 0])
     V1 = &(V[i, 0])
     #############################################################
@@ -117,9 +122,10 @@ cdef void sub_update(FLOAT[:, ::1] XY,
             if gsy < 0 or gsy >= grid_size: #out of boundary
                 continue
             j = Grid[gsx, gsy]
-            if j == NO_INDEX or j == i: #no ball at this grid or the ball is itself
+            if j == NO_INDEX or j <= i: #no ball at this grid or the ball is itself; prevent collide twice: only collide with larger index
                 continue
             #printf("after j %u gsx %i gsy %i\n", j, gsx, gsy)
+            acquire(&locks[j])
             XY2 = &(XY[j, 0])
             V2 = &(V[j, 0])
             if overlapping(XY1, XY2, R):
@@ -130,7 +136,8 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                 # give a slight impulse to help separate them
                 for dim in range(2):
                     V2[dim] += eps * (XY2[dim] - XY1[dim])
-                    
+            release(&locks[j])
+    release(&locks[i])
                     
 
 cpdef update(FLOAT[:, ::1] XY,
@@ -142,13 +149,13 @@ cpdef update(FLOAT[:, ::1] XY,
              uintptr_t locks_ptr,
              float t):
     cdef:
-        int count = XY.shape[0], n_th = 1
+        int count = XY.shape[0], n_th = 4
         int chunk = count/n_th
-        int i, j, dim
-        int XYG[2]
+        int i, j, dim, id
+        int XYG0, XYG1
         FLOAT *XY1, *XY2, *V1, *V2
         # SUBPROBLEM 4: uncomment this code.
-        # omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
+        omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
 
     assert XY.shape[0] == V.shape[0]
     assert XY.shape[1] == V.shape[1] == 2
@@ -171,7 +178,7 @@ cpdef update(FLOAT[:, ::1] XY,
         # scheduling.
         for i in prange(count, schedule='static', chunksize=chunk, num_threads=n_th ):
         #for i in range(count):
-            sub_update(XY, V, R, i, count, Grid, grid_spacing, grid_size)
+            sub_update(XY, V, R, i, count, Grid, grid_spacing, grid_size, locks)
 
         # update positions
         #
@@ -183,66 +190,21 @@ cpdef update(FLOAT[:, ::1] XY,
                 # XY[i, dim] += V[i, dim] * t
         # SUBPROBLEM 2: update the grid values.
         for i in prange(count, schedule='static', chunksize=chunk, num_threads=n_th ):
+        #for i in range(count):
             # obtain the grid index of XYi
-            XYG[0] = int(XY[i, 0]/grid_spacing)
-            XYG[1] = int(XY[i, 1]/grid_spacing)
-            cuttail(XYG, grid_size)
-            if Grid[XYG[0], XYG[1]] == i: # if this position has no other ball, set to no ball
-                Grid[XYG[0], XYG[1]] = NO_INDEX
+            id = threadid()
+            XYG0 = cuttail(XY[i, 0], grid_spacing, grid_size)
+            XYG1 = cuttail(XY[i, 1], grid_spacing, grid_size)
+            #printf("%i: XYG0=%i XYG1=%i grid_size=%i\n", id, XYG0, XYG1, grid_size)
+            if Grid[XYG0, XYG1] == i: # if this position has no other ball, set to no ball
+                Grid[XYG0, XYG1] = NO_INDEX
             for dim in range(2):
                 XY[i, dim] += V[i, dim] * t
-            XYG[0] = int(XY[i, 0]/grid_spacing)
-            XYG[1] = int(XY[i, 1]/grid_spacing)
-            cuttail(XYG, grid_size)
-            Grid[XYG[0], XYG[1]] = i
+            XYG0 = cuttail(XY[i, 0], grid_spacing, grid_size)
+            XYG1 = cuttail(XY[i, 1], grid_spacing, grid_size)
+            Grid[XYG0, XYG1] = i
 
-## Hilbert_curve
-#convert (x,y) to d
-cdef int xy2d (int n, int x, int y) {
-    cdef:
-        int rx, ry, s, d=0;
-    for (s=n/2; s>0; s/=2) {
-        rx = (x & s) > 0;
-        ry = (y & s) > 0;
-        d += s * s * ((3 * rx) ^ ry);
-        rot(s, &x, &y, rx, ry);
-    }
-    return d;
-}
 
-#convert d to (x,y)
-cdef void d2xy(int n, int d, int *x, int *y) {
-    cdef:
-        int rx, ry, s, t=d;
-    *x = *y = 0;
-    for (s=1; s<n; s*=2) {
-        rx = 1 & (t/2);
-        ry = 1 & (t ^ rx);
-        rot(s, x, y, rx, ry);
-        *x += s * rx;
-        *y += s * ry;
-        t /= 4;
-    }
-}
-
-#rotate/flip a quadrant appropriately
-cdef void rot(int n, int *x, int *y, int rx, int ry) {
-    cdef:
-        int t
-    if (ry == 0) {
-        if (rx == 1) {
-            *x = n-1 - *x;
-            *y = n-1 - *y;
-        }
-
-        #Swap x and y
-        t  = *x;
-        *x = *y;
-        *y = t;
-    }
-}
-            
-            
 def preallocate_locks(num_locks):
     cdef omp_lock_t *locks = get_N_locks(num_locks)
     assert 0 != <uintptr_t> <void *> locks, "could not allocate locks"
