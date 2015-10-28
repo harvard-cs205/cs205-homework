@@ -86,12 +86,8 @@ class ZEncoder(object):
 
     @classmethod
     def for_shape(cls, shape):
-        # Default to 32-bit codes, but use 64-bit codes if needed for a shape.
-        maxdim = max(shape)
-        if math.ceil(math.log(maxdim, 2)) >= (32 / len(shape)):
-            bits = 64
-        else:
-            bits = 32
+        # MY CHANGE: Always use 64 bits, or terrible things will happen
+        bits=64
         return ZEncoder(len(shape), bits)
 
     def get_filter(self, ndim, bits):
