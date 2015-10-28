@@ -50,29 +50,45 @@ cpdef mandelbrot_multrithreads_ILP(np.complex64_t [:, :] in_coords,
 				int n_elem,
 				int max_iterations=511):
 	cdef:
-		int i, j,m_8,j_m, iter
+		int i, j,m_8,j_m,k, iter
 		np.complex64_t c, z
 		AVX.float8 c_real, c_imag, iter_float8, z_mag
 		AVX.float8 mask, mag_check, z_float8_real, z_float8_imag, z_float8_real_new
-		float out_vals[8]
-		float [:] out_view = out_vals
-
 
 	assert in_coords.shape[1] % 8 == 0, "Input array must have 8N columns"
 	assert in_coords.shape[0] == out_counts.shape[0], "Input and output arrays must be the same size"
 	assert in_coords.shape[1] == out_counts.shape[1],  "Input and output arrays must be the same size"
 
 	# parallize the rows with prange
-	for i in prange(in_coords.shape[0], nogil = True, schedule = 'static', chunksize =1,
-					num_threads = n_threads):
-	# keep unparallelized for testing
-	#for i in range(in_coords.shape[0]):
+	#for i in prange(in_coords.shape[0], nogil = True, schedule = 'static', chunksize =1,
+	# 				num_threads = n_threads):
+	# # keep unparallelized for testing
+	for i in range(in_coords.shape[0]):
 
 		for m_8 in range(n_elem):
 
 			z_float8_real = AVX.float_to_float8(0.0)
 			z_float8_imag = AVX.float_to_float8(0.0)
 			iter_float8 = AVX.float_to_float8(0.0)
+
+			# generate avxval distinguishing real and imaginary parts
+
+			c_real = AVX.make_float8(in_coords[i, m_8*8 + 7].real,
+										in_coords[i, m_8*8 + 6].real,
+										in_coords[i, m_8*8 + 5].real,
+										in_coords[i, m_8*8 + 4].real,
+										in_coords[i, m_8*8 + 3].real,
+										in_coords[i, m_8*8 + 2].real,
+										in_coords[i, m_8*8 + 1].real,
+										in_coords[i, m_8*8 + 0].real)
+			c_imag = AVX.make_float8(in_coords[i, m_8*8 + 7].imag,
+										in_coords[i, m_8*8 + 6].imag,
+										in_coords[i, m_8*8 + 5].imag,
+										in_coords[i, m_8*8 + 4].imag,
+										in_coords[i, m_8*8 + 3].imag,
+										in_coords[i, m_8*8 + 2].imag,
+										in_coords[i, m_8*8 + 1].imag,
+										in_coords[i, m_8*8 + 0].imag)
 
 			for iter in range(max_iterations):
 
@@ -83,29 +99,14 @@ cpdef mandelbrot_multrithreads_ILP(np.complex64_t [:, :] in_coords,
 				if AVX.signs(AVX.less_than(AVX.float_to_float8(4.0), z_mag)) == 255:
 					break				
 
-
-				# generate avxval distinguishing real and imaginary parts
-
-				c_real = AVX.make_float8(in_coords[i, m_8*8 + 7].real,
-										in_coords[i, m_8*8 + 6].real,
-										in_coords[i, m_8*8 + 5].real,
-										in_coords[i, m_8*8 + 4].real,
-										in_coords[i, m_8*8 + 3].real,
-										in_coords[i, m_8*8 + 2].real,
-										in_coords[i, m_8*8 + 1].real,
-										in_coords[i, m_8*8 + 0].real)
-				c_imag = AVX.make_float8(in_coords[i, m_8*8 + 7].imag,
-										in_coords[i, m_8*8 + 6].imag,
-										in_coords[i, m_8*8 + 5].imag,
-										in_coords[i, m_8*8 + 4].imag,
-										in_coords[i, m_8*8 + 3].imag,
-										in_coords[i, m_8*8 + 2].imag,
-										in_coords[i, m_8*8 + 1].imag,
-										in_coords[i, m_8*8 + 0].imag)
-
-
 				# update z: Re(z) = x^2 -y^2 + Re(c)
-				z_float8_real_new = update_z_real(z_float8_real,z_float8_imag, c_real)
+				#z_float8_real_new = update_z_real(z_float8_real,z_float8_imag, c_real)
+
+				# update z: z = z^2 + Re(c)
+				# with z^2 = x^2 - y^2 + i 2xy where z = x+iy
+				z_float8_real_new = AVX.sub(AVX.fmadd(z_float8_real, z_float8_real, c_real), AVX.mul(z_float8_imag, z_float8_imag))
+
+
 				# Im(z) = 2xy + Im(c)
 				z_float8_imag = AVX.fmadd(AVX.mul(z_float8_real,AVX.float_to_float8(2)) ,z_float8_imag,c_imag)
 				z_float8_real = z_float8_real_new
@@ -123,21 +124,10 @@ cpdef mandelbrot_multrithreads_ILP(np.complex64_t [:, :] in_coords,
 
 				
 				# Assign the iterations
-				iter_to_mem(iter_float8,&out_counts[i,0], m_8*8, m_8*8+7)
+				#iter_to_mem(iter_float8,&out_counts[i,0], m_8*8, m_8*8+8)
+				for k in range(8):
+					out_counts[i,m_8+k]= <np.uint32_t> ((<np.float32_t*> &iter_float8)[k])			
 			
-
-
-			#for j_m in range(8):
-			#	j = m_8*8 + j_m
-			#	c = in_coords[i, j]
-			#	z = 0
-			#	for iter in range(max_iterations):
-				#	if magnitude_squared(z) > 4:
-					#	break
-				#	z = z * z + c
-			#	out_counts[i, j] = iter
-
-
 
 cpdef mandelbrot(np.complex64_t [:, :] in_coords,
 				np.uint32_t [:, :] out_counts,

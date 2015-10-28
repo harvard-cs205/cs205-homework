@@ -29,7 +29,7 @@ if __name__ == '__main__':
     in_coords, out_counts = make_coords()
 
     # define the number of threads
-    n_threads = 2
+    n_threads = 1
 
     # Create an array of indexes with [[0,..,7],[8,..,15],[...3999]]
     n_elem = len(in_coords[0,:]) / 8
@@ -46,3 +46,4 @@ if __name__ == '__main__':
     plt.imshow(np.log(out_counts))
     plt.savefig('plot_p3.png')
     plt.show()
+
