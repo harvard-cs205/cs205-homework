@@ -27,20 +27,20 @@ prange with 12 threads (max):
 #### prange and AVX ####
 
 prange with one thread:
-1074.752739 Million Complex FMAs in 0.765990018845 seconds
-1403.08974342 million Complex FMAs / second
+1074.94829 Million Complex FMAs in 0.759642839432 seconds
+1415.07065453 million Complex FMAs / second
 
 prange with two threads:
-1074.752739 Million Complex FMAs in 0.623715877533 seconds
-1723.14474862 million Complex FMAs / second
+1074.94829 Million Complex FMAs in 0.646858930588 seconds
+1661.79709233 million Complex FMAs / second
 
 prange with four threads:
-1074.752739 Million Complex FMAs in 0.455903053284 seconds
-2357.41509354 million Complex FMAs / second
+1074.94829 Million Complex FMAs in 0.46462392807 seconds
+2313.58788271 million Complex FMAs / second
 
 prange with 12 threads (max):
-1074.752739 Million Complex FMAs in 0.284477949142 seconds
-3777.98258965 million Complex FMAs / second
+1074.94829 Million Complex FMAs in 0.318794965744 seconds
+3371.91112002 million Complex FMAs / second
 
 #TODO: Figure out why I have the slight difference in FMA totals
 
