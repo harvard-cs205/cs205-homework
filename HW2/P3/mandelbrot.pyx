@@ -53,7 +53,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     cdef AVX.float8 temp_z_real, temp_z_imag
 
     cdef AVX.float8 max_iterations_f8 = AVX.float_to_float8(max_iterations)
-    cdef AVX.float8 over_max_iterations
+    cdef AVX.float8 under_max_iterations
     cdef AVX.float8 to_add, go_mask
 
     with nogil:
@@ -79,9 +79,8 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                 while True:
 
                     # Check that you are not equal to the maximum number of iterations
-                    over_max_iterations = AVX.greater_than(iter, max_iterations_f8)
-                    # One is over the max iteration...and we increment each time, so if one is over we are done!
-                    if AVX.signs(over_max_iterations) > 0:
+                    under_max_iterations = AVX.less_than(iter, max_iterations_f8)
+                    if AVX.signs(under_max_iterations) < 255: # If any are done, we stop!
                         break
 
                     mag_squared = magnitude_squared_float8(real_z_float8, imag_z_float8)
