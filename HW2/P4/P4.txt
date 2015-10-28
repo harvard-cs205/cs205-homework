@@ -1,0 +1,10 @@
+
+MULTITHREADING EXPERIMENT
+-------------------------
+1 Thread: 12 seconds
+2 Threads: 9 seconds
+4 Threads: 5 seconds
+See P4.png for a visual.
+
+The more threads we seem to add, on the basis of just these three points, we seem to experience diminishing returns
+from adding threads. First, the gain is relatively big (1 to 2), and then we have smaller gains (2 to 4).
