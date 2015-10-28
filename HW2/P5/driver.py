@@ -26,6 +26,7 @@ def randcolor():
 if __name__ == '__main__':
     num_balls = 10**4
     radius = 0.002
+
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -60,6 +61,9 @@ if __name__ == '__main__':
     index_matrix = index_array.reshape((grid_size, grid_size))
     zorder(index_matrix)
     zordered_indices = index_matrix.ravel()
+
+    assert set(zordered_indices) == set(index_array) # Make sure the set of all values has not been changed
+
     print 'Done!'
 
     # A matplotlib-based animator object
