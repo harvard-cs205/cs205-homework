@@ -1,0 +1,23 @@
+
+
+
+
+Mandelbrot without threading (not using prange):
+1074.656613 Million Complex FMAs in 4.19999599457 seconds, 255.87086616 million Complex FMAs / second
+Mandelbrot with 1 thread using prange:
+1074.656613 Million Complex FMAs in 4.25236701965 seconds, 252.719628394 million Complex FMAs / second
+Mandelbrot with 2 threads using prange:
+1074.656613 Million Complex FMAs in 1.98472499847 seconds, 541.463736198 million Complex FMAs / second
+Mandelbrot with 3 threads using prange:
+1074.656613 Million Complex FMAs in 1.44326591492 seconds, 744.600563134 million Complex FMAs / second
+Mandelbrot with 4 threads using prange:
+1074.656613 Million Complex FMAs in 1.05489706993 seconds, 1018.73125221 million Complex FMAs / second
+This is using AVX for threading the j loop into 8 floats.
+Mandelbrot with 1 thread using prange and AVX:
+1074.948291 Million Complex FMAs in 0.561136960983 seconds, 1915.66117676 million Complex FMAs / second
+Mandelbrot with 2 threads using prange and AVX:
+1074.948291 Million Complex FMAs in 0.275889873505 seconds, 3896.29484165 million Complex FMAs / second
+Mandelbrot with 3 threads using prange and AVX:
+1074.948291 Million Complex FMAs in 0.273995876312 seconds, 3923.22798966 million Complex FMAs / second
+Mandelbrot with 4 threads using prange and AVX:
+1074.948291 Million Complex FMAs in 0.249143123627 seconds, 4314.5814155 million Complex FMAs / second

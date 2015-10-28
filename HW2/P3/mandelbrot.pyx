@@ -132,13 +132,11 @@ cpdef mandelbrot_avx(np.complex64_t [:, :] in_coords,
 
             for ii in range(max_iterations):
                 # OBTAINING THE MAGNITUDE OF THE COMPLEX VALUE Z
-                z_r_mag = AVX.mul(z_r,z_r)
-                z_magnitude= AVX.fmadd(z_i, z_i, z_r_mag)
-
+      
 
                 # THIS PART COMPARES THE MAGINITUDE OF Z AND MULTIPLIES THE VALUES
                 # OF -NAN TO OBTAIN THAT IT IS EITHER 1 OR 0 DEPENDIGN ON THE THE COMPARISSON
-                mask_t=AVX.less_than(z_magnitude, z_4)
+                mask_t=AVX.less_than(AVX.fmadd(z_i, z_i, AVX.mul(z_r,z_r)), z_4)
 
                 # THIS COMPARE USES THE ABOVE TO KNOW IF WE SHOULE EXIT THE CODE 
                 # IF THIS IS TRUE WE WILL EXIT THE CODE, AND IT WILL ONLY BE TRUE IF 
@@ -150,23 +148,19 @@ cpdef mandelbrot_avx(np.complex64_t [:, :] in_coords,
                 # WITH THE ADDED C THROUGH THE EQUATION
                 # Z= Z*Z+C
                 z_r_temp=z_r
-                z_r_temp1=AVX.mul(z_r,z_r)
-                z_r_temp2=AVX.mul(z_i,z_i)
-                z_r=AVX.sub(z_r_temp1,z_r_temp2)
-                z_r=AVX.add(z_r,c_real)
+                z_r=AVX.add(AVX.sub(AVX.mul(z_r,z_r),AVX.mul(z_i,z_i)),c_real)
 
                 # CREATING FLOAT 8 FOR THE IMAGINARY PART OF C FOR THE 
                 # EQUATION DESCRIBED ABOVE
-                z_i_temp1=AVX.mul(z_r_temp,z_i)
-                z_i=AVX.fmadd(z_i_temp1, z_2, c_imag)
+                z_i=AVX.fmadd(AVX.mul(z_r_temp,z_i), z_2, c_imag)
 
                 
-                mask =AVX.bitwise_and(mask_t, z_1)
-                #print_float8(z_magnitude)
+                
+             
                 # ONCE WE OBTAIN THE VALUE ABOVE WE CAN ADD THE MASK TO THE ITERATION
                 # AS THE MASK WILL EITHER BE 1 OR 0 DEPENDING ON THE INDEQUALITY 
                 # BOOLEAN RESULT FROM THE PART ABOVE
-                iter_float8 = AVX.add(iter_float8,mask)
+                iter_float8 = AVX.add(iter_float8,AVX.bitwise_and(mask_t, z_1))
                 
             for k in range(8):
                 out_counts[i,j+k]= <np.uint32_t> ((<np.float32_t*> &iter_float8)[k])
