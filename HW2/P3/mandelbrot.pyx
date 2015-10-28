@@ -77,6 +77,13 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                 iter = AVX.float_to_float8(0)
 
                 while True:
+
+                    # Check that you are not equal to the maximum number of iterations
+                    over_max_iterations = AVX.greater_than(iter, max_iterations_f8)
+                    # One is over the max iteration...and we increment each time, so if one is over we are done!
+                    if AVX.signs(over_max_iterations) > 0:
+                        break
+
                     mag_squared = magnitude_squared_float8(real_z_float8, imag_z_float8)
                     go_mask = AVX.less_than(mag_squared, AVX.float_to_float8(4))
 
@@ -86,19 +93,12 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                     # Increment iter...we will adjust for improper goers in a second
                     to_add = AVX.bitwise_and(go_mask, AVX.float_to_float8(1))
                     iter = AVX.add(iter, to_add) #Only add to those that were supposed to go
-                    # Subtract 1 from the ones that weren't supposed to go
 
                     temp_z_real = do_mandelbrot_update_real(real_z_float8, imag_z_float8, real_c_float8)
                     temp_z_imag = do_mandelbrot_update_imag(real_z_float8, imag_z_float8, imag_c_float8)
 
                     real_z_float8 = temp_z_real
                     imag_z_float8 = temp_z_imag
-
-                    # Check that you are not equal to the maximum number of iterations
-                    over_max_iterations = AVX.greater_than(iter, max_iterations_f8)
-                    # One is over the max iteration...and we increment each time, so if one is over we are done!
-                    if AVX.signs(over_max_iterations) > 0:
-                        break
 
                 # Assign the iterations
                 assign_values_to_matrix(iter, &out_counts[i][0], j_start, j_end)
