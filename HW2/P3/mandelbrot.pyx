@@ -105,25 +105,25 @@ cpdef mandelbrot_avx(np.complex64_t [:, :] in_coords,
 
             # CREATING THE REAL COMPONENT OF C BASED ON THE REAL PART COORDINATES IN
             # AS A FLOAT 8 WITH THE DIFFERENT VALUES IN PARALLEL
-            c_real=AVX.make_float8(r_coords[i,j_s],
-                                        r_coords[i,j_s+1],
-                                        r_coords[i,j_s+2],
-                                        r_coords[i,j_s+3],
-                                        r_coords[i,j_s+4],
-                                        r_coords[i,j_s+5],
+            c_real=AVX.make_float8(r_coords[i,j_s+7],
                                         r_coords[i,j_s+6],
-                                        r_coords[i,j_s+7])
+                                        r_coords[i,j_s+5],
+                                        r_coords[i,j_s+4],
+                                        r_coords[i,j_s+3],
+                                        r_coords[i,j_s+2],
+                                        r_coords[i,j_s+1],
+                                        r_coords[i,j_s])
 
             # CREATING THE IMAGINARY COMPONENT OF C BASED ON THE REAL PART COORDINATES IN
             # AS A FLOAT 8 WITH THE DIFFERENT VALUES IN PARALLEL
-            c_imag=AVX.make_float8(i_coords[i,j_s],
-                                        i_coords[i,j_s+1],
-                                        i_coords[i,j_s+2],
-                                        i_coords[i,j_s+3],
-                                        i_coords[i,j_s+4],
-                                        i_coords[i,j_s+5],
+            c_imag=AVX.make_float8(i_coords[i,j_s+7],
                                         i_coords[i,j_s+6],
-                                        i_coords[i,j_s+7])
+                                        i_coords[i,j_s+5],
+                                        i_coords[i,j_s+4],
+                                        i_coords[i,j_s+3],
+                                        i_coords[i,j_s+2],
+                                        i_coords[i,j_s+1],
+                                        i_coords[i,j_s])
 
             # DEFINING THE INTIAL VALUES OF Z REAL COMPLEX AND ITERATIONS AS 0
             z_r=z_0
@@ -131,20 +131,6 @@ cpdef mandelbrot_avx(np.complex64_t [:, :] in_coords,
             iter_float8=z_0
 
             for ii in range(max_iterations):
-                # CREATING FLOAT 8 FOR THE REAL AND UPDATIND THE VALUES
-                # WITH THE ADDED C THROUGH THE EQUATION
-                # Z= Z*Z+C
-                z_r_temp=z_r
-                z_r_temp1=AVX.mul(z_r,z_r)
-                z_r_temp2=AVX.mul(z_i,z_i)
-                z_r=AVX.sub(z_r_temp1,z_r_temp2)
-                z_r=AVX.add(z_r,c_real)
-
-                # CREATING FLOAT 8 FOR THE IMAGINARY PART OF C FOR THE 
-                # EQUATION DESCRIBED ABOVE
-                z_i_temp1=AVX.mul(z_r_temp,z_i)
-                z_i=AVX.fmadd(z_i_temp1, z_2, c_imag)
-
                 # OBTAINING THE MAGNITUDE OF THE COMPLEX VALUE Z
                 z_r_mag = AVX.mul(z_r,z_r)
                 z_magnitude= AVX.fmadd(z_i, z_i, z_r_mag)
@@ -160,6 +146,21 @@ cpdef mandelbrot_avx(np.complex64_t [:, :] in_coords,
                 if not AVX.signs(mask_t):
                     break
 
+                # CREATING FLOAT 8 FOR THE REAL AND UPDATIND THE VALUES
+                # WITH THE ADDED C THROUGH THE EQUATION
+                # Z= Z*Z+C
+                z_r_temp=z_r
+                z_r_temp1=AVX.mul(z_r,z_r)
+                z_r_temp2=AVX.mul(z_i,z_i)
+                z_r=AVX.sub(z_r_temp1,z_r_temp2)
+                z_r=AVX.add(z_r,c_real)
+
+                # CREATING FLOAT 8 FOR THE IMAGINARY PART OF C FOR THE 
+                # EQUATION DESCRIBED ABOVE
+                z_i_temp1=AVX.mul(z_r_temp,z_i)
+                z_i=AVX.fmadd(z_i_temp1, z_2, c_imag)
+
+                
                 mask =AVX.bitwise_and(mask_t, z_1)
                 #print_float8(z_magnitude)
                 # ONCE WE OBTAIN THE VALUE ABOVE WE CAN ADD THE MASK TO THE ITERATION
