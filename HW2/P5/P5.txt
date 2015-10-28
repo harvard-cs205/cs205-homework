@@ -1,0 +1,3 @@
+Multithreading with prange()
+With 1 thread we get results between 3.0 and 4.0 frames per second. With 4 threads we get results between 4.2 and 6.1 frames per second, which is consistently an improvement but almost double the range size. This is less than a 2x speedup for a 4x increase in threads.
+***WHY?***
