@@ -1,4 +1,4 @@
---- Multithreading ---
+--- Multithreading without Instruction-level Parallelism ---
 
 For now we just compare the code efficiency when only the rows parallelized with a prange.
 
@@ -18,4 +18,4 @@ Because this problem is embarassingly parallel, multitheading reduces the run ti
 
 
 
--- Instruction-level Parallelism --
+-- Multithreading with Instruction-level Parallelism  --

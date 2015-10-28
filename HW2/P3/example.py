@@ -11,5 +11,6 @@ pyximport.install()
 import numpy as np
 from mandelbrot import example_sqrt_8
 
-print example_sqrt_8(np.arange(8, dtype=np.float32))
+print 'initial vector:', np.arange(8, dtype=np.float32)
+print 'final vector:', example_sqrt_8(np.arange(8, dtype=np.float32))
  

@@ -31,8 +31,14 @@ if __name__ == '__main__':
     # define the number of threads
     n_threads = 4
 
+    # Create an array of indexes with [[0,..,7],[8,..,15],[...3999]]
+    n_elem = len(in_coords[0,:]) / 8
+    sliced = np.arange(in_coords.shape[1], dtype = np.uint32)
+    sliced = sliced.reshape(-1,8)
+
+
     with Timer() as t:
-        mandelbrot.mandelbrot(in_coords, out_counts, n_threads, 1024 )
+        mandelbrot.mandelbrot_multrithreads_ILP(in_coords, out_counts, n_threads, n_elem,1024 )
     seconds = t.interval
 
     print("{} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
