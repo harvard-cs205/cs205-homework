@@ -4,7 +4,6 @@ cimport cython
 import numpy
 cimport AVX
 from cython.parallel import prange
-from libc.stdlib cimport malloc, free
 from libc.stdio cimport printf, stdout, fprintf
 
 cimport openmp
@@ -57,7 +56,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     cdef AVX.float8 to_add, go_mask
 
     with nogil:
-        for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=1):
+        for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=12):
             for j in range(num_cols_to_iterate): # Parallelize via AVX here...do 8 at a time
                 j_start = 8*j
                 j_end = 8*(j+1)
@@ -103,20 +102,19 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                 assign_values_to_matrix(iter, &out_counts[i][0], j_start, j_end)
 
 cdef void print_float8(AVX.float8 f8) nogil:
-    cdef float *iter_view = <float *> malloc(8*sizeof(float))
+    cdef float iter_view[8]
 
-    AVX.to_mem(f8, iter_view)
+    AVX.to_mem(f8, &iter_view[0])
     cdef int i
     for i in range(8):
         printf('%f \n', iter_view[i])
     printf('Done with float8')
     printf('\n')
-    free(iter_view)
 
 cdef void assign_values_to_matrix(AVX.float8 iter, np.uint32_t *to_big_matrix, int j_start, int j_end) nogil:
-    cdef float *iter_view = <float *> malloc(8*sizeof(float))
+    cdef float iter_view[8]
 
-    AVX.to_mem(iter, iter_view)
+    AVX.to_mem(iter, &iter_view[0])
 
     # Now assign appropriately
     cdef int j
@@ -124,8 +122,6 @@ cdef void assign_values_to_matrix(AVX.float8 iter, np.uint32_t *to_big_matrix, i
     for j in range(j_start, j_end):
         to_big_matrix[j] = <np.uint32_t> iter_view[count]
         count += 1
-
-    free(iter_view)
 
 cdef AVX.float8 do_mandelbrot_update_real(AVX.float8 z_real, AVX.float8 z_imag, AVX.float8 c_real) nogil:
     '''Real part is a^2 - b^2 + c_real'''
@@ -143,7 +139,7 @@ cdef AVX.float8 do_mandelbrot_update_imag(AVX.float8 z_real, AVX.float8 z_imag, 
     return AVX.add(two_a_b, c_imag)
 
 cdef AVX.float8 array_to_float8(float *c, int j_start, int j_end) nogil:
-    cdef float *filled_array = <float *> malloc(8*sizeof(c))
+    cdef float filled_array[8]
 
     cdef int count = 0
     cdef int j
@@ -163,7 +159,6 @@ cdef AVX.float8 array_to_float8(float *c, int j_start, int j_end) nogil:
                            filled_array[2],
                            filled_array[1],
                            filled_array[0])
-    free(filled_array)
     return f8
 
 # An example using AVX instructions
