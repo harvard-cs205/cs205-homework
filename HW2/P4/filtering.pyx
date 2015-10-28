@@ -15,6 +15,10 @@ cdef extern from "median9.h":
                   FLOAT s3, FLOAT s4, FLOAT s5,
                   FLOAT s6, FLOAT s7, FLOAT s8) nogil
 
+
+
+
+
 # clamped pixel fetch
 cdef inline FLOAT GETPIX(FLOAT[:, :] im, int i, int j) nogil:
     if i < 0:
@@ -26,6 +30,11 @@ cdef inline FLOAT GETPIX(FLOAT[:, :] im, int i, int j) nogil:
     if j >= im.shape[1]:
         j = im.shape[1] - 1
     return im[i, j]
+
+
+
+
+
 
 # median filtering
 cpdef median_3x3(FLOAT[:, :] input_image,
@@ -39,9 +48,20 @@ cpdef median_3x3(FLOAT[:, :] input_image,
 
     with nogil:
         i = offset
+        #for i in prange(input_image.shape[0], nogil=True, num_threads=2, schedule=static):
         while i < input_image.shape[0]:
             for j in range(input_image.shape[1]):  # columns
                     output_image[i, j] = median9(GETPIX(input_image, i-1, j-1), GETPIX(input_image, i-1, j), GETPIX(input_image, i-1, j+1),
                                                  GETPIX(input_image, i,   j-1), GETPIX(input_image, i,   j), GETPIX(input_image, i,   j+1),
                                                  GETPIX(input_image, i+1, j-1), GETPIX(input_image, i+1, j), GETPIX(input_image, i+1, j+1))
             i += step
+
+
+
+
+
+
+
+
+
+
