@@ -20,8 +20,11 @@ I use Morton order to sort the positions by utilizing an excellent module writte
 (see morton.py). Reading about Morton order on Wikipedia, "Morton order maps multidimensional data
 to one dimension while preserving the locality of the data points." It basically uses a multi-dimensional fractal that
 efficiently maps data from N dimensions to one while preserving data locality in N dimensions. Our strategy is consequently to take
-the 2d position data and sort it based on Morton order; this way, points close in space are close in memory. It is
-slightly confusing to do this. We begin by creating an index matrix, looking something like
+the 2d position data and sort it based on Morton order; this way, points close in space are close in memory. This is
+ advantageous as points close in space frequently interact with each other; we want memory lookups between them to be
+ very fast.
+
+ It is slightly confusing to implement morton sorting. We begin by creating an index matrix, looking something like
 
 [[0, 1, 2],
  [3, 4, 5],
@@ -29,7 +32,10 @@ slightly confusing to do this. We begin by creating an index matrix, looking som
  ]
 
 This matrix is analagous to where our particles are located in the grid, i.e. rows can be interpreted as the y axis and
-columns can be interpreted as the x axis. We then sort the grid via morton order, returning
+columns can be interpreted as the x axis. Note that this is how arrays are normally stored in memory (at least in c);
+along rows, then columns. The image "standard_logical_indices.png" shows a standard logical index.
+
+We then sort the grid via morton order, returning
 something like
 
 [[0, 2, 6],
@@ -38,9 +44,12 @@ something like
  ]
 
 This tells us that element 0 in the original matrix should be given a value of 0 when sorting,
-1 in the original matrix has a value of 2, and 2 has a value of 6, etc.
+1 in the original matrix has a value of 2, and 2 has a value of 6, etc. A sorted matrix in morton order can be seen
+in "morton_ordering.png." On average, it looks like points closer in space are closer together logically (i.e.
+similar colors). The fractal nature of the morton ordering is evident when you zoom in on the sorted matrix; it looks
+identical on the large and small scale! See "morton_ordering_zoomed.png" for a zoom-in.
 
-Every iteration, we take the position of the particles, assign them an appropriate morton-ordered value, and then sort
+Every iteration, we take the position of the particles, assign them their corresponding morton-ordered value, and then sort
 the resulting 1d array. In other words, our position data looks like
 
 [[x1, y1], --> [Morton ordering value,
