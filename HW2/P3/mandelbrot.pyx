@@ -10,19 +10,23 @@ cdef np.float64_t magnitude_squared(np.complex64_t z) nogil:
 	return z.real * z.real + z.imag * z.imag
 
 
-cdef AVX.float8 update_z_real(AVX.float8 z_real, AVX.float8 z_imag, AVX.float8 c_real) nogil:
+cdef AVX.float8 update_z_real(AVX.float8 z_real, 
+			AVX.float8 z_imag, AVX.float8 c_real) nogil:
 
-	# update z: Re(z) = |z|^2 + Re(c)
-	# with |z|^2 = x^2 + y^2 where z = x+iy
+	# update z: z = z^2 + Re(c)
+	# with z^2 = x^2 - y^2 + i 2xy where z = x+iy
 
 	# x_s = x^2 + Re(c)
 	cdef AVX.float8 x_s = AVX.fmadd(z_real, z_real, c_real)
 	# y_s = y^2
 	cdef AVX.float8 y_s = AVX.mul(z_imag, z_imag)
 
-	return AVX.add(x_s,y_s)
+	return AVX.sub(x_s,y_s)
 
-cdef void iter_to_mem(AVX.float8 iter, np.uint32_t *to_big_matrix, int j_start, int j_end) nogil:
+cdef void iter_to_mem(AVX.float8 iter, 
+						np.uint32_t *to_big_matrix,
+						int slice_start,
+						int slice_end) nogil:
 	cdef float *iter_view = <float *> malloc(8*sizeof(float))
 
 	AVX.to_mem(iter, iter_view)
@@ -30,7 +34,7 @@ cdef void iter_to_mem(AVX.float8 iter, np.uint32_t *to_big_matrix, int j_start, 
 	# Now assign appropriately
 	cdef int j
 	cdef int count = 0
-	for j in range(j_start, j_end):
+	for j in range(slice_start, slice_end):
 		to_big_matrix[j] = <np.uint32_t> iter_view[count]
 		count += 1
 
@@ -100,9 +104,10 @@ cpdef mandelbrot_multrithreads_ILP(np.complex64_t [:, :] in_coords,
 										in_coords[i, m_8*8 + 0].imag)
 
 
-				# update z: Re(z) = |z|^2 + Re(c), Im(z) = Im(c)
+				# update z: Re(z) = x^2 -y^2 + Re(c)
 				z_float8_real = update_z_real(z_float8_real,z_float8_imag, c_real)
-				z_float8_imag = c_imag
+				# Im(z) = 2xy + Im(c)
+				z_float8_imag = AVX.fmadd(AVX.mul(z_float8_real,AVX.float_to_float8(2)) ,z_float8_imag,c_imag)
 
 
 				# mask will be true where 4.0 < avxval
@@ -117,7 +122,7 @@ cpdef mandelbrot_multrithreads_ILP(np.complex64_t [:, :] in_coords,
 
 				
 				# Assign the iterations
-				#iter_to_mem(z_mag,&out_counts[i][0], m_8*8, m_8*8+7)
+				iter_to_mem(iter_float8,&out_counts[i,0], m_8*8, m_8*8+7)
 			
 
 
