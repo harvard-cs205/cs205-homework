@@ -72,15 +72,17 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
 
                 for iteration in range(max_iterations):
                     # if magnitude_squared(z) > 4
-                    magnitudes_squared = AVX.mul(z_real, z_real)
-                    magnitudes_squared = AVX.fmadd(z_imag, z_imag, magnitudes_squared)
+                    magnitudes_squared = AVX.fmadd(z_imag, z_imag, AVX.mul(z_real, z_real))
                     greater4 = AVX.less_than(compare4, magnitudes_squared)
 
                     # Mask to add counts to those bigger than magnitude 4 and a 0 count
                     mask = AVX.bitwise_and(AVX.less_than(counts, compare1), greater4)
 
+                    if iteration % 100 == 0:
+                        print_complex_AVX(greater4, magnitudes_squared)
+
                     # Update count
-                    current_count = AVX.float_to_float8(<float> iteration)
+                    current_count = AVX.float_to_float8(<float>iteration)
                     counts = AVX.add(AVX.bitwise_and(mask, current_count), counts)
 
                     # Check if done
@@ -94,17 +96,8 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                         break
 
                     # z = z * z + c
-                    # Real z
-                    z_real = AVX.fmadd(z_real, z_real, z_real)
-                    z_real = AVX.sub(z_real, AVX.mul(z_imag, z_imag))
-
-                    # Imaginary z
-                    z_imag = AVX.fmadd(z_imag, z_real, z_imag)
-                    z_imag = AVX.fmadd(z_real, z_imag, z_imag)
-
-                    # Add c
-                    z_real = AVX.add(z_real, c_reals)
-                    z_imag = AVX.add(z_imag, c_imags)
+                    z_real = AVX.add(AVX.sub(AVX.fmadd(z_real, z_real, z_real), AVX.mul(z_imag, z_imag)), c_reals)
+                    z_imag = AVX.add(AVX.fmadd(z_imag, z_real, AVX.fmadd(z_real, z_imag, z_imag)), c_imags)
 
                 # Store result
                 AVX.to_mem(counts, counts_mem)
