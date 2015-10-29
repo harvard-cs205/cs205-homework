@@ -17,8 +17,8 @@ def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
 if __name__ == '__main__':
-    num_balls = 10000 #500 
-    radius = 0.002 #0.01 
+    num_balls = 10000 #500
+    radius = 0.002 #0.01
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -41,8 +41,8 @@ if __name__ == '__main__':
     # Each square in the grid stores the index of the object in that square, or
     # -1 if no object.  We don't worry about overlapping objects, and just
     # store one of them.
-    grid_spacing = radius / np.sqrt(2.0)
-    grid_size = int((1.0 / grid_spacing) + 1)
+    grid_spacing = radius / np.sqrt(2.0) #Distance between 2 grid points
+    grid_size = int((1.0 / grid_spacing) + 1) #Number of points on each axis
     grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
     grid[(positions[:, 0] / grid_spacing).astype(int),
          (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
@@ -64,7 +64,7 @@ if __name__ == '__main__':
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
-                   radius, grid_size, locks_ptr,
+                   radius, grid_spacing, locks_ptr,
                    physics_step)
 
         # udpate our estimate of how fast the simulator runs

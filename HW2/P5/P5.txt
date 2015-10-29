@@ -1,3 +1,3 @@
 Multithreading with prange()
 With 1 thread we get results between 3.0 and 4.0 frames per second. With 4 threads we get results between 4.2 and 6.1 frames per second, which is consistently an improvement but almost double the range size. This is less than a 2x speedup for a 4x increase in threads.
-***WHY?***
+If prange() divides the loop into contiguous sections, then some sections will take longer than others because sub_update() checks all values from the current to the end and some contiguous sections will be closer to the end than others. Since sections take varying amounts of time, speedup is less than it could be. This also explains the runtime variability.
