@@ -1,0 +1,41 @@
+# solution to P2
+
+For both uncorrelated or correlated problem, the serial version is very fast, much faster than any parallel version I could provide. It is because in this problem parallel version creates locks and derives overheads which take up most of the time.
+
+Comparing fine-grained and medium-grained cases, we notice medium-grained method with N = 1 is equivalent to fine-grained method in theory. (Practically some additional calculation is added, there is a difference of one second.) There is a trade-off for the number of locks - generally speaking, with more locks, we increase concurrency but also overheads. For uncorrelated problem, using less locks decrease concurrency sharply, that we observed increasing time spend with increasing N. However for correlated problem, using less locks do not decrease concurrency much if N is decent. A recommended choice of N would be 50.
+
+Please find the original output of P2.py below.
+
+Serial uncorrelated: 0.235194921494 seconds
+Fine grained uncorrelated: 4.24531388283 seconds
+medium grained, N = 1
+Medium grained uncorrelated: 5.11828589439 seconds
+medium grained, N = 2
+Medium grained uncorrelated: 5.11909413338 seconds
+medium grained, N = 5
+Medium grained uncorrelated: 5.22023510933 seconds
+medium grained, N = 10
+Medium grained uncorrelated: 5.37920713425 seconds
+medium grained, N = 20
+Medium grained uncorrelated: 5.73369598389 seconds
+medium grained, N = 50
+Medium grained uncorrelated: 6.7995660305 seconds
+medium grained, N = 100
+Medium grained uncorrelated: 8.8041331768 seconds
+
+Serial correlated: 0.258160829544 seconds
+Fine grained correlated: 3.98389291763 seconds
+medium grained, N = 1
+Medium grained correlated: 4.92405414581 seconds
+medium grained, N = 2
+Medium grained correlated: 4.9650080204 seconds
+medium grained, N = 5
+Medium grained correlated: 4.67653107643 seconds
+medium grained, N = 10
+Medium grained correlated: 4.28928804398 seconds
+medium grained, N = 20
+Medium grained correlated: 3.85058093071 seconds
+medium grained, N = 50
+Medium grained correlated: 3.79889893532 seconds
+medium grained, N = 100
+Medium grained correlated: 4.14627599716 seconds
