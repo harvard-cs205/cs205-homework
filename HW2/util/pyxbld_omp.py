@@ -18,5 +18,6 @@ def make_ext(modname, pyxfilename):
                                          '-march=native',
                                          '-fopenmp',
                                          '-I{}'.format(np.get_include()),
-                                         '-I.'],
+                                         '-I.',
+                                         '-mavx'],
                      extra_link_args=extra_link_args)
