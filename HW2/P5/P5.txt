@@ -1,0 +1,11 @@
+P5. 
+For this problem I collaborated with Taylor Killian.
+
+Subproblem 1: There does appear to be a difference in performance when we compare 1 threads (serial performance ) to that of 4 threads:
+
+1 Thread: ~12 simulation frames per second
+4 Threads: ~28 simulation frames per second
+
+Note: chunk size set to (1/4)*count
+
+This performance difference makes sense. Here we are able to distribute the work across multiple processes instead of serially in a single process (which is a lot to handle when number of balls is large). Thus, more work (i.e., simulation frames per second) can be done. Note the increase in performance is only roughly 2x better here, though we have increased the number of threads by a factor of 4. 
