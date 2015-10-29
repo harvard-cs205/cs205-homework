@@ -10,6 +10,7 @@ pyximport.install()
 import numpy as np
 from timer import Timer
 from parallel_vector import move_data_serial, move_data_fine_grained, move_data_medium_grained
+import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
     ########################################
@@ -39,13 +40,17 @@ if __name__ == '__main__':
     ########################################
     # You should explore different values for the number of locks in the medium
     # grained locking
-    ########################################
-    N = 10
-    counts[:] = orig_counts
-    with Timer() as t:
-        move_data_medium_grained(counts, src, dest, 100, N)
-    assert counts.sum() == total, "Wrong total after move_data_medium_grained"
-    print("Medium grained uncorrelated: {} seconds".format(t.interval))
+    ########################################    
+    N = range(1,33)
+    T=[]
+    for n in N:
+        print "n is ", n
+        counts[:] = orig_counts
+        with Timer() as t:
+            move_data_medium_grained(counts, src, dest, 100, n)
+        assert counts.sum() == total, "Wrong total after move_data_medium_grained"
+        print("Medium grained uncorrelated: {} seconds".format(t.interval))
+        T.append(t.interval)
 
     ########################################
     # Now use correlated data movement
@@ -73,10 +78,22 @@ if __name__ == '__main__':
     ########################################
     # You should explore different values for the number of locks in the medium
     # grained locking
-    ########################################
-    N = 10
-    counts[:] = orig_counts
-    with Timer() as t:
-        move_data_medium_grained(counts, src, dest, 100, N)
-    assert counts.sum() == total, "Wrong total after move_data_medium_grained"
-    print("Medium grained correlated: {} seconds".format(t.interval))
+    ########################################    
+    N2 = range(1,33)
+    T2=[]
+    for n in N2:
+        print "n is ", n
+        counts[:] = orig_counts
+        with Timer() as t:
+            move_data_medium_grained(counts, src, dest, 100, n)
+        assert counts.sum() == total, "Wrong total after move_data_medium_grained"
+        print("Medium grained correlated: {} seconds".format(t.interval))
+        T2.append(t.interval)
+    
+    plt.plot(N,T,label="Medium grained uncorrelated time")
+    plt.plot(N2,T2,label="Medium grained correlated time")
+    plt.xlabel("N")
+    plt.ylabel("Time (s)")
+    plt.title("P2 Time Comparison")
+    plt.legend()
+    plt.savefig("P2_fig")
