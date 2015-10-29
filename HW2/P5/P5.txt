@@ -1,0 +1,10 @@
+
+---------------------------------------
+SUBPROBLEM 1: Multithreading
+---------------------------------------
+
+For the serial case the average number of simulation frames per second is 13.
+
+When using 4 threads with prange a chunksize of count/100 = 1e3 the average number of simulation frames per second is 50.
+
+We can play with the chunksize. Using a chunksize of count/4 leads to an average number of simulation frames per second of 30.
