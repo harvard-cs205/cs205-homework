@@ -13,10 +13,12 @@ cdef np.float64_t magnitude_squared(np.complex64_t z) nogil:
 @cython.wraparound(False)
 cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                  np.uint32_t [:, :] out_counts,
+                 int num_threads,
                  int max_iterations=511):
     cdef:
        int i, j, iter
        np.complex64_t c, z
+       int nt = num_threads
 
        # To declare AVX.float8 variables, use:
        # cdef:
@@ -31,16 +33,15 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     assert in_coords.shape[0] == out_counts.shape[0], "Input and output arrays must be the same size"
     assert in_coords.shape[1] == out_counts.shape[1],  "Input and output arrays must be the same size"
 
-    with nogil:
-        for i in range(in_coords.shape[0]):
-            for j in range(in_coords.shape[1]):
-                c = in_coords[i, j]
-                z = 0
-                for iter in range(max_iterations):
-                    if magnitude_squared(z) > 4:
-                        break
-                    z = z * z + c
-                out_counts[i, j] = iter
+    for i in prange(in_coords.shape[0], nogil=True, num_threads=nt, schedule='static', chunksize=1):
+        for j in range(in_coords.shape[1]):
+            c = in_coords[i, j]
+            z = 0
+            for iter in range(max_iterations):
+                if magnitude_squared(z) > 4:
+                    break
+                z = z * z + c
+            out_counts[i, j] = iter
 
 
 
