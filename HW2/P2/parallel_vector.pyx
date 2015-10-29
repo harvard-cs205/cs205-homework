@@ -17,14 +17,14 @@ from libc.stdlib cimport malloc, free
 import numpy as np
 cimport numpy as np
 
-# lock helper functions
+# Lock helper functions
 cdef void acquire(omp_lock_t *l) nogil:
     omp_set_lock(l)
 
 cdef void release(omp_lock_t *l) nogil:
     omp_unset_lock(l)
 
-# helper function to fetch and initialize several locks
+# Helper function to fetch and initialize several locks
 cdef omp_lock_t *get_N_locks(int N) nogil:
     cdef:
         omp_lock_t *locks = <omp_lock_t *> malloc(N * sizeof(omp_lock_t))
@@ -46,18 +46,50 @@ cdef void free_N_locks(int N, omp_lock_t *locks) nogil:
 
     free(<void *> locks)
 
+# Helper function to acquire locks in order
+cdef void acquire_locks(int idx1, int idx2, omp_lock_t *locks) nogil:
+
+    # Only require one lock
+    if idx1 == idx2: 
+        acquire(&(locks[idx1]))
+    
+    # Acquire in ascending order - to avoid deadlock
+    else:
+        if idx1 < idx2:
+            acquire(&(locks[idx1]))
+            acquire(&(locks[idx2]))
+        else:
+            acquire(&(locks[idx2]))
+            acquire(&(locks[idx1]))
+
+# Helper function to release locks in order
+cdef void release_locks(int idx1, int idx2, omp_lock_t *locks) nogil:
+
+    # Only require one lock
+    if idx1 == idx2: 
+        release(&(locks[idx1]))
+    
+    # Release in ascending order - to avoid deadlock
+    else:
+        if idx1 < idx2:
+            release(&(locks[idx1]))
+            release(&(locks[idx2]))
+        else:
+            release(&(locks[idx2]))
+            release(&(locks[idx1]))
+
 ##################################################
 # Your code below
 ##################################################
 
-# NOTE: cpdef functions can be called from both Python and C
+# cpdef functions can be called from both Python and C
 
 cpdef move_data_serial(np.int32_t[:] counts,
                        np.int32_t[:] src,
                        np.int32_t[:] dest,
                        int repeat):
 
-   # NOTE: cdef makes C-level declarations
+   # cdef makes C-level declarations
 
     cdef:
        int idx, r
@@ -83,18 +115,18 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
 
         for idx in prange(src.shape[0], nogil=True, num_threads=4):
 
+            # Acquire locks - before if statement to avoid multiple threads setting counts[src[idx]] < 0
+            acquire_locks(src[idx], dest[idx], locks)
+
+            # Update values
             if counts[src[idx]] > 0:
+                counts[dest[idx]] += 1
+                counts[src[idx]] -= 1
 
-                acquire(&locks[dest[idx]]) # Acquire lock for index from dest array
-                counts[dest[idx]] += 1 # Update value
-                release(&locks[dest[idx]]) # Release lock
-
-                acquire(&locks[src[idx]]) # Acquire lock for index from src array
-                counts[src[idx]] -= 1 # Update value
-                release(&locks[src[idx]]) # Release lock
+            # Release locks
+            release_locks(src[idx], dest[idx], locks)
 
     free_N_locks(counts.shape[0], locks) # Frees all locks
-
 
 cpdef move_data_medium_grained(np.int32_t[:] counts,
                                np.int32_t[:] src,
@@ -110,14 +142,15 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
 
         for idx in prange(src.shape[0], nogil=True, num_threads=4):
 
+            # Acquire locks - before if statement to avoid multiple threads setting counts[src[idx]] < 0
+            acquire_locks(src[idx]/N, dest[idx]/N, locks)
+
+            # Update values
             if counts[src[idx]] > 0:
+                counts[dest[idx]] += 1
+                counts[src[idx]] -= 1
 
-                acquire(&locks[dest[idx]/N]) # Acquire lock for index from dest array
-                counts[dest[idx]] += 1 # Update value
-                release(&locks[dest[idx]/N]) # Release lock
-
-                acquire(&locks[src[idx]/N]) # Acquire lock for index from src array
-                counts[src[idx]] -= 1 # Update value
-                release(&locks[src[idx]/N]) # Release lock
+            # Release locks
+            release_locks(src[idx]/N, dest[idx]/N, locks)
 
     free_N_locks(num_locks, locks) # Frees all locks
