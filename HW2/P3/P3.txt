@@ -1,0 +1,23 @@
+P3. For this question, I collaborated with Virgile Audi and Taylor Killian.
+
+################
+#    No AVX    #
+################
+
+Performance increases significantly when I change the number of threads (without instruction level parallelism):
+1 Thread: 4.65 seconds
+2 Threads: 2.35 seconds
+4 Threads: 1.22 seconds
+From these results, it would appear that the speed up is about proportional to the number of threads that we implement.
+
+################
+#      AVX     #
+################
+
+When instruction level parallelism is added, performance increases even more.
+
+1 Thread: 0.73 seconds
+2 Threads: 0.37 seconds
+4 Threads:  0.19 seconds
+
+Clearly, the addition of instruction level parallelism using AVX has drastically reduced the time. With a single thread, AVX appears to improve time by a factor of 6-7. It’s likely that a full 8 is not hit because we are not always working on all 8 registers at once. There are times when some registers are above our threshold and thus using a mask allows us to avoid operating on them. perhaps we could have swapped out completed registers with new ones as soon as they are ready instead of waiting for all 8 registers to meet our threshold specifications before inserting in a new set of 8 registers. 
