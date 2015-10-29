@@ -17,8 +17,8 @@ def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
 if __name__ == '__main__':
-    num_balls = 1e4
-    radius = 0.002
+    num_balls = 500
+    radius = 0.01
     n_threads = 4
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
@@ -47,6 +47,7 @@ if __name__ == '__main__':
     grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
     grid[(positions[:, 0] / grid_spacing).astype(int),
          (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
+
 
     # A matplotlib-based animator object
     animator = Animator(positions, radius * 2)

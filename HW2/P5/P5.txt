@@ -8,3 +8,9 @@ For the serial case the average number of simulation frames per second is 13.
 When using 4 threads with prange a chunksize of count/100 = 1e3 the average number of simulation frames per second is 50.
 
 We can play with the chunksize. Using a chunksize of count/4 leads to an average number of simulation frames per second of 30.
+
+Since we are using a static scheduler because the chunks have roughly the same runtime it is interesting to try to optimize the chunksize. Note that, when we don't prescribe the chunksize the arerage number of simulation frames per second is 30. It looks like, because we prescribe 4 threads, the automatic chunksize is count/4.
+
+---------------------------------------
+SUBPROBLEM 1: Spatial decomposition
+---------------------------------------

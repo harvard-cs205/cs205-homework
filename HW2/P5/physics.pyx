@@ -1,4 +1,5 @@
-#cython: boundscheck=False, wraparound=False
+#cython: boundscheck=False
+#cython: wraparound=False
 
 cimport numpy as np
 from libc.math cimport sqrt
@@ -11,8 +12,6 @@ from cython.parallel import prange
 ctypedef np.float32_t FLOAT
 ctypedef np.uint32_t UINT
 
-@cython.boundscheck(False)
-@cython.wraparound(False)
 
 cdef inline int overlapping(FLOAT *x1,
                             FLOAT *x2,
@@ -96,38 +95,43 @@ cpdef update(FLOAT[:, ::1] XY,
     cdef:
         int count = XY.shape[0]
         int i, j, dim
-        FLOAT *XY1, *XY2, *V1, *V2
+        #FLOAT *XY1, *XY2, *V1, *V2
         # SUBPROBLEM 4: uncomment this code.
         # omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
 
     assert XY.shape[0] == V.shape[0]
     assert XY.shape[1] == V.shape[1] == 2
-
+    # --------------------
     # bounce off of walls
+    # --------------------
     #
     # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
     # scheduling.
-    for i in prange(count ,nogil = True, schedule = 'static', chunksize =count/4 , num_threads = n_threads):
+    for i in prange(count ,nogil = True, schedule = 'static', chunksize =count/100 , num_threads = n_threads):
     # Serial loop kept for testing
     #for i in range(count):
         for dim in range(2):
             if (((XY[i, dim] < R) and (V[i, dim] < 0)) or
                 ((XY[i, dim] > 1.0 - R) and (V[i, dim] > 0))):
                 V[i, dim] *= -1
+    # --------------------
     # bounce off of each other
+    # --------------------
     #
     # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
     # scheduling.
-    for i in prange(count ,nogil = True, schedule = 'static', chunksize =count/4 , num_threads = n_threads):
+    for i in prange(count ,nogil = True, schedule = 'static', chunksize =count/100 , num_threads = n_threads):
     # Serial loop kept for testing
     #for i in range(count):
         sub_update(XY, V, R, i, count, Grid, grid_spacing)
+    # --------------------
     # update positions
+    # --------------------
     #
     # SUBPROBLEM 1: parallelize this loop over 4 threads (with static
     #    scheduling).
     # SUBPROBLEM 2: update the grid values.
-    for i in prange(count ,nogil = True, schedule = 'static', chunksize =count/4 , num_threads = n_threads):
+    for i in prange(count ,nogil = True, schedule = 'static', chunksize =count/100 , num_threads = n_threads):
     # Serial loop kept for testing
     #for i in range(count):
         for dim in range(2):
