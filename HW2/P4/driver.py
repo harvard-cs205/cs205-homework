@@ -23,17 +23,18 @@ def py_median_3x3(image, iterations=10, num_threads=1):
     Threads = []
     Events = [] #np.empty([num_threads,iterations])
     
-    #Create 2D array of events.
+    # Create 2D array of events, each event corresponds to a single (thread, iteration) pair
     for i in range(iterations):
         for n in range(num_threads):
             Events += [threading.Event()]
     Events = np.array(Events).reshape((num_threads,iterations))
     
-    #Create separate threads and set them loose on the image!
+    # Create separate threads and set them loose on the image!
     for n in range(num_threads):
         thread = threading.Thread(target=parallizeImage, args=(n, num_threads, tmpA, tmpB, Events, iterations))
         thread.start()
         Threads += [thread]
+    # Kill 
     for t in Threads:
         t.join()
         
