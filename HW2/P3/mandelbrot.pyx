@@ -56,7 +56,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     cdef AVX.float8 to_add, go_mask
 
     with nogil:
-        for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=1):
+        for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=12):
             for j in range(num_cols_to_iterate): # Parallelize via AVX here...do 8 at a time
                 j_start = 8*j
                 j_end = 8*(j+1)

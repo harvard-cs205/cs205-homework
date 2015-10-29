@@ -27,20 +27,20 @@ prange with 12 threads (max):
 #### prange and AVX ####
 
 prange with one thread:
-1074.94829 Million Complex FMAs in 0.664915084839 seconds
-1616.67002977 million Complex FMAs / second
+1074.94829 Million Complex FMAs in 0.585830926895 seconds
+1834.9121575 million Complex FMAs / second
 
 prange with two threads:
-1074.94829 Million Complex FMAs in 0.458148956299 seconds
-2346.28558075 million Complex FMAs / second
+1074.94829 Million Complex FMAs in 0.314192056656 seconds
+3421.30956919 million Complex FMAs / second
 
 prange with four threads:
-1074.94829 Million Complex FMAs in 0.36952996254 seconds
-2908.96110998 million Complex FMAs / second
+1074.94829 Million Complex FMAs in 0.174145936966 seconds
+6172.68659108 million Complex FMAs / second
 
 prange with 12 threads (max):
-1074.94829 Million Complex FMAs in 0.227474927902 seconds
-4725.56821938 million Complex FMAs / second
+1074.94829 Million Complex FMAs in 0.11225104332 seconds
+9576.28774049 million Complex FMAs / second
 
 #TODO: Update discussion since my code now scales nicely
 
