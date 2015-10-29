@@ -1,0 +1,29 @@
+Below is the times of each run.
+
+Serial uncorrelated: 0.275421142578 seconds
+Fine grained uncorrelated: 3.58328294754 seconds
+Medium grained correlated, N = 1: 4.63656806946 seconds
+Medium grained correlated, N = 2: 5.24040412903 seconds
+Medium grained correlated, N = 3: 5.85056400299 seconds
+Medium grained correlated, N = 4: 6.43449807167 seconds
+Medium grained correlated, N = 5: 7.3750910759 seconds
+Medium grained correlated, N = 6: 8.20255303383 seconds
+Medium grained correlated, N = 7: 9.15443515778 seconds
+Medium grained correlated, N = 8: 10.1533591747 seconds
+Medium grained correlated, N = 9: 11.0850629807 seconds
+Medium grained correlated, N = 10: 12.2166399956 seconds
+
+Serial correlated: 0.27863907814 seconds
+Fine grained correlated: 3.78258991241 seconds
+Medium grained correlated, N = 1: 5.00998592377 seconds
+Medium grained correlated, N = 2: 4.94884514809 seconds
+Medium grained correlated, N = 3: 5.79343700409 seconds
+Medium grained correlated, N = 4: 6.34704494476 seconds
+Medium grained correlated, N = 5: 7.08802008629 seconds
+Medium grained correlated, N = 6: 7.9741590023 seconds
+Medium grained correlated, N = 7: 8.97585201263 seconds
+Medium grained correlated, N = 8: 9.94677901268 seconds
+Medium grained correlated, N = 9: 11.0350589752 seconds
+Medium grained correlated, N = 10: 11.9213550091 seconds
+
+TODO
