@@ -63,8 +63,8 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                 if j_end > in_coords.shape[1]:
                     j_end = in_coords.shape[1]
 
-                real_c = &real_in_coords[i][0] # get pointers to the arrays
-                imag_c = &imag_in_coords[i][0]
+                real_c = &real_in_coords[i, 0] # get pointers to the arrays
+                imag_c = &imag_in_coords[i, 0]
 
                 real_c_float8 = array_to_float8(real_c, j_start, j_end)
                 imag_c_float8 = array_to_float8(imag_c, j_start, j_end)
@@ -99,7 +99,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                     imag_z_float8 = temp_z_imag
 
                 # Assign the iterations
-                assign_values_to_matrix(iter, &out_counts[i][0], j_start, j_end)
+                assign_values_to_matrix(iter, &out_counts[i, 0], j_start, j_end)
 
 cdef void print_float8(AVX.float8 f8) nogil:
     cdef float iter_view[8]
