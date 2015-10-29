@@ -20,10 +20,9 @@ cpdef mandelbrot_multrithreads_ILP(np.complex64_t [:, :] in_coords,
 				int n_elem,
 				int max_iterations=511):
 	cdef:
-		int i, j,m_8,j_m,k, iterations
-		np.complex64_t c, z
+		int i,m_8,k, iterations
 		AVX.float8 c_real, c_imag, iter_float8, z_mag
-		AVX.float8 mask, mag_check, z_float8_real, z_float8_imag, z_float8_real_new
+		AVX.float8 mask, z_float8_real, z_float8_imag, z_float8_real_new
 		AVX.float8 four_float8, two_float8, one_float8, zero_float8
 
 	four_float8 = AVX.float_to_float8(4.0)
@@ -99,7 +98,7 @@ cpdef mandelbrot_multrithreads_ILP(np.complex64_t [:, :] in_coords,
 				
 				# Assign the iterations to out_counts
 				for k in range(8):
-					out_counts[i,m_8*8+k]= <np.uint32_t> ((<np.float32_t*> &iter_float8)[k])			
+					out_counts[i,m_8*8+k]= <np.uint32_t> (<np.float32_t *> &iter_float8)[k]			
 			
 
 cpdef mandelbrot(np.complex64_t [:, :] in_coords,
