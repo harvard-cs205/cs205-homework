@@ -1,3 +1,6 @@
+# I received help from Jonathan Friedman and collaborated with Andrew Petschek, Abhishek Malali and Reinier Maat
+#This was also insightful: http://stackoverflow.com/questions/12317940/python-threading-can-i-sleep-on-two-threading-events-simultaneously
+————————————————————————————————————————————-
 With 1 Thread:
 3.17745709419 seconds for 10 filter passes.
 
@@ -9,3 +12,8 @@ With 4 Threads:
 
 With 8 Threads:
 1.44997811317 seconds for 10 filter passes.
+————————————————————————————————————————————————
+
+I was happy to see that my code ran as I thought it should. Where with each increase in the number of threads, there was a perceived improvement to the performance. This increase is due to the interleaving of the rows of the image we’re processing, allowing for a large jump in performance from a serial implementation (1 thread). There isn’t as noticeable of a jump in performance from 2 to 4 threads because there is added waiting time when synchronizing the work as well as the background processes on my computer eating up compute with at least one of those threads. My computer has only 2 processors with two virtual cores per processor (happy hyper threading) so there shouldn’t be an appreciable jump in performance from 4 to 8 threads. You get less synchronization per thread, in relation to the other threads running but there is added overhead as my cores switch between threads that wasn’t there previously. This tradeoff results in minimal performance gains by doubling the number of threads. But still, to process an image as large as this in ~1.5 seconds is impressive no matter how you dice it. I’m pleased with what I’ve learned and accomplished.
+
+I controlled cooperation between threads by creating a 2D list of threading.Event()’s. Each (thread,iteration) pair was provided their own event that was set to true when thread n completed scanning its assigned rows of the image during iteration i. What this enabled was a simple coordination with the threads directly adjacent to thread n that were still working on the i-1st iteration. The only consideration that I had to make after this implementation were the conditions that constrained the threads and iterations that thread n was dependent on. With these conditions in place, careful coordination was ensured. I’m certain that there is a better way of using events but this was intuitive to me and was actually pretty straight forward to implement.
