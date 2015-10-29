@@ -126,15 +126,15 @@ cpdef update(FLOAT[:, ::1] XY,
     assert XY.shape[0] == V.shape[0]
     assert XY.shape[1] == V.shape[1] == 2
 
-    thread_count = 1
+    thread_count = 4
     chunk_size = count/4
     with nogil:
         # bounce off of walls
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
-        for i in prange(count, schedule='static', chunksize=chunk_size, num_threads=thread_count):
-        #for i in range(count):
+        #for i in prange(count, schedule='static', chunksize=chunk_size, num_threads=thread_count):
+        for i in range(count):
             for dim in range(2):
                 if (((XY[i, dim] < R) and (V[i, dim] < 0)) or
                     ((XY[i, dim] > 1.0 - R) and (V[i, dim] > 0))):
@@ -144,7 +144,8 @@ cpdef update(FLOAT[:, ::1] XY,
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
-        for i in prange(count, schedule='static', chunksize=chunk_size, num_threads=thread_count):
+        #for i in prange(count, schedule='static', chunksize=chunk_size, num_threads=thread_count):
+        for i in range(count):
             sub_update(XY, V, R, i, count, Grid, grid_spacing)
             
             #Clear grid location to prepare for update
@@ -158,7 +159,8 @@ cpdef update(FLOAT[:, ::1] XY,
         # SUBPROBLEM 1: parallelize this loop over 4 threads (with static
         #    scheduling).
         # SUBPROBLEM 2: update the grid values.
-        for i in prange(count, schedule='static', chunksize=chunk_size, num_threads=thread_count):
+        #for i in prange(count, schedule='static', chunksize=chunk_size, num_threads=thread_count):
+        for i in range(count):
             for dim in range(2):
                 XY[i, dim] += V[i, dim] * t
             
