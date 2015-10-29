@@ -1,0 +1,11 @@
+With 1 Thread:
+3.17745709419 seconds for 10 filter passes.
+
+With 2 Threads:
+1.62956380844 seconds for 10 filter passes.
+
+With 4 Threads:
+1.45653891563 seconds for 10 filter passes.
+
+With 8 Threads:
+1.44997811317 seconds for 10 filter passes.
