@@ -4,7 +4,6 @@ cimport cython
 import numpy
 cimport AVX
 from cython.parallel import prange
-from libc.stdlib cimport malloc, free
 
 cdef np.float64_t magnitude_squared(np.complex64_t z) nogil:
 	return z.real * z.real + z.imag * z.imag
