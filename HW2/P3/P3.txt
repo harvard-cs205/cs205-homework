@@ -7,3 +7,8 @@ In the graph P3_experiment_multithreading.png we see the execution times for 1, 
 
 MULTITHREADING WITH INSTRUCTION-LEVEL OPTIMIZATIONS
 ---------------------------------------------------
+The experiment with AVX optimizations shows exactly the opposite answer compared to the serial version. AVX is
+emulated on my machine, which is likely the cause of slower execution times for more cores. The values can be seen in
+ P3_multithreading_AVX.png. Another thing that is apparent is that the AVX code is a tenfold slower than the serial
+ code. I wonder whether that is due to the emulation, or due to locking and waiting of threads (especially because 2
+ and 4 threads are slower than only 1 thread, which should expectedly be the other way around).

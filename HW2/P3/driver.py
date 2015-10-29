@@ -12,7 +12,6 @@ import mandelbrot
 from timer import Timer
 
 import pylab as plt
-import seaborn as sns
 import numpy as np
 
 
@@ -48,11 +47,10 @@ if __name__ == '__main__':
         plt.imshow(np.log(out_counts))
         plt.show()
 
-    sns.set_style("darkgrid")
     f, ax = plt.subplots(1)
     plt.plot(threadcount, execution_times)
     plt.xlabel('N')
     plt.ylabel('Time (sec.)')
-    plt.title('Execution time for 1, 2 and 4 threads')
+    plt.title('Execution time for 1, 2 and 4 threads with AVX')
     ax.set_ylim(0,)
     plt.show()

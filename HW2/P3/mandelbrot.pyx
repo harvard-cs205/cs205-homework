@@ -33,12 +33,11 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
        float k, sum
        float[8] mask_mem, counts_mem
        np.complex64_t c, z
-       AVX.float8 c_reals, c_imags, z_real, z_imag, counts, magnitudes_squared, greater4, mask, current_count
+       AVX.float8 c_reals, c_imags, z_real, z_real_, z_imag, counts, magnitudes_squared, greater4, mask, current_count
 
        int nt = num_threads
        AVX.float8 compare4 = AVX.float_to_float8(4.0)
        AVX.float8 compare1 = AVX.float_to_float8(1.0)
-
 
        # To declare AVX.float8 variables, use:
        # cdef:
@@ -78,9 +77,6 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                     # Mask to add counts to those bigger than magnitude 4 and a 0 count
                     mask = AVX.bitwise_and(AVX.less_than(counts, compare1), greater4)
 
-                    if iteration % 100 == 0:
-                        print_complex_AVX(greater4, magnitudes_squared)
-
                     # Update count
                     current_count = AVX.float_to_float8(<float>iteration)
                     counts = AVX.add(AVX.bitwise_and(mask, current_count), counts)
@@ -96,19 +92,32 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                         break
 
                     # z = z * z + c
-                    z_real = AVX.add(AVX.sub(AVX.fmadd(z_real, z_real, z_real), AVX.mul(z_imag, z_imag)), c_reals)
-                    z_imag = AVX.add(AVX.fmadd(z_imag, z_real, AVX.fmadd(z_real, z_imag, z_imag)), c_imags)
+                    z_real_ = z_real  # Save old value
+                    z_real = AVX.add(AVX.fmsub(z_real, z_real, AVX.mul(z_imag, z_imag)), c_reals)
+                    z_imag = AVX.add(AVX.fmadd(z_imag, z_real_, AVX.mul(z_real_, z_imag)), c_imags)
 
                 # Store result
                 AVX.to_mem(counts, counts_mem)
-                out_counts[i, j] = <np.uint32_t> counts_mem[0]
-                out_counts[i, j+1] = <np.uint32_t> counts_mem[1]
-                out_counts[i, j+2] = <np.uint32_t> counts_mem[2]
-                out_counts[i, j+3] = <np.uint32_t> counts_mem[3]
-                out_counts[i, j+4] = <np.uint32_t> counts_mem[4]
-                out_counts[i, j+5] = <np.uint32_t> counts_mem[5]
-                out_counts[i, j+6] = <np.uint32_t> counts_mem[6]
-                out_counts[i, j+7] = <np.uint32_t> counts_mem[7]
+                write_out(counts_mem, i, j, out_counts)
+cdef :
+    int refcount = 0
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef void write_out(float[8] counts_array, int out_i, int out_j, np.uint32_t [:, :] out_counts) nogil:
+    global refcount
+    while refcount != 0:
+        pass
+    refcount = refcount + 1
+    out_counts[out_i, out_j] = <np.uint32_t> counts_array[0]
+    out_counts[out_i, out_j+1] = <np.uint32_t> counts_array[1]
+    out_counts[out_i, out_j+2] = <np.uint32_t> counts_array[2]
+    out_counts[out_i, out_j+3] = <np.uint32_t> counts_array[3]
+    out_counts[out_i, out_j+4] = <np.uint32_t> counts_array[4]
+    out_counts[out_i, out_j+5] = <np.uint32_t> counts_array[5]
+    out_counts[out_i, out_j+6] = <np.uint32_t> counts_array[6]
+    out_counts[out_i, out_j+7] = <np.uint32_t> counts_array[7]
+    refcount = refcount - 1
 
 
 # An example using AVX instructions
