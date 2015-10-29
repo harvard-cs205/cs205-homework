@@ -1,0 +1,24 @@
+Subproblem 1: Multithreading
+
+With a serial implementation, the simulation rendered 9-14 frames per second. When I changed to 4 threads, the simulation then rendered 15-19 frames per second.
+
+
+Subproblem 2: Spatial Decomposition
+
+
+With a serial implementation, the simulation rendered between 500 and 700 frames per second. With 4 threads, the simulation then rendered between 800 and 1200 frames per second.
+
+Overall, there isn’t much speed up within the Multi-threading subproblem. This is possibly due to background processes hindering true multi-threading as well as my computer’s smaller number of virtual cores. This is also possibly due to the fact that although we’re  partitioning the chunks that operate on each thread, there is still significant lagging in each thread as there are a large number of computations needed to be performed per thread on a large number of balls.
+
+What we see when combining these two subproblems is the speed experienced when only considering the balls within the grid spacing at each time step (in the update() method). When we consider the balls that are colliding, in those versions without the spatial decomposition, we looked over each ball in the space that was close enough to be considered overlapping. By constraining that search space to only those cells at most two away from each ball, we eliminated unnecessary calculations in our quantum view of each ball’s dynamics. This process is sped up through parallelization with additional threads. 
+
+
+Subproblem 3: Spatially Coherent Sorting
+
+
+With a serial implementation, the simulation rendered between 600 and 800 frames per second. With 4 threads, the simulation then rendered between 900 and 1300 frames per second. Sorting with Morton Ordering has provided slight speed up in both the serial and multithreading running of my code. This is understandable seeing that we’ve reordered the particle data in memory so that objects closer to each other will be accessed faster when searching for collisions in the sub-update() subroutine. By eliminating I/O overhead due to this search we’ve been able to devote more resources to compute and therefore reduce the lag that builds up on the threads.
+
+
+Subproblem 4: Locking
+
+Without locking and four threads running, the simulation rendered between 900 and 1300 frames per second. When adding locks the simulation then rendered between _ _ _ and _ _ _ frames per second. I would anticipate that there is some slowing due to introducing locks, thus forcing the threads to wait for access to specific pointers. I wasn’t able to observe this due to my code screeching to a halt. It would appear as though my code becomes deadlocked although I don’t understand why. I thought that by implementing fine grained locking, that we would avoid deadlocking. If I get the time before this HW is due, I’ll try to fix this issue.
