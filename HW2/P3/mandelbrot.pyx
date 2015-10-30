@@ -38,7 +38,7 @@ cpdef mandelbrot_AVX(np.complex64_t [:, :] in_coords,
 			c_real = AVX.make_float8(in_coords_real[i, j+7], in_coords_real[i, j+6], in_coords_real[i, j+5],
 			in_coords_real[i, j+4], in_coords_real[i, j+3], in_coords_real[i, j+2], in_coords_real[i, j+1],
 			in_coords_real[i, j+0])
-			# define c_imag
+			# define c_imag (in the AVX 7 to 0 format)
 			c_imag = AVX.make_float8(in_coords_imag[i, j+7], in_coords_imag[i, j+6], in_coords_imag[i, j+5],
 			in_coords_imag[i, j+4], in_coords_imag[i, j+3], in_coords_imag[i, j+2], in_coords_imag[i, j+1],
 			in_coords_imag[i, j+0])
