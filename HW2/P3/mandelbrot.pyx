@@ -46,7 +46,6 @@ cpdef mandelbrot_AVX(np.complex64_t [:, :] in_coords,
 			z_real = AVX.float_to_float8(0.)
 			z_imag = AVX.float_to_float8(0.)
 			iter_AVX = AVX.float_to_float8(0.)
-			mask = AVX.float_to_float8(-1.)
 
 
 			# now iterate and count teh number of iterations
