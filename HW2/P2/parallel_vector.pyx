@@ -86,7 +86,7 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
                 if src[idx] < dest[idx]:
                     acquire(&(locks[src[idx]]))
                     acquire(&(locks[dest[idx]]))
-                # Handle the case where the src and dest lock ids are the same
+                # Handle the case where the src and dest lock ids are the same, avoid double locking
                 elif src[idx] == dest[idx]:
                     acquire(&(locks[src[idx]]))
                 else:
@@ -131,7 +131,7 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
                 if (src[idx] / N) < (dest[idx] / N):
                     acquire(&(locks[(src[idx] / N)]))
                     acquire(&(locks[(dest[idx] / N)]))
-                # Handle the case where the src and dest lock ids are the same
+                # Handle the case where the src and dest lock ids are the same, avoid double locking
                 elif (src[idx] / N) == (dest[idx] / N):
                     acquire(&(locks[(src[idx] / N)]))
                 else:

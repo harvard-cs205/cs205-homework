@@ -2,7 +2,7 @@ Remarkably, coarse-grained (serial) works better than the fine-, and medium-grai
 
 Both fine- and medium-grained perform better in the Correlated case.  This makes sense because the indexes that you need to lock on are likely to be in the same lock when they are correlated, making threads less likely to be held up waiting for other threads to free up locks.
 
-For medium-grained, for the uncorrelated case, I would chosse a very low value, like 1-5, as grouping large numbers of indexes into locks together does not help, and only holds up other threads.  In the correlated case, however, I would choose a number in the range of 30-40 for N as that performs best, as you can see from my trial data below.
+For medium-grained, for the uncorrelated case, I would chosse a very low value, like 1-5, as grouping large numbers of indexes into locks together does not help, and only holds up other threads.  In the correlated case, however, I would choose a number in the range of 25-30 for N as that performs best, as you can see from my trial data below.  This also makes sense, because if the source and destination are no more than 10 away, if you have 30, you will have a 10 ids in the middle all of whose links are present and then 10 on either side with decreasing probabilities that their src/dest is in the same lock grouping.  So there will be a lot of interal src-dest combos in each lock grouping.
 
 # Uncorrelated
 Serial uncorrelated: 0.277314186096 seconds
@@ -29,10 +29,13 @@ Fine grained correlated: 4.67542409897 seconds
 Medium grained 5 correlated: 4.81455206871 seconds
 Medium grained 10 correlated: 4.4177069664 seconds
 Medium grained 20 correlated: 3.50130414963 seconds
-Medium grained 30 correlated: 3.23521399498 seconds
-Medium grained 35 correlated: 3.21808600426 seconds
-Medium grained 40 correlated: 3.32813191414 seconds
-Medium grained 45 correlated: 3.30341506004 seconds
+Medium grained 25 correlated: 3.36418700218 seconds
+Medium grained 28 correlated: 3.32191300392 seconds
+Medium grained 29 correlated: 3.33710217476 seconds
+Medium grained 30 correlated: 3.42214202881 seconds
+Medium grained 35 correlated: 3.36982393265 seconds
+Medium grained 40 correlated: 3.40120220184 seconds
+Medium grained 45 correlated: 3.38620996475 seconds
 Medium grained 50 correlated: 3.44138407707 seconds
 Medium grained 100 correlated: 4.4582669735 seconds
 Medium grained 1000 correlated: 18.6743969917 seconds

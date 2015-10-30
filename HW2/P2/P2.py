@@ -103,6 +103,27 @@ if __name__ == '__main__':
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################
+    N = 25
+    counts[:] = orig_counts
+    with Timer() as t:
+        move_data_medium_grained(counts, src, dest, 100, N)
+    assert counts.sum() == total, "Wrong total after move_data_medium_grained"
+    print("Medium grained 25 correlated: {} seconds".format(t.interval))
+    
+    N = 28
+    counts[:] = orig_counts
+    with Timer() as t:
+        move_data_medium_grained(counts, src, dest, 100, N)
+    assert counts.sum() == total, "Wrong total after move_data_medium_grained"
+    print("Medium grained 28 correlated: {} seconds".format(t.interval))
+    
+    N = 29
+    counts[:] = orig_counts
+    with Timer() as t:
+        move_data_medium_grained(counts, src, dest, 100, N)
+    assert counts.sum() == total, "Wrong total after move_data_medium_grained"
+    print("Medium grained 29 correlated: {} seconds".format(t.interval))
+    
     N = 30
     counts[:] = orig_counts
     with Timer() as t:
