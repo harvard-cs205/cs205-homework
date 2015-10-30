@@ -1,4 +1,4 @@
-#cython: boundscheck=False, wraparound=False
+#cython: boundscheck=True, wraparound=False
 
 cimport numpy as np
 from libc.math cimport sqrt
@@ -58,7 +58,8 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                      float grid_spacing) nogil:
     cdef:
         FLOAT *XY1, *XY2, *V1, *V2
-        int j, dim
+        int j, k, l, dim, grid_idx1[2], grid_idx2[2]
+        int m=0
         float eps = 1e-5
 
     # SUBPROBLEM 4: Add locking
@@ -69,19 +70,29 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     ############################################################
     # SUBPROBLEM 2: use the grid values to reduce the number of other
     # objects to check for collisions.
-    for j in range(i + 1, count):
-        XY2 = &(XY[j, 0])
-        V2 = &(V[j, 0])
-        if overlapping(XY1, XY2, R):
-            # SUBPROBLEM 4: Add locking
-            if not moving_apart(XY1, V1, XY2, V2):
-                collide(XY1, V1, XY2, V2)
+    grid_idx1[1]=XY1[1]/grid_spacing
+    grid_idx1[2]=XY1[2]/grid_spacing
+    for k in range(-grid_idx[0],grid_idx[0]+1):
+        for l in range(-grid_idx[1],grid_idx[1]+1):
+            #find nearby objects
+            search_idx[m]=Grid[grid_idx[1],grid_idx[2]]
+            m+=1
+    search_idx=sorted(search_idx)
 
-            # give a slight impulse to help separate them
-            for dim in range(2):
-                V2[dim] += eps * (XY2[dim] - XY1[dim])
+    for j in search_idx:
+        if j>i and j!=-1:
+            XY2 = &(XY[j, 0])
+            V2 = &(V[j, 0])
+            if overlapping(XY1, XY2, R):
+                # SUBPROBLEM 4: Add locking
+                if not moving_apart(XY1, V1, XY2, V2):
+                    collide(XY1, V1, XY2, V2)
 
-cpdef update(FLOAT[:, ::1] XY,
+                # give a slight impulse to help separate them
+                for dim in range(2):
+                    V2[dim] += eps * (XY2[dim] - XY1[dim])
+
+cpdef update(FLOAT[:, ::1] XY, 
              FLOAT[:, ::1] V,
              UINT[:, ::1] Grid,
              float R,

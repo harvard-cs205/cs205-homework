@@ -46,7 +46,7 @@ if __name__ == '__main__':
     grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
     grid[(positions[:, 0] / grid_spacing).astype(int),
          (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
-
+    import pdb; pdb.set_trace()
     # A matplotlib-based animator object
     animator = Animator(positions, radius * 2)
 
@@ -59,12 +59,12 @@ if __name__ == '__main__':
 
     # SUBPROBLEM 4: uncomment the code below.
     # preallocate locks for objects
-    locks_ptr = preallocate_locks(num_balls)
+    #locks_ptr = preallocate_locks(num_balls)
 
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
-                   radius, grid_size, locks_ptr,
+                   radius, grid_spacing, locks_ptr,
                    physics_step)
 
         # udpate our estimate of how fast the simulator runs
