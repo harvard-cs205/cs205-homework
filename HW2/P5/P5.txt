@@ -1,0 +1,3 @@
+SUBPROBLEM 1: MULTITHREADING
+----
+With four threads, the simulation runs at about 10-11 frames per second, while with just one thread (serial execution), it runs a little under 5 frames per second (so just over 2x speedup with 4 threads).
