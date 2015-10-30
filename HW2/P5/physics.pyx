@@ -66,9 +66,7 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     # SUBPROBLEM 4: Add locking
     XY1 = &(XY[i, 0])
     V1 = &(V[i, 0])
-    # with gil: print 'check0'
     xidx, yidx = <UINT> (XY[i, 0]/grid_spacing), <UINT> (XY[i, 1]/grid_spacing)
-    # with gil: print 'checkMaybe'
     #############################################################
     # IMPORTANT: do not collide two balls twice.
     ############################################################
@@ -83,7 +81,8 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     if (xidx < Grid.shape[0]) and (yidx < Grid.shape[0]): # object on grid?
         for m in range(max(2, xidx)-2, min(Grid.shape[0], xidx+3)): # handle objects near edge
             for n in range(max(2, yidx)-2, min(Grid.shape[0], yidx+3)): # same as above
-                if (not (m == xidx and n == yidx)) and (i < Grid[m, n] < Grid.shape[0]):
+                # with gil: print 'm, n, xidx, yidx, Grid[m, n]:', m, n, xidx, yidx, Grid[m, n]
+                if (not (m == xidx and n == yidx)) and (i < Grid[m, n] < XY.shape[0]):
                     XY2 = &(XY[Grid[m, n], 0])
                     V2 = &(V[Grid[m, n], 0])
 
@@ -106,7 +105,7 @@ cpdef update(FLOAT[:, ::1] XY,
     cdef:
         int count = XY.shape[0]
         int i, j, dim, num_thr, chunk, temp
-        UINT tempidx1, tempidx2
+        UINT tempidx1, tempidx2, newidx1, newidx2
         FLOAT *XY1, *XY2, *V1, *V2
         # SUBPROBLEM 4: uncomment this code.
         # omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
@@ -135,18 +134,18 @@ cpdef update(FLOAT[:, ::1] XY,
             tempidx1 = <UINT> (XY[i, 0]/grid_spacing)
             tempidx2 = <UINT> (XY[i, 1]/grid_spacing)
 
-            if (tempidx1 < Grid.shape[0]) and (tempidx2 < Grid.shape[0]):
-                temp = Grid[tempidx1, tempidx2]
-
             for dim in range(2):
                 XY[i, dim] += V[i, dim] * t
 
-            if (((<UINT> (XY[i, 0]/grid_spacing)) < Grid.shape[0]) and
-                ((<UINT> (XY[i, 1]/grid_spacing)) < Grid.shape[0])):
-                Grid[<UINT> (XY[i, 0]/grid_spacing), <UINT> (XY[i, 1]/grid_spacing)] = i
+            newidx1 = <UINT> (XY[i, 0]/grid_spacing)
+            newidx2 = <UINT> (XY[i, 1]/grid_spacing)
 
-                if (tempidx1 < Grid.shape[0]) and (tempidx2 < Grid.shape[0]):
-                    Grid[tempidx1, tempidx2] = temp
+            if (newidx1 < Grid.shape[0]) and (newidx2 < Grid.shape[0]):
+                Grid[newidx1, newidx2] = i
+
+                if (tempidx1 < Grid.shape[0] and tempidx2 < Grid.shape[0] and
+                    (tempidx1 != newidx1 or tempidx2 != newidx2)):
+                    Grid[tempidx1, tempidx2] = -1
 
 
 def preallocate_locks(num_locks):
