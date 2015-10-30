@@ -67,26 +67,27 @@ def numpy_median(image, iterations=10):
 if __name__ == '__main__':
     input_image = np.load('image.npz')['image'].astype(np.float32)
 
-    pylab.gray()
+   #pylab.gray()
 
-    pylab.imshow(input_image)
-    pylab.title('original image')
+   #pylab.imshow(input_image)
+   #pylab.title('original image')
 
-    pylab.figure()
-    pylab.imshow(input_image[1200:1800, 3000:3500])
-    pylab.title('before - zoom')
+   #pylab.figure()
+   #pylab.imshow(input_image[1200:1800, 3000:3500])
+   #pylab.title('before - zoom')
 
     # verify correctness
     from_cython = py_median_3x3(input_image, 2, 5)
     from_numpy = numpy_median(input_image, 2)
     assert np.all(from_cython == from_numpy)
 
-    with Timer() as t:
-        new_image = py_median_3x3(input_image, 10, 8)
+    for nt in [1, 2, 4]:
+        with Timer() as t:
+            new_image = py_median_3x3(input_image, 10, nt)
 
-    pylab.figure()
-    pylab.imshow(new_image[1200:1800, 3000:3500])
-    pylab.title('after - zoom')
+       #pylab.figure()
+       #pylab.imshow(new_image[1200:1800, 3000:3500])
+       #pylab.title('after - zoom')
 
-    print("{} seconds for 10 filter passes.".format(t.interval))
-    pylab.show()
+        print("{0} seconds for 10 filter passes with {1} threads.".format(t.interval, nt))
+       #pylab.show()
