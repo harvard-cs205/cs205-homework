@@ -74,22 +74,15 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                     magnitudes_squared = AVX.fmadd(z_imag, z_imag, AVX.mul(z_real, z_real))
                     greater4 = AVX.less_than(compare4, magnitudes_squared)
 
-                    # Mask to add counts to those bigger than magnitude 4 and a 0 count
-                    mask = AVX.bitwise_and(AVX.less_than(counts, compare1), greater4)
+                    # Mask to add counts to those bigger than magnitude 4 and a 0 count (if not last iteration)
+                    if iteration == max_iterations - 1:
+                        mask = AVX.less_than(counts, compare1)
+                    else:
+                        mask = AVX.bitwise_and(AVX.less_than(counts, compare1), greater4)
 
                     # Update count
                     current_count = AVX.float_to_float8(<float>iteration)
                     counts = AVX.add(AVX.bitwise_and(mask, current_count), counts)
-
-                    # Check if done
-                    sum = 0.0
-                    AVX.to_mem(greater4, mask_mem)
-                    for k in mask_mem:
-                        sum = sum + k
-
-                    # Break if done
-                    if sum == -8.0:
-                        break
 
                     # z = z * z + c
                     z_real_ = z_real  # Save old value
