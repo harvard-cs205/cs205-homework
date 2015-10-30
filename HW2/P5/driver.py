@@ -42,9 +42,21 @@ if __name__ == '__main__':
     # Each square in the grid stores the index of the object in that square, or
     # -1 if no object.  We don't worry about overlapping objects, and just
     # store one of them.
+
+    #  size of one side = grid_spacing
+    #  --------
+    # |        |
+    # |        |
+    # |        |
+    # |        |
+    #  --------
+    # size of a diagonal is R
+    # need 4 grids to fit one ball
     grid_spacing = radius / np.sqrt(2.0)
-    grid_size = int((1.0 / grid_spacing) + 1)
+    grid_size = int((1.0 / grid_spacing) + 1)   
     grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
+    # look at the positions of the balls in the grid
+    # attribute a number to each ball
     grid[(positions[:, 0] / grid_spacing).astype(int),
          (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
 
@@ -63,6 +75,8 @@ if __name__ == '__main__':
     # preallocate locks for objects
     locks_ptr = preallocate_locks(num_balls)
 
+    iterations = 0
+
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
@@ -72,11 +86,20 @@ if __name__ == '__main__':
         # udpate our estimate of how fast the simulator runs
         physics_step = 0.9 * physics_step + 0.1 * t.interval
         total_time += t.interval
+        iterations += 1
 
         frame_count += 1
         if total_time > anim_step:
             animator.update(positions)
             print("{} simulation frames per second".format(frame_count / total_time))
+            # print 'iterations:', iterations
+            # if iterations > 30000:
+            #     print 'end of the code'
+            #     print 'here is a slice of the grid'
+            #     p = np.random.randint(0,grid_size)
+            #     print grid[p:p+10,p:p+10]
+            #     print 'grid_spacing', grid_spac
+            #     break                
             frame_count = 0
             total_time = 0
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
