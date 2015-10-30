@@ -71,7 +71,7 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
                              np.int32_t[:] dest,
                              int repeat):
    cdef:
-       int idx, r
+       int idx, r, sidx, didx
        omp_lock_t *locks = get_N_locks(counts.shape[0])
 
    ##########
@@ -79,12 +79,22 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
    # Use parallel.prange() and a lock for each element of counts to parallelize
    # data movement.  Be sure to avoid deadlock, and double-locking.
    ##########
-   with nogil:
-       for r in range(repeat):
-           for idx in range(src.shape[0]):
-               if counts[src[idx]] > 0:
-                   counts[dest[idx]] += 1
-                   counts[src[idx]] -= 1
+   for r in range(repeat):
+       for idx in prange(src.shape[0], nogil = True , num_threads = 4 ):
+           sidx, didx = src[idx], dest[idx]
+           if sidx == didx:
+               acquire(&(locks[didx]))
+           else:
+               acquire(&(locks[min(didx,sidx)]))
+               acquire(&(locks[max(didx,sidx)]))
+           if counts[src[idx]] > 0:
+               counts[dest[idx]] += 1
+               counts[src[idx]] -= 1
+           if sidx == didx:
+               release(&(locks[didx]))
+           else:
+               release(&(locks[min(didx,sidx)]))
+               release(&(locks[max(didx,sidx)]))
 
    free_N_locks(counts.shape[0], locks)
 
@@ -95,7 +105,7 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
                                int repeat,
                                int N):
    cdef:
-       int idx, r
+       int idx, r, sidx, didx
        int num_locks = (counts.shape[0] + N - 1) / N  # ensure enough locks
        omp_lock_t *locks = get_N_locks(num_locks)
 
@@ -105,11 +115,19 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
    # to parallelize data movement.  Be sure to avoid deadlock, as well as
    # double-locking.
    ##########
-   with nogil:
-       for r in range(repeat):
-           for idx in range(src.shape[0]):
-               if counts[src[idx]] > 0:
-                   counts[dest[idx]] += 1
-                   counts[src[idx]] -= 1
-
-   free_N_locks(num_locks, locks)
+   for r in range(repeat):
+       for idx in prange(src.shape[0], nogil = True , num_threads = 4 ):
+           sidx, didx = src[idx]/N, dest[idx]/N
+           if sidx == didx:
+               acquire(&(locks[didx]))
+           else:
+               acquire(&(locks[min(didx,sidx)]))
+               acquire(&(locks[max(didx,sidx)]))
+           if counts[src[idx]] > 0:
+               counts[dest[idx]] += 1
+               counts[src[idx]] -= 1
+           if sidx == didx:
+               release(&(locks[didx]))
+           else:
+               release(&(locks[min(didx,sidx)]))
+               release(&(locks[max(didx,sidx)]))

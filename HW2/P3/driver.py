@@ -28,9 +28,16 @@ def make_coords(center=(-0.575 - 0.575j),
 if __name__ == '__main__':
     in_coords, out_counts = make_coords()
 
+    # define the number of threads
+    n_threads = 4
+
     with Timer() as t:
-        mandelbrot.mandelbrot(in_coords, out_counts, 1024)
+        mandelbrot.mandelbrot_AVX(in_coords, out_counts, n_threads, 1024 )
     seconds = t.interval
+
+    # with Timer() as t:
+    #     mandelbrot.mandelbrot(in_coords, out_counts, n_threads, 1024)
+    # seconds = t.interval
 
     print("{} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
 
