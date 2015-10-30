@@ -1,0 +1,17 @@
+PROBLEM 3
+
+number_threads = 4:
+
+1074.94829 Million Complex FMAs in 0.240414142609 seconds, 4471.23566998 million Complex FMAs / second
+
+number_threads = 2:
+
+1074.94829 Million Complex FMAs in 0.383368015289 seconds, 2803.95924315 million Complex FMAs / second
+
+number_threads = 1:
+
+1074.94829 Million Complex FMAs in 0.659620046616 seconds, 1629.64769721 million Complex FMAs / second
+
+without threading:
+
+1074.656613 Million Complex FMAs in 4.90935301781 seconds, 218.899844664 million Complex FMAs / second

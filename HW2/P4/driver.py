@@ -15,10 +15,12 @@ import filtering
 from timer import Timer
 import threading
 
-def py_median_3x3(image, iterations=10, num_threads=1):
+
+def py_median_3x3_old(image, iterations=10, num_threads=1):
     ''' repeatedly filter with a 3x3 median '''
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
+    
 
     for i in range(iterations):
         filtering.median_3x3(tmpA, tmpB, 0, 1)
@@ -26,6 +28,43 @@ def py_median_3x3(image, iterations=10, num_threads=1):
         tmpA, tmpB = tmpB, tmpA
 
     return tmpA
+
+def parallel_function(tmpA, tmpB, t, num_threads, events_list, iterations):
+    for i in range(iterations):
+        events_list[t].clear()
+        filtering.median_3x3(tmpA, tmpB, t, num_threads)
+        events_list[t].set()
+        tmpA, tmpB = tmpB, tmpA
+        
+        for e in events_list:
+            if e!=t:
+                e.wait()
+
+def py_median_3x3(image, iterations=10, num_threads=4):
+    ''' repeatedly filter with a 3x3 median '''
+    tmpA = image.copy()
+    tmpB = np.empty_like(tmpA)
+    
+    
+    events_list = []
+    threads_list = []
+    
+    for t in range(num_threads):
+        
+        e = threading.Event()
+        events_list.append(e)
+        t = threading.Thread(target=parallel_function, args=(tmpA, tmpB, t, num_threads, events_list, iterations))
+        t.start()
+        threads_list.append(t)
+        
+    
+    for thread in threads_list:
+        thread.join()
+    
+
+    return tmpA
+
+
 
 def numpy_median(image, iterations=10):
     ''' filter using numpy '''
