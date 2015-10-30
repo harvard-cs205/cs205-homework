@@ -14,18 +14,43 @@ import pylab
 import filtering
 from timer import Timer
 import threading
+from multiprocessing.pool import ThreadPool
 
 def py_median_3x3(image, iterations=10, num_threads=1):
     ''' repeatedly filter with a 3x3 median '''
-    tmpA = image.copy()
-    tmpB = np.empty_like(tmpA)
+    tmp_even = image.copy()
+    tmp_odd = np.empty_like(tmp_even)
 
-    for i in range(iterations):
-        filtering.median_3x3(tmpA, tmpB, 0, 1)
-        # swap direction of filtering
-        tmpA, tmpB = tmpB, tmpA
+    # create pool of correct number of threads
+    pool = ThreadPool(num_threads)
 
-    return tmpA
+    # set up event for each thread for each iteration
+    events = [[threading.Event() for k in range(iterations)] for j in range(num_threads)]
+
+    def median_wrapper(thread_n, num_threads=num_threads, iterations=iterations, tmpA=tmp_even, tmpB=tmp_odd, events=events):
+        ''' Helper function for each thread '''
+        for i in range(iterations):
+            # wait for completion of previous iteration
+            if i > 0:
+                events[thread_n][i - 1].wait()
+                if thread_n > 0:
+                    events[thread_n - 1][i - 1].wait()
+                if thread_n < num_threads - 1:
+                    events[thread_n + 1][i - 1].wait()
+
+            # median filter on every Nth line, starting with line n
+            filtering.median_3x3(tmpA, tmpB, thread_n, num_threads)
+
+            # set event saying we finished this iteration
+            events[thread_n][i].set()
+
+            # swap direction of filtering
+            tmpA, tmpB = tmpB, tmpA
+
+    # send work to all the threads
+    pool.map(median_wrapper, range(num_threads), chunksize=1)
+
+    return tmp_even if iterations % 2 == 0 else tmp_odd
 
 def numpy_median(image, iterations=10):
     ''' filter using numpy '''
