@@ -1,0 +1,12 @@
+
+MULTITHREADING
+--------------
+This sped up the program by a factor of 2.
+
+SPATIAL DECOMPOSITION
+---------------------
+This sped up the program by another factor of 2 ony my Intel Duo Core machine.
+
+Compare this version to the non-gridded version, for both 4 and 1 threads, and discuss the reasons for performance
+differences between all four versions.
+
