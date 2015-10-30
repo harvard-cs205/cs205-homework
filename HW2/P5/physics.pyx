@@ -56,40 +56,49 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                      float R,
                      int i, int count,
                      UINT[:, ::1] Grid,
-                     float grid_spacing) nogil:
+                     float grid_spacing,
+                     omp_lock_t *locks) nogil:
     cdef:
         FLOAT *XY1, *XY2, *V1, *V2
         int j, dim, m, n
         UINT xidx, yidx
         float eps = 1e-5
 
-    # SUBPROBLEM 4: Add locking
+    # There was a 'SUBPROBLEM 4' thing here, but locking isn't needed right here since
+    # no collisions are happening.
     XY1 = &(XY[i, 0])
     V1 = &(V[i, 0])
     xidx, yidx = <UINT> (XY[i, 0]/grid_spacing), <UINT> (XY[i, 1]/grid_spacing)
     #############################################################
     # IMPORTANT: do not collide two balls twice.
     ############################################################
-    # SUBPROBLEM 2: use the grid values to reduce the number of other
-    # objects to check for collisions.
-    # Need to check for collisions with the object o in grid squares marked with *:
+    # Need to check for collisions with the object o in grid squares marked with *
+    # (since the balls can collide from up to two squares away):
     # *  *  *  *  *
     # *  *  *  *  *
     # *  *  o  *  *
     # *  *  *  *  *
     # *  *  *  *  *
-    if (xidx < Grid.shape[0]) and (yidx < Grid.shape[0]): # object on grid?
-        for m in range(max(2, xidx)-2, min(Grid.shape[0], xidx+3)): # handle objects near edge
-            for n in range(max(2, yidx)-2, min(Grid.shape[0], yidx+3)): # same as above
-                # with gil: print 'm, n, xidx, yidx, Grid[m, n]:', m, n, xidx, yidx, Grid[m, n]
+    #
+    # Things these if statements do, roughly in order:
+    # make sure object is on grid,
+    # handle objects near edge,
+    # make sure object doesn't try to collide with itself, 
+    # make sure two objects don't collide twice.
+    if (xidx < Grid.shape[0]) and (yidx < Grid.shape[0]):
+        for m in range(max(2, xidx)-2, min(Grid.shape[0], xidx+3)):
+            for n in range(max(2, yidx)-2, min(Grid.shape[0], yidx+3)):
                 if (not (m == xidx and n == yidx)) and (i < Grid[m, n] < XY.shape[0]):
                     XY2 = &(XY[Grid[m, n], 0])
                     V2 = &(V[Grid[m, n], 0])
 
                     if overlapping(XY1, XY2, R):
-                        # SUBPROBLEM 4: Add locking
                         if not moving_apart(XY1, V1, XY2, V2):
+                            acquire(&locks[i])
+                            acquire(&locks[Grid[m, n]])
                             collide(XY1, V1, XY2, V2)
+                            release(&locks[i])
+                            release(&locks[Grid[m, n]])
 
                         # give a slight impulse to help separate them
                         for dim in range(2):
@@ -107,13 +116,12 @@ cpdef update(FLOAT[:, ::1] XY,
         int i, j, dim, num_thr, chunk, temp
         UINT tempidx1, tempidx2, newidx1, newidx2
         FLOAT *XY1, *XY2, *V1, *V2
-        # SUBPROBLEM 4: uncomment this code.
-        # omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
+        omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
 
     assert XY.shape[0] == V.shape[0]
     assert XY.shape[1] == V.shape[1] == 2
-    num_thr = 1
-    chunk = 125
+    num_thr = 4
+    chunk = 2500
 
     with nogil:
         # bounce off of walls
@@ -124,10 +132,9 @@ cpdef update(FLOAT[:, ::1] XY,
                     V[i, dim] *= -1
         # bounce off of each other
         for i in prange(count, num_threads=num_thr, schedule='static', chunksize=chunk):
-            sub_update(XY, V, R, i, count, Grid, grid_spacing)
+            sub_update(XY, V, R, i, count, Grid, grid_spacing, locks)
         # update positions
         #
-        # SUBPROBLEM 2: update the grid values.
         # Whole bunch of if statements. The end result: only store an object's index in a 
         # grid square if the object is actually on the grid.
         for i in prange(count, num_threads=num_thr, schedule='static', chunksize=chunk):

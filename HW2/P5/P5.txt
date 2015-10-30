@@ -1,0 +1,39 @@
+With Just Threading:
+
+# threads             frames/sec
+--------------------------------
+1                     ~11
+4                     ~16
+
+Using four threads increases performance by about 50% compared to using one thread.
+
+
+With Grid:
+
+# threads             frames/sec
+--------------------------------
+1                     ~465
+4                     ~915
+
+In this case, using four threads almost doubles performance over one thread. Grinding produces a huge increase in performance over just threading, since with 10,000 balls, an O(N^2) is, more or less, a factor of 10,000 slower than O(N). Obviously, we don’t see a 10,000x performance increase, but it’s almost 500x faster.
+
+
+With Sorting:
+
+# threads             frames/sec
+--------------------------------
+1                     ~580
+4                     ~950
+
+Sorting (with Z-ordering / Morton ordering) seems to produce a modest, but noticeable, improvement over just using a grid, even though sorting incurs some overhead from all the operations required to implement it. The gains from better memory access patterns overcome the losses from loops, sorts, searches and such. As an added bonus, it makes all the balls flash different colors, which looks cool.
+
+
+With Locking:
+
+
+# threads             frames/sec
+--------------------------------
+1                     ~570
+4                     ~930
+
+Locking slows the code down a little bit, but the slowdown is really not bad.

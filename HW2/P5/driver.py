@@ -16,6 +16,19 @@ from physics import update, preallocate_locks
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
+def interleave(a, b):
+    '''
+    Interleave the bits of integers a and b and return
+    an integer representation of the result.
+    '''
+    abin = '{0:016b}'.format(a)
+    bbin = '{0:016b}'.format(b)
+    inter = ''
+    for i in range(16):
+        inter += abin[-i-1]
+        inter += bbin[-i-1]
+    return int(inter, 2)
+
 if __name__ == '__main__':
     num_balls = 10000
     radius = 0.002
@@ -47,6 +60,7 @@ if __name__ == '__main__':
     grid[(positions[:, 0] / grid_spacing).astype(int),
          (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
 
+
     # A matplotlib-based animator object
     animator = Animator(positions, radius * 2)
 
@@ -56,15 +70,17 @@ if __name__ == '__main__':
     total_time = 0
 
     frame_count = 0
+    interlist = []
+    speedtest = 0
+    total_iters = 0
 
-    # SUBPROBLEM 4: uncomment the code below.
     # preallocate locks for objects
     locks_ptr = preallocate_locks(num_balls)
 
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
-                   radius, grid_size, locks_ptr,
+                   radius, grid_spacing, locks_ptr,
                    physics_step)
 
         # udpate our estimate of how fast the simulator runs
@@ -73,10 +89,27 @@ if __name__ == '__main__':
 
         frame_count += 1
         if total_time > anim_step:
+            total_iters += 1
             animator.update(positions)
             print("{} simulation frames per second".format(frame_count / total_time))
+            # maintain a running average to make it easier to analyze performance
+            speedtest += frame_count / total_time
+            print("{} average frames per second").format(speedtest/total_iters)
             frame_count = 0
             total_time = 0
-            # SUBPROBLEM 3: sort objects by location.  Be sure to update the
-            # grid if objects' indices change!  Also be sure to sort the
-            # velocities with their object positions!
+
+            # This is Z-ordering / Morton ordering. Note: as far as I know, you can't really
+            # interleave the bits of a float, so I just multiply the floats by 10,000 and
+            # convert them to integers, dropping the trailing (and hopefully unimportant)
+            # digits. There's probably a better way, but this seems to work pretty well.
+            interlist = []
+            for i in range(num_balls):
+                interlist.append(interleave(int(positions[i, 0]*10000), 
+                    int(10000*positions[i, 1])))
+            
+            idx = np.argsort(interlist)
+            positions = positions[idx]
+            velocities = velocities[idx]
+            xidx, yidx = np.where(np.invert((0 <= grid)-(grid<num_balls))) # where 0<=grid<num_balls
+            for m in zip(xidx, yidx):
+                grid[m] = idx[grid[m]]
