@@ -16,9 +16,24 @@ from physics import update, preallocate_locks
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
+# https://en.wikipedia.org/wiki/Z-order_curve
+def less_msb(x, y):
+    return x < y and x < (x ^ y)
+
+def cmp_zorder(a, b):
+    j = 0
+    k = 0
+    x = 0
+    for k in xrange(2):
+        y = a[k] ^ b[k]
+        if less_msb(x, y):
+            j = k
+            x = y
+    return a[j] - b[j]
+
 if __name__ == '__main__':
-    num_balls = 10000
-    radius = 0.002
+    num_balls = 10 #10000
+    radius = 0.1 #0.002
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -64,7 +79,7 @@ if __name__ == '__main__':
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
-                   radius, grid_size, locks_ptr,
+                   radius, grid_spacing, locks_ptr,
                    physics_step)
 
         # udpate our estimate of how fast the simulator runs
@@ -80,3 +95,20 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+            
+            grid[:,:] = -1
+            # Set to grid positions
+            grid_pos = (positions/grid_spacing).astype(int)
+            shifted_grid_pos = np.array(list(grid_pos[1:]) + list(grid_pos[:1]))
+            morton = map(lambda x, y: cmp_zorder(x, y), grid_pos, shifted_grid_pos)
+            sorted_pos_idx = np.argsort(morton)
+
+            # Set positions and velocities by Morton order
+            positions = np.array(positions)[sorted_pos_idx]
+            velocities = np.array(velocities)[sorted_pos_idx]
+
+            for i in xrange(num_balls):
+                if positions[i,0] >= 0 and positions[i,0] <= 1 and positions[i,1] >= 0 and positions[i,1] <= 1:
+                    x = (positions[i,0]/grid_spacing).astype(int)
+                    y = (positions[i,1]/grid_spacing).astype(int)
+                    grid[x,y] = i

@@ -1,0 +1,55 @@
+Serial:
+9.35445553387 simulation frames per second
+9.23916558363 simulation frames per second
+9.18486206187 simulation frames per second
+9.37100828226 simulation frames per second
+9.28763222402 simulation frames per second
+9.63167152732 simulation frames per second
+
+Subproblem1:
+need for 4 to 1 threads
+14.5125600321 simulation frames per second
+15.1050288826 simulation frames per second
+14.7368672548 simulation frames per second
+14.8612975233 simulation frames per second
+15.0021603834 simulation frames per second
+15.3078464363 simulation frames per second
+
+Subproblem 2:
+1 thread:
+986.754345191 simulation frames per second
+982.788718793 simulation frames per second
+852.178289686 simulation frames per second
+1017.47565944 simulation frames per second
+836.812053249 simulation frames per second
+971.544312327 simulation frames per second
+795.212471034 simulation frames per second
+1017.10555746 simulation frames per second
+1004.09319486 simulation frames per second
+969.876407565 simulation frames per second
+779.967271271 simulation frames per second
+974.183783784 simulation frames per second
+1001.19587745 simulation frames per second
+
+
+4 threads:
+597.785759079 simulation frames per second
+31.5795718922 simulation frames per second
+595.147782902 simulation frames per second
+713.909503125 simulation frames per second
+702.357600368 simulation frames per second
+599.39607434 simulation frames per second
+606.707089834 simulation frames per second
+764.321787522 simulation frames per second
+685.390454143 simulation frames per second
+474.539234473 simulation frames per second
+291.930762353 simulation frames per second
+491.786685795 simulation frames per second
+15.6426251151 simulation frames per second
+545.576241365 simulation frames per second
+310.523990604 simulation frames per second
+167.803803003 simulation frames per second
+24.0547357555 simulation frames per second
+553.950743378 simulation frames per second
+654.569681493 simulation frames per second
+676.055393625 simulation frames per second
