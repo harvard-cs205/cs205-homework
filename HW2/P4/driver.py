@@ -56,7 +56,7 @@ def py_median_3x3(image, iterations=10, num_threads=1):
     #Initialize create a list of threads
     thread_list=[]
     for threadidx in range(num_threads):
-        #assign thread number to be used as an argument to dictate the 'Nth' lines of work to be done
+        #create num_threads one by one, note that we pass threadidx which is the index of the thread
         th = threading.Thread(target = worker, args = (tmpA, tmpB, iterations, threadidx, num_threads, events))
         thread_list.append(th)
         th.start()
