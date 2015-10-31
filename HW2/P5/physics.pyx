@@ -135,7 +135,7 @@ cpdef update(FLOAT[:, ::1] XY,
     assert XY.shape[1] == V.shape[1] == 2
 
     cdef int chunksize=1000
-    cdef int num_threads = 1
+    cdef int num_threads = 4
 
     cdef int before_xgrid, before_ygrid, after_xgrid, after_ygrid
 

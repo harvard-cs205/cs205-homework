@@ -3,8 +3,9 @@ discuss the reasons for any performance difference.
 
 With one thread, we get roughly 12 fps. With 4 threads, we get roughly
 16 fps. This is a very small speedup; we naively expect that N cores
-should speed us up N times. The overhead must be gigantic here; we are likely doing expensive operations
-at inappropriate times as we have not implemented locks. Qualitatively, the behavior of the simulation
+should speed us up N times. The overhead of parallelizing the code must be gigantic here, resulting in inefficient scaling.
+Also, the simulation is likely incorrect as we have not implemented locks; this could result in bizarre behavior,
+slowing down the simulation as additional threads are added.. Qualitatively, the behavior of the simulation
 still looks correct, however.
 
 >>Spatial Decomposition
@@ -64,8 +65,6 @@ With four threads, we average about 800-900 fps. We do not see any significant s
 technique, unfortunately. Perhaps the overhead of sorting is too high. Perhaps Morton sorting was not an ideal choice
 for this problem. Regardless, I think it's cool.
 
-#TODO: Figure out why this is
-
 >> Locking
 
 With locking, one thread, and our previous improvements we average about 500 fps. With locking and
@@ -74,3 +73,7 @@ each thread cannot enter the collision code simultaneously for a given particle;
 colliding with something else, another thread cannot collide it with another particle. This makes sense
 physically; collisions should be handled individually and should not be interrupted by other threads.
 Locking consequently slightly decreases speed but makes our simulation more realistic.
+
+Evidently, in this problem, the pain of implementing threading was not worth it; we saw very small speedups.
+This must be a problem where the overhead associated with threading is so large relative to the underlying problem
+that it is not worth implementing! Perhaps if there were even more particles, threading would help to speed up the code.
