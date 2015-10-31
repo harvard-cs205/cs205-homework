@@ -126,7 +126,7 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
                big = big/N
                acquire(&(locks[small]))
                if small != big:
-                acquire(&(locks[big]))
+                 acquire(&(locks[big]))
                if counts[src[idx]] > 0:
                    counts[dest[idx]] += 1
                    counts[src[idx]] -= 1
