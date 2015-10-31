@@ -8,6 +8,7 @@ import pyximport
 pyximport.install()
 
 import numpy as np
+import matplotlib.pyplot as plt 
 from timer import Timer
 from parallel_vector import move_data_serial, move_data_fine_grained, move_data_medium_grained
 
@@ -29,7 +30,7 @@ if __name__ == '__main__':
     print("Serial uncorrelated: {} seconds".format(t.interval))
     serial_counts = counts.copy()
 
-    # fine grained
+    # # fine grained
     counts[:] = orig_counts
     with Timer() as t:
         move_data_fine_grained(counts, src, dest, 100)
@@ -40,12 +41,11 @@ if __name__ == '__main__':
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################
-    N = 10
     counts[:] = orig_counts
     with Timer() as t:
         move_data_medium_grained(counts, src, dest, 100, N)
     assert counts.sum() == total, "Wrong total after move_data_medium_grained"
-    print("Medium grained uncorrelated: {} seconds".format(t.interval))
+    print("Medium grained uncorrelated for N={}: {} seconds".format(N, t.interval))
 
     ########################################
     # Now use correlated data movement
@@ -74,9 +74,12 @@ if __name__ == '__main__':
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################
-    N = 10
-    counts[:] = orig_counts
-    with Timer() as t:
-        move_data_medium_grained(counts, src, dest, 100, N)
-    assert counts.sum() == total, "Wrong total after move_data_medium_grained"
-    print("Medium grained correlated: {} seconds".format(t.interval))
+    Nlist = range(1,15)
+    correlatedTimes = []
+    for N in Nlist:
+        counts[:] = orig_counts
+        with Timer() as t:
+            move_data_medium_grained(counts, src, dest, 100, N)
+        assert counts.sum() == total, "Wrong total after move_data_medium_grained"
+        print("Medium grained correlated for N={}: {} seconds".format(N, t.interval))
+        correlatedTimes.append(t.interval)

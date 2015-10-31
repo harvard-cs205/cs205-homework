@@ -16,16 +16,38 @@ from timer import Timer
 import threading
 
 def py_median_3x3(image, iterations=10, num_threads=1):
-    ''' repeatedly filter with a 3x3 median '''
+    # repeatedly filter with a 3x3 median
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
 
-    for i in range(iterations):
-        filtering.median_3x3(tmpA, tmpB, 0, 1)
+    # Each thread controls every Nth line in image
+    threads = [None] * num_threads
+    # Each event corresponds to a particular thread and particular iteration - represents whether that thread
+    # is done with that iteration
+    events = [[threading.Event() for i in range(iterations)] for j in range(num_threads)]
+
+    for thread_id in range(num_threads):
+        threads[thread_id] = threading.Thread(target=filter_image, args=(num_threads, thread_id, tmpA, tmpB, events, iterations))
+        threads[thread_id].start()
+
+    # Terminate all threads
+    for thread in threads:
+        thread.join()
+
+    # Return fully filtered image
+    return tmpA
+
+def filter_image(num_threads, thread_id, tmpA, tmpB, events, iterations=10):
+    for itr in range(iterations):
+        # Waits on itr-1 of thread_id-1 and thread_id+1 to finish itr-1 before executing current itr
+        if num_threads > 1 and itr > 0:
+            events[(thread_id-1)%num_threads][itr-1].wait()
+            events[(thread_id+1)%num_threads][itr-1].wait()
+        filtering.median_3x3(tmpA, tmpB, thread_id, num_threads)
+        # Set event flag to GO
+        events[thread_id][itr].set()
         # swap direction of filtering
         tmpA, tmpB = tmpB, tmpA
-
-    return tmpA
 
 def numpy_median(image, iterations=10):
     ''' filter using numpy '''

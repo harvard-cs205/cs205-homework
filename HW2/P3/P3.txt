@@ -1,0 +1,14 @@
+# Results for 1,2,4 threads with and without instruction-level parallelism
+
+For multithreading without instruction-level parallelism without AVX, we get the following performances for 1,2,4 threads respectively:
+
+1 thread -> 1074.656613 Million Complex FMAs in 6.13090515137 seconds, 175.285147375 million Complex FMAs / second
+2 threads -> 1074.656613 Million Complex FMAs in 3.10020208359 seconds, 346.640826638 million Complex FMAs / second
+4 threads -> 1074.656613 Million Complex FMAs in 1.73726797104 seconds, 618.590010819 million Complex FMAs / second
+
+For multithreading with AVX instruction-level
+
+1 thread -> 1074.94829 Million Complex FMAs in 0.854171037674 seconds, 1258.46960689 million Complex FMAs / second
+2 thread -> 1074.94829 Million Complex FMAs in 0.437566995621 seconds, 2456.64846928 million Complex FMAs / second
+4 threads -> 1074.94829 Million Complex FMAs in 0.298840045929 seconds, 3597.06908309 million Complex FMAs / second
+
