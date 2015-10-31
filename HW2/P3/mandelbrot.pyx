@@ -36,9 +36,10 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
         for i in prange(in_coords.shape[0],num_threads=4, schedule='static', chunksize=1):
             for j in xrange(0,in_coords.shape[1],8): # range(in_coords.shape[1]):
             
-                
+                # Track iterations in 8 bit float register
                 iterCounts = AVX.float_to_float8(0.0)
                 
+                # Extract real part of 8 consecutive complex numbers and convert them to 8 bit float register
                 cr = AVX.make_float8((in_coords[i, j+7]).real,
                                      (in_coords[i, j+6]).real,
                                      (in_coords[i, j+5]).real,
@@ -47,6 +48,8 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                                      (in_coords[i, j+2]).real,
                                      (in_coords[i, j+1]).real,
                                      (in_coords[i, j]).real)
+
+                # Extract complex part of 8 consecutive complex numbers and convert them to 8 bit float register                    
                 ci = AVX.make_float8((in_coords[i, j+7]).imag,
                                      (in_coords[i, j+6]).imag,
                                      (in_coords[i, j+5]).imag,
@@ -55,6 +58,8 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                                      (in_coords[i, j+2]).imag,
                                      (in_coords[i, j+1]).imag,
                                      (in_coords[i, j]).imag)
+
+                # Initialize iterated complex values
                 zr = AVX.float_to_float8(0.0)
                 zi = AVX.float_to_float8(0.0)
                 ones = AVX.float_to_float8(1.0)
@@ -82,6 +87,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                     magZ = AVX.fmadd(zr,zr,AVX.mul(zi,zi))
                     mask = AVX.less_than(magZ,AVX.float_to_float8(4.0))
                 
+                # Write iteration counts to memory
                 counts_to_output(iterCounts, out_counts, i, j)
 
 #Facilitating safe writes to memory

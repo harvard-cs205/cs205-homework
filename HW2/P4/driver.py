@@ -42,6 +42,7 @@ def py_median_3x3(image, iterations=10, num_threads=1):
     return tmpA
     
 def parallizeImage(threadNum, num_threads, tmpA, tmpB, Events, iterations=10):
+'''Helper function used to coordinate threads from iteration to iteration'''
     for i in range(iterations):
         #Check events, create checks for conditions. i==0, n==num_threads, etc...
         if num_threads >1:

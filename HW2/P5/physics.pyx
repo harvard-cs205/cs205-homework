@@ -79,26 +79,31 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     grid_size = <unsigned int>((1.0 / grid_spacing) + 1)
     
     for ii in range(x_grid+1, (x_grid+2)+1): #Scan over all pts in grid that are 2 away from current ball
-        for jj in range(y_grid+1, (y_grid+2)+2-(ii-x_grid)):
-            #if (ii == x_grid) and (jj == y_grid):
-            #    continue
-            if i == Grid[ii,jj]: #Avoid deadlocking
-                continue
+        for jj in range(y_grid+1, (y_grid+2)+2-(ii-x_grid)): #Decrement extent of y window to look over based on what our current x value is
+        
         #Check to see if ii and jj are within the [0,1]x[0,1] grid
-            if (ii < grid_size and ii > 0) and (jj < grid_size and jj > 0) and Grid[ii,jj] < count:
+            if (ii < grid_size and ii > 0) and (jj < grid_size and jj > 0) and Grid[ii,jj] < count: 
                 
                 XY2 = &(XY[Grid[ii,jj], 0])
                 V2 = &(V[Grid[ii,jj], 0])
+                
                 if overlapping(XY1, XY2, R):
+                    
                     # SUBPROBLEM 4: Add locking
+                    
                     acquire(&(locks[Grid[ii,jj]])) # Acquiring lock for XY2
+                    
                     if not moving_apart(XY1, V1, XY2, V2):
                         collide(XY1, V1, XY2, V2)
+                    
                     # give a slight impulse to help separate them
                     for dim in range(2):
                         V2[dim] += eps * (XY2[dim] - XY1[dim])
+                        
                     release(&(locks[Grid[ii,jj]])) # Releasing lock for XY2
-    release(&(locks[i]))    
+    release(&(locks[i])) # Releasing lock for XY1
+    
+        
 cpdef update(FLOAT[:, ::1] XY,
              FLOAT[:, ::1] V,
              UINT[:, ::1] Grid,
