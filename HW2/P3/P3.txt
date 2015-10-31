@@ -42,8 +42,6 @@ prange with 12 threads (max):
 1074.94829 Million Complex FMAs in 0.11225104332 seconds
 9576.28774049 million Complex FMAs / second
 
-#TODO: Update discussion since my code now scales nicely
-
 ############ Summary ##########################
 
 See the plot "timing_vs_technique_scaled.png". For 1, 2, and 4 threads we see behavior
@@ -57,10 +55,14 @@ be due to a bottleneck in the code (i.e. with an infinite number of cores, we wo
 
 When we add AVX and threading, the results are more unexpected. Naively, since we operate on 8 numbers at once,
 we would expect the speed with N threads relative to serial code to be roughly 8N. Instead, with
-1 thread, we speedup of about 4x, 2 threads ~ 5x, 4 threads ~6.5x, and 12 threads ~ 10x. The reason for this imperfect
+1 thread, we speedup of about 5x, 2 threads ~ 10x, 4 threads ~18x, and 12 threads ~ 28x. So, for 1 to 4 threads,
+we see a speedup of roughly 5N instead of 8N. The reason for this imperfect
 scaling is likely that when we are operating on 8 numbers at once, we do not stop operating on them until *all*
-pixels have finished. Hence, the speedup in each set of 8 is limited by the slowest pixel.
+pixels have finished. Hence, the speedup in each set of 8 is limited by the slowest pixel, and on average we get a
+speedup of about 5x.
 
-Interestingly, the speedup for 12 threads with and without AVX is about the same.
-This hints that we have "saturated" the code with parallel processors; adding additional cores or AVX techniques will
-not necessarily help speed up the code.
+Interestingly, the speedup for 12 threads does not obey the scaling for small numbers of threads (i.e. for N threads,
+we got a speedup of 5N). This could be because my desktop has 6 physical cores which, via hyperthreading, act like 12.
+If each physical core can only process one set of AVX instructions at once, our maximum expected speedup would be
+about 6*5 = 30x instead of 12*5 = 60x (what I expected due to hyperthreading). Hopefully the OpenCL unit will teach me how to
+identify how many sets of AVX instructions my cores can run at once!
