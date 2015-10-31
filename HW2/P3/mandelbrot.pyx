@@ -6,6 +6,20 @@ cimport AVX
 from cython.parallel import prange
 
 
+
+cdef void print_complex_AVX(AVX.float8 real, AVX.float8 imag) nogil:
+    cdef:
+        float real_parts[8]
+        float imag_parts[8]
+        int i
+
+    AVX.to_mem(real, &(real_parts[0]))
+    AVX.to_mem(imag, &(imag_parts[0]))
+
+    with gil:
+        for i in range(8):
+            print("    {}: {}, {}".format(i, real_parts[i], imag_parts[i]))
+
 cdef np.float64_t magnitude_squared(np.complex64_t z) nogil:
     return z.real * z.real + z.imag * z.imag
 
@@ -13,7 +27,9 @@ cdef np.float64_t magnitude_squared(np.complex64_t z) nogil:
 @cython.wraparound(False)
 cpdef mandelbrot(np.complex64_t [:, :] in_coords,
         np.uint32_t [:, :] out_counts,
+        int n_threads,
         int max_iterations=511):
+
     cdef:
         int i, j, iter
         np.complex64_t c, z
@@ -32,7 +48,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     assert in_coords.shape[1] == out_counts.shape[1],  "Input and output arrays must be the same size"
 
     with nogil:
-        for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=4):
+        for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=n_threads):
             for j in range(in_coords.shape[1]):
                 c = in_coords[i, j]
                 z = 0
@@ -42,10 +58,31 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                     z = z * z + c
                 out_counts[i, j] = iter
 
+cdef void counts_to_output(AVX.float8 counts,
+        np.uint32_t [:, :] out_counts,
+        int out_counts_i,
+        int out_counts_j) nogil:
+    # Declare some necessary variables
+    cdef:
+        int i
+        float tmp_counts[8]
+
+    # Put the float8 values into tmp_counts so we can access them individually
+    AVX.to_mem(counts, &(tmp_counts[0]))
+
+    # Now, put these into the out_counts array
+    for i in range(8):
+        out_counts[out_counts_i, out_counts_j + i] = <int> tmp_counts[i]
+
+
+
+
+
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cpdef mandelbrot_avx(np.complex64_t [:, :] in_coords,
         np.uint32_t [:, :] out_counts,
+        int n_threads,
         int max_iterations=511):
     cdef:
         int i, j, iter
@@ -67,10 +104,8 @@ cpdef mandelbrot_avx(np.complex64_t [:, :] in_coords,
         AVX.float8 z_r_rel_floats, z_z_rel_floats, c_r_rel_floats, c_z_rel_floats
         AVX.float8 z_new_r, z_new_z, iter_counter
         AVX.float8 tmp1, tmp2, tmp3
-        np.float64_t [:, :] in_coords_r, in_coords_z
+        np.float32_t [:, :] in_coords_r, in_coords_z
         float new_out_counts[8]
-
-
 
     # Separate the in_coords into real and imaginary parts
     in_coords_r = np.real(in_coords)
@@ -87,10 +122,10 @@ cpdef mandelbrot_avx(np.complex64_t [:, :] in_coords,
     assert in_coords.shape[1] == out_counts.shape[1],  "Input and output arrays must be the same size"
 
     with nogil:
-        for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=4):
+        for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=n_threads):
             # We do a step size of 8 because we are going to handle 8 at a time
             # The assert above guarantees that we will not miss any items in doing so
-            for j in range(in_coords.shape[1], 8):
+            for j in range(0, in_coords.shape[1], 8):
 
                 # Construct our AVX values - gotta be a better way to do this
                 c_r_vals = AVX.make_float8(in_coords_r[i, j + 7],
@@ -124,11 +159,7 @@ cpdef mandelbrot_avx(np.complex64_t [:, :] in_coords,
                     z_mag = AVX.fmadd(z_r_vals, z_r_vals, AVX.mul(z_z_vals, z_z_vals))
 
                     # Now get a mask that tells us which of these are less than 4
-                    # And another one that tells us which are greater than 4
-                    # This lets us access the ones we want to modify, as well as later pick off the values
-                    # That we did not modify
                     z_mag_small = AVX.less_than(z_mag, z_mag_cutoff)
-                    z_mag_big = AVX.greater_than(z_mag, z_mag_cutoff)
 
                     # If nothing needs to be updated, we are done
                     if (AVX.signs(z_mag_small) == 0):
@@ -136,11 +167,6 @@ cpdef mandelbrot_avx(np.complex64_t [:, :] in_coords,
 
                     # Every z with |z|^2 less than 4 is getting updated - so increment accordingly
                     iter_counter = AVX.add(iter_counter, AVX.bitwise_and(all_ones, z_mag_small))
-
-                    # Now we only want to iterate those floats which are less than 4 
-                    # so separate their real and imaginary parts
-                    z_r_rel_floats = AVX.bitwise_and(z_mag_small, z_r_vals)
-                    z_z_rel_floats = AVX.bitwise_and(z_mag_small, z_z_vals)
 
                     # And we also want those components of C, because we only want to modify those
                     c_r_rel_floats = AVX.bitwise_and(z_mag_small, c_r_vals)
@@ -150,27 +176,16 @@ cpdef mandelbrot_avx(np.complex64_t [:, :] in_coords,
                     # z' = z * z + c
                     # For z = x + iy, this gives us:
                     # Re(z') = x^2 + Re(c) - y^2
-                    # Im(z') = 2xy + Im(y)
-                    
-                    tmp1 = AVX.mul(z_r_rel_floats, z_r_rel_floats)
-                    tmp1 = AVX.add(tmp1, c_r_rel_floats)
-                    tmp2 = AVX.mul(z_z_rel_floats, z_z_rel_floats)
-                    z_new_r = AVX.sub(tmp1, tmp2)
-
-
-#                    z_new_r = AVX.sub(AVX.fmadd(z_r_rel_floats, z_r_rel_floats, c_r_rel_floats),
-#                            AVX.mul(z_z_rel_floats, z_z_rel_floats))
-                    z_new_z = AVX.fmadd(AVX.mul(AVX.float_to_float8(2), z_r_rel_floats), z_z_rel_floats, c_z_rel_floats)
+                    # Im(z') = 2xy + Im(c)
+                    z_new_r = AVX.sub(AVX.fmadd(z_r_vals, z_r_vals, c_r_vals), AVX.mul(z_z_vals, z_z_vals))
+                    z_new_z = AVX.fmadd(AVX.mul(AVX.float_to_float8(2), z_r_vals), z_z_vals, c_z_vals)
 
                     # Now that we have the updated z values (for those that should be updated), we keep the 
                     # old, un-updated values and overwrite the new ones
-                    z_r_vals = AVX.add(AVX.bitwise_and(z_r_vals, z_mag_big), z_new_r)
-                    z_z_vals = AVX.add(AVX.bitwise_and(z_r_vals, z_mag_big), z_new_z)
+                    z_r_vals = z_new_r
+                    z_z_vals = z_new_z
 
-                AVX.to_mem(iter_counter, &(new_out_counts[0]))
-                for iter in range(8):
-                    out_counts[i, j+iter] = <int> new_out_counts[iter]
-
+                counts_to_output(iter_counter, out_counts, i, j)
 
 
 # An example using AVX instructions
