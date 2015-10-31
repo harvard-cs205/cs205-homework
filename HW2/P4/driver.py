@@ -80,8 +80,8 @@ if __name__ == '__main__':
 
     print 'Checking solution...'
     # Check with the appropriate number of threads
-    from_cython = py_median_3x3(input_image, 2, num_threads_to_use)
-    from_numpy = numpy_median(input_image, 2)
+    from_cython = py_median_3x3(input_image, 10, num_threads_to_use)
+    from_numpy = numpy_median(input_image, 10)
     assert np.all(from_cython == from_numpy)
     print 'Check passed! Now running timed code...'
 
