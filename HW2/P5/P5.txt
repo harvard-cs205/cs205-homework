@@ -12,5 +12,22 @@ We can play with the chunksize. Using a chunksize of count/4 leads to an average
 Since we are using a static scheduler because the chunks have roughly the same runtime it is interesting to try to optimize the chunksize. Note that, when we don't prescribe the chunksize the arerage number of simulation frames per second is 30. It looks like, because we prescribe 4 threads, the automatic chunksize is count/4.
 
 ---------------------------------------
-SUBPROBLEM 1: Spatial decomposition
+SUBPROBLEM 2: Spatial decomposition
 ---------------------------------------
+Now that we only consider the neighborhood of each ball O(N) algorithm instead of O(N^2) where N is the number of balls. The average number roof simulation frames per second is ? for 1 thread and ? for 4 threads.
+---------------------------------------
+SUBPROBLEM 3: Spatially coherent sorting
+---------------------------------------
+
+The average number roof simulation frames per second is ? for 1 thread and ? for 4 threads.
+
+We have reduced the distance in the memory of balls that need to be check for collision when considering one ball in the algorithm. This makes the algorithm faster.
+
+---------------------------------------
+SUBPROBLEM 4: Locking
+---------------------------------------
+
+
+
+
+

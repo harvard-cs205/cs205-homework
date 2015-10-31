@@ -12,12 +12,17 @@ import numpy as np
 from timer import Timer
 from animator import Animator
 from physics import update, preallocate_locks
+import pdb
+# import the Hilbert ordering
+# check this website for details:
+# http://www.tiac.net/~sw/2008/10/Hilbert
+from hilbert import Hilbert_to_int
 
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
 if __name__ == '__main__':
-    num_balls = 500
+    num_balls = 100
     radius = 0.01
     n_threads = 4
     positions = np.random.uniform(0 + radius, 1 - radius,
@@ -40,8 +45,10 @@ if __name__ == '__main__':
     # Initialize grid indices:
     #
     # Each square in the grid stores the index of the object in that square, or
-    # -1 if no object.  We don't worry about overlapping objects, and just
+    # int_max (=4294967295) if no object.  We don't worry about overlapping objects, and just
     # store one of them.
+
+
 
     #  size of one side = grid_spacing
     #  --------
@@ -62,7 +69,7 @@ if __name__ == '__main__':
 
 
     # A matplotlib-based animator object
-    animator = Animator(positions, radius * 2)
+    animator = Animator(positions, radius * 2, grid_size)
 
     # simulation/animation time variablees
     physics_step = 1.0 / 100  # estimate of real-time performance of simulation
@@ -80,7 +87,7 @@ if __name__ == '__main__':
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
-                   radius, grid_size, locks_ptr,
+                   radius, grid_spacing, locks_ptr,
                    physics_step, n_threads)
 
         # udpate our estimate of how fast the simulator runs
@@ -90,18 +97,29 @@ if __name__ == '__main__':
 
         frame_count += 1
         if total_time > anim_step:
-            animator.update(positions)
+            animator.update(positions)  
             print("{} simulation frames per second".format(frame_count / total_time))
-            # print 'iterations:', iterations
-            # if iterations > 30000:
-            #     print 'end of the code'
-            #     print 'here is a slice of the grid'
-            #     p = np.random.randint(0,grid_size)
-            #     print grid[p:p+10,p:p+10]
-            #     print 'grid_spacing', grid_spac
-            #     break                
+            #pdb.set_trace()              
             frame_count = 0
             total_time = 0
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+
+            # we choose to order using Hilbert curve
+            positions_hilbert = [Hilbert_to_int([int(x_grid),int(y_grid)]) for x_grid, y_grid in zip(positions[:,0]/grid_spacing,positions[:,1]/grid_spacing)]
+
+            # sort this : grid_sorted gives an array with the index of positions_hilbert
+            # once sorted
+            grid_sorted = np.argsort(positions_hilbert)
+
+            # reorder the positions with this
+            positions = positions[grid_sorted]
+            velocities = velocities[grid_sorted]
+
+            # because we changed the ordering
+            # we update the grid --> change the colors in animation.py
+            grid[(positions[:,0]/grid_spacing).astype(int),
+                (positions[:,0]/grid_spacing).astype(int)] = np.arange(num_balls)
+
+
