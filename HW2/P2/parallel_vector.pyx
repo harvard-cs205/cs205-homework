@@ -45,7 +45,6 @@ cdef void free_N_locks(int N, omp_lock_t *locks) nogil:
 
     free(<void *> locks)
 
-
 ##################################################
 # Your code below
 ##################################################
@@ -70,23 +69,32 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
                              np.int32_t[:] src,
                              np.int32_t[:] dest,
                              int repeat):
-   cdef:
-       int idx, r
-       omp_lock_t *locks = get_N_locks(counts.shape[0])
+  cdef:
+    int idx, r, first, second
+    omp_lock_t *locks = get_N_locks(counts.shape[0])
 
    ##########
    # Your code here
    # Use parallel.prange() and a lock for each element of counts to parallelize
    # data movement.  Be sure to avoid deadlock, and double-locking.
    ##########
-   with nogil:
-       for r in range(repeat):
-           for idx in range(src.shape[0]):
-               if counts[src[idx]] > 0:
-                   counts[dest[idx]] += 1
-                   counts[src[idx]] -= 1
-
-   free_N_locks(counts.shape[0], locks)
+   # Old stuff
+  with nogil:
+    for r in range(1):
+      for idx in prange(src.shape[0]):
+        # Make sure to grab lower indexed locks first to avoid deadlock
+        first = min(src[idx], dest[idx])
+        second = max(src[idx], dest[idx])
+        if first == second:
+          continue
+        omp_set_lock(&locks[first])
+        omp_set_lock(&locks[second])
+        if counts[src[idx]] > 0:
+          counts[dest[idx]] += 1
+          counts[src[idx]] -= 1
+        omp_unset_lock(&locks[first])
+        omp_unset_lock(&locks[second])
+  free_N_locks(counts.shape[0], locks)
 
 
 cpdef move_data_medium_grained(np.int32_t[:] counts,
