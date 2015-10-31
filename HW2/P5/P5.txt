@@ -1,3 +1,14 @@
 Multithreading with prange()
 With 1 thread we get results between 3.0 and 4.0 frames per second. With 4 threads we get results between 4.2 and 6.1 frames per second, which is consistently an improvement but almost double the range size. This is less than a 2x speedup for a 4x increase in threads.
 If prange() divides the loop into contiguous sections, then some sections will take longer than others because sub_update() checks all values from the current to the end and some contiguous sections will be closer to the end than others. Since sections take varying amounts of time, speedup is less than it could be. This also explains the runtime variability.
+
+Grid (spatial decomposition)
+With 1 thread we generally get results between 400 and 600 frames per second, with one result at 255. With 4 threads we get between 25 and 630 frames per second, with high variability.
+Adding the grid is ~100x faster than multithreading alone. For n=10,000, switching from an O(n^2) algorithm to an O(n) algorithm is likely to make a significant difference even if the O(n) algorithm has high overhead, e.g. updating the grid.
+The fact that 1 thread is generally ~5x faster than 4 threads makes no sense. After speaking with the course staff and attempting to debug, no error was found in the code and they agreed it made no sense. *Shrug* multithreading is complicated and perhaps my VM is not the best with threads + complex code.
+When my .pyx file was run on a different computer, 4 threads apparently showed a 50% speedup where the speedup limitation is memory-bound.
+
+Spatially coherent sorting
+For spatially coherent sorting, I used a Hilbert curve because it preserves locality better than a Z-order curve. To convert the coordinates to integers, I used my existing code for converting to grid squares. Because each dimension should be scaled to 2n - 1 for a given Hilbert curve order n, I set n = (grid_size + 1) / 2.
+It has already been established that my computer is doing something wrong with my 4-threaded code, and it looks like the results only get wonkier.
+The first 30 printouts of each thread count are depicted in SCS-1thread.png and SCS-4thread.png, respectively. With 1 thread, results are generally between 400 and 1000. With 4 threads, results range between 20 and 2250 with most results below 1000. In both cases, the minimum result remains the same but the maximum result increases, suggesting that spatially coherent sorting speeds up some cases but has little effect on others. This makes sense given that the speedup probably is related to improved use of the cache due to spatial coherence and that sorting methods are imperfect.

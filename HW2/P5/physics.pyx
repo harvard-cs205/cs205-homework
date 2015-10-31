@@ -22,7 +22,7 @@ cdef int max_bound(int index, int max_grid_index) nogil:
         index = max_grid_index
     return index
 
-cdef int grid_index(float pos, float grid_spacing, int max_grid_index) nogil:
+cpdef int grid_index(float pos, float grid_spacing, int max_grid_index) nogil:
     return max_bound(min_bound(<int>(pos / grid_spacing)), max_grid_index)
 
 cdef inline int overlapping(FLOAT *x1,
@@ -126,15 +126,20 @@ cpdef update(FLOAT[:, ::1] XY,
     assert XY.shape[0] == V.shape[0]
     assert XY.shape[1] == V.shape[1] == 2
 
-    thread_count = 4
+    thread_count = 1
     chunk_size = count/4
     with nogil:
         # bounce off of walls
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
-        #for i in prange(count, schedule='static', chunksize=chunk_size, num_threads=thread_count):
-        for i in range(count):
+        for i in prange(count, schedule='static', chunksize=chunk_size, num_threads=thread_count):
+            
+            #Update grid values after potential Hilbert sort but before calculations
+            gridx = grid_index(XY[i, 0], grid_spacing, max_grid_index)
+            gridy = grid_index(XY[i, 1], grid_spacing, max_grid_index)
+            Grid[gridx, gridy] = i
+
             for dim in range(2):
                 if (((XY[i, dim] < R) and (V[i, dim] < 0)) or
                     ((XY[i, dim] > 1.0 - R) and (V[i, dim] > 0))):
@@ -144,8 +149,7 @@ cpdef update(FLOAT[:, ::1] XY,
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
-        #for i in prange(count, schedule='static', chunksize=chunk_size, num_threads=thread_count):
-        for i in range(count):
+        for i in prange(count, schedule='static', chunksize=chunk_size, num_threads=thread_count):
             sub_update(XY, V, R, i, count, Grid, grid_spacing)
             
             #Clear grid location to prepare for update
@@ -158,16 +162,11 @@ cpdef update(FLOAT[:, ::1] XY,
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads (with static
         #    scheduling).
-        # SUBPROBLEM 2: update the grid values.
-        #for i in prange(count, schedule='static', chunksize=chunk_size, num_threads=thread_count):
-        for i in range(count):
+        # SUBPROBLEM 2: update the grid values. <--- Moved to first loop
+        for i in prange(count, schedule='static', chunksize=chunk_size, num_threads=thread_count):
             for dim in range(2):
                 XY[i, dim] += V[i, dim] * t
             
-            #Update grid values
-            gridx = grid_index(XY[i, 0], grid_spacing, max_grid_index)
-            gridy = grid_index(XY[i, 1], grid_spacing, max_grid_index)
-            Grid[gridx, gridy] = i
 
 def preallocate_locks(num_locks):
     cdef omp_lock_t *locks = get_N_locks(num_locks)

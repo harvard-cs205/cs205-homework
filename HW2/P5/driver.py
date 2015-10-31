@@ -9,12 +9,42 @@ import pyximport
 pyximport.install()
 
 import numpy as np
+import matplotlib.pyplot as plt
 from timer import Timer
 from animator import Animator
-from physics import update, preallocate_locks
+from physics import update, preallocate_locks, grid_index
 
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
+
+#Hibert sorting for part 3
+#Adapted from http://blog.notdot.net/2009/11/Damn-Cool-Algorithms-Spatial-indexing-with-Quadtrees-and-Hilbert-Curves
+
+#Starting map
+hilbert_map = {
+    'a': {(0, 0): (0, 'd'), (0, 1): (1, 'a'), (1, 0): (3, 'b'), (1, 1): (2, 'a')},
+    'b': {(0, 0): (2, 'b'), (0, 1): (1, 'b'), (1, 0): (3, 'a'), (1, 1): (0, 'c')},
+    'c': {(0, 0): (2, 'c'), (0, 1): (3, 'd'), (1, 0): (1, 'c'), (1, 1): (0, 'b')},
+    'd': {(0, 0): (0, 'a'), (0, 1): (3, 'c'), (1, 0): (1, 'd'), (1, 1): (2, 'd')},
+}
+
+def point_to_hilbert(coords, spacing, max_index):
+    #Convert coords to ints for bit manipulation
+    floatx, floaty = tuple(coords)
+    x = grid_index(floatx, spacing, max_index)
+    y = grid_index(floaty, spacing, max_index)
+    #For a Hilbert curve of order n, each dimension should range between 0 and 2n - 1
+    n = (max_index + 1) / 2
+    current_square = 'a'
+    position = 0
+    #Hilbert calculations
+    for i in range(n - 1, -1, -1):
+        position <<= 2
+        quad_x = 1 if x & (1 << i) else 0
+        quad_y = 1 if y & (1 << i) else 0
+        quad_position, current_square = hilbert_map[current_square][(quad_x, quad_y)]
+        position |= quad_position
+    return position
 
 if __name__ == '__main__':
     num_balls = 10000 #500
@@ -48,7 +78,7 @@ if __name__ == '__main__':
          (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
 
     # A matplotlib-based animator object
-    animator = Animator(positions, radius * 2)
+    #animator = Animator(positions, radius * 2)
 
     # simulation/animation time variablees
     physics_step = 1.0 / 100  # estimate of real-time performance of simulation
@@ -61,6 +91,8 @@ if __name__ == '__main__':
     # preallocate locks for objects
     locks_ptr = preallocate_locks(num_balls)
 
+    histogram_vals = []
+    
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
@@ -73,10 +105,23 @@ if __name__ == '__main__':
 
         frame_count += 1
         if total_time > anim_step:
-            animator.update(positions)
-            print("{} simulation frames per second".format(frame_count / total_time))
+            #animator.update(positions)
+            fps = frame_count / total_time
+            print("{} simulation frames per second".format(fps))
+            histogram_vals.append(fps)
+            if len(histogram_vals) == 30:
+                plt.hist(histogram_vals)
+                plt.savefig('SCS-1thread.png')
             frame_count = 0
             total_time = 0
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+            
+            #Sort according to Hilbert curve distance
+            distances = np.apply_along_axis(point_to_hilbert, 1, positions, grid_spacing, grid_size)
+            order = np.argsort(distances)
+            
+            #Update velocities and positions (grid is updated in physics.pyx)
+            velocities = np.array(velocities)[order]
+            positions = np.array(positions)[order]
