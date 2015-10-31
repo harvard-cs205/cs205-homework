@@ -1,39 +1,52 @@
 With Instruction Level Parallelism
+See with_instruction_parallelism.png for a graph of this.
 
-1 Thread:
-1074.94829 Million Complex FMAs in 16.6752960682 seconds, 64.4635205039 million Complex FMAs / second
-1074.94829 Million Complex FMAs in 16.7121660709 seconds, 64.3213025431 million Complex FMAs / second
-1074.94829 Million Complex FMAs in 19.0027937889 seconds, 56.5679079582 million Complex FMAs / second
+1 Threads: 1074.94829 Million Complex FMAs in 1.19651412964 seconds, 898.399996601 million Complex FMAs / second
+1 Threads: 1074.94829 Million Complex FMAs in 1.19606995583 seconds, 898.73362738 million Complex FMAs / second
+1 Threads: 1074.94829 Million Complex FMAs in 1.23515701294 seconds, 870.29282815 million Complex FMAs / second
+1 Threads: 1074.94829 Million Complex FMAs in 1.3961391449 seconds, 769.943521696 million Complex FMAs / second
+1 Threads: 1074.94829 Million Complex FMAs in 1.25031495094 seconds, 859.742010754 million Complex FMAs / second
+1 Threads: 1074.94829 Million Complex FMAs in 1.26311397552 seconds, 851.030319377 million Complex FMAs / second
 
-2 Threads:
-1074.94829 Million Complex FMAs in 20.7269210815 seconds, 51.8624201719 million Complex FMAs / second
-1074.94829 Million Complex FMAs in 22.6895301342 seconds, 47.3764015227 million Complex FMAs / second
-1074.94829 Million Complex FMAs in 23.7964780331 seconds, 45.1725792576 million Complex FMAs / second
+2 Threads: 1074.94829 Million Complex FMAs in 0.878556966782 seconds, 1223.53851901 million Complex FMAs / second
+2 Threads: 1074.94829 Million Complex FMAs in 0.708559036255 seconds, 1517.09065159 million Complex FMAs / second
+2 Threads: 1074.94829 Million Complex FMAs in 0.711874008179 seconds, 1510.02604063 million Complex FMAs / second
+2 Threads: 1074.94829 Million Complex FMAs in 0.750517845154 seconds, 1432.27545746 million Complex FMAs / second
+2 Threads: 1074.94829 Million Complex FMAs in 0.711735963821 seconds, 1510.3189169 million Complex FMAs / second
+2 Threads: 1074.94829 Million Complex FMAs in 0.693587064743 seconds, 1549.83901033 million Complex FMAs / second
 
-4 Threads:
-1074.94829 Million Complex FMAs in 27.0126180649 seconds, 39.79430233 million Complex FMAs / second
-1074.94829 Million Complex FMAs in 25.8918800354 seconds, 41.5168110052 million Complex FMAs / second
-1074.94829 Million Complex FMAs in 26.2690429688 seconds, 40.9207252536 million Complex FMAs / second
 
+4 Threads: 1074.94829 Million Complex FMAs in 0.582358121872 seconds, 1845.85438002 million Complex FMAs / second
+4 Threads: 1074.94829 Million Complex FMAs in 0.503425121307 seconds, 2135.26946611 million Complex FMAs / second
+4 Threads: 1074.94829 Million Complex FMAs in 0.496190071106 seconds, 2166.40427247 million Complex FMAs / second
+4 Threads: 1074.94829 Million Complex FMAs in 0.510525941849 seconds, 2105.57035771 million Complex FMAs / second
+4 Threads: 1074.94829 Million Complex FMAs in 0.514708995819 seconds, 2088.4583303 million Complex FMAs / second
+4 Threads: 1074.94829 Million Complex FMAs in 0.65876698494 seconds, 1631.75798814 million Complex FMAs / second
 
 
 ----------------------------------------------
-Without Instruction Level Parallelism (this was done on original code before modifying it)
+Without Instruction Level Parallelism (this was done on original code before modifying it for instruction-level parallelism)
+See without_instruction_parallelism.png for a graph of this.
 
 
-1 Thread:
-1074.656613 Million Complex FMAs in 7.00435709953 seconds, 153.426873834 million Complex FMAs / second
-1074.656613 Million Complex FMAs in 6.5706808567 seconds, 163.553311512 million Complex FMAs / second
-1074.656613 Million Complex FMAs in 7.13023519516 seconds, 150.718255932 million Complex FMAs / second
+1 Threads: 1074.656613 Million Complex FMAs in 6.1589179039 seconds, 174.487893777 million Complex FMAs / second
+1 Threads: 1074.656613 Million Complex FMAs in 6.2493751049 seconds, 171.962251419 million Complex FMAs / second
+1 Threads: 1074.656613 Million Complex FMAs in 6.19680500031 seconds, 173.421079564 million Complex FMAs / second
+1 Threads: 1074.656613 Million Complex FMAs in 6.42867398262 seconds, 167.16613969 million Complex FMAs / second
+1 Threads: 1074.656613 Million Complex FMAs in 6.1917579174 seconds, 173.562440156 million Complex FMAs / second
+1 Threads: 1074.656613 Million Complex FMAs in 6.31927990913 seconds, 170.05997969 million Complex FMAs / second
 
+2 Threads: 1074.656613 Million Complex FMAs in 3.37078309059 seconds, 318.815119252 million Complex FMAs / second
+2 Threads: 1074.656613 Million Complex FMAs in 3.36708903313 seconds, 319.1648936 million Complex FMAs / second
+2 Threads: 1074.656613 Million Complex FMAs in 3.39102196693 seconds, 316.912312418 million Complex FMAs / second
+2 Threads: 1074.656613 Million Complex FMAs in 3.36820602417 seconds, 319.059049621 million Complex FMAs / second
+2 Threads: 1074.656613 Million Complex FMAs in 3.37363100052 seconds, 318.545985864 million Complex FMAs / second
+2 Threads: 1074.656613 Million Complex FMAs in 3.36886405945 seconds, 318.996728285 million Complex FMAs / second
 
-2 Thread:
-1074.656613 Million Complex FMAs in 4.6469938755 seconds, 231.258452624 million Complex FMAs / second
-1074.656613 Million Complex FMAs in 4.56187105179 seconds, 235.573649671 million Complex FMAs / second
-1074.656613 Million Complex FMAs in 4.64534211159 seconds, 231.340682168 million Complex FMAs / second
-
-4 Threads:
-1074.656613 Million Complex FMAs in 3.4072868824 seconds, 315.399509959 million Complex FMAs / second
-1074.656613 Million Complex FMAs in 3.43155193329 seconds, 313.169269733 million Complex FMAs / second
-1074.656613 Million Complex FMAs in 3.57511591911 seconds, 300.593501669 million Complex FMAs / second
+4 Threads: 1074.656613 Million Complex FMAs in 1.85349988937 seconds, 579.798584916 million Complex FMAs / second
+4 Threads: 1074.656613 Million Complex FMAs in 1.86611509323 seconds, 575.879063889 million Complex FMAs / second
+4 Threads: 1074.656613 Million Complex FMAs in 1.84833502769 seconds, 581.418734644 million Complex FMAs / second
+4 Threads: 1074.656613 Million Complex FMAs in 2.00391697884 seconds, 536.278011689 million Complex FMAs / second
+4 Threads: 1074.656613 Million Complex FMAs in 1.88849616051 seconds, 569.054168853 million Complex FMAs / second
+4 Threads: 1074.656613 Million Complex FMAs in 2.02837705612 seconds, 529.811067305 million Complex FMAs / second
 

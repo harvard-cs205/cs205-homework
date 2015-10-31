@@ -35,26 +35,28 @@ cdef void counts_to_output(AVX.float8 counts, np.uint32_t [:, :] out_counts, int
   for elem in range(8):
     out_counts[out_counts_i, out_counts_j+elem] = <int> out_vals[elem]
 
-cdef AVX.float8 get_reals(np.complex64_t [:] items):
+cdef AVX.float8 get_reals(np.complex64_t [:] items) nogil:
   cdef:
-    np.ndarray[float, ndim=1] reals
+    float reals[8]
     AVX.float8 real_avx
-
-  reals = np.real(items)
+  for e in range(8):
+    reals[e] = items[e].real
   real_avx = AVX.make_float8(reals[7], reals[6], reals[5], reals[4], reals[3], reals[2], reals[1], reals[0])
   return real_avx
-cdef AVX.float8 get_imags(np.complex64_t [:] items):
+
+cdef AVX.float8 get_imags(np.complex64_t [:] items) nogil:
   cdef:
-    np.ndarray[float, ndim=1] imags
+    float imags[8]
     AVX.float8 real_avx
-  imags = np.imag(items)
+  for e in range(8):
+    imags[e] = items[e].imag
   imag_avx = AVX.make_float8(imags[7], imags[6], imags[5], imags[4], imags[3], imags[2], imags[1], imags[0])
   return imag_avx
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cpdef mandelbrot(np.complex64_t [:, :] in_coords,
-                 np.uint32_t [:, :] out_counts,
+                 np.uint32_t [:, :] out_counts, int number_threads,
                  int max_iterations=511):
     cdef:
        int i, j, elem, rep
@@ -63,19 +65,17 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     assert in_coords.shape[1] % 8 == 0, "Input array must have 8N columns"
     assert in_coords.shape[0] == out_counts.shape[0], "Input and output arrays must be the same size"
     assert in_coords.shape[1] == out_counts.shape[1],  "Input and output arrays must be the same size"
-    print in_coords.shape[0], in_coords.shape[1]
 
     with nogil:
-      for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=4):
+      for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=number_threads):
         for j in range(0, in_coords.shape[1], 8):
           # Initialize real and imaginary parts of z
           z_real = AVX.float_to_float8(0)
           z_imag = AVX.float_to_float8(0)
           
           # Get the real and imaginary parts of the in_coords
-          with gil:
-            c_real = get_reals(in_coords[i, j:j+8])
-            c_imag = get_imags(in_coords[i, j:j+8])
+          c_real = get_reals(in_coords[i, j:j+8])
+          c_imag = get_imags(in_coords[i, j:j+8])
           
           # Initialize the counts
           counts = AVX.float_to_float8(0)
