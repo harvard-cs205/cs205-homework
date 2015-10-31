@@ -1,12 +1,14 @@
 
 MULTITHREADING
 --------------
-This sped up the program by a factor of 2.
+This sped up the program by a factor of 2. (10 frames vs. 5 frames per second)
 
 SPATIAL DECOMPOSITION
 ---------------------
-This sped up the program by another factor of 2 ony my Intel Duo Core machine.
+This sped up the program immensly, by a factor 500 ony my Intel Duo Core machine. (2000 frames vs. 5 frames per second)
 
 Compare this version to the non-gridded version, for both 4 and 1 threads, and discuss the reasons for performance
 differences between all four versions.
+
+
 

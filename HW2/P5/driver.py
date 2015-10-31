@@ -82,9 +82,16 @@ if __name__ == '__main__':
             update(positions, velocities, grid,
                    radius, grid_size, locks_ptr,
                    physics_step)
-            #indexes = np.argsort(grid.view('i8,i8'), order=less_msb)
-            #grid = grid[indexes]
-            #velocities = velocities[indexes]
+
+            # index = np.ogrid[:grid.shape[0], :grid.shape[1]]
+            # index[0] = grid.argsort(0)
+            # index[1] = grid.argsort(1)
+            # grid = grid[index]
+            #
+            # ix = np.ogrid[:velocities.shape[0], :velocities.shape[1]]
+            # ix[0] = velocities.argsort(0)
+            # ix[1] = velocities.argsort(1)
+            # velocities = velocities[ix]
 
         # udpate our estimate of how fast the simulator runs
         physics_step = 0.9 * physics_step + 0.1 * t.interval
