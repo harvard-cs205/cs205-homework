@@ -40,7 +40,7 @@ if __name__ == '__main__':
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################
-    N = 10
+    N = 4
     counts[:] = orig_counts
     with Timer() as t:
         move_data_medium_grained(counts, src, dest, 100, N)
@@ -74,7 +74,7 @@ if __name__ == '__main__':
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################
-    N = 10
+    N = 4
     counts[:] = orig_counts
     with Timer() as t:
         move_data_medium_grained(counts, src, dest, 100, N)
