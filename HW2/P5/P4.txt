@@ -1,0 +1,4 @@
+Subproblem 1:
+==================
+Run this at home - hyperthreading makes this annoying to deal with. 4 threads is actually slower than 2 on my mac.
+

@@ -1,4 +1,4 @@
-#cython: boundscheck=True, wraparound=False
+#cython: boundscheck=False, wraparound=False
 
 cimport numpy as np
 from libc.math cimport sqrt
@@ -56,15 +56,13 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                      float R,
                      int i, int count,
                      UINT[:, ::1] Grid,
-                     float grid_spacing,
-                     omp_lock_t *locks) nogil:
+                     float grid_spacing) nogil:
     cdef:
         FLOAT *XY1, *XY2, *V1, *V2
         int k, j, dim
         int grid_x_dim, grid_y_dim
         FLOAT x1, y1
         int grid_x1, grid_y1, other_ball_grid_val
-        int first_lock, second_lock, same_lock
         float eps = 1e-5
 
     # SUBPROBLEM 4: Add locking
@@ -96,22 +94,7 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                     # If we have someone there...
                     if (other_ball_grid_val != -1):
 
-                        # We apply the same logic as in P2
-                        if i == other_ball_grid_val:
-                            same_lock = 1
-                            first_lock = i
-                        elif i < other_ball_grid_val:
-                            first_lock = i
-                            second_lock = other_ball_grid_val
-                        else:
-                            first_lock = other_ball_grid_val
-                            second_lock = i
-
-                        # then treat the collision accordingly and lock as necessary
-                        acquire(&locks[first_lock])
-                        if not same_lock:
-                            acquire(&locks[second_lock])
-
+                        # then treat it accordingly
                         XY2 = &(XY[other_ball_grid_val, 0])
                         V2 = &(V[other_ball_grid_val, 0])
 
@@ -123,12 +106,6 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                             # give a slight impulse to help separate them
                             for dim in range(2):
                                 V2[dim] += eps * (XY2[dim] - XY1[dim])
-
-                        # And now release the locks
-                        release(&locks[first_lock])
-
-                        if not same_lock:
-                            release(&locks[second_lock])
 
 cpdef update(FLOAT[:, ::1] XY,
              FLOAT[:, ::1] V,
@@ -144,7 +121,7 @@ cpdef update(FLOAT[:, ::1] XY,
         int chunk_size = count / nthreads 
         FLOAT *XY1, *XY2, *V1, *V2
         # SUBPROBLEM 4: uncomment this code.
-        omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
+        # omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
 
     assert XY.shape[0] == V.shape[0]
     assert XY.shape[1] == V.shape[1] == 2
@@ -165,7 +142,7 @@ cpdef update(FLOAT[:, ::1] XY,
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
         for i in prange(count, num_threads=nthreads, chunksize=chunk_size, schedule='static'):
-            sub_update(XY, V, R, i, count, Grid, grid_spacing, locks)
+            sub_update(XY, V, R, i, count, Grid, grid_spacing)
 
         # update positions
         #

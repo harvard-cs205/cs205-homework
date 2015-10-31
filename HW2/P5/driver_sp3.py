@@ -87,3 +87,20 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+            for ii in range(num_balls):
+                # Convert the positions to grid coordinates
+                grid_x = int(positions[ii, 0] / grid_spacing)
+                grid_y = int(positions[ii, 1] / grid_spacing)
+
+                # Now get their coordinate along the hilbert curve
+                hilbert_vals[ii] = point_to_hilbert(grid_x, grid_y, grid_spacing)
+            
+            # Now find out where the different balls SHOUlD be
+            sort_indices = np.argsort(hilbert_vals)
+
+            # Now sort our positions and velocities simultaneously, as well as update the grid 
+            positions = positions[sort_indices]
+            velocities = velocities[sort_indices] 
+            grid[(positions[:, 0] / grid_spacing).astype(int),
+             (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
+
