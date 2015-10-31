@@ -1,0 +1,39 @@
+With Instruction Level Parallelism
+
+1 Thread:
+1074.94829 Million Complex FMAs in 16.6752960682 seconds, 64.4635205039 million Complex FMAs / second
+1074.94829 Million Complex FMAs in 16.7121660709 seconds, 64.3213025431 million Complex FMAs / second
+1074.94829 Million Complex FMAs in 19.0027937889 seconds, 56.5679079582 million Complex FMAs / second
+
+2 Threads:
+1074.94829 Million Complex FMAs in 20.7269210815 seconds, 51.8624201719 million Complex FMAs / second
+1074.94829 Million Complex FMAs in 22.6895301342 seconds, 47.3764015227 million Complex FMAs / second
+1074.94829 Million Complex FMAs in 23.7964780331 seconds, 45.1725792576 million Complex FMAs / second
+
+4 Threads:
+1074.94829 Million Complex FMAs in 27.0126180649 seconds, 39.79430233 million Complex FMAs / second
+1074.94829 Million Complex FMAs in 25.8918800354 seconds, 41.5168110052 million Complex FMAs / second
+1074.94829 Million Complex FMAs in 26.2690429688 seconds, 40.9207252536 million Complex FMAs / second
+
+
+
+----------------------------------------------
+Without Instruction Level Parallelism (this was done on original code before modifying it)
+
+
+1 Thread:
+1074.656613 Million Complex FMAs in 7.00435709953 seconds, 153.426873834 million Complex FMAs / second
+1074.656613 Million Complex FMAs in 6.5706808567 seconds, 163.553311512 million Complex FMAs / second
+1074.656613 Million Complex FMAs in 7.13023519516 seconds, 150.718255932 million Complex FMAs / second
+
+
+2 Thread:
+1074.656613 Million Complex FMAs in 4.6469938755 seconds, 231.258452624 million Complex FMAs / second
+1074.656613 Million Complex FMAs in 4.56187105179 seconds, 235.573649671 million Complex FMAs / second
+1074.656613 Million Complex FMAs in 4.64534211159 seconds, 231.340682168 million Complex FMAs / second
+
+4 Threads:
+1074.656613 Million Complex FMAs in 3.4072868824 seconds, 315.399509959 million Complex FMAs / second
+1074.656613 Million Complex FMAs in 3.43155193329 seconds, 313.169269733 million Complex FMAs / second
+1074.656613 Million Complex FMAs in 3.57511591911 seconds, 300.593501669 million Complex FMAs / second
+
