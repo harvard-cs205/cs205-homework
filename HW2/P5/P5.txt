@@ -53,3 +53,41 @@ Subproblem 2:
 553.950743378 simulation frames per second
 654.569681493 simulation frames per second
 676.055393625 simulation frames per second
+
+
+
+Subproblem 3:
+1 thread:
+
+4 thread:
+
+Subproblem 4:
+1 thread:
+640.978945394 simulation frames per second
+667.887426526 simulation frames per second
+629.325407259 simulation frames per second
+580.024753673 simulation frames per second
+659.920387336 simulation frames per second
+624.170072848 simulation frames per second
+648.22401124 simulation frames per second
+676.932628816 simulation frames per second
+698.992417299 simulation frames per second
+502.899960503 simulation frames per second
+683.576089113 simulation frames per second
+701.334875393 simulation frames per second
+
+4 threads:
+1062.678631 simulation frames per second
+860.808447096 simulation frames per second
+415.336370066 simulation frames per second
+684.770351625 simulation frames per second
+683.363028448 simulation frames per second
+864.049327641 simulation frames per second
+997.302898064 simulation frames per second
+502.974457369 simulation frames per second
+979.949817337 simulation frames per second
+989.98678225 simulation frames per second
+798.509455515 simulation frames per second
+1074.10081236 simulation frames per second
+822.862011463 simulation frames per second
+756.632326821 simulation frames per second

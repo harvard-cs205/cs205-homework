@@ -11,7 +11,7 @@ from omp_defs cimport omp_lock_t, get_N_locks, free_N_locks, acquire, release
 ctypedef np.float32_t FLOAT
 ctypedef np.uint32_t UINT
 
-@cython.boundscheck(True)
+# @cython.boundscheck(True)
 
 cdef inline int overlapping(FLOAT *x1,
                             FLOAT *x2,
@@ -58,7 +58,8 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                      float R,
                      int i, int count,
                      UINT[:, ::1] Grid,
-                     float grid_spacing) nogil:
+                     float grid_spacing,
+                     omp_lock_t *locks) nogil:
     cdef:
         FLOAT *XY1, *XY2, *V1, *V2
         int x_idx, y_idx, dim
@@ -66,6 +67,8 @@ cdef void sub_update(FLOAT[:, ::1] XY,
         unsigned int size, x, y
 
     # SUBPROBLEM 4: Add locking
+    acquire(&(locks[i]))
+
     XY1 = &(XY[i, 0])
     V1 = &(V[i, 0])
     #############################################################
@@ -80,6 +83,7 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     for x_idx in xrange(x+1, x+3):
         for y_idx in xrange(y+1, y+4-(x_idx-x)):
             if x_idx < size and y_idx < size and Grid[x_idx, y_idx] < count:
+                acquire(&(locks[Grid[x_idx, y_idx]]))
                 XY2 = &(XY[Grid[x_idx, y_idx], 0])
                 V2 = &(V[Grid[x_idx, y_idx], 0])
                 if overlapping(XY1, XY2, R):
@@ -90,6 +94,8 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                     # give a slight impulse to help separate them
                     for dim in range(2):
                         V2[dim] += eps * (XY2[dim] - XY1[dim])
+                release(&(locks[Grid[x_idx, y_idx]]))
+    release(&(locks[i]))
 
 cpdef update(FLOAT[:, ::1] XY,
              FLOAT[:, ::1] V,
@@ -105,7 +111,7 @@ cpdef update(FLOAT[:, ::1] XY,
         unsigned int x, y
         FLOAT *XY1, *XY2, *V1, *V2
         # SUBPROBLEM 4: uncomment this code.
-        # omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
+        omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
 
     assert XY.shape[0] == V.shape[0]
     assert XY.shape[1] == V.shape[1] == 2
@@ -126,7 +132,7 @@ cpdef update(FLOAT[:, ::1] XY,
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
         for i in prange(count, num_threads=num_threads, schedule='static', chunksize=count/4):
-            sub_update(XY, V, R, i, count, Grid, grid_spacing)
+            sub_update(XY, V, R, i, count, Grid, grid_spacing, locks)
 
         # update positions
         #
