@@ -1,0 +1,17 @@
+I implemented asynchronous concurrent-thread filtering with the use of Thread and Event variables from the threading module.  Each thread was responsible for computing the medians of every N rows, starting at row n, where N is the number of threads (and therefore the step size), and n is a given thread index.  
+
+I created a 2D (num_threads x iterations) array of Event variables, so that each thread on each iteration had its own Event to register.  Event variables evaluate to False until the .set() method is applied, in which case they evaluate to True.  There's also a .wait() method, which blocks a thread from continuing until the Event it's waiting on is set to True. 
+
+With this setup, for thread n on iteration i, I told it to .wait() on the Events for (1) thread n-1/iteration i-1, (2) thread n/iteration i-1, and (3) thread n+1/iteration i-1. Once those had all been .set(), I knew that the local image pixel cells that I needed to compute the median for thread n were ready to go. After thread n finished computing, it set its own Event (thread n/iteration i) to True.
+
+This method allows threads to operate asynchronously, meaning it doesn't need to wait for any other threads besides its neighbors to finish the i-1 iteration before it can begin.
+
+Processing times:
+ 
+1 THREADS: 3.537 seconds for 10 filter passes.
+2 THREADS: 1.863 seconds for 10 filter passes.
+4 THREADS: 1.848 seconds for 10 filter passes.
+
+There's about a 2x speedup with 2 threads over 1 thread.  
+4 threads doesn't get much better - this may be the thread overhead beginning to compete with the speedup in computing gained by concurrency.
+
