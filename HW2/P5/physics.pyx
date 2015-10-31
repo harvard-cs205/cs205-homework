@@ -1,5 +1,5 @@
 #cython: boundscheck=False, wraparound=False
-
+from cython.parallel import parallel, prange
 cimport numpy as np
 from libc.math cimport sqrt
 from libc.stdint cimport uintptr_t
@@ -97,33 +97,36 @@ cpdef update(FLOAT[:, ::1] XY,
 
     assert XY.shape[0] == V.shape[0]
     assert XY.shape[1] == V.shape[1] == 2
+    chunksize = count/4
 
-    with nogil:
-        # bounce off of walls
-        #
-        # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
-        # scheduling.
-        for i in range(count):
-            for dim in range(2):
-                if (((XY[i, dim] < R) and (V[i, dim] < 0)) or
-                    ((XY[i, dim] > 1.0 - R) and (V[i, dim] > 0))):
-                    V[i, dim] *= -1
+    # with nogil:
 
-        # bounce off of each other
-        #
-        # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
-        # scheduling.
-        for i in range(count):
-            sub_update(XY, V, R, i, count, Grid, grid_spacing)
+    # bounce off of walls
+    #
+    # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
+    # scheduling.
+    for i in prange(count, nogil = True, schedule = 'static', chunksize = chunksize, num_threads = 4):
+        for dim in range(2):
+            if (((XY[i, dim] < R) and (V[i, dim] < 0)) or
+                ((XY[i, dim] > 1.0 - R) and (V[i, dim] > 0))):
+                V[i, dim] *= -1
 
-        # update positions
-        #
-        # SUBPROBLEM 1: parallelize this loop over 4 threads (with static
-        #    scheduling).
-        # SUBPROBLEM 2: update the grid values.
-        for i in range(count):
-            for dim in range(2):
-                XY[i, dim] += V[i, dim] * t
+    # bounce off of each other
+    #
+    # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
+    # scheduling.
+    # for i in range(count):
+    for i in prange(count, nogil = True, schedule = 'static', chunksize = chunksize, num_threads = 4):
+        sub_update(XY, V, R, i, count, Grid, grid_spacing)
+
+    # update positions
+    #
+    # SUBPROBLEM 1: parallelize this loop over 4 threads (with static
+    #    scheduling).
+    # SUBPROBLEM 2: update the grid values.
+    for i in prange(count, nogil = True, schedule = 'static', chunksize = chunksize, num_threads = 4):
+        for dim in range(2):
+            XY[i, dim] += V[i, dim] * t
 
 
 def preallocate_locks(num_locks):

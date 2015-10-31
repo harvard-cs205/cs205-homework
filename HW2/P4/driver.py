@@ -15,15 +15,55 @@ import filtering
 from timer import Timer
 import threading
 
+def worker(tmpA, tmpB, iterations, threadidx, num_threads, events):
+
+    #handle many threads and also one thread
+    if num_threads > 1:
+        for i in range(iterations):
+
+            # we care about events only when there are more than one thread
+            if num_threads>1:
+                # no wait at 1st iteration
+                if i > 0 :
+                    # if first line just wait for the next one
+                    if threadidx == 0:
+                        events[threadidx+1,i-1].wait()
+                    # if last line just wait for the one before
+                    elif threadidx == num_threads-1:
+                        events[threadidx-1,i-1].wait()
+                    # else wait for line before and after
+                    else :
+                        events[threadidx+1,i-1].wait()
+                        events[threadidx-1,i-1].wait()
+
+
+            #have each thread work on every num_threads-th thread
+            filtering.median_3x3(tmpA, tmpB, threadidx, num_threads)
+            # swap direction of filtering (change the pointers)
+            tmpA, tmpB = tmpB, tmpA
+            #awakes all the thread waiting for it
+            if num_threads>1:
+                events[threadidx,i].set()
+
 def py_median_3x3(image, iterations=10, num_threads=1):
-    ''' repeatedly filter with a 3x3 median '''
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
 
-    for i in range(iterations):
-        filtering.median_3x3(tmpA, tmpB, 0, 1)
-        # swap direction of filtering
-        tmpA, tmpB = tmpB, tmpA
+    #Initialize the events one event per (threadid, iteration step) tuple
+    events = [threading.Event() for _ in range(num_threads*iterations)]
+    events = np.reshape(events,(num_threads,iterations))
+
+    #Initialize create a list of threads
+    thread_list=[]
+    for threadidx in range(num_threads):
+        #assign thread number to be used as an argument to dictate the 'Nth' lines of work to be done
+        th = threading.Thread(target = worker, args = (tmpA, tmpB, iterations, threadidx, num_threads, events))
+        thread_list.append(th)
+        th.start()
+
+    # make sure it gets the results
+    for th in thread_list:
+        th.join()
 
     return tmpA
 

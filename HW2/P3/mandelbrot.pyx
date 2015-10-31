@@ -32,7 +32,7 @@ cpdef mandelbrot_AVX(np.complex64_t [:, :] in_coords,
 	for i in prange(in_coords.shape[0], nogil = True, schedule = 'static', chunksize =1,
 	 				num_threads = n_threads):
 
-
+		# we now go by steps of 8 within the loop because each AVX takes care of 8 values
 		for j in range(0,in_coords.shape[1],8):
 			# define c_real (in the AVX 7 to 0 format)
 			c_real = AVX.make_float8(in_coords_real[i, j+7], in_coords_real[i, j+6], in_coords_real[i, j+5],
