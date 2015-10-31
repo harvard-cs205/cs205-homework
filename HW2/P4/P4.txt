@@ -16,11 +16,11 @@ Num threads: 4
 of your implementation choices to control cooperation between threads.
 
 The method I use to control cooperation between threads is relatively straightforwards. If we have N threads, the nth
-thread processes every Nth line starting with n. Within a single
+thread processes every Nth line starting with n (as suggested). Within a single
 iteration, each thread can update their assigned rows independently of the other threads, as they take information from
 the input image, act on it, and put the filtered data into the output image. To avoid problems, we must avoid updating
 the input image until each thread has finished transforming data from the input image to the output image. To wait
-until each thread is done using the input image, we simply use thread_n.join() on each thread. Once we have waited for
+until each thread is done utilizing the input image, we simply use thread.join() on each thread. Once we have waited for
 each thread to complete, we take the output filtered image and use it as an input for the next iteration. My
 technique does not create any buffers, i.e. I use tmpA and tmpB as is.
 
