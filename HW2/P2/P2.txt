@@ -29,19 +29,20 @@ b) Correlated
 
 The correlated fine-grained code runs *faster* than the uncorrelated code. This is surprising to me...naively, I would
 expect that if the source and destination are correlated when transferring data, there would be more contention for locks.
-This does not appear to be the case. #TODO: Figure out why this is
+This does not appear to be the case. I think this must be attributed to OpenMP and compiler strageness.
 
 2. Medium Grained
 
 a) Uncorrelated
 
 Now, there are less locks; a single lock controls access to multiple array elements. Naively, this could be a good
-choice as it will lessen the penalty of assigning many locks. This hypothesis relies on the fact that there will not
-be much waiting for locks.
+choice as it will lessen the penalty of assigning and releasing many locks. It will only speed up the code if there
+is not a lot of contention for the locks, i.e. if N is too big, there will be too much contention for locks and the
+code will slow down.
 
 See plot "uncorrelated_vs_N.png". Strangely, when N=1, we record a time of roughly 9 seconds. N=1 corresponds to the
 fine-grained case where we recorded a time of roughly 2.56 seconds; evidently the overhead associated with assigning
-locks is large (i.e. doing division and addition). #TODO: Figure out why this is too
+locks is large (i.e. doing division and addition). I again attribute this to compiler strangeness.
 
 Regardless, the trends we see in the plot make sense; there is a peak in time around N=3; the combination of many locks
 and increased contention for locks must create this. After N=3, the time elapsed falls off rapidly and reaches a minimum
@@ -55,5 +56,10 @@ balanced locking technique is generally the best as illustrated by this plot.
 
 b) Correlated
 
-The beginning of the "correlated_vs_N.png" plot makes sense. Since data is correlated...no I'm confused.
-#TODO Figure this out!
+Intuitively, since the source and destination are less
+than or equal to 10 indices apart, we expect that an N slightly greater than 10 would result in very little contention for locks; this should
+provide a large speedup. We see this in the plot: the largest speedup occurs for an N larger than 10. It looks like
+the maximum speedup occurs for N ~ 35. At larger N, the code again becomes slow. This is likely because at large N,
+less elements can be swapped at once, as a lock prevents many elements from swapping.
+N ~ 35 must hit the sweet spot between avoiding correlation between source and index and not locking too many locks
+at once.
