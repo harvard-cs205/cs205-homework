@@ -17,6 +17,8 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     cdef:
        int i, j, iter
        np.complex64_t c, z
+       AVX.float8 v1, v2, v3, c1
+       np.ndarray[np.float_t, ndim=1] zs
 
        # To declare AVX.float8 variables, use:
        # cdef:
@@ -34,13 +36,15 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     with nogil:
         for i in range(in_coords.shape[0]):
             for j in range(in_coords.shape[1]):
-                c = in_coords[i, j]
-                z = 0
-                for iter in range(max_iterations):
-                    if magnitude_squared(z) > 4:
-                        break
-                    z = z * z + c
-                out_counts[i, j] = iter
+              zs = AVX.make_float8(0,0,0,0,0,0,0,0)
+              #cdef np.ndarray zs = np.zeros(8, dtype=np.float_t)
+              c = in_coords[i, j]
+              z = 0
+              for iter in range(max_iterations):
+                  if magnitude_squared(z) > 4:
+                      break
+                  z = z * z + c
+              out_counts[i, j] = iter
 
 
 
