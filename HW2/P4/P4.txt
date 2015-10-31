@@ -1,0 +1,32 @@
+Implementation:
+
+I used "Events" to control communication between theads. In order to accommodate varying numbers of threads and iterations, I create a two-dimensional array of events, where each item in the array represents a thread-iteration pair and can be called by events[thread_id][iteration]. The entire array is then passed to the relevant worker function (either wrap_median_3x3_synch or wrap_median_3x3_asynch) so that all the threads can access every event item.
+
+Each thread-iteration pair clears its event flag before beginning to work and then set it upon completion. 
+
+In the synchronous implementation, wait() statements are used to ensure that each thread waits for all other threads to complete the same iteration before moving on.
+
+e.g. with 4 threads: after completing iteration 4, thread 0 will wait for events [1][4], [2][4] and [3][4] to be set.
+
+In the asynchronous implementation, the same approach is used but each thread only waits for threads upon which it depends.
+
+e.g. with 4 threads: after completing iteration 4, thread 0 will wait for events [1][4] and [3][4]. The helper function dependent_threads is used to determine which threads to wait for in each case.
+
+Note: I collaborated with Kendrick Lo on the implementation for this problem.
+
+Performance:
+
+P4_graph compares the performance across 1, 2, 4 and 8 threads for both the synchronous and the asynchronous implementation.  There is a slight variation in runtime across runtimes, so I have included five different runtimes for each option for completeness.
+
+The run-times for the synchronous and asynchronous implementations are comparable. This is due to the fact that the work is fairly evenly split across the threads, so it is unlikely that individual threads will complete significantly earlier than others. In addition, having to wait for their 'neighbors' to finish continues to constrain threads, even in the asynchronous case.
+
+Run-time with one thread is roughly comparable to serial run-time for both the synchronous and asynchronous implementation. The average run-time over 5 runs for the three cases is:
+Serial: 3.6 seconds
+1 thread - synchronous: 3.6 seconds
+1 thread - asynchronous: 3.7 seconds
+
+The slightly higher runtime for the asynchronous implementation is most likely due to the overhead of calling the dependent_threads helper function.
+
+When moving to two threads, both the synchronous and asynchronous implementation show a roughly 2x speedup. Averaging over 5 runs results in an average runtime of 1.8 seconds for both versions.
+
+The majority of the improvements from parallelism are obtained with two threads, and moving to higher number of threads yields a much lower improvement in run-time. For the synchronous implementation, both 4 and 8 threads result in roughly a 2.2x speed-up compared to the one-threaded version. For the asynchronous implementation, both 4 and 8 threads result in roughly a 2.3x speed-up compared to the one-threaded version.
