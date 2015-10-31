@@ -56,10 +56,10 @@ balanced locking technique is generally the best as illustrated by this plot.
 
 b) Correlated
 
-Intuitively, since the source and destination are less
-than or equal to 10 indices apart, we expect that an N slightly greater than 10 would result in very little contention for locks; this should
+Intuitively, since the source and destination are less than or equal to 10 indices apart, we expect that an
+N slightly greater than 10 would result in very little contention for locks; this should
 provide a large speedup. We see this in the plot: the largest speedup occurs for an N larger than 10. It looks like
-the maximum speedup occurs for N ~ 35. At larger N, the code again becomes slow. This is likely because at large N,
-less elements can be swapped at once, as a single lock prevents many elements from swapping.
-N ~ 35 must hit the sweet spot between avoiding correlation between the source and destination and not locking too indices
-at once.
+the maximum speedup occurs for N ~ 35. At N larger than 35, the code again becomes slow. This is likely because at large N,
+less elements can be swapped at once, as a single lock controls a large number of indices relative to the total number of
+indices. N ~ 35 must be the sweet spot because it avoids contention due to correlation between the source and destination
+and avoids contention due to too many locked indices at once (large N).
