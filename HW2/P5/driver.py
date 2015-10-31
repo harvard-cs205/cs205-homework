@@ -93,10 +93,11 @@ if __name__ == '__main__':
             #see hilbert.py for more information on the function
             new_order = np.argsort([Hilbert_to_int([int(k),int(l)]) for k,l in grid_coordinates])
 
-            # Reorder the positions and velocity arrays
+            #reorder the positions and velocity arrays with respect to the sorting
             positions = positions[new_order]
             velocities = velocities[new_order]
 
-            # Based on the new positions, update the grid
+            #update the grid with the new ordering 
+            #(this will change the colors)
             grid_coordinates_reordered = grid_coordinates[new_order]
             grid[grid_coordinates_reordered[:, 0], grid_coordinates_reordered[:, 1]] = np.arange(num_balls)
