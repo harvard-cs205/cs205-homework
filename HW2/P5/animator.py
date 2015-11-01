@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from matplotlib.collections import EllipseCollection
 import numpy as np
+import matplotlib.cm as cm
 
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
@@ -15,7 +16,9 @@ class Animator(object):
         self.ax = ax
 
         diameters = np.ones(self.count) * diameter
-        colors = [randcolor() for _ in range(self.count)]
+        #changed coloring so you can verify the re-ordering is working 
+        colors = cm.jet(np.linspace(0,1,self.count))
+        #[randcolor() for _ in range(self.count)]
         self.circles = EllipseCollection(widths=diameters,
                                          heights=diameters,
                                          angles=np.zeros_like(diameters),
