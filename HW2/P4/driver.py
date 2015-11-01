@@ -20,12 +20,45 @@ def py_median_3x3(image, iterations=10, num_threads=1):
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
 
+    rows = tmpB.shape[0]
+    block_size = rows/num_threads
+
+    threads = []
+
+    # Create events that signals the threads to avoid collisions
+    events = np.array([threading.Event()]*(iterations*num_threads)).reshape([num_threads, iterations])
+
+    if num_threads==1:
+        for i in range(iterations):
+            filtering.median_3x3(tmpA, tmpB, 0, 1)
+            # swap direction of filtering
+            tmpA, tmpB = tmpB, tmpA
+    else:
+        for tid in range(num_threads):
+            t = threading.Thread(target=filterHelper, 
+                                 args=(tid, num_threads, tmpA, tmpB, events))
+            threads.append(t)
+            t.start()
+        for tid in range(num_threads):
+            threads[tid].join()
+
+
+    return tmpA
+
+def filterHelper(tid, num_threads, tmpA, tmpB, events):
+
     for i in range(iterations):
+        #Handle events
+        
+
+
         filtering.median_3x3(tmpA, tmpB, 0, 1)
         # swap direction of filtering
         tmpA, tmpB = tmpB, tmpA
 
-    return tmpA
+    return False
+
+
 
 def numpy_median(image, iterations=10):
     ''' filter using numpy '''

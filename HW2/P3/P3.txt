@@ -1,0 +1,17 @@
+As shown below, the performance of implementing AVX yields much better time efficiency. And the more threads, the faster. The rate of speed increase, however is decreasing.
+
+
+Cases:
+1. With no AVX:
+1074.656613 Million Complex FMAs in 6.03112888336 seconds, 178.184985561 million Complex FMAs / second
+
+2. With AVX, 2 threads:
+1059.218048 Million Complex FMAs in 0.404404163361 seconds, 2619.2065858 million Complex FMAs / second
+
+3. With AVX, 4 threads:
+1059.218048 Million Complex FMAs in 0.285069942474 seconds, 3715.64269037 million Complex FMAs / second
+
+4. With AVX, 2 threads:
+1059.218048 Million Complex FMAs in 0.259290933609 seconds, 4085.0562465 million Complex FMAs / second
+
+A smaller number in FMAs is probably due to the boundary condition whether or not the counting includes 4.
