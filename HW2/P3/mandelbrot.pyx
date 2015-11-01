@@ -9,6 +9,18 @@ from cython.parallel import prange
 cdef np.float64_t magnitude_squared(np.complex64_t z) nogil:
     return z.real * z.real + z.imag * z.imag
 
+cdef void counts_to_output(AVX.float8 counts,
+                      np.uint32_t[:, :] out_counts,
+                      int i, int j) nogil:
+    cdef:
+        float tmp_counts[8]
+        int jj
+
+    AVX.to_mem(counts, &(tmp_counts[0]))
+    
+    for jj in range(8):
+        out_counts[i, j+jj]= <int>tmp_counts[jj]
+    
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cpdef mandelbrot(np.complex64_t [:, :] in_coords,
@@ -16,33 +28,66 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                  int max_iterations=511):
     cdef:
        int i, j, iter
-       np.complex64_t c, z
+       np.float32_t [:, :] in_coords_r, in_coords_i
+       AVX.float8 counts, cr, ci, zr, zi, zr_temp, zi_temp, magnitude_squared, mask
 
-       # To declare AVX.float8 variables, use:
-       # cdef:
-       #     AVX.float8 v1, v2, v3
-       #
-       # And then, for example, to multiply them
-       #     v3 = AVX.mul(v1, v2)
-       #
-       # You may find the numpy.real() and numpy.imag() fuctions helpful.
+
+    in_coords_r = np.real(in_coords)
+    in_coords_i = np.imag(in_coords)
+
+     # To declare AVX.float8 variables, use:
+     # cdef:
+     #     AVX.float8 v1, v2, v3
+     #
+     # And then, for example, to multiply them
+     #     v3 = AVX.mul(v1, v2)
+     #
+     # You may find the numpy.real() and numpy.imag() fuctions helpful.
 
     assert in_coords.shape[1] % 8 == 0, "Input array must have 8N columns"
     assert in_coords.shape[0] == out_counts.shape[0], "Input and output arrays must be the same size"
     assert in_coords.shape[1] == out_counts.shape[1],  "Input and output arrays must be the same size"
 
     with nogil:
-        for i in range(in_coords.shape[0]):
-            for j in range(in_coords.shape[1]):
-                c = in_coords[i, j]
-                z = 0
+        for i in prange(in_coords.shape[0], num_threads=4, schedule='static', chunksize=1) :
+            for j in range(0, in_coords.shape[1], 8) :
+                counts = AVX.float_to_float8(0.0)
+                cr = AVX.make_float8(in_coords_r[i, j+7], 
+                                in_coords_r[i, j+6], 
+                                in_coords_r[i, j+5], 
+                                in_coords_r[i, j+4], 
+                                in_coords_r[i, j+3], 
+                                in_coords_r[i, j+2], 
+                                in_coords_r[i, j+1], 
+                                in_coords_r[i, j])
+                ci = AVX.make_float8(in_coords_i[i, j+7], 
+                                in_coords_i[i, j+6], 
+                                in_coords_i[i, j+5], 
+                                in_coords_i[i, j+4], 
+                                in_coords_i[i, j+3], 
+                                in_coords_i[i, j+2], 
+                                in_coords_i[i, j+1], 
+                                in_coords_i[i, j])
+
+                zr = AVX.float_to_float8(0.0)
+                zi = AVX.float_to_float8(0.0)
+
                 for iter in range(max_iterations):
-                    if magnitude_squared(z) > 4:
-                        break
-                    z = z * z + c
-                out_counts[i, j] = iter
+                    magnitude_squared = AVX.fmadd(zr, zr, AVX.mul(zi,zi))
+                    mask = AVX.less_than(magnitude_squared, AVX.float_to_float8(4.0))
+                    
+                    if 0 == AVX.signs(mask):
+                      break
 
+                    counts = AVX.add(counts, AVX.bitwise_and(AVX.float_to_float8(1.0), mask))
 
+                    #  (zr + zi*i)(zr+zi*i) + (cr + ci*i) = (zr * zr + cr - zi * zi) + (2 * zr * zi + ci)* i 
+                    zr_temp = AVX.sub(AVX.fmadd(zr, zr, cr), AVX.mul(zi,zi))
+                    zi_temp = AVX.fmadd(AVX.mul(AVX.float_to_float8(2.0), zr), zi, ci)
+                    zr = zr_temp
+                    zi = zi_temp
+
+                counts_to_output(counts, out_counts, i, j)
 
 # An example using AVX instructions
 cpdef example_sqrt_8(np.float32_t[:] values):
