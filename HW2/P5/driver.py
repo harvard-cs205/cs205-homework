@@ -13,12 +13,14 @@ from timer import Timer
 from animator import Animator
 from physics import update, preallocate_locks
 
+import matplotlib.pyplot as plt
+
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
 if __name__ == '__main__':
-    num_balls = 10000
-    radius = 0.002
+    num_balls = 500
+    radius = 0.01
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -57,15 +59,19 @@ if __name__ == '__main__':
 
     frame_count = 0
 
-    # SUBPROBLEM 4: uncomment the code below.
     # preallocate locks for objects
     locks_ptr = preallocate_locks(num_balls)
+
+    chunk = num_balls/4
+    nthread = 1
+    SFPS = []
+    ct = 0
 
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
-                   radius, grid_size, locks_ptr,
-                   physics_step)
+                   radius, grid_spacing, locks_ptr,
+                   physics_step, nthread, chunk)
 
         # udpate our estimate of how fast the simulator runs
         physics_step = 0.9 * physics_step + 0.1 * t.interval
@@ -75,8 +81,23 @@ if __name__ == '__main__':
         if total_time > anim_step:
             animator.update(positions)
             print("{} simulation frames per second".format(frame_count / total_time))
+            SFPS.append(frame_count / total_time)
             frame_count = 0
             total_time = 0
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+        if ct > 10000:
+            fig, ax = plt.subplots()
+            ax.hist(SFPS, bins=100)
+            ax.set_title("Histogram of simulation FPS, {} threads".format(nthread), fontsize=16)
+            ax.set_xlabel("Simulation Frames Per Second", fontsize=14)
+            ax.set_ylabel("Frequency", fontsize=14)
+            ax.set_xlim([0,2500])
+            fig.savefig('threads{}.png'.format(nthread))
+            
+            
+            #img = mpimg.imread("foo.png")
+            #mpimg.imsave("out.png", img)
+            break
+        ct += 1

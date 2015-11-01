@@ -1,0 +1,6 @@
+Part 1: Multithreading
+
+With prange in the three sections specified, FPS slowed considerably (see p5-pt1-a.png) with 4 threads compared to 1 thread.  Ray advised that I only use prange for the loop around sub_update (see Piazza @454), and when I did that, 4 threads ran faster than 1 thread (see p5-pt1-b.png).  According to Ray, in some setups (like mine), "the compiler gets confused about the modifications in the loop and adds memory barriers at the end of each iteration".  The speedup we do see around iterating sub_update makes sense, as the for-loop over all balls in there is expensive and works faster when distributed across threads.
+
+Part 2: Spatial decomposition
+
