@@ -16,6 +16,7 @@ from physics import update, preallocate_locks
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
+# Grabbed from Morton ordering functions from 
 # https://en.wikipedia.org/wiki/Z-order_curve
 def less_msb(x, y):
     return x < y and x < (x ^ y)
@@ -96,17 +97,19 @@ if __name__ == '__main__':
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
             
+            # Discard all objects in grid
             grid[:,:] = -1
-            # Set to grid positions
-            grid_pos = (positions/grid_spacing).astype(int)
-            shifted_grid_pos = np.array(list(grid_pos[1:]) + list(grid_pos[:1]))
-            morton = map(lambda x, y: cmp_zorder(x, y), grid_pos, shifted_grid_pos)
-            sorted_pos_idx = np.argsort(morton)
+            # Zip the indexes with the grid positions
+            positions_idx = zip(range(len(positions)), (positions/grid_spacing).astype(int))
+            # Sort by Morton ordering and grab indexes
+            positions_idx.sort(cmp_zorder, key=lambda x: x[1])
+            positions_idx = map(lambda x: x[0], positions_idx)
 
             # Set positions and velocities by Morton order
-            positions = np.array(positions)[sorted_pos_idx]
-            velocities = np.array(velocities)[sorted_pos_idx]
+            positions = np.array(positions)[positions_idx]
+            velocities = np.array(velocities)[positions_idx]
 
+            # Set position for each ball
             for i in xrange(num_balls):
                 if positions[i,0] >= 0 and positions[i,0] <= 1 and positions[i,1] >= 0 and positions[i,1] <= 1:
                     x = (positions[i,0]/grid_spacing).astype(int)

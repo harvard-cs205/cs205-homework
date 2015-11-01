@@ -67,6 +67,8 @@ cdef void sub_update(FLOAT[:, ::1] XY,
         unsigned int size, x, y
 
     # SUBPROBLEM 4: Add locking
+
+    # Acquire lock to update current object
     acquire(&(locks[i]))
 
     XY1 = &(XY[i, 0])
@@ -77,15 +79,25 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     # SUBPROBLEM 2: use the grid values to reduce the number of other
     # objects to check for collisions.
 
+    # Number of grid squares across grid
     size = <unsigned int> (1+(1.0/grid_spacing))
+
+    # Get x and y grid coordinates
     x = <unsigned int> (XY1[0]/grid_spacing)
     y = <unsigned int> (XY1[1]/grid_spacing)
+
+    # Check grid spaces within 2 squares up or right
     for x_idx in xrange(x+1, x+3):
         for y_idx in xrange(y+1, y+4-(x_idx-x)):
+            # Ensure we don't index out of the grid
             if x_idx < size and y_idx < size and Grid[x_idx, y_idx] < count:
+                # Acquire lock for neighboring object
                 acquire(&(locks[Grid[x_idx, y_idx]]))
+
+                # Grab coordinates and velocity for neighboring object
                 XY2 = &(XY[Grid[x_idx, y_idx], 0])
                 V2 = &(V[Grid[x_idx, y_idx], 0])
+
                 if overlapping(XY1, XY2, R):
                     # SUBPROBLEM 4: Add locking
                     if not moving_apart(XY1, V1, XY2, V2):
@@ -94,7 +106,10 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                     # give a slight impulse to help separate them
                     for dim in range(2):
                         V2[dim] += eps * (XY2[dim] - XY1[dim])
+                
+                # Release for neighboring object
                 release(&(locks[Grid[x_idx, y_idx]]))
+    # Release for current object
     release(&(locks[i]))
 
 cpdef update(FLOAT[:, ::1] XY,
@@ -140,12 +155,14 @@ cpdef update(FLOAT[:, ::1] XY,
         #    scheduling).
         # SUBPROBLEM 2: update the grid values.
         for i in prange(count, num_threads=num_threads, schedule='static', chunksize=count/4):
+            # Discard previous position of current object
             if (XY[i, 0] >= 0 and XY[i, 0] <= 1) and (XY[i, 1] >= 0 and XY[i, 1] <= 1):
                 x = <unsigned int> (XY[i, 0]/grid_spacing)
                 y = <unsigned int> (XY[i, 1]/grid_spacing)
                 Grid[x, y] = -1
             for dim in range(2):
                 XY[i, dim] += V[i, dim] * t
+            # Set new position of current object after updating position with velocity
             if (XY[i, 0] >= 0 and XY[i, 0] <= 1) and (XY[i, 1] >= 0 and XY[i, 1] <= 1):
                 x = <unsigned int> (XY[i, 0]/grid_spacing)
                 y = <unsigned int> (XY[i, 1]/grid_spacing)
