@@ -25,6 +25,10 @@ def py_median_3x3(image, iterations=10, num_threads=1):
 
     # events[] has an event for each thread i finishing iteration n. It looks like:
     # [thr0 iter1, thr0 iter2, ..., thr0 iter k, thr1 iter1, ..., thrN iterK]
+    # This way, every thread can see when a particular thread has finished a
+    # particular iteration.
+    #
+    # There are more details in P4.txt
 
     def process_image(threadnum, tmpA, tmpB, offset=num_threads):
         ''' do filtering for the threadnum-th thread '''

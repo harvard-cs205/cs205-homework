@@ -1,0 +1,18 @@
+Without AVX
+# of Threads	Millions of Complex FMAs / sec
+---------------------------------------------
+1		199.991176329
+2		396.005757256
+4		706.542373629
+
+More threads => more performance, and the increase is almost linear. Four threads are close to four times as fast as one thread. The increase from two threads to four threads is proportionally less than the increase from one thread to two threads, which is reasonable, since diminishing returns for more threading is not unusual.
+
+With AVX
+# of Threads	Millions of Complex FMAs / sec
+---------------------------------------------
+1		101.646625339
+2		196.69971906
+4		342.408732116
+
+
+I assume the slowdown for AVX is because my computer has to simulate AVX. I don’t get the GIL at any point in my computation loop, and I don’t see any other things that would cause slowdown. Aside from that, more threads still makes things faster.

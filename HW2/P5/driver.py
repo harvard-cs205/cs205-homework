@@ -64,7 +64,7 @@ if __name__ == '__main__':
     # A matplotlib-based animator object
     animator = Animator(positions, radius * 2)
 
-    # simulation/animation time variablees
+    # simulation/animation time variables
     physics_step = 1.0 / 100  # estimate of real-time performance of simulation
     anim_step = 1.0 / 30  # FPS
     total_time = 0
@@ -99,13 +99,13 @@ if __name__ == '__main__':
             total_time = 0
 
             # This is Z-ordering / Morton ordering. Note: as far as I know, you can't really
-            # interleave the bits of a float, so I just multiply the floats by 10,000 and
-            # convert them to integers, dropping the trailing (and hopefully unimportant)
+            # interleave the bits of a float, so I just multiply the floats by num_balls**2
+            # and convert them to integers, dropping the trailing (and hopefully unimportant)
             # digits. There's probably a better way, but this seems to work pretty well.
             interlist = []
             for i in range(num_balls):
-                interlist.append(interleave(int(positions[i, 0]*10000), 
-                    int(10000*positions[i, 1])))
+                interlist.append(interleave(int(num_balls*num_balls*positions[i, 0]), 
+                    int(num_balls*num_balls*positions[i, 1])))
             
             idx = np.argsort(interlist)
             positions = positions[idx]

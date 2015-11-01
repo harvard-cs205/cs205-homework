@@ -1,5 +1,5 @@
 Both parallel approaches were at least 30 times slower than serial code (0.3s vs 10-18s), presumably due to overhead. The fine-grained and medium-grained approaches took about the same amount of time.
 
-For some reason, even values of N produced a better runtime than odd values. In addition, for correlated data, N=10 resulted in much worse performance than any other value of N, though this may be random noise.
+P2graph.png shows a plot of medium-grained locking performance for N from 1 to 20. For some reason, even values of N produced a better runtime than odd values. In addition, for correlated data, N=10 resulted in much worse performance than any other value of N, though this may be random noise.
 
 N=4 produced good runtimes (relatively speaking) for both correlated and uncorrelated data. N values greater than 15 also worked well for correlated data. This is probably because one lock frequently covered both the source and destination, thus reducing locking overhead.

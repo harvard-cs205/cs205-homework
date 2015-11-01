@@ -4,28 +4,12 @@ cimport cython
 cimport AVX
 from cython.parallel import prange
 
-
-cdef np.float64_t magnitude_squared(np.complex64_t z) nogil:
-    return z.real * z.real + z.imag * z.imag
-
 @cython.boundscheck(False)
 @cython.wraparound(False)
 
-cdef void print_complex_AVX(AVX.float8 real,
-                             AVX.float8 imag) nogil:
-    cdef:
-        float real_parts[8]
-        float imag_parts[8]
-        int i
-
-    AVX.to_mem(real, &(real_parts[0]))
-    AVX.to_mem(imag, &(imag_parts[0]))
-    with gil:
-        for i in range(8):
-            print("    {}: {}, {}".format(i, real_parts[i], imag_parts[i]))
-
 cdef void counts_to_output(AVX.float8 counts, np.uint32_t [:, :] out_counts,
                   int i, int j, int max_iterations) nogil:
+  # Writes counts to out_counts in a threadsafe way.
   cdef:
     float tmp_counts[8]
     int k
@@ -76,6 +60,11 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
           z_im = AVX.float_to_float8(0.)
           counts = AVX.float_to_float8(0.)
 
+          # The computation takes place in this loop. The counts are only updated
+          # for threads whose magnitude is < 4. This is accomplished by masking with
+          # an AVX.float8 of all ones and adding the result to count.
+          # The rest of the lines are just the regular Mandelbrot computations
+          # rephrased in AVX. 
           for iter in range(max_iterations):
             z_re_new = AVX.add(AVX.sub(AVX.mul(z_re, z_re), AVX.mul(z_im, z_im)), re)
             z_im = AVX.fmadd(AVX.mul(z_re, z_im), AVX.float_to_float8(2.), im)

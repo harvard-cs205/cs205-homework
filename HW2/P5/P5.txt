@@ -1,3 +1,5 @@
+All frames/sec estimates were produced using the running average as seen in my driver.py.
+
 With Just Threading:
 
 # threads             frames/sec

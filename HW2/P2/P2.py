@@ -10,6 +10,7 @@ pyximport.install()
 import numpy as np
 from timer import Timer
 from parallel_vector import move_data_serial, move_data_fine_grained, move_data_medium_grained
+from matplotlib import pyplot as plt
 
 if __name__ == '__main__':
     ########################################
@@ -40,12 +41,14 @@ if __name__ == '__main__':
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################
-    N = 10
+    Nlist =  []
     counts[:] = orig_counts
-    with Timer() as t:
-        move_data_medium_grained(counts, src, dest, 100, N)
-    assert counts.sum() == total, "Wrong total after move_data_medium_grained"
-    print("Medium grained uncorrelated: {} seconds".format(t.interval))
+    for N in range(1,21):
+		with Timer() as t:
+			move_data_medium_grained(counts, src, dest, 100, N)
+		assert counts.sum() == total, "Wrong total after move_data_medium_grained"
+		Nlist.append(t.interval)
+		print("N: {}  Medium grained uncorrelated: {} seconds".format(N, t.interval))
 
     ########################################
     # Now use correlated data movement
@@ -74,9 +77,19 @@ if __name__ == '__main__':
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################
-    N = 10
+    Nlistc = []
     counts[:] = orig_counts
-    with Timer() as t:
-        move_data_medium_grained(counts, src, dest, 100, N)
-    assert counts.sum() == total, "Wrong total after move_data_medium_grained"
-    print("Medium grained correlated: {} seconds".format(t.interval))
+    for N in range(1,21):
+		with Timer() as t:
+			move_data_medium_grained(counts, src, dest, 100, N)
+		assert counts.sum() == total, "Wrong total after move_data_medium_grained"
+		Nlistc.append(t.interval)
+		print("N: {}  Medium grained correlated: {} seconds".format(N, t.interval))
+		
+plt.plot(np.arange(1,21), Nlist, color='b', label='Uncorrelated')
+plt.plot(np.arange(1,21), Nlistc, color='r', label='Correlated')
+plt.xlabel('N')
+plt.ylabel('Time (seconds)')
+plt.xlim((1,20))
+plt.legend()
+plt.show()
