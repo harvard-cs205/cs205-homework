@@ -4,3 +4,6 @@ Multithreading
 4 threads -> 1074.656613 Million Complex FMAs in 1.56879615784 seconds, 685.01991647 million Complex FMAs / second
 
 Instruction Level
+1 thread -> 1074.656611 Million Complex FMAs in 0.925685882568 seconds, 1160.93010733 million Complex FMAs / second
+2 threads -> 1074.656611 Million Complex FMAs in 0.413547039032 seconds, 2598.63210124 million Complex FMAs / second
+4 threads -> 1074.656611 Million Complex FMAs in 0.272787094116 seconds, 3939.54345414 million Complex FMAs / second
