@@ -1,0 +1,1 @@
+P2/P2.txt: A text file describing your experiments with the three scales of locking, including your suggestions for a good N to choose for medium-grained locking in the two cases explored (uncorrelated and correlated transfers) and your justification for that choice (or why you were unable to find a good value).
