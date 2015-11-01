@@ -1,0 +1,12 @@
+Without instruction-level parallelism:
+    1 thread:
+        1074.656613 Million Complex FMAs in 5.76224303246 seconds
+        186.499702798 million Complex FMAs / second
+    2 threads:
+        1074.656613 Million Complex FMAs in 2.89445900917 seconds
+        371.280646779 million Complex FMAs / second
+    4 threads:
+        1074.656613 Million Complex FMAs in 1.50371003151 seconds
+        714.670109583 million Complex FMAs / second
+        
+We see almost double the rate of computation, resulting in completion in almost half the time, when we double the number of threads.  Therefore, the performance scales well as we increase the number of threads.

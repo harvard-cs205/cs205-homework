@@ -73,19 +73,31 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
    cdef:
        int idx, r
        omp_lock_t *locks = get_N_locks(counts.shape[0])
-
    ##########
    # Your code here
    # Use parallel.prange() and a lock for each element of counts to parallelize
    # data movement.  Be sure to avoid deadlock, and double-locking.
    ##########
    with nogil:
+       #for r in prange(repeat, num_threads=4):
        for r in range(repeat):
-           for idx in range(src.shape[0]):
+           for idx in prange(src.shape[0], num_threads=4):
+               #always get lower numbered lock first
+               if src[idx] < dest[idx]:
+                   acquire(&(locks[src[idx]]))
+                   acquire(&(locks[dest[idx]]))
+               elif src[idx] > dest[idx]:
+                   acquire(&(locks[dest[idx]]))
+                   acquire(&(locks[src[idx]]))
+               else:
+                   #make sure we don't double lock
+                   acquire(&(locks[src[idx]]))
                if counts[src[idx]] > 0:
                    counts[dest[idx]] += 1
                    counts[src[idx]] -= 1
-
+               if src[idx] != dest[idx]:
+                   release(&(locks[dest[idx]]))
+               release(&(locks[src[idx]]))
    free_N_locks(counts.shape[0], locks)
 
 
@@ -98,7 +110,8 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
        int idx, r
        int num_locks = (counts.shape[0] + N - 1) / N  # ensure enough locks
        omp_lock_t *locks = get_N_locks(num_locks)
-
+       int src_lock_idx
+       int dest_lock_idx
    ##########
    # Your code here
    # Use parallel.prange() and a lock for every N adjacent elements of counts
@@ -107,9 +120,23 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
    ##########
    with nogil:
        for r in range(repeat):
-           for idx in range(src.shape[0]):
+           #for idx in range(src.shape[0]):
+           for idx in prange(src.shape[0], num_threads=4):
+               src_lock_idx= src[idx]/N
+               dest_lock_idx = dest[idx]/N
+               if src_lock_idx < dest_lock_idx:
+                   acquire(&(locks[src_lock_idx]))
+                   acquire(&(locks[dest_lock_idx]))
+               elif src_lock_idx > dest_lock_idx:
+                   acquire(&(locks[dest_lock_idx]))
+                   acquire(&(locks[src_lock_idx]))
+               else:
+                   #make sure we don't double lock
+                   acquire(&(locks[src_lock_idx]))
                if counts[src[idx]] > 0:
                    counts[dest[idx]] += 1
                    counts[src[idx]] -= 1
-
+               if src_lock_idx != dest_lock_idx:
+                   release(&(locks[dest_lock_idx]))
+               release(&(locks[src_lock_idx]))
    free_N_locks(num_locks, locks)

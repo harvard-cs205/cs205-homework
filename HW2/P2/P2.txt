@@ -1,0 +1,15 @@
+N=10
+Serial uncorrelated: 0.315571069717 seconds
+Fine grained uncorrelated: 5.07081413269 seconds
+Medium grained uncorrelated: 6.37231898308 seconds
+Serial correlated: 0.329191923141 seconds
+Fine grained correlated: 4.82436203957 seconds
+Medium grained correlated: 4.8664867878 seconds
+
+N=100
+Serial uncorrelated: 0.314683198929 seconds
+Fine grained uncorrelated: 5.27880001068 seconds
+Medium grained uncorrelated: 9.99726891518 seconds
+Serial correlated: 0.328505992889 seconds
+Fine grained correlated: 5.10451292992 seconds
+Medium grained correlated: 5.2350051403 seconds

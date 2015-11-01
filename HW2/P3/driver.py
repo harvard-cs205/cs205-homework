@@ -22,12 +22,25 @@ def make_coords(center=(-0.575 - 0.575j),
 
     x = np.linspace(start=(-width / 2), stop=(width / 2), num=count)
     xx = center + (x + 1j * x[:, np.newaxis]).astype(np.complex64)
+    
+    return xx, np.zeros_like(xx, dtype=np.uint32)
+
+def make_coords_test(center=(-0.575 - 0.575j),
+                width=0.0025,
+                count=8):
+
+    x = np.linspace(start=(-width / 2), stop=(width / 2), num=count)
+    xx = center + (x + 1j * x[:, np.newaxis]).astype(np.complex64)
+    xx = np.array([xx[0]])
+    
     return xx, np.zeros_like(xx, dtype=np.uint32)
 
 
 if __name__ == '__main__':
+    #in_coords, out_counts = make_coords_test()
+    #print in_coords.shape[0]
+    #print in_coords.shape[1]
     in_coords, out_counts = make_coords()
-
     with Timer() as t:
         mandelbrot.mandelbrot(in_coords, out_counts, 1024)
     seconds = t.interval
