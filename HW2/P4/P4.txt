@@ -22,7 +22,7 @@ the input image, act on it, and put the filtered data into the output image. To 
 the input image until each thread has finished transforming data from the input image to the output image. To wait
 until each thread is done utilizing the input image, we simply use thread.join() on each thread. Once we have waited for
 each thread to complete, we take the output filtered image and use it as an input for the next iteration. My
-technique does not create any buffers, i.e. I use tmpA and tmpB as is.
+technique does not create any new buffers, i.e. I use tmpA and tmpB as is.
 
 See the plots "time_vs_threads.png" and "speedup_vs_threads.png" for a summary of how my parallelization technique
 performed. With 2 and 3 threads, we obtain a speedup of approximately 1.5, and with 4 threads we obtain
