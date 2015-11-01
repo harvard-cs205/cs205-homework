@@ -15,15 +15,41 @@ import filtering
 from timer import Timer
 import threading
 
+def median_3x3_worker(A, B, offset, step, iterations, sems) : 
+    for i in range(iterations):
+        lower_sem = sems[(offset - 1) % step][1]
+        upper_sem = sems[(offset + 1) % step][0]
+
+        (self_sem_1, self_sem_2) = sems[offset]
+        lower_sem.acquire()
+        upper_sem.acquire()
+       
+        filtering.median_3x3(A, B, offset, step)
+
+        # swap direction of filtering
+        A, B = B, A
+
+        self_sem_1.release()
+        self_sem_2.release()
+
+
 def py_median_3x3(image, iterations=10, num_threads=1):
     ''' repeatedly filter with a 3x3 median '''
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
 
-    for i in range(iterations):
-        filtering.median_3x3(tmpA, tmpB, 0, 1)
-        # swap direction of filtering
-        tmpA, tmpB = tmpB, tmpA
+    sems = []
+    for i in range(num_threads) :
+        sems.append((threading.Semaphore(1), threading.Semaphore(1)))
+
+    threads = []
+    for i in range(num_threads) :
+        t = threading.Thread(target=median_3x3_worker, name=str(i), args=(tmpA, tmpB, i, num_threads, iterations, sems))
+        t.start()
+        threads.append(t)
+
+    for t in threads :
+        t.join()
 
     return tmpA
 
@@ -57,7 +83,7 @@ if __name__ == '__main__':
     assert np.all(from_cython == from_numpy)
 
     with Timer() as t:
-        new_image = py_median_3x3(input_image, 10, 8)
+        new_image = py_median_3x3(input_image, 10, 4)
 
     pylab.figure()
     pylab.imshow(new_image[1200:1800, 3000:3500])
