@@ -24,9 +24,9 @@ if __name__ == '__main__':
     total = orig_counts.sum()
 
     # data for plots
-    lock_times = [1, 5, 10, 20, 50, 100]
+    locks = [1, 5, 10, 20, 50, 100]
     trials = 5
-    num_locks = len(lock_times)
+    num_locks = len(locks)
     uncorrelated_times = [sys.maxint]*num_locks
     correlated_times = [sys.maxint]*num_locks
 
@@ -52,14 +52,14 @@ if __name__ == '__main__':
     ########################################
     for x in xrange(trials):
         for i in xrange(num_locks):
-            N = lock_times[i]
+            N = locks[i]
             counts[:] = orig_counts
             with Timer() as t:
                 move_data_medium_grained(counts, src, dest, 100, N)
             assert counts.sum() == total, "Wrong total after move_data_medium_grained"
             uncorrelated_times[i] = min(uncorrelated_times[i], t.interval)
     for i in xrange(num_locks):
-        N = lock_times[i]
+        N = locks[i]
         time = uncorrelated_times[i]
         print("Medium grained uncorrelated for N={}: {} seconds".format(N, time))
 
@@ -92,21 +92,21 @@ if __name__ == '__main__':
     ########################################
     for x in xrange(trials):
         for i in xrange(num_locks):
-            N = lock_times[i]
+            N = locks[i]
             counts[:] = orig_counts
             with Timer() as t:
                 move_data_medium_grained(counts, src, dest, 100, N)
             assert counts.sum() == total, "Wrong total after move_data_medium_grained"
             correlated_times[i] = min(correlated_times[i], t.interval)
     for i in xrange(num_locks):
-        N = lock_times[i]
+        N = locks[i]
         time = correlated_times[i]
         print("Medium grained correlated for N={}: {} seconds".format(N, time))
 
-    plt.plot(lock_times, uncorrelated_times)
-    plt.plot(lock_times, correlated_times)
+    plt.plot(locks, uncorrelated_times)
+    plt.plot(locks, correlated_times)
     plt.title('Uncorrelated and correlated data movement time for N locks')
-    plt.xlabel('N = # of locks')
+    plt.xlabel('N')
     plt.ylabel('Time')
     plt.legend(['Uncorrelated times', 'Correlated times'])
     plt.show()
