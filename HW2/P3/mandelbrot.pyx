@@ -64,6 +64,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     #        out_counts[i, j] = iter
 
 
+
     #with AVX
     for i in prange(in_coords.shape[0], nogil=True, schedule='static', chunksize = 1, num_threads = 4):
         #divide y into 8 (start, end, step)
@@ -121,14 +122,14 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                 else:
                     z_r_temp = z_r
                     z_r = AVX.add(AVX.sub(AVX.mul(z_r,z_r),AVX.mul(z_i,z_i)),c_r)
-                    z_i = AVX.add(AVX.mul(AVX.mul(AVX.float_to_float8(2.0),z_r_temp),c_r),c_i)
+                    z_i = AVX.add(AVX.mul(AVX.mul(AVX.float_to_float8(2.0),z_r_temp),z_i),c_i)
 
                     #also update counters which has 1(which still satisfy out condition)
                     #we only need to increment certain counters which satisfy our conditions
-                    counters = AVX.add(AVX.bitwise_and(cond,counters),AVX.float_to_float8(1.0))
+                    counters = AVX.add(AVX.bitwise_and(cond,AVX.float_to_float8(1.0)),counters)
 
-        counts_to_output(counters, out_counts, i, j)
-
+        #print_AVX(counters)
+                counts_to_output(counters, out_counts, i, j)
 
 
 
@@ -142,7 +143,7 @@ cdef void counts_to_output(AVX.float8 counters,
         int index
     AVX.to_mem(counters, &(tmp_counters[0]))
     for index in range(8):
-        out_counts[i,j+index] = <np.uint32_t> tmp_counters[index]
+        out_counts[i,j+index] = <unsigned int> tmp_counters[index]
 
 
 
