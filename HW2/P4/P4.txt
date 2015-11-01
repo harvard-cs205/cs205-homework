@@ -1,0 +1,33 @@
+Original times:
+Main: 4.49185609818 seconds for 10 filter passes.
+
+
+
+Multithreaded times:
+
+See performancebynumthreads.png for a graph of the data
+
+Threads: 1. Time: 4.78213000298 seconds for 10 filter passes.
+Threads: 1. Time: 4.091766119 seconds for 10 filter passes.
+Threads: 1. Time: 4.1126601696 seconds for 10 filter passes.
+Threads: 1. Time: 4.14261603355 seconds for 10 filter passes.
+Threads: 1. Time: 4.11232304573 seconds for 10 filter passes.
+
+Threads: 2. Time: 2.27520394325 seconds for 10 filter passes.
+Threads: 2. Time: 2.28757190704 seconds for 10 filter passes.
+Threads: 2. Time: 2.28277492523 seconds for 10 filter passes.
+Threads: 2. Time: 2.2849111557 seconds for 10 filter passes.
+Threads: 2. Time: 2.28204512596 seconds for 10 filter passes.
+
+Threads: 4. Time: 2.11169791222 seconds for 10 filter passes.
+Threads: 4. Time: 2.10361099243 seconds for 10 filter passes.
+Threads: 4. Time: 2.1059319973 seconds for 10 filter passes.
+Threads: 4. Time: 2.11611104012 seconds for 10 filter passes.
+Threads: 4. Time: 2.1030728817 seconds for 10 filter passes.
+
+
+This shows that increasing from one to two threads leads to a substantial increase in performance, around 2x, but the increase to four threads does not substantially increase performance from two threads.
+
+Overview of Implementation Choice. I did the extra credit approach - letting thread n start iteration i as soon as threads n, n-1, and n+1 have finished iteration i-1 without waiting for other threads. 
+
+The way that I controlled cooperation was to use threading.Event() objects. Essentially, I had an Event() object for every (thread, iteration) pair, on which I called set() upon completing that pair. For each (thread, iteration) pair first did a .wait() on each of the (thread - 1, iteration - 1), (thread, iteration - 1) and (thread, iteration + 1) Events, and this made sure everything occured in the correct order. It also meant that a given (thread, iteration) pair was only waiting for the previous iteration on threads n-1, n, n+1 as was required for the extra credit.
