@@ -12,7 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from timer import Timer
 from animator import Animator
-from physics import update, preallocate_locks, grid_index
+from physics import update, preallocate_locks, grid_index, free_locks
 
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
@@ -78,7 +78,7 @@ if __name__ == '__main__':
          (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
 
     # A matplotlib-based animator object
-    #animator = Animator(positions, radius * 2)
+    animator = Animator(positions, radius * 2)
 
     # simulation/animation time variablees
     physics_step = 1.0 / 100  # estimate of real-time performance of simulation
@@ -87,12 +87,9 @@ if __name__ == '__main__':
 
     frame_count = 0
 
-    # SUBPROBLEM 4: uncomment the code below.
-    # preallocate locks for objects
+    # SUBPROBLEM 4: preallocate locks for objects
     locks_ptr = preallocate_locks(num_balls)
 
-    histogram_vals = []
-    
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
@@ -105,13 +102,9 @@ if __name__ == '__main__':
 
         frame_count += 1
         if total_time > anim_step:
-            #animator.update(positions)
+            animator.update(positions)
             fps = frame_count / total_time
             print("{} simulation frames per second".format(fps))
-            histogram_vals.append(fps)
-            if len(histogram_vals) == 30:
-                plt.hist(histogram_vals)
-                plt.savefig('SCS-1thread.png')
             frame_count = 0
             total_time = 0
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
@@ -125,3 +118,6 @@ if __name__ == '__main__':
             #Update velocities and positions (grid is updated in physics.pyx)
             velocities = np.array(velocities)[order]
             positions = np.array(positions)[order]
+    
+    #Free the locks when done
+    free_locks(num_balls, locks_ptr)

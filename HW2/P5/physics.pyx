@@ -70,7 +70,8 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                      float R,
                      int i, int count,
                      UINT[:, ::1] Grid,
-                     float grid_spacing) nogil:
+                     float grid_spacing,
+                     omp_lock_t *locks) nogil:
     cdef:
         FLOAT *XY1, *XY2, *V1, *V2
         int j, k, dim, gridx, gridy, xmin, xmax, ymin, ymax, XY2_index
@@ -78,6 +79,7 @@ cdef void sub_update(FLOAT[:, ::1] XY,
         float eps = 1e-5
 
     # SUBPROBLEM 4: Add locking
+    acquire(&locks[i])
     XY1 = &(XY[i, 0])
     V1 = &(V[i, 0])
     #############################################################
@@ -97,6 +99,7 @@ cdef void sub_update(FLOAT[:, ::1] XY,
         for k in range(ymin, ymax):
             XY2_index = Grid[j, k]
             if XY2_index > i:
+                acquire(&locks[XY2_index])
                 XY2 = &(XY[XY2_index, 0])
                 V2 = &(V[XY2_index, 0])
                 if overlapping(XY1, XY2, R):
@@ -107,6 +110,8 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                     # give a slight impulse to help separate them
                     for dim in range(2):
                         V2[dim] += eps * (XY2[dim] - XY1[dim])
+                release(&locks[XY2_index])
+    release(&locks[i])
 
 cpdef update(FLOAT[:, ::1] XY,
              FLOAT[:, ::1] V,
@@ -121,12 +126,12 @@ cpdef update(FLOAT[:, ::1] XY,
         int i, j, k, dim, chunk_size, thread_count, gridx, gridy
         FLOAT *XY1, *XY2, *V1, *V2
         # SUBPROBLEM 4: uncomment this code.
-        # omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
+        omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
 
     assert XY.shape[0] == V.shape[0]
     assert XY.shape[1] == V.shape[1] == 2
 
-    thread_count = 1
+    thread_count = 4
     chunk_size = count/4
     with nogil:
         # bounce off of walls
@@ -150,7 +155,7 @@ cpdef update(FLOAT[:, ::1] XY,
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
         for i in prange(count, schedule='static', chunksize=chunk_size, num_threads=thread_count):
-            sub_update(XY, V, R, i, count, Grid, grid_spacing)
+            sub_update(XY, V, R, i, count, Grid, grid_spacing, locks)
             
             #Clear grid location to prepare for update
         #for i in range(count):
@@ -172,3 +177,8 @@ def preallocate_locks(num_locks):
     cdef omp_lock_t *locks = get_N_locks(num_locks)
     assert 0 != <uintptr_t> <void *> locks, "could not allocate locks"
     return <uintptr_t> <void *> locks
+    
+cpdef free_locks(num_locks, locks_ptr):
+    cdef:
+        omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
+    free_N_locks(num_locks, locks)
