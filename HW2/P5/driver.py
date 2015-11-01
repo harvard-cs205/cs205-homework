@@ -16,9 +16,24 @@ from physics import update, preallocate_locks
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
+# Reference from wikipedia curve for Z order curve
+def less_msb(x, y):
+    return x < y and x < (x ^ y)
+
+def cmp_zorder(a, b):
+    j = 0
+    k = 0
+    x = 0
+    for k in range(2):
+        y = a[0][k] ^ b[0][k]
+        if less_msb(x, y):
+            j = k
+            x = y
+    return a[0][j] - b[0][j]
+
 if __name__ == '__main__':
-    num_balls = 500
-    radius = 0.01
+    num_balls = 10000
+    radius = 0.002
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -64,10 +79,10 @@ if __name__ == '__main__':
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
-                   radius, grid_size, locks_ptr,
+                   radius, grid_spacing, locks_ptr,
                    physics_step)
 
-        # udpate our estimate of how fast the simulator runs
+        # update our estimate of how fast the simulator runs
         physics_step = 0.9 * physics_step + 0.1 * t.interval
         total_time += t.interval
 
@@ -80,3 +95,18 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+            
+            # Get new sorted index (newIdx) with Morton sorting
+            positionsWithIdx = zip((positions/grid_spacing).astype(int), range(len(positions)))
+            positionsWithIdx.sort(cmp_zorder)
+            newIdx = map(lambda x:x[1], positionsWithIdx)
+            positions = positions[newIdx]
+            velocities = velocities[newIdx]
+            # Reset grid
+            grid[:,:] = -1
+            # Update locations on grid
+            for i in range(num_balls):
+                if positions[i,0] >= 0 and positions[i,1] >= 0 and positions[i,0] <= 1 and positions[i,1] <= 1:
+                    grid[(positions[i,0]/grid_spacing).astype(int), (positions[i,1]/grid_spacing).astype(int)] = i
+
+

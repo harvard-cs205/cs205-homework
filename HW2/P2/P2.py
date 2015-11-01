@@ -41,11 +41,15 @@ if __name__ == '__main__':
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################
-    counts[:] = orig_counts
-    with Timer() as t:
-        move_data_medium_grained(counts, src, dest, 100, N)
-    assert counts.sum() == total, "Wrong total after move_data_medium_grained"
-    print("Medium grained uncorrelated for N={}: {} seconds".format(N, t.interval))
+    Nlist = [1,5,10,20,50,100]
+    uncorrelatedTimes = []
+    for N in Nlist:
+        counts[:] = orig_counts
+        with Timer() as t:
+            move_data_medium_grained(counts, src, dest, 100, N)
+        assert counts.sum() == total, "Wrong total after move_data_medium_grained"
+        print("Medium grained uncorrelated for N={}: {} seconds".format(N, t.interval))
+        uncorrelatedTimes.append(t.interval)
 
     ########################################
     # Now use correlated data movement
@@ -74,7 +78,6 @@ if __name__ == '__main__':
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################
-    Nlist = range(1,15)
     correlatedTimes = []
     for N in Nlist:
         counts[:] = orig_counts
@@ -83,3 +86,13 @@ if __name__ == '__main__':
         assert counts.sum() == total, "Wrong total after move_data_medium_grained"
         print("Medium grained correlated for N={}: {} seconds".format(N, t.interval))
         correlatedTimes.append(t.interval)
+
+    # Plot graph for comparing uncorrelated and correlated times 
+    plt.plot(Nlist, uncorrelatedTimes, label='Uncorrelated medium grained times')
+    plt.plot(Nlist, correlatedTimes, label='Correlated medium grained times')
+    plt.xlabel('N')
+    plt.ylabel('Runtimes')
+    plt.title('Comparing medium grained correlated vs uncorrelated runtimes')
+    plt.legend()
+    plt.show()
+

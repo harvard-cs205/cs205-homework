@@ -11,11 +11,8 @@ Serial uncorrelated: 0.341490030289 seconds
 Fine grained uncorrelated: 7.19965696335 seconds
 Medium grained uncorrelated: 8.84274315834 seconds 
 
-
-
 Serial correlated: 0.402601003647 seconds
 Fine grained correlated: 6.42255997658 seconds
-Medium grained correlated for N=5: 8.71063399315 seconds
-Medium grained correlated for N=10: 7.55082011223 seconds
-Medium grained correlated for N=15: 6.47775006294 seconds
-Medium grained correlated for N=20: 6.75871300697 seconds
+Medium grained correlated: 10.71063399315 seconds
+
+Exploring different values of N and comparing correlated and uncorrelated data transfer patterns resulted in the graph P2.png. The graph shows that for medium-grained computations, performance decreases as N increases. This is because of the fact that as N increases, more elements in the count array fall under the same lock and the acquiring and releasing of locks become less frequent/there are more collisions. Hence, the most ideal value for N for correlated would be 1 (fine-grained) whereas that for uncorrelated is somewhere in the range of 40-60.

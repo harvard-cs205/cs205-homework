@@ -12,3 +12,4 @@ For multithreading with AVX instruction-level
 2 thread -> 1074.94829 Million Complex FMAs in 0.437566995621 seconds, 2456.64846928 million Complex FMAs / second
 4 threads -> 1074.94829 Million Complex FMAs in 0.298840045929 seconds, 3597.06908309 million Complex FMAs / second
 
+For the non-AVX case where we are multithreading without instruction-level parallelism, our code performance improves from roughly 6 to 3 to 1.5 seconds for 1,2,4 threads respectively, meaning that it scales pretty well proportionally to number of threads used/parallelism. Switching from non-AVX to using AVX gave us significant improvements of almost 8 times speedup, where the single-thread performance improved to 0.85 seconds. After that, increasing to 2 and 4 threads scaled accordingly as well.

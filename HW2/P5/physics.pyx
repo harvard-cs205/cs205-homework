@@ -1,4 +1,4 @@
-#cython: boundscheck=False, wraparound=False
+# cython: boundscheck=False, wraparound=False
 
 cimport numpy as np
 from libc.math cimport sqrt
@@ -56,13 +56,16 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                      float R,
                      int i, int count,
                      UINT[:, ::1] Grid,
-                     float grid_spacing) nogil:
+                     float grid_spacing,
+                     omp_lock_t *locks) nogil:
     cdef:
         FLOAT *XY1, *XY2, *V1, *V2
         int j, dim
         float eps = 1e-5
+        unsigned int x_grid, y_grid, grid_size
 
     # SUBPROBLEM 4: Add locking
+    acquire(&(locks[i]))
     XY1 = &(XY[i, 0])
     V1 = &(V[i, 0])
     #############################################################
@@ -70,17 +73,27 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     ############################################################
     # SUBPROBLEM 2: use the grid values to reduce the number of other
     # objects to check for collisions.
-    for j in range(i + 1, count):
-        XY2 = &(XY[j, 0])
-        V2 = &(V[j, 0])
-        if overlapping(XY1, XY2, R):
-            # SUBPROBLEM 4: Add locking
-            if not moving_apart(XY1, V1, XY2, V2):
-                collide(XY1, V1, XY2, V2)
+    x_grid = <unsigned int>(XY[i,0] / grid_spacing)
+    y_grid = <unsigned int>(XY[i,1] / grid_spacing)
+    grid_size = <unsigned int>((1.0 / grid_spacing) + 1)
 
-            # give a slight impulse to help separate them
-            for dim in range(2):
-                V2[dim] += eps * (XY2[dim] - XY1[dim])
+    # Check all points in grid that are 2 away from current ball
+    for xIdx in range(x_grid+1, x_grid+3):
+        for yIdx in range(y_grid+1, y_grid+4+x_grid-j):
+            if xIdx < grid_size and yIdx < grid_size and Grid[xIdx,yIdx] < count:
+                acquire(&(locks[Grid[xIdx,yIdx]]))
+                XY2 = &(XY[Grid[xIdx, yIdx], 0])
+                V2 = &(V[Grid[yIdx, xIdx], 0])
+                if overlapping(XY1, XY2, R):
+                    # SUBPROBLEM 4: Add locking
+                    if not moving_apart(XY1, V1, XY2, V2):
+                        collide(XY1, V1, XY2, V2)
+
+                    # give a slight impulse to help separate them
+                    for dim in range(2):
+                        V2[dim] += eps * (XY2[dim] - XY1[dim])
+                release(&(locks[Grid[xIdx,yIdx]]))
+    release(&(locks[i]))
 
 cpdef update(FLOAT[:, ::1] XY,
              FLOAT[:, ::1] V,
@@ -93,8 +106,9 @@ cpdef update(FLOAT[:, ::1] XY,
         int count = XY.shape[0]
         int i, j, dim
         FLOAT *XY1, *XY2, *V1, *V2
+        unsigned int x_grid, y_grid
         # SUBPROBLEM 4: uncomment this code.
-        # omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
+        omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
 
     assert XY.shape[0] == V.shape[0]
     assert XY.shape[1] == V.shape[1] == 2
@@ -115,7 +129,7 @@ cpdef update(FLOAT[:, ::1] XY,
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
         for i in range(count):
-            sub_update(XY, V, R, i, count, Grid, grid_spacing)
+            sub_update(XY, V, R, i, count, Grid, grid_spacing, locks)
 
         # update positions
         #
@@ -123,8 +137,17 @@ cpdef update(FLOAT[:, ::1] XY,
         #    scheduling).
         # SUBPROBLEM 2: update the grid values.
         for i in range(count):
+            # Check to see if ball is within grid
+            if XY[i,0] >= 0 and XY[i,0] <= 1 and XY[i,1] >= 0 and XY[i,1] <= 1:
+                x_grid = <unsigned int>(XY[i,0] / grid_spacing)
+                y_grid = <unsigned int>(XY[i,1] / grid_spacing)
+                Grid[x_grid, y_grid] = -1
             for dim in range(2):
                 XY[i, dim] += V[i, dim] * t
+            if (XY[i,0]>=0 and XY[i,0]<=1) and (XY[i,1]>=0 and XY[i,1]<=1): #Check to see if ball is within grid
+                x_grid = <unsigned int>(XY[i,0] / grid_spacing)
+                y_grid = <unsigned int>(XY[i,1] / grid_spacing)
+                Grid[x_grid, y_grid] = i
 
 
 def preallocate_locks(num_locks):

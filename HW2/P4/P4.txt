@@ -1,0 +1,9 @@
+How multithreading works for image processing is that we make use of our N threads to accelerate the process of applying the filtering.py_median_3x3 function on the entire image. Each thread takes every other Nth row of the image to process and since the median filtering function operates on and is dependent upon only the 3x3 pixel square around the one under transformation, we only need to wait on the rows immediately before and after, i.e. rows N-1 and N+1. Hence we only need to wait for the previous iteration of the two threads handling the N-1 and N+1th row to finish.
+
+We subsequently make use of Python threads and event schedulers from the threading module to help us handle thread scheduling. We define a 2D array of events, each corresponding to a particular instance of (thread, iteration). We set() the event after we wait on the events that it is dependent on to be set, and these events are (thread for previous row, iteration - 1) and (thread for next row, iteration - 1).
+
+1 thread -> 3.61811685562 seconds for 10 filter passes.
+2 threads -> 1.96235108376 seconds for 10 filter passes.
+4 threads -> 1.94492578506 seconds for 10 filter passes.
+
+We see that multithreading with 1,2,4 threads scales pretty well, achieving 2x and 4x performance for 2,4 threads respectively. Increasing from 1 to 2 threads doesn't see perfect speedup however because each thread has to wait on every other row to finish the previous iteration so improvements in performance is not too significant. Increasing from 2 to 4 threads did not see much improvement either, probably because of noise from background processes running on my computer that mostly takes 1 or 2 cores.

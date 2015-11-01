@@ -1,0 +1,90 @@
+Part 1: Multithreading
+
+Serial:
+
+9.72468206953 simulation frames per second
+9.38993151712 simulation frames per second
+9.46539086478 simulation frames per second
+9.62963711251 simulation frames per second
+9.33785721283 simulation frames per second
+
+Multithreading with prange 4 threads:
+
+15.4566607336 simulation frames per second
+15.2522918599 simulation frames per second
+14.744275319 simulation frames per second
+13.0601020071 simulation frames per second
+15.3595875111 simulation frames per second
+
+As seen from random samples of the simulation frames per second above, the performance for serial code ranges from 7-12
+simulation frames per second whereas if we tried multithreading with 4 threads, the performance increased slightly to
+12-17 simulation frames per second. This is a slight improvement but not much.
+
+Part 2: Spatial Decomposition
+
+Serial: 
+
+1217.91868099 simulation frames per second
+1300.72437659 simulation frames per second
+1463.03063282 simulation frames per second
+1342.1486475 simulation frames per second
+1275.53164163 simulation frames per second
+1584.15832881 simulation frames per second
+
+Multithreading with prange 4 threads:
+
+1519.4278272 simulation frames per second
+1675.1134886 simulation frames per second
+1671.8488969 simulation frames per second
+1598.5023786 simulation frames per second
+1669.2760796 simulation frames per second
+1610.2880753 simulation frames per second
+
+Decomposing the grid into different components to improve running time from O(n^2) to O(n) improved our performance
+dramatically. As seen above, it improved almost x100 to an average of 1400 simulation frames per second for the 
+multithreaded case with 4 threads. This is because in our sub_update method, we looked over all balls close enough in the 
+entire space to be considered overlapping; however, after we have partitioned the simulation space into grids, we only have
+to check grids that are 2 away from the grid in consideration for potential overlaps. Since we are only checking a constant
+number of neighboring grids per iteration, we can achieve O(n) runtime. The performance for single thread with spatial decomposition performed only slightly worse than the multithreaded case.
+
+Part 3: Spatially Coherent Spacing
+1 thread -> 
+
+1649.02783908 simulation frames per second
+1414.49401598 simulation frames per second
+1699.94464034 simulation frames per second
+1718.51100776 simulation frames per second
+
+4 threads -> 
+
+2598.05378312 simulation frames per second
+2706.44390081 simulation frames per second
+2364.37079269 simulation frames per second
+2568.28252449 simulation frames per second
+
+Part 4: Locking
+
+1 thread ->
+
+1585.88395768 simulation frames per second
+1431.05535811 simulation frames per second
+1570.42317718 simulation frames per second
+1574.43843844 simulation frames per second
+
+4 threads ->
+
+2058.74829142 simulation frames per second
+2106.32187321 simulation frames per second
+1964.61939001 simulation frames per second
+1968.28577782 simulation frames per second
+
+Adding spatially coherent spacing using Morton sorting increases performance by roughly 1.5 times, whereas performance with locking decreases both single-threaded and 4-threaded performance by a few 100 simulation fps. I chose Morton ordering using z order curves for implementing sorting of the balls since it is a simple and intuitive function to use to transform multidimensional data (2D for coordinates in this case) to one dimension for sorting. This improves the locality of data, making sure balls near each other in space are also near each in memory, increasing memory bandwidth and hence improving performance in terms of fps. The additional scheduling overhead involved with acquiring and using locks decreases performance slightly for both serial and parallel computations, albeit in an insignificant way.
+
+
+
+
+
+
+
+
+
