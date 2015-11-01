@@ -1,10 +1,11 @@
-#cython: boundscheck=False, wraparound=False
+#cython: boundscheck=True, wraparound=False
 
 cimport numpy as np
 from libc.math cimport sqrt
 from libc.stdint cimport uintptr_t
 cimport cython
 from omp_defs cimport omp_lock_t, get_N_locks, free_N_locks, acquire, release
+from cython.parallel import parallel, prange
 
 # Useful types
 ctypedef np.float32_t FLOAT
@@ -82,6 +83,50 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                 V2[dim] += eps * (XY2[dim] - XY1[dim])
 
 cpdef update(FLOAT[:, ::1] XY,
+             FLOAT[:, ::1] V,
+             UINT[:, ::1] Grid,
+             float R,
+             float grid_spacing,
+             uintptr_t locks_ptr,
+             float t):
+    cdef:
+        int count = XY.shape[0]
+        int i, j, dim
+        FLOAT *XY1, *XY2, *V1, *V2
+        # SUBPROBLEM 4: uncomment this code.
+        # omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
+
+    assert XY.shape[0] == V.shape[0]
+    assert XY.shape[1] == V.shape[1] == 2
+
+    with nogil:
+        # bounce off of walls
+        #
+        # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
+        # scheduling.
+        for i in prange(count, chunksize = count/4, schedule='static', num_threads=4):
+            for dim in range(2):
+                if (((XY[i, dim] < R) and (V[i, dim] < 0)) or
+                    ((XY[i, dim] > 1.0 - R) and (V[i, dim] > 0))):
+                    V[i, dim] *= -1
+
+        # bounce off of each other
+        #
+        # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
+        # scheduling.
+        for i in prange(count, chunksize = count/4, schedule='static', num_threads=4):
+            sub_update(XY, V, R, i, count, Grid, grid_spacing)
+
+        # update positions
+        #
+        # SUBPROBLEM 1: parallelize this loop over 4 threads (with static
+        #    scheduling).
+        # SUBPROBLEM 2: update the grid values.
+        for i in prange(count, chunksize = count/4, schedule='static', num_threads=4):
+            for dim in range(2):
+                XY[i, dim] += V[i, dim] * t
+
+cpdef update_original(FLOAT[:, ::1] XY,
              FLOAT[:, ::1] V,
              UINT[:, ::1] Grid,
              float R,

@@ -43,8 +43,7 @@ def py_median_3x3(image, iterations=10, num_threads=1):
                                  args=(iterations, tid, num_threads, tmpA, tmpB, events))
             threads.append(t)
             t.start()
-        for tid in range(num_threads):
-            threads[tid].join()
+        map(lambda t: t.join(), threads)
 
     return tmpA
 

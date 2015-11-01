@@ -11,7 +11,7 @@ pyximport.install()
 import numpy as np
 from timer import Timer
 from animator import Animator
-from physics import update, preallocate_locks
+from physics import update, preallocate_locks, update_original
 
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
