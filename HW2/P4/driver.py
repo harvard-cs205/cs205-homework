@@ -15,13 +15,17 @@ import filtering
 from timer import Timer
 import threading
 
+import logging
+
+logging.basicConfig(level=logging.DEBUG,
+                    format='[%(levelname)s] (%(threadName)-10s) %(message)s',
+                    )
+
+
 def py_median_3x3(image, iterations=10, num_threads=1):
     ''' repeatedly filter with a 3x3 median '''
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
-
-    rows = tmpB.shape[0]
-    block_size = rows/num_threads
 
     threads = []
 
@@ -36,27 +40,48 @@ def py_median_3x3(image, iterations=10, num_threads=1):
     else:
         for tid in range(num_threads):
             t = threading.Thread(target=filterHelper, 
-                                 args=(tid, num_threads, tmpA, tmpB, events))
+                                 args=(iterations, tid, num_threads, tmpA, tmpB, events))
             threads.append(t)
             t.start()
         for tid in range(num_threads):
             threads[tid].join()
 
-
     return tmpA
 
-def filterHelper(tid, num_threads, tmpA, tmpB, events):
+def filterHelper(iterations, tid, num_threads, tmpA, tmpB, events):
+
+    # The first iteration only sets events, no more waiting
+    filtering.median_3x3(tmpA, tmpB, tid, num_threads)
+    # swap direction of filtering
+    tmpA, tmpB = tmpB, tmpA
+    events[tid, 1].set()
+
+    for i in range(1, iterations):
+        #Handle events
+        if tid>0:
+            events[tid-1, i-1].wait()
+        if tid<num_threads-1:
+            events[tid+1, i-1].wait()
+
+        filtering.median_3x3(tmpA, tmpB, tid, num_threads)
+        # swap direction of filtering
+        tmpA, tmpB = tmpB, tmpA
+        events[tid, i].set()
+
+
+
+def py_median_3x3_original(image, iterations=10, num_threads=1):
+    ''' repeatedly filter with a 3x3 median '''
+    tmpA = image.copy()
+    tmpB = np.empty_like(tmpA)
 
     for i in range(iterations):
-        #Handle events
-        
-
-
         filtering.median_3x3(tmpA, tmpB, 0, 1)
         # swap direction of filtering
         tmpA, tmpB = tmpB, tmpA
 
-    return False
+    return tmpA
+
 
 
 
@@ -90,7 +115,7 @@ if __name__ == '__main__':
     assert np.all(from_cython == from_numpy)
 
     with Timer() as t:
-        new_image = py_median_3x3(input_image, 10, 8)
+        new_image = py_median_3x3(input_image, 10, 5)
 
     pylab.figure()
     pylab.imshow(new_image[1200:1800, 3000:3500])
