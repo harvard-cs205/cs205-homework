@@ -81,6 +81,9 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                     # z_square_imag = (2ab)
                     z_square_real = AVX.sub(AVX.mul(z_real_avxval, z_real_avxval), AVX.mul(z_imag_avxval, z_imag_avxval))
                     z_square_imag = AVX.add(AVX.mul(z_real_avxval, z_imag_avxval), AVX.mul(z_real_avxval, z_imag_avxval))
+                    
+                    # z_real = (a^2 - b^2) + x
+                    # z_imag = (2ab) + y
                     z_real_avxval = AVX.add(z_square_real,c_real_avxval)
                     z_imag_avxval = AVX.add(z_square_imag,c_imag_avxval)
 
