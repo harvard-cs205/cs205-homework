@@ -105,11 +105,12 @@ if __name__ == '__main__':
             # get the new order of each position
             new_posindex = pos_mrt_dstack[:, 0]
             ''' 
-            positions = positions[new_posindex, :]
+
             new_posindex = morton_order[(positions[:, 0] / grid_spacing).astype(int),
                                         (positions[:, 1] / grid_spacing).astype(int)]
-            
             new_posindex = np.argsort(new_posindex)
+
+            positions = positions[new_posindex, :]
             velocities = velocities[new_posindex, :]
             
             grid[(positions[:, 0] / grid_spacing).astype(int),
