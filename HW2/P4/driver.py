@@ -42,10 +42,14 @@ def py_median_3x3(image, iterations=10, num_threads=1):
     tmpB = np.empty_like(tmpA)
 
     # There are iterations rows, and num_threads columns
+    # Create an Event() for each of those which will be set() once that (n, i) pair has been done.
     conditions = [[threading.Event() for j in range(num_threads)] for i in range(iterations)]
+    # Instantiate the threads.
     threads = [threading.Thread(target=thread_worker, args=(conditions, iterations, t, tmpA, tmpB, num_threads)) for t in range(num_threads)]
+    # Start the threads
     for t in threads:
         t.start()
+    # Wait for all of the threads to finish.
     for t in threads:
         t.join()
 
