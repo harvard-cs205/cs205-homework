@@ -64,5 +64,5 @@ speedup of about 5x.
 Interestingly, the speedup for 12 threads does not obey the scaling for small numbers of threads (i.e. for N threads,
 we got a speedup of 5N). This could be because my desktop has 6 physical cores which, via hyperthreading, act like 12.
 If each physical core can only process one set of AVX instructions at once, our maximum expected speedup would be
-about 6*5 = 30x instead of 12*5 = 60x (what I expected due to hyperthreading). Hopefully the OpenCL unit will teach me how to
-identify how many sets of AVX instructions my cores can run at once!
+about 6*5 = 30x instead of 12*5 = 60x (what I expected due to hyperthreading) which is approximately what we see.
+Hopefully the OpenCL unit will teach me how to identify how many sets of AVX instructions my cores can run at once!

@@ -7,12 +7,13 @@ Let us list the running times of each scenario first.
 serial: 0.20 seconds
 fine grained: 3.67 seconds
 medium grained: I plotted this as a function of N. See "uncorrelated_vs_N.png". Times range from 6.5 seconds to 17
-                seconds depending on N.
+                seconds depending on N. Note that multiple runs were averaged together to make this plot.
 
 #### Correlated ####
 serial: 0.21 seconds
 fine grained: 2.56 seconds
-medium grained: See "correlated_vs_N.png". Times range from 4 seconds to about 10 seconds depending on N.
+medium grained: See "correlated_vs_N.png". Times range from 4 seconds to about 10 seconds depending on N. Note that
+                multiple runs were averaged together to make this plot.
 
 Let us now characterize the performance of each approach.
 
@@ -28,8 +29,9 @@ uncorrelated case! Evidently, the penalty of using locks is greater than the gai
 b) Correlated
 
 The correlated fine-grained code runs *faster* than the uncorrelated code. This is surprising to me...naively, I would
-expect that if the source and destination are correlated when transferring data, there would be more contention for locks.
-This does not appear to be the case. I think this must be attributed to OpenMP and compiler strageness.
+expect that if the source and destination are correlated when transferring data, there would be more contention for locks
+(i.e. different threads would be more likely to simultaneously read and write to the same indices).
+This does not appear to be the case. I think this must be attributed to OpenMP and compiler strangeness.
 
 2. Medium Grained
 
@@ -37,8 +39,8 @@ a) Uncorrelated
 
 Now, there are less locks; a single lock controls access to multiple array elements. Naively, this could be a good
 choice as it will lessen the penalty of assigning and releasing many locks. It will only speed up the code if there
-is not a lot of contention for the locks, i.e. if N is too big, there will be too much contention for locks and the
-code will slow down.
+is not a lot of contention for the locks, i.e. if N is too big relative to the total number of indices in the array,
+there will be too much contention for locks and the code will slow down.
 
 See plot "uncorrelated_vs_N.png". Strangely, when N=1, we record a time of roughly 9 seconds. N=1 corresponds to the
 fine-grained case where we recorded a time of roughly 2.56 seconds; evidently the overhead associated with assigning
@@ -52,7 +54,7 @@ Strangely, as N grows even larger, there appears to be a slight dip in the time 
 this; it could be due to stochastic fluctuations in the execution of the code.
 
 I think the takeaway message here is that fine-grained and coarse-grained locking are rarely ideal; a medium-grained,
-balanced locking technique is generally the best as illustrated by this plot.
+balanced locking technique is generally the best.
 
 b) Correlated
 
