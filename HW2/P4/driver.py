@@ -30,24 +30,54 @@ def py_median_3x3(image, iterations=10, num_threads=1):
 
 
 
-def py_median_3x3_threading(image, iterations=10, num_threads=8):
-    ''' repeatedly filter with a 3x3 median
-        using threading
-     '''
+def py_median_3x3_threading(image, iterations, num_threads):
     
-    N = num_threads
+    ''' 
+    
+    repeatedly filter with a 3x3 median using threading
+    
+    '''
+    
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
-    for i in range(iterations):  
-        for n in range(num_threads):
-            th = threading.Thread(target=filtering.median_3x3, args=(tmpA, tmpB, n, N))
-            th.start()
-        th.join()
-        tmpA, tmpB = tmpB, tmpA
+    
+    event = np.array([[threading.Event()]*iterations]*num_threads)
+    
+    for n in range(num_threads):
+        thread = threading.Thread(target=worker, args=(tmpA, tmpB, iterations, n, 
+                                                       num_threads, event))
         
-        
-        
-    return tmpA
+        thread.start()
+    thread.join()
+    
+    
+    if  iterations % 2 == 1:
+        return tmpB
+    else:
+        return tmpA
+
+
+def worker(in_coord, out_coord, iterations, threadid, thread_num, event_array):
+    for i in range(iterations):
+
+        if thread_num == 1:
+            pass
+        elif i == 0:
+            pass
+        elif threadid == 0:
+            event_array[threadid + 1,i - 1].wait()
+        elif threadid == thread_num - 1:
+            event_array[threadid - 1, i - 1].wait()
+        else:
+            event_array[threadid - 1, i - 1].wait()#causes to current thread
+            event_array[threadid + 1, i - 1].wait()# to wait on these threads 
+                                                   #to be complete
+                
+        filtering.median_3x3(in_coord, out_coord, threadid, thread_num)
+        event_array[threadid, i].set() #tell the event that this thread is complete
+        in_coord, out_coord = out_coord, in_coord
+
+
 
 
 def numpy_median(image, iterations=10):
