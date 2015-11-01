@@ -57,6 +57,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     for i in prange(in_coords.shape[0], nogil=True, schedule='static', chunksize=1, num_threads=4):
         #for j in range(in_coords.shape[1]):
         for j in range(0, in_coords.shape[1], 8):
+            
             iterCount = AVX.float_to_float8(0.0)
             creal = AVX.make_float8(in_coords_real[i, j],
                                         in_coords_real[i, j+1],
@@ -108,10 +109,8 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                     break
                 z = z * z + c
             out_counts[i, j] = iter
-            if i == 2500 and j == 2000:
-                with gil:
-                    print out_counts[i, j]
-           ''' 
+            '''
+
 # An example using AVX instructions
 cpdef example_sqrt_8(np.float32_t[:] values):
     cdef:
