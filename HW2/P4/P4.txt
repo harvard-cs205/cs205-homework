@@ -1,0 +1,9 @@
+# P4 write up
+
+1 thread:   3.59872698784 seconds for 10 filter passes.
+2 threads:  1.79542899132 seconds for 10 filter passes.
+4 threads:  1.63268899918 seconds for 10 filter passes.
+
+We can see that when changing from serial version (1 thread) to 2 threads, the amount of time decreased almost half. However, it did not change too much as the number of threads increased to 4. I might need a new Mac...
+
+There is no coorperation between threads. They each is responsible for (n + kN)-th line with no overlapping. Iteration i will not start until all the threads complete iteration (i-1). This pattern interleaves adjacent lines to different threads. A better approach might be divide the image into four continuous chunck and distribute each chunck to a different thread?
