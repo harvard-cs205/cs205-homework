@@ -14,12 +14,16 @@ Since we are using a static scheduler because the chunks have roughly the same r
 ---------------------------------------
 SUBPROBLEM 2: Spatial decomposition
 ---------------------------------------
-Now that we only consider the neighborhood of each ball O(N) algorithm instead of O(N^2) where N is the number of balls. The average number roof simulation frames per second is ? for 1 thread and ? for 4 threads.
+Now that we only consider the neighborhood of each ball O(N) algorithm instead of O(N^2) where N is the number of balls. The average number roof simulation frames per second is 933 for 1 thread and 2321 for 4 threads.
+
+This makes the algorithm considerably faster.
+
+
 ---------------------------------------
 SUBPROBLEM 3: Spatially coherent sorting
 ---------------------------------------
 
-The average number roof simulation frames per second is ? for 1 thread and ? for 4 threads.
+The average number roof simulation frames per second is 1014 for 1 thread and 2601 for 4 threads.
 
 We have reduced the distance in the memory of balls that need to be check for collision when considering one ball in the algorithm. This makes the algorithm faster.
 
@@ -27,7 +31,10 @@ We have reduced the distance in the memory of balls that need to be check for co
 SUBPROBLEM 4: Locking
 ---------------------------------------
 
+The average simulation frames per second is 2563 for 4 threads. The locks don't seem to slow down the code even though, now, threads cannont access the collide function simultaneously.
 
+
+Overall we speed up the code from 13 to 2584 simulation frames per second when using multithreading !
 
 
 

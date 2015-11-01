@@ -22,8 +22,8 @@ def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
 if __name__ == '__main__':
-    num_balls = 100
-    radius = 0.01
+    num_balls = 1e4
+    radius = 0.002
     n_threads = 4
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
