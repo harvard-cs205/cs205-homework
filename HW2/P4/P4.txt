@@ -1,0 +1,20 @@
+1. Results
+
+Thread 1 : 3.948538064956665 seconds for 10 filter passes.
+Thread 2 : 1.8376600742340088 seconds for 10 filter passes.
+Thread 4 : 1.8476707935333252 seconds for 10 filter passes.
+Thread 8 : 1.6697030067443848 seconds for 10 filter passes.
+Thread 16 : 1.6834080219268799 seconds for 10 filter passes.
+
+2. Mothod to control cooperation between threads
+- Basically, I use a set of threading.Event() and its set() and wait() to make sure that n-1, n, n+1 threads have done their works at iteration i-1 before n thread starts its work at iteration i. 
+At the boundaries of threads (thread_idx = 0 or thread_idx = num_threads-1), I only check n, n+1 threads for thread_idx = 0 and n-1, n threads for thread_idx = num_threads-1. 
+With this method, all threads can start asynchronously without waiting for all threads to complete at previous iteration.
+
+3. Discussion about results
+- 2x performance is obtained from thread 1 case when I used thread.
+But, when I use larger threads, the amount of performance benefit is saturated. 
+I guess the reason is that the more numbers of threads are used, the more time 
+is waste checking neighbor threads because of dependencies.
+So, we need to figure out what number of thread is optimal.
+
