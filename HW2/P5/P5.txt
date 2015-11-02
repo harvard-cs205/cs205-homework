@@ -64,22 +64,23 @@ figure above), and then sort the resulting 1d array. In other words, our positio
 and we sort the positions based on their morton ordering value. We updated the velocities and grid based on the sorting
 as well.
 
-With one thread, we average about 600fps which is not fantastic relative to the old performance.
+With one thread, we average about 650fps which is not fantastic relative to the old performance.
 With four threads, we average about 800-900 fps. We do not see any significant speedups due to this
 technique, unfortunately. Perhaps the overhead of sorting is too high. Perhaps Morton sorting was not an ideal choice
 for this problem. Regardless, I think it's cool.
 
 >> Locking
 
-With locking, one thread, and our previous improvements we average about 500 fps. With locking and
-four threads, we average about 700 fps. Locking likely slows done the code slightly as
+See "1_thread_final_code_histogram.png" and "4_threads_final_code_histogram.png". With locking, one thread,
+and our previous improvements we average about 700 fps. With locking and
+four threads, we average about 825 fps. Locking likely slows done the code slightly as
 each thread cannot enter the collision code simultaneously for a given particle; if that particle is
 colliding with something else, another thread cannot collide it with another particle. This makes sense
 physically; collisions should be handled individually and should not be interrupted by other threads.
 Locking consequently slightly decreases speed but makes our simulation more realistic.
 
-Evidently, in this problem, the pain of implementing threading was likely not worth it; we saw very small speedups.
-This must be a problem where the overhead associated with threading is so large relative to the underlying problem
-that it is not worth implementing! Perhaps if there were even more particles, threading would help to speed up the code.
-It is also possible that although threading does not speed up the code much, it makes the code run more consistently,
-i.e. if the system is perturbed, the framerate of the simulation will still be high.
+Although threading did not make our code run much faster, according to the histogram plots, it made our code run more
+consistently. The single threaded code had two large peaks: one at about 650 fps and one at 775 fps. In contrast,
+the code with 4 threads had one peak at about 850 fps; there was no peak at smaller fps. Threading evidently allowed
+our code to maintain high performance consistently. Evidently, it still may be worth threading an application to ensure
+consistency even if the threading does not vastly increase speed!
