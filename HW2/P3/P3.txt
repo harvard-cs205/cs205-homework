@@ -1,0 +1,64 @@
+P3.txt
+
+######################
+#
+# Submission by Kendrick Lo (Harvard ID: 70984997) for
+# CS 205 - Computing Foundations for Computational Science (Prof. R. Jones)
+# 
+# Homework 2 - Problem 3
+#
+# I did not colloborate with anyone to complete this problem.
+#
+# Documentation:
+# CS 205 Piazza Posts
+# http://docs.cython.org/src/userguide/parallelism.html
+#
+######################
+
+1. Multithreading
+
+We added multithreading using a prange loop, with chunksize of 1, and
+static scheduling. We reran the simulation with 1, 2, and 4 threads:
+
+      1 Thread:
+      248.212092278 million Complex FMAs / second
+
+      2 Threads:
+      543.267287476 million Complex FMAs / second
+
+      4 Threads:
+      1025.68131241 million Complex FMAs / second
+
+We were certainly able to increase performance by adding multithreading
+here. It was interesting to see that we were able to obtain slightly
+better than 2 and 4 times performance for the two-threaded and four-
+threaded performance, respectively. However, such apparent better-than-
+expected performance may be illusory, as there might be certain "fixed"
+overhead costs that stunts performance in the single-thread case, but 
+which get spread out when multiple threads are involved.
+
+2. Instruction-Level Parallelism
+
+We used AVX instructions to add 8-way instruction-level parallelism, and
+found the performance improvement somewhat astonishing:
+
+      1 Thread:
+      1253.09308396 million Complex FMAs / second
+
+      2 Threads:
+      2476.41423439 million Complex FMAs / second
+
+      4 Threads:
+      3971.81712272 million Complex FMAs / second
+
+First, as between these three simulations, we now do see some evidence of
+a drop from 4 times performance in the four thread case from one thread
+case. This is not that unexpected since we are using static scheduling.
+According to the Cython documentation, static scheduling is "most 
+appropriate when the scheduling overhead matters and the problem can be cut
+down into equally sized chunks that are known to have approximately the 
+same runtime". This assumption may not hold true in our problem and/or
+implementation using AVX instructions.
+
+What is more interesting is that we have achieved at least 4-5 time speedups
+with the use of instruction-level parallelism over the multi-threaded version.

@@ -5,9 +5,33 @@ import numpy
 cimport AVX
 from cython.parallel import prange
 
+######################
+#
+# Submission by Kendrick Lo (Harvard ID: 70984997) for
+# CS 205 - Computing Foundations for Computational Science (Prof. R. Jones)
+# 
+# Homework 2 - Problem 3
+#
+######################
 
-cdef np.float64_t magnitude_squared(np.complex64_t z) nogil:
-    return z.real * z.real + z.imag * z.imag
+@cython.boundscheck(False)
+@cython.wraparound(False)
+#############
+#
+# helper function added to update out_counts array
+#
+#############
+cdef np.uint32_t [:, :] update_oc(np.uint32_t [:, :] out_counts, int i, 
+                                  int j, AVX.float8 vals) nogil:
+    cdef: 
+        int k
+        float tmp_counts[8]
+
+    AVX.to_mem(vals, &(tmp_counts[0]))
+    for k in range(8):
+        out_counts[i, j+k] = <int>tmp_counts[k]
+
+    return out_counts
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -16,56 +40,96 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                  int max_iterations=511):
     cdef:
        int i, j, iter
-       np.complex64_t c, z
+       int n_threads  # added to allow setting of number of threads
 
-       # To declare AVX.float8 variables, use:
-       # cdef:
-       #     AVX.float8 v1, v2, v3
-       #
-       # And then, for example, to multiply them
-       #     v3 = AVX.mul(v1, v2)
-       #
-       # You may find the numpy.real() and numpy.imag() fuctions helpful.
+       np.float32_t [:, :] r_coords, i_coords  # store real and imag parts
+       int n_8cols  # number of 8 column chunks
+
+       AVX.float8 cr, ci, zr, zi  # c and z 
+       AVX.float8 iter_ind  # iteration counter for individual pixels
+       AVX.float8 magz, newzr, newzi  # temporary values associated with z
+       AVX.float8 mask, tmp, new_iter_ind
 
     assert in_coords.shape[1] % 8 == 0, "Input array must have 8N columns"
     assert in_coords.shape[0] == out_counts.shape[0], "Input and output arrays must be the same size"
     assert in_coords.shape[1] == out_counts.shape[1],  "Input and output arrays must be the same size"
 
+    # separate real and imaginary components
+    r_coords = np.real(in_coords)
+    i_coords = np.imag(in_coords)
+
     with nogil:
-        for i in range(in_coords.shape[0]):
-            for j in range(in_coords.shape[1]):
-                c = in_coords[i, j]
-                z = 0
+
+        n_threads = 4
+        n_8cols = in_coords.shape[1] / 8  # break into chunks of 8 columns
+
+        for i in prange(in_coords.shape[0], num_threads=n_threads,
+                        schedule='static', chunksize=1):
+
+            for j in range(n_8cols):
+
+                cr = AVX.make_float8(r_coords[i, j*8+7],
+                                     r_coords[i, j*8+6],
+                                     r_coords[i, j*8+5],
+                                     r_coords[i, j*8+4],
+                                     r_coords[i, j*8+3],
+                                     r_coords[i, j*8+2],
+                                     r_coords[i, j*8+1],
+                                     r_coords[i, j*8])
+
+                ci = AVX.make_float8(i_coords[i, j*8+7],
+                                     i_coords[i, j*8+6],
+                                     i_coords[i, j*8+5],
+                                     i_coords[i, j*8+4],
+                                     i_coords[i, j*8+3],
+                                     i_coords[i, j*8+2],
+                                     i_coords[i, j*8+1],
+                                     i_coords[i, j*8])
+
+                zr = AVX.float_to_float8(0.0)
+                zi = AVX.float_to_float8(0.0)
+                iter_ind = AVX.float_to_float8(0.0)
+
                 for iter in range(max_iterations):
-                    if magnitude_squared(z) > 4:
-                        break
-                    z = z * z + c
-                out_counts[i, j] = iter
+                    
+                    # calculate |Z|
+                    magz = AVX.mul(zi, zi)
+                    magz = AVX.fmadd(zr, zr, magz)  # zr * zr + (zi * zi)
 
+                    # mask will be true where |Z| < 4
+                    mask = AVX.less_than(magz, AVX.float_to_float8(4.0))
+                    if AVX.signs(mask)==0:
+                        break # no values less than 4 (i.e. all values >= 4)
 
+                    # calculate potential changed values for z
+                    newzr = AVX.fmadd(zr, zr, cr)
+                    tmp = AVX.mul(zi, zi)
+                    newzr = AVX.sub(newzr, tmp)  # zr * zr + cr - zi * zi
+                    newzi = AVX.mul(AVX.float_to_float8(2.0), zr)
+                    newzi = AVX.fmadd(newzi, zi, ci)  # 2 * zr * zi + ci
 
-# An example using AVX instructions
-cpdef example_sqrt_8(np.float32_t[:] values):
-    cdef:
-        AVX.float8 avxval
-        float out_vals[8]
-        float [:] out_view = out_vals
+                    # increment iteration counter
+                    new_iter_ind = AVX.add(iter_ind, AVX.float_to_float8(1.0))
 
-    assert values.shape[0] == 8
+                    #########
+                    #
+                    # apply mask
+                    # (i.e. flow through new values for zr, zi, and 
+                    #  iteration counter if masked, otherwise keep old values)
+                    #
+                    #########
 
-    # Note that the order of the arguments here is opposite the direction when
-    # we retrieve them into memory.
-    avxval = AVX.make_float8(values[7],
-                             values[6],
-                             values[5],
-                             values[4],
-                             values[3],
-                             values[2],
-                             values[1],
-                             values[0])
+                    tmp = AVX.bitwise_and(mask, newzr)
+                    zr = AVX.bitwise_andnot(mask, zr)
+                    zr = AVX.add(zr, tmp)  
 
-    avxval = AVX.sqrt(avxval)
+                    tmp = AVX.bitwise_and(mask, newzi)
+                    zi = AVX.bitwise_andnot(mask, zi)
+                    zi = AVX.add(zi, tmp) 
 
-    AVX.to_mem(avxval, &(out_vals[0]))
+                    tmp = AVX.bitwise_and(mask, new_iter_ind)
+                    iter_ind = AVX.bitwise_andnot(mask, iter_ind)
+                    iter_ind = AVX.add(iter_ind, tmp) 
 
-    return np.array(out_view)
+                # update master grid with the iteration counts
+                update_oc(out_counts, i, j*8, iter_ind)
