@@ -1,0 +1,155 @@
+Original: serial performance.
+
+Feifeis-MacBook-Pro:P5-0 feifeipeng$ python driver.py
+10.5228794573 simulation frames per second
+11.4006632237 simulation frames per second
+11.126802934 simulation frames per second
+11.3681562913 simulation frames per second
+11.0154083731 simulation frames per second
+11.318367402 simulation frames per second
+9.74714566906 simulation frames per second
+8.75811277811 simulation frames per second
+10.6177384894 simulation frames per second
+10.8117616429 simulation frames per second
+10.7424233499 simulation frames per second
+11.1395691631 simulation frames per second
+11.098890456 simulation frames per second
+11.002318871 simulation frames per second
+10.8728892207 simulation frames per second
+11.260239256 simulation frames per second
+10.9135720233 simulation frames per second
+11.0264705496 simulation frames per second
+11.0136728751 simulation frames per second
+10.8674239284 simulation frames per second
+10.8097553935 simulation frames per second
+11.3591355333 simulation frames per second
+11.2963584408 simulation frames per second
+10.8370427404 simulation frames per second
+11.3214224981 simulation frames per second
+^Z
+[1]+  Stopped                 python driver.py
+
+
+
+
+
+Multithreading: after doing 4 multithreading, the number of simulation frames per second increases around 2.5 times compared to the original case.
+
+Feifeis-MacBook-Pro:P5-1 feifeipeng$ python driver.py
+24.9625291625 simulation frames per second
+27.7531380476 simulation frames per second
+27.8769091707 simulation frames per second
+27.8404566725 simulation frames per second
+27.8031778439 simulation frames per second
+26.4199804731 simulation frames per second
+24.458864967 simulation frames per second
+27.0593275012 simulation frames per second
+26.4214783365 simulation frames per second
+27.7963603589 simulation frames per second
+24.9023570623 simulation frames per second
+27.8249424502 simulation frames per second
+26.6540248219 simulation frames per second
+27.8922959268 simulation frames per second
+27.8574683023 simulation frames per second
+27.5808591926 simulation frames per second
+27.7645283219 simulation frames per second
+27.8280808376 simulation frames per second
+24.4894260524 simulation frames per second
+27.8157160005 simulation frames per second
+26.9484072423 simulation frames per second
+^Z
+[1]+  Stopped                 python driver.py
+
+
+
+
+
+Spatial decomposition: after doing spatial decomposition, the number of simulation frames per second increases around 70 times compared to the multithreading case.
+
+
+Feifeis-MacBook-Pro:P5-2 feifeipeng$ python driver.py
+1545.78306968 simulation frames per second
+1844.38237088 simulation frames per second
+1792.32271436 simulation frames per second
+1828.85061974 simulation frames per second
+1832.38687402 simulation frames per second
+1827.92292579 simulation frames per second
+1850.32729239 simulation frames per second
+1817.40560737 simulation frames per second
+1819.21475551 simulation frames per second
+1816.91517359 simulation frames per second
+1823.20758777 simulation frames per second
+1810.70448691 simulation frames per second
+1816.9409793 simulation frames per second
+1772.40338904 simulation frames per second
+1830.33621442 simulation frames per second
+1827.51817143 simulation frames per second
+1211.90195774 simulation frames per second
+1838.78752395 simulation frames per second
+1754.57806706 simulation frames per second
+1821.15838422 simulation frames per second
+1849.27463181 simulation frames per second
+1821.31269888 simulation frames per second
+1822.03903974 simulation frames per second
+1829.26904323 simulation frames per second
+1813.74665221 simulation frames per second
+^Z
+[1]+  Stopped                 python driver.py
+
+
+
+
+
+Spatially Coherent Sorting: after doing spatially Coherent Sorting, the number of simulation frames per second decreases around 0.5 times compared to the spatial decomposition case.
+
+Feifeis-MacBook-Pro:P5-3 feifeipeng$ python driver.py
+927.923495786 simulation frames per second
+1019.51968887 simulation frames per second
+1014.53679845 simulation frames per second
+999.771002321 simulation frames per second
+1016.54728588 simulation frames per second
+1031.04093945 simulation frames per second
+1012.82189757 simulation frames per second
+933.896436076 simulation frames per second
+1019.08255202 simulation frames per second
+882.86267576 simulation frames per second
+1035.80599184 simulation frames per second
+1026.49894064 simulation frames per second
+1029.98477481 simulation frames per second
+1024.90794719 simulation frames per second
+1014.34195889 simulation frames per second
+^Z
+[1]+  Stopped                 python driver.py
+
+
+
+
+
+Locking: add locking for each object, to prevent simultaneous updates to object velocities when they collide.
+
+Feifeis-MacBook-Pro:P5-4 feifeipeng$ python driver.py
+1281.2767082 simulation frames per second
+1599.18390172 simulation frames per second
+1480.48541153 simulation frames per second
+1572.9233556 simulation frames per second
+1577.37663646 simulation frames per second
+1592.16904973 simulation frames per second
+1604.59941056 simulation frames per second
+1589.97877149 simulation frames per second
+1581.78767006 simulation frames per second
+1591.20708164 simulation frames per second
+1554.05470804 simulation frames per second
+1578.6312164 simulation frames per second
+1594.29845703 simulation frames per second
+1571.17794819 simulation frames per second
+1610.32645574 simulation frames per second
+1576.40347195 simulation frames per second
+1600.7209917 simulation frames per second
+1596.54610049 simulation frames per second
+1598.55183998 simulation frames per second
+1514.28564147 simulation frames per second
+1386.59554055 simulation frames per second
+1603.64507633 simulation frames per second
+1609.04516844 simulation frames per second
+^Z
+[1]+  Stopped                 python driver.py
