@@ -1,0 +1,44 @@
+First of all, note that the lock implementation here is not
+logically equivalent to the serial version because it can result
+in double incrementing or double decrementing some values (while
+serial would only do so once). However, this way of locking still
+guarantees the same amount of data being transferred around (which
+is ok based on problem's correctness condition).
+
+Below is the timing output for different scales of locking:
+
+Serial uncorrelated: 0.765774965286 seconds
+Fine grained uncorrelated: 5.3875579834 seconds
+Medium grained uncorrelated: 7.5688688755 seconds, N = 1
+Medium grained uncorrelated: 8.2150850296 seconds, N = 2
+Medium grained uncorrelated: 8.72940611839 seconds, N = 4
+Medium grained uncorrelated: 9.35337090492 seconds, N = 6
+Medium grained uncorrelated: 9.7058570385 seconds, N = 8
+Medium grained uncorrelated: 10.2679920197 seconds, N = 10
+Serial correlated: 0.777853965759 seconds
+Fine grained correlated: 4.69085407257 seconds
+Medium grained correlated: 6.71653103828 seconds, N = 1
+Medium grained correlated: 6.97477507591 seconds, N = 2
+Medium grained correlated: 7.35910701752 seconds, N = 4
+Medium grained correlated: 7.96923303604 seconds, N = 6
+Medium grained correlated: 8.26710605621 seconds, N = 8
+Medium grained correlated: 8.86940908432 seconds, N = 10
+
+As we can see, introducing locks increase overhead and cause
+worse performance compared to serial versions. This is purely
+because the algorithm is not computation-bound so paralellism
+does not help.
+
+We also see that medium-grained locking is slower than fine-grained
+locking. This is expected because with medium-grained, more threads
+have to wait for others even though they may not work on the same
+chunks of memory, so they end up sleeping and wasting time. Curiously
+when N = 1, medium-grained is logically equivalent to fine-grained
+but runs slower. Perhaps this is due to the extra divide / N operations
+inside the loop, which could accumulate nontrivially over 1 million
+items. A clear trend with this result is that the higher N is, the
+slower it performs (which is expected due to reasons explained above).
+Thus, based on this we should set N = 1 (which makes it equivalent
+to fine-grained, but of course the best thing to do in reality is to
+not parallelize at all so no locks are necessary, or rearrange src
+and dst somehow so that we can do so in an embarassingly parallel way).
