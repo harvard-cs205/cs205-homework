@@ -228,7 +228,8 @@ respectively, with locking (in addition to gridding and sorting):
 	mean simulation frames per second: 1669.06680921
 
 There was no significant change when we instituted locking for the
-one thread case (there is only one thread after all), and a slight improvement for the four thread version.
+one thread case (there is only one thread after all), and a slight
+improvement for the four thread version.
 
 The final combination of improvements resulted in a 58x improved 
 performance over the baseline for the one-threaded case, and
