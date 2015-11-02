@@ -42,23 +42,26 @@ def py_median_3x3_threads(image, iterations=10, num_threads=1):
     #Initialize the events one event per (threadid, iteration step) tuple
     e = [threading.Event() for _ in range(num_threads*iterations)]
     e = np.reshape(e,(num_threads,iterations))
-    print e
 
 
-    # Create a list of theads
+    # Create the treads, append them into a list
+    # this way, it will be easier to join them at the end
     threads = []
     for thread_id in range(num_threads):
+    	# create the threads, pass the function and the inputs
         t = threading.Thread(target=filter_image, 
-            args=(image, iterations, thread_id, num_threads, e))
+            args=(tmpA, tmpB, iterations, thread_id, num_threads, e))
         threads.append(t)
-        # start doing the jobx
+        # threads start working now
         t.start()
-    # make sure to end all threads
-    [t.join() for t in threads]
+    # kill all the threads because the work is done
+    print 'now joining all the threads'
+    if e
+    map(lambda t: t.join(),threads)
 
     return tmpA
     
-def filter_image(image, iterations, thread_id,num_threads,e ):
+def filter_image(tmpA, tmpB, iterations, thread_id,num_threads, e ):
 
     
     for i in range(iterations):
@@ -74,10 +77,20 @@ def filter_image(image, iterations, thread_id,num_threads,e ):
             else :
                 e[thread_id+1,i-1].wait()
                 e[thread_id-1,i-1].wait()
-        #logging.debug('starting')
+
+        # do the job        
+        logging.debug('starting iteration %s with thread_id %s', i, thread_id)
         filtering.median_3x3(tmpA, tmpB, thread_id, num_threads)
+        logging.debug('ending iteration %s with thread_id %s',  i, thread_id)
+
+
         # swap direction of filtering
         tmpA, tmpB = tmpB, tmpA
+
+
+        #awakes all the thread waiting for it
+        if num_threads>1:
+            e[thread_id,i].set()
 
 
     return tmpA
@@ -107,10 +120,11 @@ if __name__ == '__main__':
     pylab.title('before - zoom')
 
     # verify correctness
-    from_cython = py_median_3x3_threads(input_image, iterations=2, num_threads=1)
+    from_cython = py_median_3x3_threads(input_image, iterations=2, num_threads=2)
     from_numpy = numpy_median(input_image, 2)
     assert np.all(from_cython == from_numpy)
     print 'FIRST TEST IS PASSED'
+    print 'NOW DOING THE REAL IMAGE PROCESSING'
 
     with Timer() as t:
         new_image = py_median_3x3_threads(input_image, 10, 8)
