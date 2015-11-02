@@ -59,7 +59,8 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                      float grid_spacing) nogil:
     cdef:
         FLOAT *XY1, *XY2, *V1, *V2
-        int j, dim
+        int j, j_start, j_end, k, k_start, k_end, idx, dim
+        int grid_size = <int>((1.0 / grid_spacing) + 1)
         float eps = 1e-5
 
     # SUBPROBLEM 4: Add locking
@@ -70,17 +71,24 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     ############################################################
     # SUBPROBLEM 2: use the grid values to reduce the number of other
     # objects to check for collisions.
-    for j in range(i + 1, count):
-        XY2 = &(XY[j, 0])
-        V2 = &(V[j, 0])
-        if overlapping(XY1, XY2, R):
-            # SUBPROBLEM 4: Add locking
-            if not moving_apart(XY1, V1, XY2, V2):
-                collide(XY1, V1, XY2, V2)
+    j_start = <int>(XY1[0] / grid_spacing - 2) if XY1[0] / grid_spacing - 2 > 0 else 0
+    j_end = <int>(XY1[0] / grid_spacing + 3) if XY1[0] / grid_spacing + 3 < grid_size else grid_size
+    k_start = <int>(XY1[1] / grid_spacing - 2) if XY1[1] / grid_spacing - 2 > 0 else 0
+    k_end = <int>(XY1[1] / grid_spacing + 3) if XY1[1] / grid_spacing + 3 < grid_size else grid_size
+    for j in range(j_start, j_end):
+        for k in range(k_start, k_end):
+            idx = Grid[j, k]
+            if (idx != -1) and (idx > i):
+                XY2 = &(XY[idx, 0])
+                V2 = &(V[idx, 0])
+                if overlapping(XY1, XY2, R):
+                    # SUBPROBLEM 4: Add locking
+                    if not moving_apart(XY1, V1, XY2, V2):
+                        collide(XY1, V1, XY2, V2)
 
-            # give a slight impulse to help separate them
-            for dim in range(2):
-                V2[dim] += eps * (XY2[dim] - XY1[dim])
+                    # give a slight impulse to help separate them
+                    for dim in range(2):
+                        V2[dim] += eps * (XY2[dim] - XY1[dim])
 
 cpdef update(FLOAT[:, ::1] XY,
              FLOAT[:, ::1] V,
@@ -122,9 +130,12 @@ cpdef update(FLOAT[:, ::1] XY,
         # SUBPROBLEM 1: parallelize this loop over 4 threads (with static
         #    scheduling).
         # SUBPROBLEM 2: update the grid values.
+        Grid[:,:] = -1
         for i in prange(count, num_threads=4, schedule='static', chunksize=count/4):
             for dim in range(2):
                 XY[i, dim] += V[i, dim] * t
+            Grid[<int>(XY[i, 0] / grid_spacing),
+                 <int>(XY[i, 1] / grid_spacing)] = i
 
 
 def preallocate_locks(num_locks):
