@@ -80,7 +80,12 @@ if __name__ == '__main__':
     # preallocate locks for objects
     locks_ptr = preallocate_locks(num_balls)
 
-    while True:
+    num_to_record = 100
+    num_recorded = 0
+    list_of_fps = []
+
+
+    while True: # so we can do a quantitative comparison
         with Timer() as t:
             update(positions, velocities, grid,
                    radius, grid_spacing, locks_ptr,
@@ -93,9 +98,15 @@ if __name__ == '__main__':
         frame_count += 1
 
         ball_indices = np.arange(num_balls)
+
         if total_time > anim_step:
             animator.update(positions)
-            print("{} simulation frames per second".format(frame_count / total_time))
+            fps = frame_count / total_time
+            list_of_fps.append(fps)
+            print("{} simulation frames per second".format(fps))
+            num_recorded += 1
+            if num_recorded == num_to_record:
+                break
             frame_count = 0
             total_time = 0
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
@@ -104,7 +115,6 @@ if __name__ == '__main__':
 
             # We cannot unravel the grid to sort, as overlapping elements will be missed! We need to sort on position
             # unfortunately.
-
             positions_in_grid = (positions/grid_spacing).astype(np.int)
             # Adjust the positions in grid, so that you are not actually outside the grid
             positions_in_grid[positions_in_grid >= grid_size] = grid_size -1
@@ -119,3 +129,12 @@ if __name__ == '__main__':
             # Based on the new positions, update the grid
             ordered_grid_positions = positions_in_grid[order_fixer]
             grid[ordered_grid_positions[:, 0], ordered_grid_positions[:, 1]] = ball_indices
+
+    # Make a histogram of number of threads vs. performance for the last part of the problem
+    plt.clf()
+    plt.hist(list_of_fps, 20)
+    plt.xlabel('FPS')
+    plt.ylabel('Count')
+    plt.title('Histogram of FPS: 1 thread')
+    plt.show()
+    plt.savefig('1_thread_final_code_histogram.png', dpi=200, bbox_inches='tight')

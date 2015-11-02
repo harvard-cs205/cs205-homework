@@ -81,3 +81,5 @@ Locking consequently slightly decreases speed but makes our simulation more real
 Evidently, in this problem, the pain of implementing threading was likely not worth it; we saw very small speedups.
 This must be a problem where the overhead associated with threading is so large relative to the underlying problem
 that it is not worth implementing! Perhaps if there were even more particles, threading would help to speed up the code.
+It is also possible that although threading does not speed up the code much, it makes the code run more consistently,
+i.e. if the system is perturbed, the framerate of the simulation will still be high.
