@@ -6,6 +6,7 @@ set_compiler.install()
 
 import pyximport
 pyximport.install()
+import matplotlib.pyplot as plt
 
 import numpy as np
 from timer import Timer
@@ -40,12 +41,16 @@ if __name__ == '__main__':
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################
-    N = 10
+    NValue = [5,10,20,40,80]
+    uncorrelatedList = []
+    correlatedList = []
     counts[:] = orig_counts
-    with Timer() as t:
-        move_data_medium_grained(counts, src, dest, 100, N)
-    assert counts.sum() == total, "Wrong total after move_data_medium_grained"
-    print("Medium grained uncorrelated: {} seconds".format(t.interval))
+    for N in NValue:
+        with Timer() as t:
+            move_data_medium_grained(counts, src, dest, 100, N)
+        assert counts.sum() == total, "Wrong total after move_data_medium_grained"
+        print("Medium grained uncorrelated: {} seconds".format(t.interval))
+        uncorrelatedList.append(t.interval)
 
     ########################################
     # Now use correlated data movement
@@ -74,9 +79,14 @@ if __name__ == '__main__':
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################
-    N = 10
     counts[:] = orig_counts
-    with Timer() as t:
-        move_data_medium_grained(counts, src, dest, 100, N)
-    assert counts.sum() == total, "Wrong total after move_data_medium_grained"
-    print("Medium grained correlated: {} seconds".format(t.interval))
+    for N in NValue:
+        with Timer() as t:
+            move_data_medium_grained(counts, src, dest, 100, N)
+        assert counts.sum() == total, "Wrong total after move_data_medium_grained"
+        print("Medium grained correlated: {} seconds".format(t.interval))
+        correlatedList.append(t.interval)
+    plt.plot(NValue, uncorrelatedList, label = 'uncorrelated')
+    plt.plot(NValue, correlatedList, label = "correlated")
+    plt.legend(loc = "best")
+    plt.show()
