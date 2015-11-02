@@ -1,0 +1,24 @@
+P3_graph compares the performance across 1, 2 and 4 threads, both with and without instruction-level parallelism via AVX.  There is a slight variation in runtime across runtimes, so I have included five different runtimes for each option for completeness.
+
+Without instruction-level parallelism:
+Performance with one thread is roughly similar to the previous version of the code that did not include threading.  A significant speed-up was observed when increasing the number of threads: the 2-threaded code ran approximately 2 times faster than the 1-threaded version; and the 4-threaded code ran slightly less than 4 times faster (about 3.8x).
+
+With instruction-level parallelism:
+Performance with one thread is significantly worse than both the original serial code and the one threaded version without instruction-level parallelism. It appears that the overhead introduced by this approach offsets the speed-up achieved by the 8-way parallelism. However, performance is significantly better with instruction-level parallelism for both 2 threads and 4 threads; in fact, the run-time is over ten times faster with four threads than with one thread. It is interesting to note that the majority of the speed-up is already obtained when using two threads (approx. 8x speed-up).
+
+Sample results for each of the options are also included below for reference purposes:
+
+Before any changes:
+1074.656613 Million Complex FMAs in 4.34200596809 seconds, 247.502334381 million Complex FMAs / second
+
+Adding multi-threading:
+
+1 thread: 1074.656613 Million Complex FMAs in 4.36838197708 seconds, 246.007931229 million Complex FMAs / second
+2 threads: 1074.656613 Million Complex FMAs in 2.14992785454 seconds, 499.857058334 million Complex FMAs / second
+4 threads: 1074.656613 Million Complex FMAs in 1.13585805893 seconds, 946.118755378 million Complex FMAs / second
+
+Adding instruction-level parallelism:
+
+1 thread: 1075.239961 Million Complex FMAs in 5.62158823013 seconds, 191.269783019 million Complex FMAs / second
+2 threads: 1075.239961 Million Complex FMAs in 0.680310964584 seconds, 1580.51246706 million Complex FMAs / second
+4 threads: 1075.239961 Million Complex FMAs in 0.529093027115 seconds, 2032.23234081 million Complex FMAs / second
