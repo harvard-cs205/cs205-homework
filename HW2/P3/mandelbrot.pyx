@@ -68,18 +68,23 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
 cpdef mandelbrot_AVX(np.complex64_t [:,:] in_coords, np.uint32_t [:,:] out_counts):
 
     cdef:
-        AVX.float8 tmp_real, tmp_img, z, c, mask, thresh, xx, yy, real, two, img1, img, mag, ones, counts, new_ones, xx_mul, yy_mul, xy_sub, z_mag_real, z_mag_img, z_mag, z_real, z_img, xy_2_mul, two_xy_mul, xy_mul
-        int i, j, it, max_iterations, k
+        AVX.float8 tmp_real, tmp_img, c, z, mask, xx, yy, real, img1, img, mag, new_ones, xx_mul, yy_mul, xy_sub, z_mag_real, z_mag_img, z_mag, z_real, z_img, xy_2_mul, two_xy_mul, xy_mul, counts
+        int i, j, it, k
+        int max_iterations=511
         np.float32_t [:,:] coords_1 
         np.float32_t [:,:] coords_2 
+        AVX.float8 zeros = AVX.float_to_float8(0)
+        AVX.float8 thresh = AVX.float_to_float8(4)
+        AVX.float8 two = AVX.float_to_float8(2)
+        AVX.float8 ones = AVX.float_to_float8(1)
+        float out_vals[8]
+        float [:] out_view = out_vals
 
-    max_iterations=511
-    thresh = AVX.make_float8(4,4,4,4,4,4,4,4)
-    two = AVX.make_float8(2,2,2,2,2,2,2,2)
     coords_1 = np.real(in_coords)
     coords_2 = np.imag(in_coords)
 
-    #for j in range(in_coords.shape[0]):
+
+
     for j in prange(in_coords.shape[0], nogil=True, num_threads=8, schedule=static):
       for i in range(0, in_coords.shape[1], 8):
 
@@ -88,21 +93,26 @@ cpdef mandelbrot_AVX(np.complex64_t [:,:] in_coords, np.uint32_t [:,:] out_count
 
         tmp_img = AVX.make_float8(coords_2[j, i],coords_2[j, i+1],coords_2[j, i+2],coords_2[j, i+3],coords_2[j, i+4],coords_2[j, i+5],coords_2[j, i+6],coords_2[j, i+7])
 
-        z_real = AVX.make_float8(0,0,0,0,0,0,0,0) 
-        z_img = AVX.make_float8(0,0,0,0,0,0,0,0)
-        z_mag_real = AVX.make_float8(0,0,0,0,0,0,0,0) 
-        z_mag_img = AVX.make_float8(0,0,0,0,0,0,0,0)
+        z_real = zeros
+        z_img = zeros
+        z_mag_real = zeros
+        z_mag_img = zeros
+        z = zeros
+        counts = zeros
+        # z_real, z_img, z_mag_real, z_mag_img, z, counts = zeros
+
         z_mag = AVX.add(z_mag_real, z_mag_img)
-
-
-        z = AVX.make_float8(0,0,0,0,0,0,0,0)
-        counts = AVX.make_float8(0,0,0,0,0,0,0,0)
 
         for it in range(max_iterations):
 
-          ones = AVX.make_float8(1, 1, 1, 1, 1, 1, 1, 1)
           mask = AVX.less_than(z_mag, thresh) 
-          new_ones = AVX.bitwise_and(ones, mask)
+          if not AVX.signs(mask):
+              break
+          new_ones = AVX.bitwise_and(ones, mask)#added not
+          ##### ADD break statement here
+          # AVX.to_mem(new_ones, &(out_vals[0]))
+          # if sum(out_view) == 0:
+
           counts = AVX.add(new_ones, counts)
 
           #z_real = x^2 - y^2 + x
