@@ -1,0 +1,131 @@
+P4.txt
+
+######################
+#
+# Submission by Kendrick Lo (Harvard ID: 70984997) for
+# CS 205 - Computing Foundations for Computational Science (Prof. R. Jones)
+# 
+# Homework 2 - Problem 4
+#
+# I collaborated with Gioia D. to discuss Event objects.
+#
+# Documentation:
+# CS 205 Piazza Posts
+# https://en.wikipedia.org/wiki/Median_filter
+# https://docs.python.org/2/library/threading.html#event-objects
+# https://pymotw.com/2/threading/index.html
+# http://www.dabeaz.com/python/NewGIL.pdf
+#
+######################
+
+1. Program Changes
+
+We modified `py_median_3x3` to change the loop over the given number
+of iterations to a loop where multiple threads are created, each of
+which calls one of the following helper functions:
+
+	median_loop - calls multiple iterations of median filter
+	            - SYNCHRONOUS: threads cannot continue until all threads
+	                           have completed a particular iteration
+
+	async_median_loop - same function as above but ASYNCHRONOUS:
+	                    threads can continue once neighbor threads signal
+	                    they have completed a particular iteration
+
+2. Signaling Between Threads
+
+We use a relatively simple construct to allow communication between threads:
+Event objects. We instantiate multiple Event objects and store them in an
+array, one Event object indexed by thread per iteration. Each Event manages
+an internal flag that can either be set or cleared. Other threads can wait
+for one or more flags to be set, and are "blocked" from continuing until that
+happens. 
+
+Accordingly, we set a flag associated with a thread to signal to all other
+threads that it is done with a particular iteration. 
+
+3. Performance
+
+For the synchronous filtering version:
+
+	Number of threads: 1
+	3.38507390022 seconds for 10 filter passes.
+	Number of threads: 2
+	1.58733415604 seconds for 10 filter passes.
+	Number of threads: 4
+	1.46829319 seconds for 10 filter passes.
+	Number of threads: 8
+	1.44426298141 seconds for 10 filter passes.
+
+For the asynchronous filtering version:
+
+	Number of threads: 1
+	3.38918185234 seconds for 10 filter passes.
+	Number of threads: 2
+	1.59523296356 seconds for 10 filter passes.
+	Number of threads: 4
+	1.41955685616 seconds for 10 filter passes.
+	Number of threads: 8
+	1.40394091606 seconds for 10 filter passes.
+
+First, it is no surprise that the performance for the one-threaded case is
+essentially the same in both filtering versions, since there are no parallel
+threads executing.
+
+The performance for the two-threaded version is effectively the same for
+both synchronous and asynchronous versions, which is also expected since each
+thread must wait for the other thread to finish processing each iteration,
+as there are only two threads.
+
+It looks like we do see some savings, mostly in the four-threaded case, when 
+threads only have to wait for neighboring threads (as opposed to all active
+threads) to complete before continuing. 
+
+Note that while there is a marked improvement when moving from one to two
+threads in both cases, the improvement when moving from two to four
+threads is not substantial at all. As noted in class, the GIL limits
+improvements in performance (see also NewGIL.pdf reference), and we probably
+need to drop down to C-level code and constructs that allow us to run without
+the GIL before seeing more marked improvement. There is also overhead
+associated with thread communication, and this does not necessarily get more
+efficient with a greater number of threads.
+
+Moreover, given that all threads must wait for the others to complete an
+iteration, the speed of any given thread is bound by that of the slowest one
+(usually the one that has to do the most work) so there is potentially much
+idling.
+
+4. Additional experimentation
+
+We also experimented with simply creating new threads for each iteration 
+of the loop in the original code. Threads would complete their task, join to
+return their results, and presumably terminate, with new threads being 
+created for the next iteration. This potentially means we would be creating
+hundreds, perhaps thousands of threads, depending on the number of iterations
+and threads we are creating. 
+
+    for i in range(iterations):
+        threadlist = []
+        for threadidx in range(num_threads):
+            th = threading.Thread(target=filtering.median_3x3,
+                                  args=(tmpA, tmpB, threadidx, num_threads))
+            threadlist.append(th)
+            th.start()
+
+        for thread in threadlist:
+            thread.join()
+
+        tmpA, tmpB = tmpB, tmpA
+
+It was instructive to note that the performance without using any
+communication constructs (other than what is implicit in join) was actually 
+competitive with the synchronous case, particularly when four threads were
+used. This may provide further evidence that there is clearly overhead
+associated with communication costs between threads. 
+
+	Number of threads: 1
+	3.30246901512 seconds for 10 filter passes.
+	Number of threads: 2
+	1.64469194412 seconds for 10 filter passes.
+	Number of threads: 4
+	1.44320011139 seconds for 10 filter passes.
