@@ -63,7 +63,7 @@ if __name__ == '__main__':
     locks_ptr = preallocate_locks(num_balls)
 
     chunk = num_balls/4
-    nthread = 1
+    nthread = 4
     SFPS = []
     ct = 0
 
@@ -87,13 +87,13 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
-        if ct > 10000:
+        if ct > 100000:
             fig, ax = plt.subplots()
             ax.hist(SFPS, bins=100)
             ax.set_title("Histogram of simulation FPS, {} threads".format(nthread), fontsize=16)
             ax.set_xlabel("Simulation Frames Per Second", fontsize=14)
             ax.set_ylabel("Frequency", fontsize=14)
-            ax.set_xlim([0,2500])
+            ax.set_xlim([0,10000])
             fig.savefig('threads{}.png'.format(nthread))
             
             
