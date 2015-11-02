@@ -1,0 +1,53 @@
+Discussions
+
+1. Implementation
+1) To avoid Deadlocks
+Basically, I choose the way to make always smaller index locked
+before larger index locked when two locks are used at the same
+time. This will prevent deadlocks. 
+
+2) To avoid double-locking
+When two locks need to be acquired/released, I only acqure/release
+a lock when they are the same.
+
+2. Results
+In general, serial cases are faster than multithreaded cases with
+locks. This is because the algorithm is memory-intensive one not
+compute-intensive. So, the benefit of multithreading is much 
+smaller than the costs of scheduling multi threads with locks. 
+
+1) Uncorrelated
+Serial uncorrelated: 0.314491987228 seconds
+Fine grained uncorrelated: 6.85843396187 seconds
+Medium grained (Good N = 2)
+1 Locks : Medium grained correlated: 8.03994297981 seconds
+2 Locks : Medium grained correlated: 8.03332591057 seconds
+5 Locks : Medium grained correlated: 8.46329498291 seconds
+10 Locks : Medium grained correlated: 8.88468194008 seconds
+25 Locks : Medium grained correlated: 10.2813818455 seconds
+50 Locks : Medium grained correlated: 10.9795629978 seconds
+100 Locks : Medium grained correlated: 15.0956821442 seconds
+200 Locks : Medium grained correlated: 20.4811868668 seconds
+500 Locks : Medium grained correlated: 28.5151100159 seconds
+2) Correlated  (Good N = 50)
+Serial correlated: 0.412587881088 seconds
+Fine grained correlated: 7.41342306137 seconds
+1 Locks : Medium grained correlated: 8.64069581032 seconds
+2 Locks : Medium grained correlated: 8.37424707413 seconds
+5 Locks : Medium grained correlated: 7.76534795761 seconds
+10 Locks : Medium grained correlated: 7.22466611862 seconds
+25 Locks : Medium grained correlated: 6.18776011467 seconds
+50 Locks : Medium grained correlated: 5.96286702156 seconds
+100 Locks : Medium grained correlated: 6.39517498016 seconds
+200 Locks : Medium grained correlated: 7.70903205872 seconds
+500 Locks : Medium grained correlated: 13.1749680042 seconds
+
+--> Fine-grained case is faster than medium-grained case
+because each job does not need to wait for other jobs to be
+done as every entry of the array has indivisual lock. But, 
+In Medium-grained case, there are many cases where jobs 
+are stalled because other jobs have locks for memory. 
+--> In general, correlated transfer cases are faster because
+they need fewer memory accesses and are easier to be scheduled
+with locks. 
+
