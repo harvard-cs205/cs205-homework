@@ -1,0 +1,26 @@
+1. Method description:
+
+In my approach, the threads can begin an iteration asynchronously by only checking
+whether threads n, n - 1, n + 1 have completed iteration i - 1 without waiting for any other threads to complete iteration i-1.
+Here I used an M * N matrix, where M is the number of threads and N is the number
+of iterations, and each element stores a threading.Event objec twhich is used to manage whether the iteration n of thread m has completed.
+
+Before calling filtering.median_3x3() in iteration i, thread thn wait() until events_matrix[i - 1][thn - 1],
+events_matrix[i - 1][thn], events_matrix[i - 1][thn + 1] has been set(). After the execution of filtering.median_3x3(),
+call events_matrix[i][thn].set() to unblock next round of iteration.
+
+2. Execution results for threads_number = 1 ,2, 4, 8
+
+threads_number = 1
+6.74074292183 seconds for 10 filter passes.
+
+threads_number = 2
+3.6135828495 seconds for 10 filter passes.
+
+threads_number = 4
+2.27016091347 seconds for 10 filter passes.
+
+threads_number = 8
+2.505245924 seconds for 10 filter passes.
+
+3. Discussions
