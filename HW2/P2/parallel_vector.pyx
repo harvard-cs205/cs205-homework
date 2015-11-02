@@ -87,7 +87,7 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
                continue
 
            # Prevent deadlock by acquiring both potential locks
-           # in order of index size
+           # in order of index.
            if src[idx] < dest[idx] :
                min_idx = src[idx]
                max_idx = dest[idx]
@@ -102,8 +102,7 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
                counts[dest[idx]] += 1
                counts[src[idx]] -= 1
 
-           # Release locks.  Order of release doesn't matter
-           # in order to prevent deadlock
+           # Release locks.
            release(&(locks[max_idx]))
            release(&(locks[min_idx]))
 
@@ -128,6 +127,8 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
    ##########
    for r in range(repeat):
        for idx in prange(src.shape[0], nogil=True, schedule=dynamic, num_threads=4):
+           
+           # Shortcut this case since this effectively is a no-op
            if src[idx] == dest[idx] :
                continue
 
@@ -139,19 +140,17 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
            else :
                l1 = dest[idx] / N
                l2 = src[idx] / N
-           if l1 == l2 :
-               acquire(&(locks[l1]))
-               if counts[src[idx]] > 0:
-                   counts[dest[idx]] += 1
-                   counts[src[idx]] -= 1
-               release(&(locks[l1])) 
-           else :
-               acquire(&(locks[l1]))
+
+           acquire(&(locks[l1]))
+           # Prevent double lock
+           if l1 != l2 :
                acquire(&(locks[l2])) 
-               if counts[src[idx]] > 0:
-                   counts[dest[idx]] += 1
-                   counts[src[idx]] -= 1
-               release(&(locks[l2]))
-               release(&(locks[l1]))
+           if counts[src[idx]] > 0:
+               counts[dest[idx]] += 1
+               counts[src[idx]] -= 1
+           # Prevent double release
+           if l1 != l2 :
+               release(&(locks[l2])) 
+           release(&(locks[l1])) 
 
    free_N_locks(num_locks, locks)

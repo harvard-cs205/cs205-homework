@@ -1,0 +1,32 @@
+Sample Results without AVX
+
+1 Thread
+1074.656613 Million Complex FMAs in 5.14439797401 seconds, 208.898420851 million Complex FMAs / second
+
+2 Threads
+1074.656613 Million Complex FMAs in 2.53549385071 seconds, 423.845087496 million Complex FMAs / second
+
+4 Threads
+1074.656613 Million Complex FMAs in 1.31263709068 seconds, 818.700477556 million Complex FMAs / second
+
+
+With AVX
+1 Thread
+1074.949755 Million Complex FMAs in 0.73210811615 seconds, 1468.29372778 million Complex FMAs / second
+
+2 Threads
+1074.949755 Million Complex FMAs in 0.356142997742 seconds, 3018.30939206 million Complex FMAs / second
+
+4 Threads
+1074.949755 Million Complex FMAs in 0.182126045227 seconds, 5902.22970943 million Complex FMAs / second
+
+
+Note that this sample is indicative of the actual performance over multiple trials.
+
+Analysis
+
+  Already, without AVX, we see that this problem sees significant speed up when adding threads, almost 2x and 4x speedup respectively, which makes sense since we have 2/4 additional threads for a highly parallelizable function.
+
+  With AVX, we see an additional x7/x8 speed increase for all numbers of threads, which again makes sence since AVX allows 8 instructions to run simultaneously, but we have some overhead to setup the AVX operations.
+
+
