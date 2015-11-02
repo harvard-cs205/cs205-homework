@@ -1,4 +1,5 @@
-Let's compare the performance in each scenario.
+Let's compare the performance in each scenario. See the plots "speedup_vs_threads.png"
+and "time_vs_threads.png" for a summary.
 
 Num threads: 1
 4.41142241955 seconds for 10 filter passes averaged over 10 runs.
