@@ -39,7 +39,7 @@ a) Uncorrelated
 
 Now, there are less locks; a single lock controls access to multiple array elements. Naively, this could be a good
 choice as it will lessen the penalty of assigning and releasing many locks. It will only speed up the code if there
-is not a lot of contention for the locks, i.e. if N is too big relative to the total number of indices in the array,
+is not a lot of contention for the locks; if N is too big relative to the total number of indices in the array,
 there will be too much contention for locks and the code will slow down.
 
 See plot "uncorrelated_vs_N.png". Strangely, when N=1, we record a time of roughly 9 seconds. N=1 corresponds to the
@@ -49,8 +49,9 @@ locks is large (i.e. doing division and addition). I again attribute this to com
 Regardless, the trends we see in the plot make sense; there is a peak in time around N=3; the combination of many locks
 and increased contention for locks must create this. After N=3, the time elapsed falls off rapidly and reaches a minimum
 at approximately N=30. This must be the sweet spot between assigning and maintaining many locks and contention. As
-expected, as N is increased further, the time elapsed increases, likely as a result of increased contention for locks.
-Strangely, as N grows even larger, there appears to be a slight dip in the time elapsed; I am not exactly sure what causes
+expected, as N is increased further, the time elapsed increases, likely as a result of increased contention for locks
+(N is no longer small relative to the total number of indices). Strangely, as N grows even larger, there appears to be
+a slight dip in the time elapsed; I am not exactly sure what causes
 this; it could be due to stochastic fluctuations in the execution of the code.
 
 I think the takeaway message here is that fine-grained and coarse-grained locking are rarely ideal; a medium-grained,
@@ -58,10 +59,16 @@ balanced locking technique is generally the best.
 
 b) Correlated
 
-Intuitively, since the source and destination are less than or equal to 10 indices apart, we expect that an
-N slightly greater than 10 would result in very little contention for locks; this should
-provide a large speedup. We see this in the plot: the largest speedup occurs for an N larger than 10. It looks like
-the maximum speedup occurs for N ~ 35. At N larger than 35, the code again becomes slow. This is likely because at large N,
+In the correlated case the source and destination indices are within 10 indices of each other. This suggests that we can
+decompose the problem into groups of 10 indices at a time. Naively, we expect lock contention to be minimized when
+each index has its own lock. If N > 10, there should always be contention for locks, as the source and destination
+will be contained within the same lock; the other indices within the lock will fight for lock control.
+
+See "correlated_vs_N.png" for my results. Even though lock contention is likely increased for N > 10, we find a minimum
+time of roughly N ~ 35. This implies that the overhead associated with maintaining grabbing, and releasing locks is very
+large; there is a much greater penalty for having many locks than fighting to grab a few.
+
+At N larger than 35, the code again becomes slow. This is likely because at large N,
 less elements can be swapped at once, as a single lock controls a large number of indices relative to the total number of
-indices. N ~ 35 must be the sweet spot because it avoids contention due to correlation between the source and destination
+indices. N ~ 35 must be the sweet spot because it avoids the overhead of having too mnay locks
 and avoids contention due to too many locked indices at once (large N).
