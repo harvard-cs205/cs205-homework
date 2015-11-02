@@ -42,8 +42,56 @@ cdef void free_N_locks(int N, omp_lock_t *locks) nogil:
 
     free(<void *> locks)
 
-# cdef omp_lock_t check_lock(idx, src, dest) nogil:
-#     if src[idx]>dest[idx]
+cdef void check_lock(int idx, omp_lock_t *locks, np.int32_t[:] counts, 
+    np.int32_t[:] src, np.int32_t[:] dest) nogil:
+    
+    if src[idx] > dest[idx]:
+        acquire(&locks[src[idx]])
+        acquire(&locks[dest[idx]])
+        counts[dest[idx]] += 1
+        counts[src[idx]] -= 1
+        release(&locks[src[idx]])
+        release(&locks[dest[idx]])
+
+    elif src[idx] < dest[idx]:
+        acquire(&locks[dest[idx]])
+        acquire(&locks[src[idx]])
+        counts[dest[idx]] += 1
+        counts[src[idx]] -= 1
+        release(&locks[src[idx]])
+        release(&locks[dest[idx]])
+
+    else:
+        acquire(&locks[src[idx]]) 
+        counts[dest[idx]] += 1
+        counts[src[idx]] -= 1
+        release(&locks[src[idx]])
+
+
+cdef void check_lock_med(int idx, int N, omp_lock_t *locks, np.int32_t[:] counts, 
+    np.int32_t[:] src, np.int32_t[:] dest) nogil:
+    
+    if src[idx]/N > dest[idx]/N:
+        acquire(&locks[src[idx]/N])
+        acquire(&locks[dest[idx]/N])
+        counts[dest[idx]] += 1
+        counts[src[idx]] -= 1
+        release(&locks[src[idx]/N])
+        release(&locks[dest[idx]/N])
+
+    elif src[idx]/N < dest[idx]/N:
+        acquire(&locks[dest[idx]/N])
+        acquire(&locks[src[idx]/N])
+        counts[dest[idx]] += 1
+        counts[src[idx]] -= 1
+        release(&locks[src[idx]/N])
+        release(&locks[dest[idx]/N])
+
+    else:
+        acquire(&locks[src[idx]/N]) 
+        counts[dest[idx]] += 1
+        counts[src[idx]] -= 1
+        release(&locks[src[idx]/N])
 
 
 ##################################################
@@ -79,30 +127,10 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
    # data movement.  Be sure to avoid deadlock, and double-locking.
    ##########
 
-   for r in prange(repeat, nogil=True, num_threads=4):
-       for idx in xrange(src.shape[0]): 
+   for r in xrange(repeat):
+       for idx in prange(src.shape[0], nogil=True, num_threads=4): 
            if counts[src[idx]] > 0:
-               if src[idx] > dest[idx]:
-                   acquire(&locks[src[idx]])
-                   acquire(&locks[dest[idx]])
-                   counts[dest[idx]] += 1
-                   counts[src[idx]] -= 1
-                   release(&locks[src[idx]])
-                   release(&locks[dest[idx]])
-         
-               elif src[idx] < dest[idx]:
-                   acquire(&locks[dest[idx]])
-                   acquire(&locks[src[idx]])
-                   counts[dest[idx]] += 1
-                   counts[src[idx]] -= 1
-                   release(&locks[src[idx]])
-                   release(&locks[dest[idx]])
-
-               else:
-                   acquire(&locks[src[idx]]) 
-                   counts[dest[idx]] += 1
-                   counts[src[idx]] -= 1
-                   release(&locks[src[idx]])
+               check_lock(idx, locks, counts, src, dest)
 
    free_N_locks(counts.shape[0], locks)
 
@@ -124,41 +152,10 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
    # double-locking.
    ##########
    
-   # print (num_locks)
-   for r in prange(repeat, nogil=True, num_threads=4):
-       for idx in xrange(src.shape[0]): 
+   for r in xrange(repeat):
+       for idx in prange(src.shape[0], nogil=True, num_threads=4):
            if counts[src[idx]] > 0:
-               if src[idx] > dest[idx]:
-                   with gil:
-                       print ("src > dest", src[idx]/N, dest[idx]/N)
-                   acquire(&locks[src[idx]/N])
-                   acquire(&locks[dest[idx]/N])
-                   counts[dest[idx]] += 1
-                   counts[src[idx]] -= 1
-                   release(&locks[src[idx]/N])
-                   release(&locks[dest[idx]/N])
-         
-               elif src[idx] < dest[idx]:
-                   acquire(&locks[dest[idx]/N])
-                   acquire(&locks[src[idx]/N])
-                   counts[dest[idx]] += 1
-                   counts[src[idx]] -= 1
-                   release(&locks[src[idx]/ N])
-                   release(&locks[dest[idx]/ N])
+               check_lock_med(idx, N, locks, counts, src, dest)
 
-               else:
-                   acquire(&locks[src[idx]/ N]) 
-                   counts[dest[idx]] += 1
-                   counts[src[idx]] -= 1
-                   release(&locks[src[idx]/ N])
-
-   # with nogil:
-   #     for r in range(repeat):
-   #         for idx in range(src.shape[0]):
-   #             if counts[src[idx]] > 0:
-   #                 counts[dest[idx]] += 1
-   #                 counts[src[idx]] -= 1
-
-
-
-   free_N_locks(num_locks, locks)
+   free_N_locks(num_locks, locks)          
+   
