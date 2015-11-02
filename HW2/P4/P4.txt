@@ -1,0 +1,8 @@
+With 1 thread:
+    3.43267893791 seconds for 10 filter passes.
+With 2 threads:
+    1.73779916763 seconds for 10 filter passes.
+With 4 threads:
+    1.00545978546 seconds for 10 filter passes.
+
+As we increase the number of threads 1 to 2, we see almost the performance almost double, as 10 filter passes take a little more than half of the time using 2 threads instead of 1.  When we increase the number of threads from 2 to 4, we again see an increase as 10 filter passes take about 4/7ths of the time with 4 threads as with 2 threads.
