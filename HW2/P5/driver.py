@@ -13,7 +13,7 @@ import pdb
 import numpy as np
 from timer import Timer
 from animator import Animator
-from physics import update#, preallocate_locks
+from physics import update, preallocate_locks
 
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
@@ -36,7 +36,6 @@ if __name__ == '__main__':
             break
         positions[mask, :] = np.random.uniform(0 + radius, 1 - radius,
                                                (num_close_to_center, 2)).astype(np.float32)
-    #pdb.set_trace()
     velocities = np.random.uniform(-0.25, 0.25,
                                    (num_balls, 2)).astype(np.float32)
 
@@ -47,7 +46,7 @@ if __name__ == '__main__':
     # store one of them.
     grid_spacing = radius / np.sqrt(2.0)
     grid_size = int((1.0 / grid_spacing) + 1)
-    grid = np.negative(np.ones((grid_size, grid_size),dtype=np.int32))
+    grid = np.negative(np.ones((grid_size, grid_size),dtype=np.uint32))
     grid[(positions[:, 0] / grid_spacing).astype(int), (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
 
     # A matplotlib-based animator object
@@ -60,29 +59,19 @@ if __name__ == '__main__':
 
     frame_count = 0
 
-
-        
-
     # SUBPROBLEM 4: uncomment the code below.
     # preallocate locks for objects
-    #locks_ptr = preallocate_locks(num_balls)
-    locks_ptr = 0
+    locks_ptr = preallocate_locks(num_balls)
+    #locks_ptr = 0
+
+
     toCheck = np.zeros((12,2),dtype=np.int32)
-
-    # cProfile.runctx("update(positions, velocities, grid,\
-    #                radius, grid_size, locks_ptr,\
-    #                physics_step, grid_spacing,toCheck)", globals(), locals(), "Profile.prof")
-    # s = pstats.Stats("Profile.prof")
-    # s.strip_dirs().sort_stats("time").print_stats()
-
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
                    radius, grid_size, locks_ptr,
                    physics_step, grid_spacing,toCheck,
-                   originalXPos=(positions[:, 0] / grid_spacing).astype(np.int32),
-                   originalYPos=(positions[:, 1] / grid_spacing).astype(np.int32),
-                   nt=4)
+                   nt=1)
 
         # udpate our estimate of how fast the simulator runs
         physics_step = 0.9 * physics_step + 0.1 * t.interval
@@ -90,21 +79,18 @@ if __name__ == '__main__':
 
         frame_count += 1
         if total_time > anim_step:
-            #sortedIndices = np.lexsort((positions[:,1],positions[:,0]))
-            sortedIndices = np.argsort(positions[:,0])
-            for idx,i in enumerate(sortedIndices):
-                grid[(positions[i][0]/grid_spacing).astype(int),(positions[i][1]/grid_spacing).astype(int)] = idx
-            positions = positions[sortedIndices]
-            velocities = velocities[sortedIndices]
+            # sortedIndices = np.lexsort((positions[:,1],positions[:,0]))
+            # grid[(positions[:, 0] / grid_spacing).astype(int), (positions[:, 1] / grid_spacing).astype(int)] = -1
+            # #The line above causes IndexError: index 708 is out of bounds for axis 0 with size 708
+            # for idx,i in enumerate(sortedIndices):
+            #     grid[(positions[i][0]/grid_spacing).astype(int),(positions[i][1]/grid_spacing).astype(int)] = idx
+            # positions = positions[sortedIndices]
+            # velocities = velocities[sortedIndices]
             animator.update(positions)
-            
-
             print("{} simulation frames per second".format(frame_count / total_time))
             frame_count = 0
             total_time = 0
-            # SUBPROBLEM 3: sort objects by location.  Be sure to update the
-            # grid if objects' indices change!  Also be sure to sort the
-            # velocities with their object positions!
+
 
 
 
