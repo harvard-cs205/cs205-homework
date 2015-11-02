@@ -1,0 +1,26 @@
+1. Without instruction-level parallelism
+For 1 thread:
+1074.677197 Million Complex FMAs in 5.97581601143 seconds, 179.837731775 million Complex FMAs / second
+
+For 2 threads:
+1074.677197 Million Complex FMAs in 3.18527388573 seconds, 337.389259308 million Complex FMAs / second
+
+For 4 threads:
+1074.677197 Million Complex FMAs in 3.0823431015 seconds, 348.655928821 million Complex FMAs / second
+
+
+2. With instruction-level parallelism
+For 1 thread:
+1074.9472 Million Complex FMAs in 0.631837129593 seconds, 1701.30425968 million Complex FMAs / second
+
+For 2 threads:
+1074.9472 Million Complex FMAs in 0.34584403038 seconds, 3108.18492029 million Complex FMAs / second
+
+For 4 threads:
+1074.9472 Million Complex FMAs in 0.329706907272 seconds, 3260.31143507 million Complex FMAs / second
+
+
+3. Conclusion: 
+1) With instruction-level parallelism, the process is almost 9 times faster than that without instruction-level parallelism.
+2) In each case, When the number of thread increases from 1 to 2, the speed improves a lot. When the number of thread increases from 2 to 4, the improvement of speed is relatively small. The reason behind it remains further consideration.
+
