@@ -15,15 +15,41 @@ import filtering
 from timer import Timer
 import threading
 
+def bounds_check(j, num_threads):
+    return j >= 0 and j < num_threads
+
+def median_worker(tmpa, tmpb, j, events, num_threads, iters):
+    for i in range(iters):
+        # wait on all the necessary conditions in order to execute (extra credit)
+        if bounds_check(j - 1, num_threads) and i - 1 >= 0:
+            events[i - 1][j - 1].wait()
+        if bounds_check(j, num_threads) and i - 1 >= 0:
+            events[i - 1][j].wait()
+        if bounds_check(j + 1, num_threads) and i - 1 >= 0:
+            events[i - 1][j + 1].wait()
+        filtering.median_3x3(tmpa, tmpb, j, num_threads)
+        events[i][j].set()
+        tmpa, tmpb = tmpb, tmpa
+
 def py_median_3x3(image, iterations=10, num_threads=1):
     ''' repeatedly filter with a 3x3 median '''
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
 
-    for i in range(iterations):
-        filtering.median_3x3(tmpA, tmpB, 0, 1)
-        # swap direction of filtering
-        tmpA, tmpB = tmpB, tmpA
+    events = [[threading.Event() for i in range(num_threads)] for k in range(iterations)]
+    threads = [threading.Thread(target=median_worker, args = \
+        (tmpA, tmpB, j, events, num_threads, iterations)) for j in range(num_threads)]
+
+    for thread in threads:
+        thread.start()
+
+    for thread in threads:
+        thread.join()
+
+    # for i in range(iterations):
+    #     filtering.median_3x3(tmpA, tmpB, 0, 1)
+    #     # swap direction of filtering
+    #     tmpA, tmpB = tmpB, tmpA
 
     return tmpA
 

@@ -17,8 +17,10 @@ def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
 if __name__ == '__main__':
-    num_balls = 10000
-    radius = 0.002
+    #num_balls = 10000
+    #RESTORE LATER
+    num_balls = 500
+    radius = 0.01 #restore later!!!
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 

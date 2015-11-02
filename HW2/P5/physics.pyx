@@ -1,4 +1,5 @@
-#cython: boundscheck=False, wraparound=False
+#cython: boundscheck=True, wraparound=False
+#TODO: change this back to false
 
 cimport numpy as np
 from libc.math cimport sqrt
@@ -103,7 +104,7 @@ cpdef update(FLOAT[:, ::1] XY,
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
-        for i in range(count):
+        for i in prange(count, num_threads=4, schedule='static'):
             for dim in range(2):
                 if (((XY[i, dim] < R) and (V[i, dim] < 0)) or
                     ((XY[i, dim] > 1.0 - R) and (V[i, dim] > 0))):
@@ -113,7 +114,7 @@ cpdef update(FLOAT[:, ::1] XY,
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
-        for i in range(count):
+        for i in range(count, num_threads=4, schedule='static'):
             sub_update(XY, V, R, i, count, Grid, grid_spacing)
 
         # update positions
@@ -121,7 +122,7 @@ cpdef update(FLOAT[:, ::1] XY,
         # SUBPROBLEM 1: parallelize this loop over 4 threads (with static
         #    scheduling).
         # SUBPROBLEM 2: update the grid values.
-        for i in range(count):
+        for i in prange(count, num_threads=4, schedule='static'):
             for dim in range(2):
                 XY[i, dim] += V[i, dim] * t
 
