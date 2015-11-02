@@ -10,6 +10,7 @@ pyximport.install()
 import numpy as np
 from timer import Timer
 from parallel_vector import move_data_serial, move_data_fine_grained, move_data_medium_grained
+import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
     ########################################
@@ -40,12 +41,17 @@ if __name__ == '__main__':
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################
-    N = 10
-    counts[:] = orig_counts
-    with Timer() as t:
-        move_data_medium_grained(counts, src, dest, 100, N)
-    assert counts.sum() == total, "Wrong total after move_data_medium_grained"
-    print("Medium grained uncorrelated: {} seconds".format(t.interval))
+    N_buffer = [5, 10, 20, 50, 100]
+    output_time_mg_uncor = []
+    
+    for N in N_buffer:
+        counts[:] = orig_counts
+        with Timer() as t:
+            move_data_medium_grained(counts, src, dest, 100, N)
+        assert counts.sum() == total, "Wrong total after move_data_medium_grained"
+        print("Number of Locks: {}".format(N))
+        print("Medium grained uncorrelated: {} seconds".format(t.interval))
+        output_time_mg_uncor.append(t.interval)
 
     ########################################
     # Now use correlated data movement
@@ -75,8 +81,23 @@ if __name__ == '__main__':
     # grained locking
     ########################################
     N = 10
-    counts[:] = orig_counts
-    with Timer() as t:
-        move_data_medium_grained(counts, src, dest, 100, N)
-    assert counts.sum() == total, "Wrong total after move_data_medium_grained"
-    print("Medium grained correlated: {} seconds".format(t.interval))
+    output_time_mg_cor = []
+    for N in N_buffer:
+        counts[:] = orig_counts
+        with Timer() as t:
+            move_data_medium_grained(counts, src, dest, 100, N)
+        assert counts.sum() == total, "Wrong total after move_data_medium_grained"
+        print("Number of Locks: {}".format(N))
+        print("Medium grained correlated: {} seconds".format(t.interval))
+        output_time_mg_cor.append(t.interval)
+
+    plt.figure(num=11, figsize=(12,5))
+    plt.plot(N_buffer, output_time_mg_uncor)
+    plt.plot(N_buffer, output_time_mg_cor)
+    plt.scatter(N_buffer, output_time_mg_uncor, s=200, c='Red', label=u'UnCorrelated')
+    plt.scatter(N_buffer, output_time_mg_cor, s=200, c='Green', label=u'Correlated')
+    plt.title("Time of Correlated Array Suffle vs. Uncorrelated")
+    plt.xlabel("N")
+    plt.ylabel("Completation Time")
+    plt.legend()
+    plt.show()   
