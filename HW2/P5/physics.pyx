@@ -59,6 +59,45 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                      float grid_spacing) nogil:
     cdef:
         FLOAT *XY1, *XY2, *V1, *V2
+        int j, dim, x_loc, y_loc, x, y
+        float eps = 1e-5
+
+    # SUBPROBLEM 4: Add locking
+    XY1 = &(XY[i, 0])
+    V1 = &(V[i, 0])
+    #############################################################
+    # IMPORTANT: do not collide two balls twice.
+    ############################################################
+    # SUBPROBLEM 2: use the grid values to reduce the number of other
+    # objects to check for collisions.
+
+    x_loc = <int>(XY[i, 0]/grid_spacing)
+    y_loc = <int>(XY[i, 1]/grid_spacing)
+
+    for x in range(x_loc-2, x_loc+2):
+        for y in range(y_loc-2, y_loc+2):
+            if x>-1 and x<Grid.shape[0] and y>-1 and y<Grid.shape[1]:
+                j = Grid[x, y]
+                if j>i and j<count:
+                    XY2 = &(XY[j, 0])
+                    V2 = &(V[j, 0])
+                    if overlapping(XY1, XY2, R):
+                        # SUBPROBLEM 4: Add locking
+                        if not moving_apart(XY1, V1, XY2, V2):
+                            collide(XY1, V1, XY2, V2)
+
+                        # give a slight impulse to help separate them
+                        for dim in range(2):
+                            V2[dim] += eps * (XY2[dim] - XY1[dim])
+
+cdef void sub_update_original(FLOAT[:, ::1] XY,
+                     FLOAT[:, ::1] V,
+                     float R,
+                     int i, int count,
+                     UINT[:, ::1] Grid,
+                     float grid_spacing) nogil:
+    cdef:
+        FLOAT *XY1, *XY2, *V1, *V2
         int j, dim
         float eps = 1e-5
 
@@ -82,6 +121,7 @@ cdef void sub_update(FLOAT[:, ::1] XY,
             for dim in range(2):
                 V2[dim] += eps * (XY2[dim] - XY1[dim])
 
+
 cpdef update(FLOAT[:, ::1] XY,
              FLOAT[:, ::1] V,
              UINT[:, ::1] Grid,
@@ -91,7 +131,7 @@ cpdef update(FLOAT[:, ::1] XY,
              float t):
     cdef:
         int count = XY.shape[0]
-        int i, j, dim
+        int i, j, dim, x_loc, y_loc
         FLOAT *XY1, *XY2, *V1, *V2
         # SUBPROBLEM 4: uncomment this code.
         # omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
@@ -122,9 +162,17 @@ cpdef update(FLOAT[:, ::1] XY,
         # SUBPROBLEM 1: parallelize this loop over 4 threads (with static
         #    scheduling).
         # SUBPROBLEM 2: update the grid values.
+        for i in range(Grid.shape[0]):
+            for j in range(Grid.shape[1]):
+                Grid[i, j] = -1
         for i in prange(count, chunksize = count/4, schedule='static', num_threads=4):
             for dim in range(2):
                 XY[i, dim] += V[i, dim] * t
+
+        x_loc = <int>(XY[i, 0]/grid_spacing)
+        y_loc = <int>(XY[i, 1]/grid_spacing)
+        if x_loc<Grid.shape[0] and y_loc<Grid.shape[1]:
+            Grid[<int>(XY[i, 0]/grid_spacing), <int>(XY[i, 1]/grid_spacing)] = i
 
 cpdef update_original(FLOAT[:, ::1] XY,
              FLOAT[:, ::1] V,

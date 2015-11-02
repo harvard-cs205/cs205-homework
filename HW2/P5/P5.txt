@@ -1,0 +1,48 @@
+1) Serial run yields performance of between 5 to 6 simulations per second, while parallel run yields 7-8 simulations per second. Therefore performance is better for 4 thread case, but not four times. Even 
+
+
+
+---------------------------
+Data:
+1) Serial run (one processor)
+6.18444652183 simulation frames per second
+5.52214887393 simulation frames per second
+5.67601684548 simulation frames per second
+6.09491923437 simulation frames per second
+5.97343055714 simulation frames per second
+5.59625555716 simulation frames per second
+5.51724573378 simulation frames per second
+5.83301324084 simulation frames per second
+5.96213734381 simulation frames per second
+5.60412917156 simulation frames per second
+5.80036785551 simulation frames per second
+
+2) Parallel run (four processors)
+7.86758504779 simulation frames per second
+7.77611456053 simulation frames per second
+7.92041634879 simulation frames per second
+7.04761584708 simulation frames per second
+7.14878067072 simulation frames per second
+7.26390805951 simulation frames per second
+7.0847695252 simulation frames per second
+7.80511333714 simulation frames per second
+7.61783541292 simulation frames per second
+7.2985797165 simulation frames per second
+7.00751156139 simulation frames per second
+7.69372605057 simulation frames per second
+
+3) Spatial decomposition
+323.750387695 simulation frames per second
+310.611793695 simulation frames per second
+312.162761588 simulation frames per second
+263.871995079 simulation frames per second
+322.593651238 simulation frames per second
+309.053387458 simulation frames per second
+303.533160966 simulation frames per second
+316.048170322 simulation frames per second
+317.252138515 simulation frames per second
+299.486183506 simulation frames per second
+317.95833362 simulation frames per second
+314.000462793 simulation frames per second
+280.756394209 simulation frames per second
+290.975359641 simulation frames per second
