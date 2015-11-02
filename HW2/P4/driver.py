@@ -51,19 +51,11 @@ def apply_py_median(tmpA, tmpB, iterations, threadidx,num_threads,events):
             events[threadidx][iter - 1].wait() #this is probably unnecessary
             if threadidx < num_threads - 1: #upper thread edge
                 events[threadidx + 1][iter - 1].wait()
-        #print('Thread {}, Iteration {} of {}'.format(threadidx,iter,iterations))
-        #do filter
-        #tmpB=np.zeros_like(tmpA)
-        #print('Before filter: Iter {}, tmpA[10,10]={}, tmpB[10,10]={}'.format(iter,tmpA[300,300],tmpB[300,300]))            
+        
         filtering.median_3x3(tmpA, tmpB, threadidx, num_threads)
-        #print('After filter: Iter {}, tmpA[10,10]={}, tmpB[10,10]={}'.format(iter,tmpA[300,300],tmpB[300,300]))            
         # swap direction of filtering, but make sure we only do it for the elements that were just filtered from this thread
         for i in range(threadidx,tmpA.shape[0],num_threads):
             tmpA[i,:], tmpB[i,:] = tmpB[i,:], tmpA[i,:]
-            #if i==10:
-                # print('Iter {}, tmpA[10,10]={}'.format(iter,tmpA[10,10]))
-        
-        #print('completed')
         #mark current event as done
         events[threadidx][iter].set()
 

@@ -1,5 +1,26 @@
 P4 notes
-Timings for various threads. For 4 threads and fewer, speed scales with number of threads. 
+
+
+I synchronized filtering using events. 
+
+We have N threads, and each thread operates on a bunch of rows of the image. each thread should run the filter function on its rows. The .pyx file has the ability to skip numbers of lines The arguments should be 
+
+filtering.median_3x3(tmpA, tmpB, threadid, num_threads)
+
+The key is to make sure that thread n waits to start iteration i until threads n-1, n, and n+1 complete iteration i-1. 
+We will use an event per thread per iteration, so a total of (num_threads*iterations) events. 
+sudo code:
+
+	wait for event[thread i-1, iter j-1]
+	wait for event[thread i, iter j-1]
+	wait for event[thread i+1, iter j-1
+	do filter starting at row i, filtering every num_threads rows
+	set event[thread i,iter j]
+
+It is most likely unnecessary to wait for event[thread i,iter j-1], since a thread will not start it's next iteration until it has completed the iteration it is currently working on, but we can add it, and it doesn't increase the computation time. We have to deal with edges, only waiting for event[thread i-1] when i>0, and only waiting for event[thread i+1] when i<num_threads. 
+
+
+Timings for various threads. For 4 threads and fewer, speed scales with number of threads. I'm not sure why there is not much of a speedup going to 8 threads. 
 3.98132801056 seconds for 10 filter passes and 1 threads.
 2.02897191048 seconds for 10 filter passes and 2 threads.
 1.21367812157 seconds for 10 filter passes and 4 threads.

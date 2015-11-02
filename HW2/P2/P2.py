@@ -41,13 +41,13 @@ if __name__ == '__main__':
     # grained locking
     ########################################
     #for N in range(1,11):
-    N=10
-    counts[:] = orig_counts
-    with Timer() as t:
-        move_data_medium_grained(counts, src, dest, 100, N)
-    assert counts.sum() == total, "Wrong total after move_data_medium_grained"
-    print("Medium grained uncorrelated, locks every {} values: {} seconds"\
-            .format(N,t.interval))
+    for N in range(1,20,3):
+        counts[:] = orig_counts
+        with Timer() as t:
+            move_data_medium_grained(counts, src, dest, 100, N)
+        assert counts.sum() == total, "Wrong total after move_data_medium_grained"
+        print("Medium grained uncorrelated, locks every {} values: {} seconds"\
+                .format(N,t.interval))
 
     ########################################
     # Now use correlated data movement
@@ -76,7 +76,7 @@ if __name__ == '__main__':
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################
-    for N in range(1,20,3):
+    for N in range(1,40,6):
         counts[:] = orig_counts
         with Timer() as t:
             move_data_medium_grained(counts, src, dest, 100, N)
