@@ -1,0 +1,35 @@
+1. When serial uncorrelated
+serial uncorrelated: 0.389642000198 seconds
+Fine grained uncorrelated: 5.39227604866 seconds
+
+Medium grained uncorrelated:
+N=5, 7.78783583641 seconds
+N=10, 8.25664401054 seconds
+N=15, 8.96474099159 seconds
+N=20, 9.40219688416 seconds
+N=50, 10.1232030392 seconds
+
+
+2. When serial correlated
+Serial correlated: 0.448005914688 seconds
+Fine grained correlated: 4.11850094795 seconds
+
+Medium grained correlated:
+N=5, 6.68246507645 seconds
+N=10, 6.85533285141 seconds
+N=15, 7.27448797226 seconds
+N=20, 8.3435189724 seconds
+N=50, 9.59883904457 seconds
+
+
+3. Conclusion:
+I plot the results when N in range(2,30,2).
+For these two situations, serial uncorrelated needs longer time than serial correlated.
+In each situation,
+1) Fine-grained locking allows higher concurrency, which needs shorter time compared with medium-grained locking. 
+2) As for medium-grained locking, when N increases, the time of medium-grained locking increases. Therefore, we cannot have a good N since it performs best when N=1, which is the fine-grained locking case. 
+3) Coarse-grained locking (a little bit like N=50) needs longer time since it uses a quite small number of locks.
+
+
+4. Further discussion:
+According to the fact mentioned in the question, the source and destination are no more than 10 elements away. Then we'd better choose a N between 2 and 10 for medium grained locking.

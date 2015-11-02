@@ -10,6 +10,7 @@ pyximport.install()
 import numpy as np
 from timer import Timer
 from parallel_vector import move_data_serial, move_data_fine_grained, move_data_medium_grained
+import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
     ########################################
@@ -20,6 +21,10 @@ if __name__ == '__main__':
     dest = np.random.randint(1000, size=1000000).astype(np.int32)
 
     total = orig_counts.sum()
+
+    medium_uncorrelated=[]
+    medium_correlated=[]
+    Ns=range(2,30,2)
 
     # serial move
     counts = orig_counts.copy()
@@ -35,17 +40,19 @@ if __name__ == '__main__':
         move_data_fine_grained(counts, src, dest, 100)
     assert counts.sum() == total, "Wrong total after move_data_fine_grained"
     print("Fine grained uncorrelated: {} seconds".format(t.interval))
+    fine_uncorrelated=t.interval
 
     ########################################
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################
-    N = 10
-    counts[:] = orig_counts
-    with Timer() as t:
-        move_data_medium_grained(counts, src, dest, 100, N)
-    assert counts.sum() == total, "Wrong total after move_data_medium_grained"
-    print("Medium grained uncorrelated: {} seconds".format(t.interval))
+    for N in Ns:
+        counts[:] = orig_counts
+        with Timer() as t:
+            move_data_medium_grained(counts, src, dest, 100, N)
+        assert counts.sum() == total, "Wrong total after move_data_medium_grained"
+        print("Medium grained uncorrelated: {} seconds".format(t.interval))
+        medium_uncorrelated.append(t.interval)
 
     ########################################
     # Now use correlated data movement
@@ -69,14 +76,27 @@ if __name__ == '__main__':
         move_data_fine_grained(counts, src, dest, 100)
     assert counts.sum() == total, "Wrong total after move_data_fine_grained"
     print("Fine grained correlated: {} seconds".format(t.interval))
+    fine_correlated=t.interval
 
     ########################################
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################
-    N = 10
-    counts[:] = orig_counts
-    with Timer() as t:
-        move_data_medium_grained(counts, src, dest, 100, N)
-    assert counts.sum() == total, "Wrong total after move_data_medium_grained"
-    print("Medium grained correlated: {} seconds".format(t.interval))
+    for N in Ns:
+        counts[:] = orig_counts
+        with Timer() as t:
+            move_data_medium_grained(counts, src, dest, 100, N)
+        assert counts.sum() == total, "Wrong total after move_data_medium_grained"
+        print("Medium grained correlated: {} seconds".format(t.interval))
+        medium_correlated.append(t.interval)
+
+    #show results
+    plt.plot(Ns,medium_uncorrelated,'ro-',linewidth=3,label='medium grained uncorrelated')
+    plt.plot(Ns,medium_correlated,'bo-',linewidth=3,label='medium grained correlated')
+    plt.axhline(fine_correlated,color='b',label='fine grained correlated')
+    plt.axhline(fine_uncorrelated,color='r',label='fine grained uncorrelated')
+    plt.xlabel('N')
+    plt.ylabel('Time')
+    plt.legend()
+    plt.ylim([0,15])
+    plt.show()
