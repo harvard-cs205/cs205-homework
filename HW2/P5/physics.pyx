@@ -99,10 +99,11 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     XY1 = &(XY[i, 0])
     V1 = &(V[i, 0])
 
-    #############################################################
+    ############################################################
     # Updated code - based on grid
     ############################################################
 
+    # Calculate grid coordinates
     check_x = int(XY[i, 0] / grid_spacing)
     check_y = int(XY[i, 1] / grid_spacing)
 
@@ -136,12 +137,12 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                         if not moving_apart(XY1, V1, XY2, V2):
                             collide(XY1, V1, XY2, V2)
                         
-                        # Release locks
-                        release_locks(i, j, locks)
-
                         # Give a slight impulse to help separate the balls
                         for dim in range(2):
                             V2[dim] += eps * (XY2[dim] - XY1[dim])
+
+                        # Release locks
+                        release_locks(i, j, locks)
 
     #############################################################
     # Original code - based on positions
