@@ -5,7 +5,7 @@ With one thread, we get roughly 12 fps. With 4 threads, we get roughly
 16 fps. This is a very small speedup; we naively expect that N cores
 should speed us up N times. The overhead of parallelizing the code must be gigantic here, resulting in inefficient scaling.
 Also, the simulation is likely incorrect as we have not implemented locks; this could result in bizarre behavior,
-slowing down the simulation as additional threads are added.. Qualitatively, the behavior of the simulation
+slowing down the simulation as additional threads are added. Qualitatively, the behavior of the simulation
 still looks correct, however.
 
 >>Spatial Decomposition
@@ -32,11 +32,12 @@ the 2d position data and sort it based on Morton order; this way, points close i
  [6, 7, 8]
  ]
 
-This matrix is analagous to where our particles are located in the grid, i.e. rows can be interpreted as the y axis and
-columns can be interpreted as the x axis. Note that this is how arrays are normally stored in memory (at least in c);
-along rows, then columns. The image "standard_logical_indices.png" shows a standard logical index.
+Each element of this matrix represents a square in our grid. For example, logical index 0 represents the top-left corner
+of our grid, element 2 the top-right, etc. This logical indexing scheme is how the elements of a matrix are usually
+stored in memory (at least in c); along rows, then columns. The image "standard_logical_indices.png" shows a colormap of
+standard logical indices in a 2-d matrix.
 
-We then sort the grid via morton order, returning
+We then sort the matrix via morton order (via the "zorder" function), returning
 something like
 
 [[0, 2, 6],
@@ -44,14 +45,17 @@ something like
  [4, 5, 8]
  ]
 
-This tells us that element 0 in the original matrix should be given a value of 0 when sorting,
-1 in the original matrix has a value of 2, and 2 has a value of 6, etc. A sorted matrix in morton order can be seen
-in "morton_ordering.png." On average, it looks like points closer in space are closer together logically (i.e.
-similar colors). The fractal nature of the morton ordering is evident when you zoom in on the sorted matrix; it looks
+This gives us a new set of logical indices for our grid. These indices tell us that the top left element (0) should be
+first in memory, then the one below that (1), and then the element to the right of the top left element (2), etc. On
+average, elements with similar logical indices are closer together now in space. A logical indexing scheme for a 2d
+matrix  in morton order can be seen in "morton_ordering.png." On average, it looks like points closer in space
+have similar colors, indicating that they will be closer in memory as expected.
+The fractal nature of the morton ordering is evident when you zoom in on the sorted matrix; it looks
 identical on the large and small scale! See "morton_ordering_zoomed.png" for a zoom-in.
 
-Every iteration, we take the position of the particles, assign them their corresponding morton-ordered value, and then sort
-the resulting 1d array. In other words, our position data looks like
+To implement morton ordering in our code, we take the position of the particles in the grid every iteration, assign them
+their corresponding morton-ordered value (i.e. particles in the bottom left grid-point will be given a value of 4 in the
+figure above), and then sort the resulting 1d array. In other words, our position data looks like
 
 [[x1, y1], --> [Morton ordering value,
 [x2, y2],  --> Morton ordering value,
@@ -74,6 +78,6 @@ colliding with something else, another thread cannot collide it with another par
 physically; collisions should be handled individually and should not be interrupted by other threads.
 Locking consequently slightly decreases speed but makes our simulation more realistic.
 
-Evidently, in this problem, the pain of implementing threading was not worth it; we saw very small speedups.
+Evidently, in this problem, the pain of implementing threading was likely not worth it; we saw very small speedups.
 This must be a problem where the overhead associated with threading is so large relative to the underlying problem
 that it is not worth implementing! Perhaps if there were even more particles, threading would help to speed up the code.
