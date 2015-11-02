@@ -77,6 +77,8 @@ cdef void sub_update(FLOAT[:, ::1] XY,
 
     for x_val in range(max(0, grid_x-1), min(grid_size, grid_x+2)):
         for y_val in range(max(0, grid_y-1), min(grid_size, grid_y+2)):
+            if x_val == grid_x and y_val == grid_y:
+                continue
             j = Grid[x_val, y_val]
             if j == -1:
                 continue
