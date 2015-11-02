@@ -47,10 +47,10 @@ something like
 
 This gives us a new set of logical indices for our grid. These indices tell us that the top left element (0) should be
 first in memory, then the one below that (1), and then the element to the right of the top left element (2), etc. On
-average, elements with similar logical indices are closer together now in space. A logical indexing scheme for a 2d
+average, elements with similar logical indices are now closer together in space. A logical indexing scheme for a 2d
 matrix  in morton order can be seen in "morton_ordering.png." On average, it looks like points closer in space
 have similar colors, indicating that they will be closer in memory as expected.
-The fractal nature of the morton ordering is evident when you zoom in on the sorted matrix; it looks
+The fractal nature of the morton ordering is evident when you zoom in on the sorted matrix; it looks nearly
 identical on the large and small scale! See "morton_ordering_zoomed.png" for a zoom-in.
 
 To implement morton ordering in our code, we take the position of the particles in the grid every iteration, assign them
