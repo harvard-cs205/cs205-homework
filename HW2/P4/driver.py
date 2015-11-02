@@ -24,14 +24,14 @@ def worker(tmpA, tmpB, iterations, threadidx, num_threads, events):
             if i > 0 :
                 # if first line just wait for the next one
                 if threadidx == 0:
-                    events[threadidx+1,i-1].wait()
+                    events[threadidx+1][i-1].wait()
                 # if last line just wait for the one before
                 elif threadidx == num_threads-1:
-                    events[threadidx-1,i-1].wait()
+                    events[threadidx-1][i-1].wait()
                 # else wait for line before and after
                 else :
-                    events[threadidx+1,i-1].wait()
-                    events[threadidx-1,i-1].wait()
+                    events[threadidx+1][i-1].wait()
+                    events[threadidx-1][i-1].wait()
 
         #have each thread work on every num_threads-th thread
         filtering.median_3x3(tmpA, tmpB, threadidx, num_threads)
@@ -39,15 +39,14 @@ def worker(tmpA, tmpB, iterations, threadidx, num_threads, events):
         tmpA, tmpB = tmpB, tmpA
         #awakes all the thread waiting for it
         if num_threads>1:
-            events[threadidx,i].set()
+            events[threadidx][i].set()
 
 def py_median_3x3(image, iterations=10, num_threads=1):
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
 
     #Initialize the events one event per (threadid, iteration step) tuple
-    events = [threading.Event() for _ in range(num_threads*iterations)]
-    events = np.reshape(events,(num_threads,iterations))
+    events = [[threading.Event() for _ in range(iterations)] for _ in range(num_threads)]
 
     #Initialize create a list of threads
     thread_list=[]
