@@ -3,6 +3,9 @@
 cimport numpy as np
 from libc.math cimport sqrt
 from libc.stdint cimport uintptr_t
+from openmp cimport omp_lock_t, \
+    omp_init_lock, omp_destroy_lock, \
+    omp_set_lock, omp_unset_lock, omp_get_thread_num
 cimport cython
 from omp_defs cimport omp_lock_t, get_N_locks, free_N_locks, acquire, release
 from cython.parallel import prange
@@ -68,7 +71,7 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                      UINT[:, ::1] Grid,
                      float grid_spacing,
                      int grid_length,
-                     omp_lock_t *locks) nogil:
+                     uintptr_t locks_ptr) nogil:
     cdef:
         FLOAT *XY1, *XY2, *V1, *V2
         int j, k, l, dim 
@@ -76,6 +79,7 @@ cdef void sub_update(FLOAT[:, ::1] XY,
         int m=0
         float eps = 1e-5
         float grid_idx[2]
+        omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
 
     # SUBPROBLEM 4: Add locking
     XY1 = &(XY[i, 0])
@@ -98,17 +102,12 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     grid_idx[1]=XY1[1]/grid_spacing
     grid_idx1[0]=<UINT> grid_idx[0]
     grid_idx1[1]=<UINT> grid_idx[1]
-    #with gil:
-    #    print('grid_idx={}'.format(grid_idx1))
 
     #do the search for nearby objects
     for k in range(grid_idx1[0]-3,grid_idx1[0]+4):
         for l in range(grid_idx1[1]-3,grid_idx1[1]+4):
             if k>=0 and l>=0 and k<grid_length and l<grid_length:
                 search_idx[m]=Grid[k,l]
-                # if grid_idx1[0]>=grid_length-2 or grid_idx1[1]>=grid_length-2:
-                    # with gil:
-                    #     print('grid [{},{}]={}'.format(k,l,Grid[k,l]))
                 m+=1
 
     for j in range(49):
@@ -119,11 +118,15 @@ cdef void sub_update(FLOAT[:, ::1] XY,
             V2 = &(V[search_idx[j], 0])
             if overlapping(XY1, XY2, R):
                 # SUBPROBLEM 4: Add locking
+                omp_set_lock(&(locks[i]))
+                omp_set_lock(&(locks[search_idx[j]]))
                 if not moving_apart(XY1, V1, XY2, V2):
                     collide(XY1, V1, XY2, V2)
                 # give a slight impulse to help separate them
                 for dim in range(2):
                     V2[dim] += eps * (XY2[dim] - XY1[dim])
+                omp_unset_lock(&(locks[search_idx[j]]))
+                omp_unset_lock(&(locks[i]))
 
 cpdef update(FLOAT[:, ::1] XY, 
              FLOAT[:, ::1] V,
@@ -134,10 +137,9 @@ cpdef update(FLOAT[:, ::1] XY,
              float t):
     cdef:
         int count = XY.shape[0]
-        int i, j, dim, grid_length=Grid.shape[0], numthreads=1
+        int i, j, dim, grid_length=Grid.shape[0], numthreads=4
         FLOAT *XY1, *XY2, *V1, *V2, grid_pos[2], grid_pos_old[2]
         # SUBPROBLEM 4: uncomment this code.
-        omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
 
     assert XY.shape[0] == V.shape[0]
     assert XY.shape[1] == V.shape[1] == 2
@@ -158,7 +160,7 @@ cpdef update(FLOAT[:, ::1] XY,
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
         for i in prange(count,num_threads=numthreads,schedule='static',chunksize=count/4):
-            sub_update(XY, V, R, i, count, Grid, grid_spacing,grid_length,*locks)
+            sub_update(XY, V, R, i, count, Grid, grid_spacing,grid_length,locks_ptr)
 
         # update positions
         #

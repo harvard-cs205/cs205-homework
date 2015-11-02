@@ -89,15 +89,15 @@ if __name__ == '__main__':
                    radius, grid_spacing, locks_ptr,
                    physics_step)
 
-        # udpate our estimate of how fast the simulator runs
+        # update our estimate of how fast the simulator runs
         physics_step = 0.9 * physics_step + 0.1 * t.interval
         total_time += t.interval
         runtime += t.interval
         frame_count += 1
         if total_time > anim_step:
-            animator.update(positions)
+            
             #pdb.set_trace()
-            print("{} simulation frames per second".format(frame_count / total_time))
+            print("{} simulation frames per second -- {} frames, {} seconds".format(frame_count / total_time,frame_count,total_time))
             frame_count = 0
             total_time = 0
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
@@ -112,7 +112,7 @@ if __name__ == '__main__':
             #update grid positions. Since we are only reordering, balls aren't moving to a new grid space, only swapping positions, so we don't have to do anything annoying like reinitialize the grid. 
             grid[(positions[:, 0] / grid_spacing).astype(int),
                  (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
-            
+            animator.update(positions)
             
         if runtime>10:
             x=False
