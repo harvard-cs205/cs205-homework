@@ -3,6 +3,6 @@
 *.pyxbldc
 *.ipynb
 *.csv
-*.txt
 
 **/.ipynb_checkpoints
+HW1
