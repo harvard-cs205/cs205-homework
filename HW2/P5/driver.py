@@ -34,9 +34,9 @@ def tomorton(x,y):
 # Helper function - calculates spatially coherent sorting
 def get_mapped_index(mapped, pos, num_balls, grid_spacing):
 
-    # Map coordinates to 1D Morton codes
+    # Map coordinates to 1D Morton codes (binary representation)
     for i in range(num_balls):
-        mapped[i] = tomorton(int(positions[i, 0] / grid_spacing), int(positions[i, 1] * grid_spacing))
+        mapped[i] = tomorton(int(positions[i, 0] / grid_spacing), int(positions[i, 1] / grid_spacing))
 
     # Return index for sorting
     return np.argsort(mapped)
