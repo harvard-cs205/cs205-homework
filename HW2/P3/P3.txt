@@ -17,15 +17,17 @@ For each doubling of the thread count, we see about a 50% reduction in processin
 
 
 Multithreading WITH Instruction-Level (AVX):
-923.223M CFMAs in: 
+1074.948M CFMAs in: 
 
 	0.723s, 1276.306M CFMAs/s [1 threads] ... 7.12x speedup from non-AVX
 
 	0.344s, 2681.590M CFMAs/s [2 threads] ... 6.93x speedup from non-AVX
 
-	0.237s, 3889.225M CFMAs/s [4 threads] ... 5.88x speedup from non-AVX
+	0.237s, 4566.008M CFMAs/s [4 threads] ... 6.89x speedup from non-AVX
 
-Using AVX gives about a 6-7x speed boost.  As the number of threads goes up, we see a slight decrease in speed gains over the non-AVX counterparts - this is expected as overhead increases with more threads (cache overuse, etc).  The number of CFMAs drops a bit too - this was also observed in Piazza @395.  The argument there was that the NaN->Inf adjustment isn't technically the same set of computations...not sure if this is the reason or not, but it's close enough so that I'm not too concerned about the difference.
+Using AVX gives about a 6-7x speed boost.  As the number of threads goes up, we see a slight decrease in speed gains over the non-AVX counterparts - this is expected as overhead increases with more threads (cache overuse, etc).  
+
+The number of CFMAs increases a bit too, by about 300K. Ray allowed that there might be slightly higher counts for AVX using the less_than method (Piazza @455), and this increase is definitely less than 1 increment per images pixels.  The argument there was that the NaN->Inf adjustment isn't technically the same set of computations.
 
 
 There are two lengthy comments in my mandelbrot.pyx file, I've reprinted them below.  
