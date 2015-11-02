@@ -216,7 +216,7 @@ cpdef update(FLOAT[:, ::1] XY,
                 # Update grid value
                 Grid[grid_x, grid_y] = i
 
-# Creates a given number of locks
+# Creates a given number of locks (equal to number of balls)
 def preallocate_locks(num_locks):
     cdef omp_lock_t *locks = get_N_locks(num_locks)
     assert 0 != <uintptr_t> <void *> locks, "could not allocate locks"
