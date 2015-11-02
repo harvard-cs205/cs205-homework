@@ -65,9 +65,6 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
 # An example using AVX instructions
 cpdef mandelbrot_AVX(np.complex64_t [:,:] in_coords, np.uint32_t [:,:] out_counts):
 
-'''
-This is the mandelbrot calcualtion using AVX
-'''
 
     cdef:
         AVX.float8 tmp_real, tmp_img, c, z, mask, xx, yy, real, img1
