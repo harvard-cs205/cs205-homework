@@ -1,0 +1,27 @@
+# Discussions for P3
+
+
+Results for 1, 2, and 4 threads without instruction-level parallelism
+--> All cases need to compute 1074.656613 Million Complex FMAs
+1. Absolute Performance
+  1) Multithreaded without instruction-level parallelism
+    - NUM of Threads [1] : 187.233892779 million Complex FMAs / second
+    - NUM of Threads [2] : 404.883582814 million Complex FMAs / second
+    - NUM of Threads [4] : 729.083898727 million Complex FMAs / second
+
+  2) Multithreaded with instruction-level parallelism
+    - NUM of Threads [1] : 1263.49161729 million Complex FMAs / second
+    - NUM of Threads [2] : 2873.43987502 million Complex FMAs / second
+    - NUM of Threads [4] : 4474.92346454 million Complex FMAs / second
+
+2. Relative Performance (normalized to Thread 1 without instruction-level parallelism)
+  1) Multithreaded without instruction-level parallelism
+    - NUM of Threads [1] : 1
+    - NUM of Threads [2] : 2.162
+    - NUM of Threads [4] : 3.894
+
+  2) Multithreaded with instruction-level parallelism
+    - NUM of Threads [1] : 6.748
+    - NUM of Threads [2] : 15.347
+    - NUM of Threads [4] : 23.900
+
