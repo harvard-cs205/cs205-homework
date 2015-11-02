@@ -10,15 +10,23 @@ pyximport.install()
 
 import numpy as np
 from timer import Timer
+import matplotlib
+matplotlib.use('TKagg')
+import matplotlib.pyplot as plt
 from animator import Animator
 from physics import update, preallocate_locks
+
+from morton import zenumerate, zorder
+
+UINT32_MAX = 4294967295
 
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
 if __name__ == '__main__':
-    num_balls = 10000
+    num_balls = 10**4
     radius = 0.002
+
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -40,12 +48,23 @@ if __name__ == '__main__':
     #
     # Each square in the grid stores the index of the object in that square, or
     # -1 if no object.  We don't worry about overlapping objects, and just
-    # store one of them.
+    # store one of them. EXCEPT -1 TURNS INTO UINT_MAX...
     grid_spacing = radius / np.sqrt(2.0)
     grid_size = int((1.0 / grid_spacing) + 1)
     grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
     grid[(positions[:, 0] / grid_spacing).astype(int),
          (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
+
+    # Create a good sorting solution using morton indexing
+    print 'Creating morton index...grid size is' , grid_size
+    index_array = np.arange(grid_size*grid_size, dtype=np.int)
+    index_matrix = index_array.reshape((grid_size, grid_size))
+    zorder(index_matrix)
+    zordered_indices = index_matrix.ravel()
+
+    assert set(zordered_indices) == set(index_array) # Make sure the set of all values has not been changed
+    print 'Morton assertion passed!'
+    print 'Done!'
 
     # A matplotlib-based animator object
     animator = Animator(positions, radius * 2)
@@ -61,10 +80,15 @@ if __name__ == '__main__':
     # preallocate locks for objects
     locks_ptr = preallocate_locks(num_balls)
 
-    while True:
+    num_to_record = 100
+    num_recorded = 0
+    list_of_fps = []
+
+
+    while True: # so we can do a quantitative comparison
         with Timer() as t:
             update(positions, velocities, grid,
-                   radius, grid_size, locks_ptr,
+                   radius, grid_spacing, locks_ptr,
                    physics_step)
 
         # udpate our estimate of how fast the simulator runs
@@ -72,11 +96,45 @@ if __name__ == '__main__':
         total_time += t.interval
 
         frame_count += 1
+
+        ball_indices = np.arange(num_balls)
+
         if total_time > anim_step:
             animator.update(positions)
-            print("{} simulation frames per second".format(frame_count / total_time))
+            fps = frame_count / total_time
+            list_of_fps.append(fps)
+            print("{} simulation frames per second".format(fps))
+            num_recorded += 1
+            if num_recorded == num_to_record:
+                break
             frame_count = 0
             total_time = 0
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+
+            # We cannot unravel the grid to sort, as overlapping elements will be missed! We need to sort on position
+            # unfortunately.
+            positions_in_grid = (positions/grid_spacing).astype(np.int)
+            # Adjust the positions in grid, so that you are not actually outside the grid
+            positions_in_grid[positions_in_grid >= grid_size] = grid_size -1
+            positions_in_grid[positions_in_grid < 0] = 0
+            logical_positions = grid_size*positions_in_grid[:, 0] + positions_in_grid[:, 1]
+            order_fixer = np.argsort(zordered_indices[logical_positions])
+
+            # Now index based on the new order
+            positions = positions[order_fixer]
+            velocities = velocities[order_fixer]
+
+            # Based on the new positions, update the grid
+            ordered_grid_positions = positions_in_grid[order_fixer]
+            grid[ordered_grid_positions[:, 0], ordered_grid_positions[:, 1]] = ball_indices
+
+    # Make a histogram of number of threads vs. performance for the last part of the problem
+    plt.clf()
+    plt.hist(list_of_fps, 20)
+    plt.xlabel('FPS')
+    plt.ylabel('Count')
+    plt.title('Histogram of FPS: 1 thread')
+    plt.show()
+    plt.savefig('1_thread_final_code_histogram.png', dpi=200, bbox_inches='tight')

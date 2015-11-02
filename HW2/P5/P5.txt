@@ -1,0 +1,86 @@
+>>Compare performance with 4 and with 1 thread (i.e., serial performance), and
+discuss the reasons for any performance difference.
+
+With one thread, we get roughly 12 fps. With 4 threads, we get roughly
+16 fps. This is a very small speedup; we naively expect that N cores
+should speed us up N times. The overhead of parallelizing the code must be gigantic here, resulting in inefficient scaling.
+Also, the simulation is likely incorrect as we have not implemented locks; this could result in bizarre behavior,
+slowing down the simulation as additional threads are added. Qualitatively, the behavior of the simulation
+still looks correct, however.
+
+>>Spatial Decomposition
+
+Spatial decomposition *dramatically* increases the FPS of our simulation. With one thread, we get
+about 700 fps, while with four threads we find something like 800-900fps. Adding additional threads
+does not seem to have a gigantic impact, surprisingly. It is not surprising that we see large
+speedups here, as our algorithm changed from O(N^2) to O(N) when N=10^4.
+
+>>Spatially Coherent Sorting
+
+I use Morton order to sort the positions by utilizing an excellent module written by the Lawrence Livermore National Lab
+(see morton.py). Reading about Morton order on Wikipedia, "Morton order maps multidimensional data
+to one dimension while preserving the locality of the data points." It basically uses a multi-dimensional fractal that
+efficiently maps data from N dimensions to one while preserving data locality in N dimensions. Our strategy is consequently to take
+the 2d position data and sort it based on Morton order; this way, points close in space are close in memory. This is
+ advantageous as points close in space frequently interact with each other; we want memory lookups between them to be
+ very fast.
+
+ It is slightly confusing to implement morton sorting. We begin by creating an index matrix, looking something like
+
+[[0, 1, 2],
+ [3, 4, 5],
+ [6, 7, 8]
+ ]
+
+Each element of this matrix represents a square in our grid. For example, logical index 0 represents the top-left corner
+of our grid, element 2 the top-right, etc. This logical indexing scheme is how the elements of a matrix are usually
+stored in memory (at least in c); along rows, then columns. The image "standard_logical_indices.png" shows a colormap of
+standard logical indices in a 2-d matrix.
+
+We then sort the matrix via morton order (via the "zorder" function), returning
+something like
+
+[[0, 2, 6],
+ [1, 3, 7],
+ [4, 5, 8]
+ ]
+
+This gives us a new set of logical indices for our grid. These indices tell us that the top left element (0) should be
+first in memory, then the one below that (1), and then the element to the right of the top left element (2), etc. On
+average, elements with similar logical indices are now closer together in space. A logical indexing scheme for a 2d
+matrix  in morton order can be seen in "morton_ordering.png." On average, it looks like points closer in space
+have similar colors, indicating that they will be closer in memory as expected.
+The fractal nature of the morton ordering is evident when you zoom in on the sorted matrix; it looks nearly
+identical on the large and small scale! See "morton_ordering_zoomed.png" for a zoom-in.
+
+To implement morton ordering in our code, we take the position of the particles in the grid every iteration, assign them
+their corresponding morton-ordered value (i.e. particles in the bottom left grid-point will be given a value of 4 in the
+figure above), and then sort the resulting 1d array. In other words, our position data looks like
+
+[[x1, y1], --> [Morton ordering value,
+[x2, y2],  --> Morton ordering value,
+[x3, y3]]  --> Morton ordering value]
+
+and we sort the positions based on their morton ordering value. We updated the velocities and grid based on the sorting
+as well.
+
+With one thread, we average about 650fps which is not fantastic relative to the old performance.
+With four threads, we average about 800-900 fps. We do not see any significant speedups due to this
+technique, unfortunately. Perhaps the overhead of sorting is too high. Perhaps Morton sorting was not an ideal choice
+for this problem. Regardless, I think it's cool.
+
+>> Locking
+
+See "1_thread_final_code_histogram.png" and "4_threads_final_code_histogram.png". With locking, one thread,
+and our previous improvements we average about 700 fps. With locking and
+four threads, we average about 825 fps. Locking likely slows done the code slightly as
+each thread cannot enter the collision code simultaneously for a given particle; if that particle is
+colliding with something else, another thread cannot collide it with another particle. This makes sense
+physically; collisions should be handled individually and should not be interrupted by other threads.
+Locking consequently slightly decreases speed but makes our simulation more realistic.
+
+Although threading did not make our code run much faster, according to the histogram plots, it made our code run more
+consistently. The single threaded code had two large peaks: one at about 650 fps and one at 775 fps. In contrast,
+the code with 4 threads had one peak at about 850 fps; there was no peak at smaller fps. Threading evidently allowed
+our code to maintain high performance consistently. Evidently, it still may be worth threading an application to ensure
+consistency even if the threading does not vastly increase speed!

@@ -5,7 +5,12 @@ import set_compiler
 set_compiler.install()
 
 import pyximport
-pyximport.install()
+
+pyximport.install(reload_support=True)
+
+# Annotate the file to make sure things are optimized
+import subprocess
+subprocess.call(["cython","-a","parallel_vector.pyx"])
 
 import numpy as np
 from timer import Timer
@@ -40,7 +45,8 @@ if __name__ == '__main__':
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################
-    N = 10
+    N = 33
+    print 'Number of locks for medium:' , N
     counts[:] = orig_counts
     with Timer() as t:
         move_data_medium_grained(counts, src, dest, 100, N)
@@ -74,7 +80,7 @@ if __name__ == '__main__':
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################
-    N = 10
+    #N = 4 Use the same N as above
     counts[:] = orig_counts
     with Timer() as t:
         move_data_medium_grained(counts, src, dest, 100, N)

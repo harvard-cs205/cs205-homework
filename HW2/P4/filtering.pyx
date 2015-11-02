@@ -45,3 +45,19 @@ cpdef median_3x3(FLOAT[:, :] input_image,
                                                  GETPIX(input_image, i,   j-1), GETPIX(input_image, i,   j), GETPIX(input_image, i,   j+1),
                                                  GETPIX(input_image, i+1, j-1), GETPIX(input_image, i+1, j), GETPIX(input_image, i+1, j+1))
             i += step
+
+cpdef median_3x3_row(FLOAT[:, :] input_image,
+                 FLOAT[:, :] output_image,
+                 int input_row):
+    cdef:
+        int i, j
+
+    assert input_image.shape[0] == output_image.shape[0], "median requires same size images for input and output"
+    assert input_image.shape[1] == output_image.shape[1], "median requires same size images for input and output"
+
+    with nogil:
+        i = input_row
+        for j in range(input_image.shape[1]):  # columns
+                output_image[i, j] = median9(GETPIX(input_image, i-1, j-1), GETPIX(input_image, i-1, j), GETPIX(input_image, i-1, j+1),
+                                             GETPIX(input_image, i,   j-1), GETPIX(input_image, i,   j), GETPIX(input_image, i,   j+1),
+                                             GETPIX(input_image, i+1, j-1), GETPIX(input_image, i+1, j), GETPIX(input_image, i+1, j+1))
