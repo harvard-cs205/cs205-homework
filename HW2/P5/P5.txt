@@ -1,3 +1,7 @@
 SUBPROBLEM 1: MULTITHREADING
 ----
-With four threads, the simulation runs at about 10-11 frames per second, while with just one thread (serial execution), it runs a little under 5 frames per second (so just over 2x speedup with 4 threads).
+With four threads, the simulation runs at about 21-24 frames per second, while with just one thread (serial execution), it runs 9-11 frames per second (so just over 2x speedup with 4 threads).
+
+SUBPROBLEM 2: SPATIAL DECOMPOSITION
+----
+With four threads, the gridded simulation runs at 1500-1900 frames/second, and with a single thread, 600-700 frames/second - an enormous speedup relative to the ungridded code! Because there are a large number of objects, the real-time difference between a O(n^2) and a O(n) algorithm for detecting collisions is very significant.
