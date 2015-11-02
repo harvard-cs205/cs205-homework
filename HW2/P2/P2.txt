@@ -70,5 +70,5 @@ large; there is a much greater penalty for having many locks than fighting to gr
 
 At N larger than 35, the code again becomes slow. This is likely because at large N, less elements can be swapped at
 once, as a single lock controls a large number of indices relative to the total number of
-indices. N ~ 35 must be the sweet spot because it avoids the overhead of having too mnay locks
+indices. N ~ 35 must be the sweet spot because it avoids the overhead of having too many locks
 and avoids contention due to too many locked indices at once (large N).
