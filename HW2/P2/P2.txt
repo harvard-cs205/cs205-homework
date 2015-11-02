@@ -1,0 +1,29 @@
+Results (Single Run)
+
+Serial uncorrelated: 0.29555606842 seconds
+Fine grained uncorrelated: 5.25359201431 seconds
+Medium grained uncorrelated: 7.3546090126 seconds
+Coarse grained uncorrelated: 17.5196149349 seconds
+
+Serial correlated: 0.302400112152 seconds
+Fine grained correlated: 4.54936408997 seconds
+Medium grained correlated: 4.5694630146 seconds
+Coarse grained correlated: 16.5692849159 seconds
+
+In both cases, serial very clearly did better.  This is mostly likely caused by the overhead of locking and scheduling in the parallel cases.
+
+
+Uncorrelated 
+  Comparing the parallel results, we notice immediately that coarse grained (single global lock) does very poorly by far.
+
+  Looking at the two graphs (P2(1_29).png, P2(30_49).png), we can see that medium grained in general does more poorly the more entries we group together with a lock.  A value of N=9 in this set of runs seems to have done best, but this tends to fluctuate.  Large N however invariably start to do badly.
+
+  Fine grained does the best for the uncorrelated case no matter what value of $N$ we use.
+
+
+Correlated
+  Comparing the parallel results, we notice immediately that coarse grained (single global lock) does very poorly by far.
+
+  Looking at the two graphs (P2(1_29).png, P2(30_49).png), we can see that medium grained seems to have a certain N that does best.  It's hard to tell from the graph because of fluxuations, but as we increase N from 1 to 30, the medium grained function continues to imporve to the point where it does slightly better than the fine grained result. It's hard to choose the best N since the values are all so close to each other but a choice of N between 20 and 40 seems to work fine.
+
+  Fine grained continues to do well here.
