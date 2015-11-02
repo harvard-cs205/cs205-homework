@@ -15,14 +15,14 @@ Spatial decomposition
 4 threads			920.5			P5_sub2_4threads.png
 
 Spatially coherent sorting
-1 thread 			812.4 			P5_sub3_1thread.png			
-4 threads 			1254.0			P5_sub3_4threads.png
+1 thread 			876.9 			P5_sub3_1thread.png			
+4 threads 			1230.3			P5_sub3_4threads.png
 
 Locking
-1 thread 			729.4			P5_sub4_1thread.png			
-4 threads 			1155.2			P5_sub4_4threads.png			
+1 thread 			842.4			P5_sub4_1thread.png			
+4 threads 			1091.5			P5_sub4_4threads.png			
 
-SFPS = Simulation frames per second
+SFPS = Simulation frames per second.
 
 Multi-threading:
 
@@ -34,10 +34,12 @@ Enabling the grid resulted in a ~50x increase in the number of simulation frames
 
 Spatially coherent sorting:
 
-I used Morton ordering for spatially coherent sorting. This mapping converts (x, y) coordinates into binary representations that are spatially coherent once sorted. There is some overhead associated with this additional step (~0.2 seconds to map the coordinates, sort positions and velocities, and update the grid), but this is offset by the speed-up in the update function. In particular, this implementation benefits from the fact that the balls whose coordinates are close to each other are nearby in memory, meaning that comparisons between ball positions (e.g. when checking for collisions) are less expensive.
+I used Morton ordering for spatially coherent sorting. This mapping converts (x, y) coordinates into binary representations that are spatially coherent once sorted. As the function is intended to map integers rather than floating-point numbers, I converted the floating-point (x, y) coordinates in integer (x, y) coordinates, using the same approach as the grid mapping i.e. coordinate / grid_spacing.
 
-The one-threaded implementation results in ~1.2x more simulation frames per second, while the four-threaded implementation results in ~1.4x more simulation frames per second (both compared to the implementation in sub-question 2 with the grid). It is interesting to note that the four-threaded implementation, which previously did not result in a linear speed-up due to being bound by bandwidth, is now performing better as memory operations have become more efficient.
+There is some overhead associated with this additional step (~0.16 seconds in total to map the coordinates, sort positions and velocities, and update the grid), but this is partly offset by the speed-up in the update function. In particular, this implementation benefits from the fact that the balls whose coordinates are close to each other are nearby in memory, meaning that comparisons between ball positions (e.g. when checking for collisions) are less expensive.
+
+More specifically, the one-threaded and four-threaded implementations both see ~1.3x more simulation frames per second after implementing the sorting.
 
 Locking:
 
-Adding locks slows down both the single-threaded and four-threaded implementation; both are now performing ~0.9x the number of simulation frames per second. This is consistent with the results of question 2: as the operations are largely bound by bandwidth, any degree of locking will inevitably slow them down.
+Adding locks slows down both the single-threaded and four-threaded implementations. This is not surprising: as the operations are largely bound by bandwidth, any degree of locking will inevitably slow them down. After adding locks, the one-threaded version is completing ~0.96x the number of simulation frames per second, while the four-threaded version is completing ~0.89x the number of simulation frames per second. The slowdown in the one-threaded code is mainly due to the overhead associated with acquiring and releasing locks, while the greater slowdown in the four-threaded version is a result of the locks limiting the performance gains that can be obtained through parallelism.

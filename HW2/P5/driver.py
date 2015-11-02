@@ -14,7 +14,6 @@ import numpy as np
 from timer import Timer
 from animator import Animator
 from physics import update, preallocate_locks
-import json
 
 # Helper function - calculates binary Morton codes for (x, y) coordinates
 # Code from http://www.thejach.com/view/2011/9/playing_with_morton_numbers
@@ -33,14 +32,11 @@ def tomorton(x,y):
     return m/4
 
 # Helper function - calculates spatially coherent sorting
-def get_mapped_index(pos, num_balls):
-
-    # Initialize array
-    mapped = np.zeros(num_balls, dtype=np.uint32)
+def get_mapped_index(mapped, pos, num_balls, grid_spacing):
 
     # Map coordinates to 1D Morton codes
     for i in range(num_balls):
-        mapped[i] = tomorton(int(positions[i, 0] * grid_size), int(positions[i, 1] * grid_size))
+        mapped[i] = tomorton(int(positions[i, 0] / grid_spacing), int(positions[i, 1] * grid_spacing))
 
     # Return index for sorting
     return np.argsort(mapped)
@@ -119,6 +115,9 @@ if __name__ == '__main__':
     num_threads = 4
     chunk_size = num_balls/num_threads
 
+    # Initialize array for sorting
+    mapped_index = np.zeros(num_balls, dtype=np.uint32)
+
     while True:
 
         # Update ball positions & velocities
@@ -149,7 +148,7 @@ if __name__ == '__main__':
             total_time = 0
 
             # Sort indices by location
-            mapped_index = get_mapped_index(positions, num_balls)
+            mapped_index = get_mapped_index(mapped_index, positions, num_balls, grid_spacing)
 
             # Apply mapping to positions & velocities arrays
             positions = positions[mapped_index]
