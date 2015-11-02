@@ -16,9 +16,33 @@ from physics import update, preallocate_locks
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
+##### Z-order curve code is modified from one obtained the wikipedia link
+def cmp_zorder(positions_1, positions_2):
+
+    result = []
+    for idx in range(positions_1.shape[0]):
+        j = 0
+        k = 0
+        x = 0
+        a = positions_1[idx]
+        b = positions_2[idx]
+        for k in range(2):
+            y = a[k] ^ b[k]
+            if less_msb(x, y):
+                j = k
+                x = y
+        result.append(a[j] - b[j])
+    return np.array(result)
+
+def less_msb(x, y):
+    return x < y and x < (x ^ y)
+######################################
+
 if __name__ == '__main__':
     num_balls = 10000
     radius = 0.002
+    #num_balls = 500
+    #radius = 0.01
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -61,10 +85,13 @@ if __name__ == '__main__':
     # preallocate locks for objects
     locks_ptr = preallocate_locks(num_balls)
 
+    Execution_Time = 0
+    cnt_execution = 0
+    end_execution = 100
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
-                   radius, grid_size, locks_ptr,
+                   radius, grid_spacing, locks_ptr,
                    physics_step)
 
         # udpate our estimate of how fast the simulator runs
@@ -75,8 +102,33 @@ if __name__ == '__main__':
         if total_time > anim_step:
             animator.update(positions)
             print("{} simulation frames per second".format(frame_count / total_time))
+            Execution_Time += frame_count / total_time
+            cnt_execution += 1
+            if cnt_execution == end_execution:
+                print("Average {} simulation frames per second".format(Execution_Time / cnt_execution))
+                break
             frame_count = 0
             total_time = 0
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+            positions_grid_1 = (positions/grid_spacing).astype("int")
+            positions_grid_2 = np.array(list(positions_grid_1[1:]) + list(positions_grid_1[:1]))
+            grid_index = np.argsort(cmp_zorder(positions_grid_1,positions_grid_2))
+                        
+            # Update sorted indices for positions and velocities  
+            positions_new = positions[grid_index]
+            velocities_new = velocities[grid_index]
+
+            # Reset grid values to "-1"
+            grid[:,:] = -1
+            
+            # set new postiions, velocities
+            positions = positions_new
+            velocities = velocities_new
+
+            # Set new values to the grid
+            for i in range(num_balls):
+                if positions[i,0]>=0 and positions[i,0]<=1 and positions[i,1]>=0 and positions[i,1]<=1:
+                    grid[(positions[i, 0] / grid_spacing).astype(int),
+                         (positions[i, 1] / grid_spacing).astype(int)] = i

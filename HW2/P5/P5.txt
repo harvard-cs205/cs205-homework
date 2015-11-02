@@ -1,0 +1,39 @@
+For this problem, I used the average values of performance after 100 steps when comparing between
+different cases. 
+
+1. Results 
+[Subproblem 1]
+1) Result
+- Base (Thread 1) : Average 10.2630150501 simulation frames per second
+- Multithreaded with 4 threads : Average 15.7446222717 simulation frames per second
+2) Discussion
+even though the algorithm is multithreaded with 4 threads, it is only 1.5x performance gain on 
+average over base performance. 
+
+[Subproblem 2]
+1) Result
+- Grided version with Thread 1 : Average 531.46811437 simulation frames per second
+- Grided version with Thread 4 : Average 909.365813281 simulation frames per second 
+2) Discussion
+When the algorihm used a grid instead of original version, performance benefits are obtained a lot. This is mainly because algorithm is converted to O(n) from O(n^2). But, multhreading with 4 threads still only gets ~1.5x benefits from the corresponding single-thread one.
+
+[Subproblem 3]
+1) Result
+- sorted version with Thread 1 : Average 1051.24089881 simulation frames per second
+- sorted version with Thread 4 : Average 1504.04464484 simulation frames per second
+2) Discussion
+Morton(z-order) algorithm used for this problem without a special reason. But, I only focused
+on how well an ordering algorithms works for making nearby objects close to each other in memory. 
+As long as it works, I think any algorithms can be used.
+Sorting affects performance a lot because it makes nearby objects close to each other in memory 
+so that they can be accessed much faster and do not need to waste of time when accessing memories.
+So, around 2x performance are achieved over ones obtained from Subproblem 2. 
+
+[Subproblem 4]
+1) Result
+- Locked version with Thread 1 : Average 535.425911142 simulation frames per second
+- Locked version with Thread 4 : Average 955.124174796 simulation frames per second
+2) Discussion
+Basically, I used locks for Object 1(XY1, V1) and for Object 2(XY2, V2).
+When locks used, algorithms are safe to errors as they prevent simultaneous updates,
+but performance decreases compared to Subproblem 3. 
