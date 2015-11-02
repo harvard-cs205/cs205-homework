@@ -10,7 +10,6 @@ Without Instruction level parallelism:
 	Num threads = 4
 	1074.652832 Million Complex FMAs in 1.63627409935 seconds, 656.768222651 million Complex FMAs / second
 
-    print out_counts[1002][0] = 54
 
 With instruction level parallelism:
 
@@ -22,3 +21,5 @@ With instruction level parallelism:
 
 	Num threads = 4
 	1074.94829 Million Complex FMAs in 0.296063899994 seconds, 3630.79825005 million Complex FMAs / second
+
+Using instruction level parallelism increases the FMAs by about 7 times.

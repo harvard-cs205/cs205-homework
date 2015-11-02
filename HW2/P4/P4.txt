@@ -1,15 +1,16 @@
 Original
 3.60938596725 seconds for 10 filter passes.
 
-New: 8 threads
-1.84536504745 seconds for 10 filter passes.
-
+Parallel Performance
 N = 1
 3.66163492203 seconds for 10 filter passes.
-
 
 N = 2
 3.22195887566 seconds for 10 filter passes.
 
 N= 4
 1.84038996696 seconds for 10 filter passes.
+
+There is a less-than-linear speedup by increasing the number of threads from N = 1 to N = 4. This may be due to overheads that cannot be parallelized.
+
+I chose to implement the parallelism using 2 sets of events. The first is a single event (event_start_iterate) that signals when to start the N threads in parallel. (Think of this as firing the starting gun at a race). The second is a list of events for each thread that signals the completion of each thread. (Think of the thread as a runner, and this event is signals that a particular runner has finishing the race). An important point is that we cannot start the next race until all the runners have finished the current race. Using this analogy, in each iteration, event_start_iterate starts the "race" of the N threads. The N threads finish in any order, and when all of them has finished, event_start_iterate starts the next iteration/race

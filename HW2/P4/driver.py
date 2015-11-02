@@ -42,7 +42,7 @@ def median3x3_worker(tmpA, tmpB, offset, step, iterations, event_start_iterate, 
         event_list[threadidx].set()
 
 
-def py_median_3x3(image, iterations=10, num_threads=1):
+def py_median_3x3(image, iterations=10, num_threads=4):
     ''' repeatedly filter with a 3x3 median '''
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
