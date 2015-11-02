@@ -1,3 +1,153 @@
 P2.txt
 
-This is a test.
+######################
+#
+# Submission by Kendrick Lo (Harvard ID: 70984997) for
+# CS 205 - Computing Foundations for Computational Science (Prof. R. Jones)
+# 
+# Homework 2 - Problem 2
+#
+# I did not colloborate with anyone in completing this problem.
+#
+# Documentation:
+# CS 205 Piazza Posts
+# http://www.javaworld.com/article/2075692/java-concurrency/
+#     avoid-synchronization-deadlocks.html
+# http://mechanical-sympathy.blogspot.com/2012/08/
+#     memory-access-patterns-are-important
+#
+######################
+
+1. Locking considerations
+
+First, we noted it was necessary to secure the element of the counts array
+identified by `src[idx]` such that when that element is decremented, it is
+guaranteed to still be positive after the comparison. 
+
+Second, since the element of the counts array identified by `dest[idx]` is
+being incremented unconditionally (e.g. there is no maximum cap), it might be
+argued that locking this element may not be necessary (i.e. it can be
+incremented at any time and need not be synchronized with the decrement
+of the src element). However, we think that not locking this element may 
+produce unexpected consequences (and is therefore undesirable). 
+
+For example, if there are to be two transfers:
+	A: counts[0] -> counts[1]
+	B: counts[1] -> counts[0]
+
+normally it should not matter if counts[1] is initially empty before A is
+complete. This is because even if counts[1] is empty, after A, counts[1] will
+no longer be empty, and then transfer B can be performed. However, if the
+instructions are initiated out of order such that an attempt to transfer 
+from B is made while it is empty and before A can complete, then according to
+the current code, transfer B would not occur at all (and would simply
+disappear).
+
+It is possible to amend the code to ensure that B is more likely to complete
+by waiting for A to complete (e.g. add a delay when B is empty, and try the
+transfer again), but the safer route would be to ensure that any destination
+element is secured from the time a transfer is initiated until the time a 
+given transfer is complete. This is all to say that we should implement locks
+on both the src and dest elements of the counts array involved in a transfer.
+
+Third, when two locks are implemented, it is necessary to engage the locks in
+a consistent order to avoid deadlock. For example, we might encounter the
+following scenario if no lock ordering was enforced:
+	Thread 1 to lock counts[0] then lock counts[1]
+	Thread 2 to lock counts[1] then lock counts[0]
+
+Here, it is possible for both threads to complete the first locking task
+before their second is complete, resulting in a situation where they end up
+waiting indefinitely for the other lock to free. However, if an ordering is
+enforced (e.g. we always lock the lower index before a higher index), deadlock
+can be avoided as we will not have this "criss-cross" waiting situation. 
+
+Fourth, it is also necessary to ensure that attempts to lock the same
+element of the counts array is not made (i.e. when src and dest are the
+same), otherwise a thread may be waiting indefinitely for something that it
+itself has locked.
+
+Finally, we release the locks in reverse order; although this is not strictly
+necessary to prevent deadlock, it is generally considered good style.
+
+2. Performance
+
+First, we compared the performance for the serial version of the program
+with the fine-grained and a medium-grained locking version (N=10):
+
+	Serial uncorrelated: 0.250679969788 seconds
+	Fine grained uncorrelated: 5.68945789337 seconds
+	Medium grained uncorrelated: 7.26793694496 seconds
+
+	Serial correlated: 0.322584152222 seconds
+	Fine grained correlated: 5.24348497391 seconds
+	Medium grained correlated: 5.71074604988 seconds
+
+Note the introduction of locking mechanisms actually slows down performance,
+compared to the serial versions. This is likely due to the overhead
+introduced by setting up the parallel processing structure (using prange()).
+This overhead appears large enough that any benefits of parallelism that
+might be attained cannot make up for this cost -- at least for this
+particular problem size and the number of threads used.
+
+With respect to the serial algorithm, it is interesting to see that the
+performance is slightly worse for the correlated case, as we would have
+expected the correlated version to run faster since elements close together
+are being accessed. Perhaps this is not being taken advantage of. 
+In contrast, in both the fine and medium-grained versions, performance is
+consistently better when the data is correlated.
+
+What is also interesting is that if we switch these two statements in the
+serial code:
+
+        for r in range(repeat):
+            for idx in range(src.shape[0]):
+
+we seem to obtain a performance improvement for the serial case:
+
+	Serial uncorrelated: 0.214073896408 seconds
+	Serial correlated: 0.218904018402 seconds
+
+This may be an interesting opportunity for optimization.
+
+Furthermore, it appears the fine-grained version outperforms the medium-
+grained version at N=10. We reran the simulation over the entire range
+of N values from 1 to 1000 (the size of counts array). We made a few
+interesting observations (see the graph P2.png). 
+
+First, when N=1 we expected the medium and fine-grained versions to 
+perform equally well, but the medium-grained version was slightly slower.
+This may be due to extra processing required for the medium-grained code. 
+
+Second, the medium-grained case does not see significant improvement in
+performance when the data is uncorrelated as N increases, but for correlated
+data exchanges we do see an improvement in performance to a certain point,
+and then a decrease in performance. This makes sense: when the data is
+close together, it makes it more likely that both src and dest elements
+will fall within the same locking section, thereby requiring only one lock
+to protect both elements rather than two. Further, with only four threads 
+and moderately-sized locking sections, we may be able to lock four sections
+with only four locks, simultaneously, without any conflicts or overlap.
+
+However, at a certain point, N becomes big enough that threads cannot
+continue independently, and are caught waiting for one section to be freed
+before they can continue. This introduces costly waiting time. The situation
+worsens as N grows, and with 1 big lock covering the entire array,
+we lose also benefits of parallelism while also incurring the overhead
+associated with locking.
+
+Note that even though we know that the source and destination are no more
+than 10 elements apart, we cannot pick any small N that guarantees both
+elements will always be in the same lock section. The lock sections sizes 
+are fixed, as are their associated index boundaries, so it is always possible
+for a src element to be at the very end of one pre-defined lock section, while
+the dest is assigned to be near the begining of an adjacent lock section. We
+are not convinced that a number near 10 or 20, as examples, should pose any
+particular significance if the total number of elements in the counts array
+is much larger.
+
+From the graph, for this size problem, and this distance for the 
+correlated transfer case, we could choose N where the graph (green line)
+is at a minimum -- around 30 to 35 -- although any N within the range of 
+15-100 appears to outperform the version that uses fine-grained locking.
+
