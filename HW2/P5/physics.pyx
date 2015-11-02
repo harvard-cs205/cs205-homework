@@ -1,10 +1,11 @@
-#cython: boundscheck=False, wraparound=False
+#cython: boundscheck=True, wraparound=False
 
 cimport numpy as np
 from libc.math cimport sqrt
 from libc.stdint cimport uintptr_t
 cimport cython
 from omp_defs cimport omp_lock_t, get_N_locks, free_N_locks, acquire, release
+from cython.parallel import prange
 
 # Useful types
 ctypedef np.float32_t FLOAT
@@ -55,10 +56,11 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                      float R,
                      int i, int count,
                      UINT[:, ::1] Grid,
+                     int grid_size,
                      float grid_spacing) nogil:
     cdef:
         FLOAT *XY1, *XY2, *V1, *V2
-        int j, dim
+        int j, dim, grid_x, grid_y, x_val, y_val
         float eps = 1e-5
 
     # SUBPROBLEM 4: Add locking
@@ -69,22 +71,32 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     ############################################################
     # SUBPROBLEM 2: use the grid values to reduce the number of other
     # objects to check for collisions.
-    for j in range(i + 1, count):
-        XY2 = &(XY[j, 0])
-        V2 = &(V[j, 0])
-        if overlapping(XY1, XY2, R):
-            # SUBPROBLEM 4: Add locking
-            if not moving_apart(XY1, V1, XY2, V2):
-                collide(XY1, V1, XY2, V2)
 
-            # give a slight impulse to help separate them
-            for dim in range(2):
-                V2[dim] += eps * (XY2[dim] - XY1[dim])
+    grid_x = <int> (XY[i, 0]/grid_spacing)
+    grid_y = <int> (XY[i, 1]/grid_spacing)
+
+    for x_val in range(max(0, grid_x-1), min(grid_size, grid_x+2)):
+        for y_val in range(max(0, grid_y-1), min(grid_size, grid_y+2)):
+            j = Grid[x_val, y_val]
+            if j == -1:
+                continue
+    #for j in range(i + 1, count):
+            XY2 = &(XY[j, 0])
+            V2 = &(V[j, 0])
+            if overlapping(XY1, XY2, R):
+                # SUBPROBLEM 4: Add locking
+                if not moving_apart(XY1, V1, XY2, V2):
+                    collide(XY1, V1, XY2, V2)
+
+                # give a slight impulse to help separate them
+                for dim in range(2):
+                    V2[dim] += eps * (XY2[dim] - XY1[dim])
 
 cpdef update(FLOAT[:, ::1] XY,
              FLOAT[:, ::1] V,
              UINT[:, ::1] Grid,
              float R,
+             int grid_size,
              float grid_spacing,
              uintptr_t locks_ptr,
              float t):
@@ -103,7 +115,7 @@ cpdef update(FLOAT[:, ::1] XY,
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
-        for i in range(count):
+        for i in prange(count, schedule='static', num_threads=4, chunksize=125):
             for dim in range(2):
                 if (((XY[i, dim] < R) and (V[i, dim] < 0)) or
                     ((XY[i, dim] > 1.0 - R) and (V[i, dim] > 0))):
@@ -113,17 +125,23 @@ cpdef update(FLOAT[:, ::1] XY,
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
-        for i in range(count):
-            sub_update(XY, V, R, i, count, Grid, grid_spacing)
+        for i in prange(count, schedule='static', num_threads=4, chunksize=125):
+            sub_update(XY, V, R, i, count, Grid, grid_size, grid_spacing)
 
         # update positions
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads (with static
         #    scheduling).
         # SUBPROBLEM 2: update the grid values.
-        for i in range(count):
+        for i in prange(count, schedule='static', num_threads=4, chunksize=125):
+            if (<int> (XY[i, 0]/grid_spacing) < grid_size) and (<int> (XY[i, 1]/grid_spacing) < grid_size):
+                if (<int> (XY[i, 0]/grid_spacing) >= 0) and (<int> (XY[i, 1]/grid_spacing) >= 0):
+                    Grid[<int> (XY[i, 0]/grid_spacing), <int> (XY[i, 1]/grid_spacing)] = -1
             for dim in range(2):
                 XY[i, dim] += V[i, dim] * t
+            if (<int> (XY[i, 0]/grid_spacing) < grid_size) and (<int> (XY[i, 1]/grid_spacing) < grid_size):
+                if (<int> (XY[i, 0]/grid_spacing) >= 0) and (<int> (XY[i, 1]/grid_spacing) >= 0):
+                    Grid[<int> (XY[i, 0]/grid_spacing), <int> (XY[i, 1]/grid_spacing)] = i
 
 
 def preallocate_locks(num_locks):
