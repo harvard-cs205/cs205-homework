@@ -1,4 +1,4 @@
-#cython: boundscheck=True, wraparound=False
+#cython: boundscheck=False, wraparound=False
 
 cimport numpy as np
 from libc.math cimport sqrt
@@ -10,6 +10,51 @@ from omp_defs cimport omp_lock_t, get_N_locks, free_N_locks, acquire, release
 # Useful types
 ctypedef np.float32_t FLOAT
 ctypedef np.uint32_t UINT
+
+cpdef void get_sorted_order(FLOAT[:, ::1] XY,
+                            UINT[:] ordering_1d,
+                            UINT[:, :] ordering_2d,
+                            float grid_spacing):
+
+    cdef:
+        int i, x, y
+
+    for i in range(XY.shape[0]):
+        x = <int>(XY[i, 0] / grid_spacing)
+        y = <int>(XY[i, 1] / grid_spacing)
+        ordering_1d[i] = ordering_2d[x, y]
+
+# adapted from Wikipedia
+cpdef int xy2hilbert (int n, int x, int y):
+
+    cdef:
+        int rx, ry
+        int s = n/2
+        int d = 0
+
+    with nogil:
+        while s > 0:
+            rx = 1 if (x & s) > 0 else 0
+            ry = 1 if (y & s) > 0 else 0
+            d += s * s * ((3 * rx) ^ ry)
+            rot(s, &x, &y, rx, ry)
+            s /= 2
+
+        return d
+
+cdef inline void rot(int n, int *x, int *y, int rx, int ry) nogil:
+
+    cdef:
+        int t
+
+    if ry == 0:
+        if rx == 1:
+            x[0] = n - 1 - x[0]
+            y[0] = n - 1 - y[0]
+
+        t = x[0]
+        x[0] = y[0]
+        y[0] = t
 
 cdef inline int overlapping(FLOAT *x1,
                             FLOAT *x2,

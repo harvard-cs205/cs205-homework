@@ -9,9 +9,10 @@ import pyximport
 pyximport.install()
 
 import numpy as np
+import math
 from timer import Timer
 from animator import Animator
-from physics import update, preallocate_locks
+from physics import update, preallocate_locks, xy2hilbert, get_sorted_order
 
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
@@ -49,6 +50,15 @@ if __name__ == '__main__':
     grid[(positions[:, 0] / grid_spacing).astype(int),
          (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
 
+    # Set up Hilbert ordering for subproblem 3
+    # n is greatest power of 2 less than number of objects
+    n = 2 ** (math.frexp(num_balls)[1] - 1)
+    hilbert = np.zeros_like(grid, dtype=np.uint32)
+    for x in range(hilbert.shape[0]):
+        for y in range(hilbert.shape[1]):
+            hilbert[x, y] = xy2hilbert(n, x, y)
+    hilbert_1d = np.zeros(num_balls, dtype=np.uint32)
+
     # A matplotlib-based animator object
     animator = Animator(positions, radius * 2)
 
@@ -82,3 +92,7 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+            get_sorted_order(positions, hilbert_1d, hilbert, grid_spacing)
+            indices_sorted = np.argsort(hilbert_1d)
+            positions[:,:] = positions[indices_sorted]
+            velocities[:,:] = velocities[indices_sorted]
