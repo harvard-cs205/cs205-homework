@@ -8,6 +8,7 @@ import pyximport
 pyximport.install()
 
 import numpy as np
+import matplotlib.pyplot as plt 
 from timer import Timer
 from parallel_vector import move_data_serial, move_data_fine_grained, move_data_medium_grained
 
@@ -47,6 +48,17 @@ if __name__ == '__main__':
     assert counts.sum() == total, "Wrong total after move_data_medium_grained"
     print("Medium grained uncorrelated: {} seconds".format(t.interval))
 
+    uNvals = range(1, 100, 5)
+    uTimes = []
+    for testN in uNvals:
+        counts[:] = orig_counts
+        with Timer() as t:
+            move_data_medium_grained(counts, src, dest, 100, testN)
+        assert counts.sum() == total, "Wrong total after move_data_medium_grained"
+        print("Medium grained uncorrelated: {} seconds, {} granularity".format(t.interval, testN))
+        uTimes.append(t.interval)
+
+
     ########################################
     # Now use correlated data movement
     ########################################
@@ -80,3 +92,22 @@ if __name__ == '__main__':
         move_data_medium_grained(counts, src, dest, 100, N)
     assert counts.sum() == total, "Wrong total after move_data_medium_grained"
     print("Medium grained correlated: {} seconds".format(t.interval))
+
+    cNvals = range(1, 100, 5)
+    cTimes = []
+    for testN in cNvals:
+        counts[:] = orig_counts
+        with Timer() as t:
+            move_data_medium_grained(counts, src, dest, 100, testN)
+        assert counts.sum() == total, "Wrong total after move_data_medium_grained"
+        print("Medium grained correlated: {} seconds, {} granularity".format(t.interval, testN))
+        cTimes.append(t.interval)
+
+    
+    plt.plot(uNvals, uTimes, label='Uncorrelated')
+    plt.plot(cNvals, cTimes, label='Correlated')
+    plt.xlabel('Granularity (N)')
+    plt.ylabel('Time')
+    plt.title('Medium-Grained Performance on Correlated and Uncorrelated Data')
+    plt.legend()
+    plt.show()
