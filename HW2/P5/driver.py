@@ -13,6 +13,26 @@ from timer import Timer
 from animator import Animator
 from physics import update, preallocate_locks
 
+# convert x,y to d
+def xy2d (n, x, y):
+    d = 0
+    s = n/2
+    while s > 0:
+        rx = (x & s) > 0
+        ry = (y & s) > 0
+        d += s * s * ((3 * rx) ^ ry)
+        x, y = rot(s, x, y, rx, ry)
+        s /= 2
+    return d
+
+# rotate/flip a quadrant appropriately
+def rot(n, x, y, rx, ry):
+    if (ry == 0):
+        if (rx == 1):
+            x = n-1 - x;
+            y = n-1 - y;
+    return y, x
+
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
@@ -82,3 +102,18 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+
+            x = map(lambda b: xy2d(grid_size, int(b[0]), int(b[1])), positions)
+            res = np.argsort(x)
+            positions = positions[res]
+            velocities = velocities[res]
+
+            grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
+            x_positions = (positions[:,0]/grid_spacing).astype(int)
+            y_positions = (positions[:,1]/grid_spacing).astype(int)
+            z = x_positions[((x_positions < grid_size) & (x_positions >= 0)) & ((y_positions < grid_size) & (y_positions >= 0))]
+            q = y_positions[((x_positions < grid_size) & (x_positions >= 0)) & ((y_positions < grid_size) & (y_positions >= 0))]
+            grid[z, q] = np.arange(num_balls)[((x_positions < grid_size) & (x_positions >= 0)) & ((y_positions < grid_size) & (y_positions >= 0))]
+            # for i in range(len(res)):
+            #     # grid at this place should be res[i]
+            #     grid[positions[res[i]][0]/grid_spacing, positions[res[i]][1]/grid_spacing] = i

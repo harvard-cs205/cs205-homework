@@ -1,4 +1,4 @@
-#cython: boundscheck=True, wraparound=False
+#cython: boundscheck=False, wraparound=False
 
 cimport numpy as np
 from libc.math cimport sqrt
@@ -74,8 +74,8 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     #for j in range(i + 1, count):
     grid_x = <int> (XY[i, 0]/grid_spacing)
     grid_y = <int> (XY[i, 1]/grid_spacing)
-    for xv in range(max(grid_x - 1, 0), min(grid_x + 2, grid_size)):
-        for yv in range(max(grid_y - 1, 0), min(grid_y + 2, grid_size)):
+    for xv in range(max(grid_x - 2, 0), min(grid_x + 3, grid_size)):
+        for yv in range(max(grid_y - 2, 0), min(grid_y + 3, grid_size)):
             if xv == grid_x and yv == grid_y:
                 continue
             j = Grid[xv, yv]
