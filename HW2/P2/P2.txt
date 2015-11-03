@@ -1,67 +1,50 @@
-Serial uncorrelated: 1.3978099823 seconds
-Fine grained uncorrelated: 23.4495401382 seconds
-Medium grained uncorrelated: 20.8377358913 seconds
-Serial correlated: 1.40612101555 seconds
-Fine grained correlated: 21.9805998802 seconds
-('Medium grained correlated: 17.1212630272 seconds', 'and N equals', 1)
-('Medium grained correlated: 23.6402380466 seconds', 'and N equals', 2)
-('Medium grained correlated: 21.782763958 seconds', 'and N equals', 3)
-('Medium grained correlated: 15.6113879681 seconds', 'and N equals', 4)
-('Medium grained correlated: 16.3010950089 seconds', 'and N equals', 5)
-('Medium grained correlated: 15.8525359631 seconds', 'and N equals', 6)
-('Medium grained correlated: 17.2126090527 seconds', 'and N equals', 7)
-raphael@raphael-R530-R730:~/cs205-homework/HW2/P2$ python P2.py 
-Serial uncorrelated: 1.37605190277 seconds
-Fine grained uncorrelated: 15.1973400116 seconds
-Medium grained uncorrelated: 17.2168440819 seconds
-Serial correlated: 1.38616800308 seconds
-Fine grained correlated: 13.8636879921 seconds
-('Medium grained correlated: 14.6046910286 seconds', 'and N equals', 1)
-('Medium grained correlated: 14.9205751419 seconds', 'and N equals', 2)
-('Medium grained correlated: 14.6044008732 seconds', 'and N equals', 3)
-('Medium grained correlated: 14.6783998013 seconds', 'and N equals', 4)
-('Medium grained correlated: 14.8479850292 seconds', 'and N equals', 5)
-('Medium grained correlated: 15.7259669304 seconds', 'and N equals', 6)
-('Medium grained correlated: 15.1423490047 seconds', 'and N equals', 7)
-raphael@raphael-R530-R730:~/cs205-homework/HW2/P2$ python P2.py 
-Serial uncorrelated: 1.37210893631 seconds
-Fine grained uncorrelated: 15.616063118 seconds
-Medium grained uncorrelated: 17.8561718464 seconds
-Serial correlated: 1.38369107246 seconds
-Fine grained correlated: 13.8693950176 seconds
-('Medium grained correlated: 15.0296759605 seconds', 'and N equals', 1)
-('Medium grained correlated: 15.1476860046 seconds', 'and N equals', 2)
-('Medium grained correlated: 15.1564290524 seconds', 'and N equals', 3)
-('Medium grained correlated: 15.4559650421 seconds', 'and N equals', 4)
-('Medium grained correlated: 18.6031808853 seconds', 'and N equals', 5)
-('Medium grained correlated: 18.4789469242 seconds', 'and N equals', 6)
-('Medium grained correlated: 15.9199118614 seconds', 'and N equals', 7)
-raphael@raphael-R530-R730:~/cs205-homework/HW2/P2$ python P2.py 
-  File "P2.py", line 43
-    For N in range(1,8)
-        ^
-SyntaxError: invalid syntax
-raphael@raphael-R530-R730:~/cs205-homework/HW2/P2$ python P2.py 
-  File "P2.py", line 43
-    For N in range(1,8):
-        ^
-SyntaxError: invalid syntax
-raphael@raphael-R530-R730:~/cs205-homework/HW2/P2$ python P2.py 
-Serial uncorrelated: 1.3729159832 seconds
-Fine grained uncorrelated: 15.5920650959 seconds
-Medium grained uncorrelated: 16.8541400433 seconds
-Medium grained uncorrelated: 19.1883780956 seconds
-Medium grained uncorrelated: 19.6752450466 seconds
-Medium grained uncorrelated: 17.6672718525 seconds
-Medium grained uncorrelated: 17.2885680199 seconds
-Medium grained uncorrelated: 17.6060371399 seconds
-Medium grained uncorrelated: 17.5206530094 seconds
-Serial correlated: 1.39840197563 seconds
-Fine grained correlated: 13.7938058376 seconds
-('Medium grained correlated: 15.127188921 seconds', 'and N equals', 1)
-('Medium grained correlated: 15.2014710903 seconds', 'and N equals', 2)
-('Medium grained correlated: 15.026211977 seconds', 'and N equals', 3)
-('Medium grained correlated: 15.1734828949 seconds', 'and N equals', 4)
-('Medium grained correlated: 15.167320013 seconds', 'and N equals', 5)
-('Medium grained correlated: 15.3156177998 seconds', 'and N equals', 6)
-('Medium grained correlated: 15.5707240105 seconds', 'and N equals', 7)
+results:
+
+Serial uncorrelated: 1.37711310387 seconds
+Fine grained uncorrelated: 16.4383928776 seconds
+With 1 Locks
+Medium grained uncorrelated: 18.7048819065 seconds
+With 2 Locks
+Medium grained uncorrelated: 18.8978350163 seconds
+With 3 Locks
+Medium grained uncorrelated: 20.5507380962 seconds
+With 4 Locks
+Medium grained uncorrelated: 19.6806840897 seconds
+With 5 Locks
+Medium grained uncorrelated: 20.4388020039 seconds
+With 6 Locks
+Medium grained uncorrelated: 20.5176510811 seconds
+With 7 Locks
+Medium grained uncorrelated: 20.5591681004 seconds
+With 8 Locks
+Medium grained uncorrelated: 22.5128788948 seconds
+With 9 Locks
+Medium grained uncorrelated: 20.3078861237 seconds
+With 10 Locks
+Medium grained uncorrelated: 18.6069779396 seconds
+
+Serial correlated: 1.38409495354 seconds
+Fine grained correlated: 13.2513270378 seconds
+With 1 Locks
+Medium grained uncorrelated: 18.3142380714 seconds
+With 2 Locks
+Medium grained uncorrelated: 18.2287211418 seconds
+With 3 Locks
+Medium grained uncorrelated: 16.2336008549 seconds
+With 4 Locks
+Medium grained uncorrelated: 15.4366669655 seconds
+With 5 Locks
+Medium grained uncorrelated: 15.2175059319 seconds
+With 6 Locks
+Medium grained uncorrelated: 15.6373009682 seconds
+With 7 Locks
+Medium grained uncorrelated: 16.2506999969 seconds
+With 8 Locks
+Medium grained uncorrelated: 16.4075810909 seconds
+With 9 Locks
+Medium grained uncorrelated: 16.0944931507 seconds
+With 10 Locks
+Medium grained uncorrelated: 16.2846899033 seconds
+
+
+Discussion:

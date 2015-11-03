@@ -1,0 +1,19 @@
+results
+
+Synchronized
+With 1
+11.5626029968 seconds for 10 filter passes.
+With 2
+6.26903891563 seconds for 10 filter passes.
+With 4
+7.02819085121 seconds for 10 filter passes.
+
+Asynchronized (result from the python code extra.py)
+With 1
+9.98658490181 seconds for 10 filter passes.
+With 2
+8.23876690865 seconds for 10 filter passes.
+With 4
+7.04103112221 seconds for 10 filter passes.
+
+discussion

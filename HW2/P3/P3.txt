@@ -1,4 +1,18 @@
-36.908813 Million Complex FMAs in 0.561467170715 seconds, 65.7363687942 million Complex FMAs / second
-36.908813 Million Complex FMAs in 0.295363903046 seconds, 124.960472893 million Complex FMAs / second
-36.908813 Million Complex FMAs in 0.297781944275 seconds, 123.945772098 million Complex FMAs / second
-1059.236124 Million Complex FMAs in 1.58886909485 seconds, 666.660411128 million Complex FMAs / second
+results
+
+Without AVX with 1 thread(s)
+1074.652832 Million Complex FMAs in 16.3464031219 seconds, 65.7424648091 million Complex FMAs / second
+Without AVX with 2 thread(s)
+1074.652832 Million Complex FMAs in 11.316598177 seconds, 94.9625333688 million Complex FMAs / second
+Without AVX with 4 thread(s)
+1074.652832 Million Complex FMAs in 10.221462965 seconds, 105.136890451 million Complex FMAs / second
+
+With AVX with 1 thread(s)
+1059.236124 Million Complex FMAs in 3.0956158638 seconds, 342.172986121 million Complex FMAs / second
+With AVX with 2 thread(s)
+1059.236124 Million Complex FMAs in 1.60934400558 seconds, 658.178810947 million Complex FMAs / second
+With AVX with 4 thread(s)
+1059.236124 Million Complex FMAs in 1.93741607666 seconds, 546.726197207 million Complex FMAs / second
+
+
+discussion

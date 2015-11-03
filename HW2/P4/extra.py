@@ -22,16 +22,15 @@ def worker(tmpA, tmpB, iterations, threadidx, num_threads, events):
         if num_threads>1:
             # no wait at 1st iteration
             if i > 0 :
-                # if first line just wait for the next one
-                if threadidx == 0:
-                    events[threadidx+1][i-1].wait()
-                # if last line just wait for the one before
-                elif threadidx == num_threads-1:
-                    events[threadidx-1][i-1].wait()
-                # else wait for line before and after
-                else :
-                    events[threadidx+1][i-1].wait()
-                    events[threadidx-1][i-1].wait()
+                # the modulo is a neat way to wrap around
+                events[(threadidx+1)%num_threads].wait()
+                events[(threadidx-1)%num_threads].wait()
+                # this permits to avoid the link between event and iterations
+                # it should permit some asynchronous computation
+                events[threadidx].clear()
+            else:
+                #in the case of the first event
+                events[threadidx].clear()
 
         #have each thread work on every num_threads-th thread
         filtering.median_3x3(tmpA, tmpB, threadidx, num_threads)
@@ -39,14 +38,14 @@ def worker(tmpA, tmpB, iterations, threadidx, num_threads, events):
         tmpA, tmpB = tmpB, tmpA
         #awakes all the thread waiting for it
         if num_threads>1:
-            events[threadidx][i].set()
+            events[threadidx].set()
 
 def py_median_3x3(image, iterations=10, num_threads=1):
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
 
     #Initialize the events one event per (threadid, iteration step) tuple
-    events = [[threading.Event() for _ in range(iterations)] for _ in range(num_threads)]
+    events = [threading.Event()for _ in range(num_threads)]
 
     #Initialize create a list of threads
     thread_list=[]
@@ -91,9 +90,8 @@ if __name__ == '__main__':
     from_numpy = numpy_median(input_image, 2)
     assert np.all(from_cython == from_numpy)
 
-    print("Synchronized")
+    print("Asynchronized")
     for N in [1,2,4]:
-
         with Timer() as t:
             new_image = py_median_3x3(input_image, 10, 8)
 
@@ -101,5 +99,5 @@ if __name__ == '__main__':
         pylab.imshow(new_image[1200:1800, 3000:3500])
         pylab.title('after - zoom')
         print("With {} threads".format(N))
-        print("{} seconds for 10 filter passes.  ".format(t.interval))
+        print("{} seconds for 10 filter passes.".format(t.interval))
         pylab.show()
