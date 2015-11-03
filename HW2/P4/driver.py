@@ -38,6 +38,7 @@ def py_median_3x3(image, iterations=10, num_threads=1):
             # swap direction of filtering
             tmpA, tmpB = tmpB, tmpA
     else:
+        # initialize the threads
         for tid in range(num_threads):
             t = threading.Thread(target=filterHelper, 
                                  args=(iterations, tid, num_threads, tmpA, tmpB, events))
@@ -48,7 +49,7 @@ def py_median_3x3(image, iterations=10, num_threads=1):
     return tmpA
 
 def filterHelper(iterations, tid, num_threads, tmpA, tmpB, events):
-
+    ''' Function that coordinates the filtering on each line of pixels'''
     # The first iteration only sets events, no more waiting
     filtering.median_3x3(tmpA, tmpB, tid, num_threads)
     # swap direction of filtering

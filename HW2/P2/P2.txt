@@ -1,6 +1,8 @@
+(Plot: plot.png)
+
 To evaluate the performance of coarse, medium and fine grained computation time, I ran 3 simulations and took the average. The performance is plotted in 'plot.png'. For medium grained, I ran N values ranging [2,4,6,8,10,12,14].
 
-Comparing the three expriments, serial (coarse grained) yields the best performance, possibly due to its low overhead. Fine grained is better than medium grained when data is uncorrelated, due to the high concurrency. For correlated medium grained, the larger N gives lower time, at N=14, it is even smaller than the fine uncorrelated data. This is probabily because of the small optimization I implemented within the lock acquire and release. In this experiment, I would choose a number N=14 (largest).
+Comparing the three expriments, serial (coarse grained) yields the best performance, possibly due to its low overhead and lack of locking and unlocking. Fine grained is better than medium grained when data is uncorrelated, due to the high concurrency. For correlated medium grained, the larger N gives lower time, at N=14, it is even smaller than the fine uncorrelated data. This is probabily because of the small optimization I implemented within the lock acquire and release. In this experiment, I would choose a number N=14 (largest).
 
 
 

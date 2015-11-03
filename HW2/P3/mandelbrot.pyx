@@ -31,9 +31,10 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     img = numpy.imag(in_coords)
 
     with nogil:
-        for i in prange(height, schedule='static', chunksize=1, num_threads=8):
+        for i in prange(height, schedule='static', chunksize=1, num_threads=1):
             for j in range(width/8):
 
+                # segmenting the values into AVX data structure, real and imaginary parts seperately.
                 z_r = AVX.float_to_float8(0.0)
                 z_i = AVX.float_to_float8(0.0)
                 c_r = AVX.make_float8(real[i, j*8],
@@ -52,15 +53,20 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                                           img[i, j*8+5],
                                           img[i, j*8+6],
                                           img[i, j*8+7])
+
+                # initialize counter (intensity) and criteria
                 counter_avx = AVX.float_to_float8(0)
                 criteria_avx = AVX.float_to_float8(4)
 
+                # Do Mandelbrot fractal...
                 for iter in range(max_iterations):
 
                     real_part = AVX.add(AVX.sub(AVX.mul(z_r, z_r), AVX.mul(z_i, z_i)), c_r)
                     img_part = AVX.add(AVX.mul(AVX.mul(z_r, z_i), AVX.float_to_float8(2)), c_i)
                     mask_avx = AVX.less_than(AVX.add(AVX.mul(real_part, real_part), AVX.mul(img_part, img_part)), 
                                             AVX.float_to_float8(4))
+
+                    # Break out if all units in the avx are done calculation
                     if AVX.signs(mask_avx)==0:
                         break
                     increment_avx = AVX.bitwise_and(mask_avx, AVX.float_to_float8(1))
@@ -68,42 +74,6 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                     z_r = real_part
                     z_i = img_part
                 AVX.to_mem(counter_avx, &(out_counts[i, j*8]))
-
-
-
-
-
-
-cpdef mandelbrot_origin(np.complex64_t [:, :] in_coords,
-                 np.uint32_t [:, :] out_counts,
-                 int max_iterations=511):
-    cdef:
-       int i, j, iter
-       np.complex64_t c, z
-
-       # To declare AVX.float8 variables, use:
-       # cdef:
-       #     AVX.float8 v1, v2, v3
-       #
-       # And then, for example, to multiply them
-       #     v3 = AVX.mul(v1, v2)
-       #
-       # You may find the numpy.real() and numpy.imag() fuctions helpful.
-
-    assert in_coords.shape[1] % 8 == 0, "Input array must have 8N columns"
-    assert in_coords.shape[0] == out_counts.shape[0], "Input and output arrays must be the same size"
-    assert in_coords.shape[1] == out_counts.shape[1],  "Input and output arrays must be the same size"
-
-    with nogil:
-        for i in range(in_coords.shape[0]):
-            for j in range(in_coords.shape[1]):
-                c = in_coords[i, j]
-                z = 0
-                for iter in range(max_iterations):
-                    if magnitude_squared(z) > 4:
-                        break
-                    z = z * z + c
-                out_counts[i, j] = iter
 
 
 

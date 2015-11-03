@@ -9,9 +9,9 @@
 16 15 14 13...
 Then I googled and found a better weighting scheme - zorder curve, which is more balanced and efficient, but I think complexity is slightly higher than my scheme. The position list is then sorted according to the weights assigned.
 
-4) After adding locks, the performance decreased from 360 to around 320 simulations per second. Locking is necessary to prevent updating simutaneously. These safety checks impede performance by acquiring the locks and wait for potential collisions to pass and then release them, and they are essential for the sounding physical movement of the colliding balls system.
+4) After adding locks, the performance decreased from 360 to around 320 simulations per second. Locking is necessary to prevent updating simutaneously. These safety checks impede performance by acquiring the locks and wait for potential collisions to pass and then release them, and they are essential for the sound physical movement of the colliding balls system.
 
-
+Through this problem I learned to use several ways to improve the performance of simple ball collision physics simulation: multithreading, decomposition and algorithm. The speed enhancement is significant. It also makes me think sometimes it would be better to first stop and think about the problem itself: is there any way to optimize the problem itself, rather than justing parallelizing it. It'll often surprise us how good this can perform with some simple optimization like the space decomposition we have in this problem.
 
 
 ---------------------------

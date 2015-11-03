@@ -1,17 +1,25 @@
-As shown below, the performance of implementing AVX yields much better time efficiency. And the more threads, the faster. The rate of speed increase, however is decreasing.
+As shown below, the performance of implementing AVX yields much better time efficiency. And the more threads, the faster.
+1) nonAVX -> AVX_1: 706%
+2) AVX_1 -> AVX_2: 208%
+3) AVX_2 -> AVX_4: 142%
+4) AVX_4 -> AVX_8: 110%
+The increase rate, however, is decreasing. 1) is implementing the SIMD idea and I got a 7x speed increase, close to the AVX block of 8 floats. Putting more threads in, 2) is having 2 threads instead of 1, the performance enhanced by factor of 2, close to the thread number ratio. However, when using 4 threads, it has only 42% performance increase and 8 threads has only a marginal 10% increase.
 
 
 Cases:
 1. With no AVX:
 1074.656613 Million Complex FMAs in 6.03112888336 seconds, 178.184985561 million Complex FMAs / second
 
-2. With AVX, 2 threads:
+2. With AVX, 1 thread:
+1059.218048 Million Complex FMAs in 0.842652797699 seconds, 1257.00413135 million Complex FMAs / second
+
+3. With AVX, 2 threads:
 1059.218048 Million Complex FMAs in 0.404404163361 seconds, 2619.2065858 million Complex FMAs / second
 
-3. With AVX, 4 threads:
+4. With AVX, 4 threads:
 1059.218048 Million Complex FMAs in 0.285069942474 seconds, 3715.64269037 million Complex FMAs / second
 
-4. With AVX, 2 threads:
+5. With AVX, 8 threads:
 1059.218048 Million Complex FMAs in 0.259290933609 seconds, 4085.0562465 million Complex FMAs / second
 
 A smaller number in FMAs is probably due to the boundary condition whether or not the counting includes 4.
