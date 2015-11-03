@@ -1,0 +1,7 @@
+The speed outputs were as follows:
+4.03133296967 seconds for 10 filter passes. number of threads 1
+2.04656791687 seconds for 10 filter passes. number of threads 2
+1.16630196571 seconds for 10 filter passes. number of threads 4
+It is interesting that the speedup is almost optimal in the number of threads. This suggests that the majority of runtime comes in the cython level median calculating function. Because that operation gives up the GIL, python multi threads can truly run in parallel.
+
+I chose to use events in this problem, which I believe is the right choice. Eeach thread has to wait on the next and previous threads to finish iteration i - 1, which is represented by waiting for an event. Every time a thread finishes a computation it sets the event which starts those threads waiting on it. It would have been possible to use a lock for every thread on every iteration. However this wouldn't achieve optimal concurrency because suppose thread 5 iteration 2 gives up it's lock, threads 6 iteration 3 and threads 4 iteration 3 could both go (ignoring waiting for other threads), but only one can acquire the lock. Semaphores replacing locks in this type of use case wouldn't ensure the threads were waiting properly. 
