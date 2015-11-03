@@ -12,6 +12,7 @@ from timer import Timer
 from parallel_vector import move_data_serial, move_data_fine_grained, move_data_medium_grained
 
 if __name__ == '__main__':
+    threads = 6
     ########################################
     # Generate some test data, first, uncorrelated
     ########################################
@@ -36,7 +37,7 @@ if __name__ == '__main__':
     counts[:] = orig_counts
 
     with Timer() as t:
-        move_data_fine_grained(counts, src, dest, 100)
+        move_data_fine_grained(counts, src, dest, 100, threads)
     assert counts.sum() == total, "Wrong total after move_data_fine_grained"
     print("Fine grained uncorrelated: {} seconds".format(t.interval))
 
@@ -47,7 +48,7 @@ if __name__ == '__main__':
     N = 10
     counts[:] = orig_counts
     with Timer() as t:
-        move_data_medium_grained(counts, src, dest, 100, N)
+        move_data_medium_grained(counts, src, dest, 100, N, threads)
     assert counts.sum() == total, "Wrong total after move_data_medium_grained"
     print("Medium grained uncorrelated: {} seconds".format(t.interval))
 
@@ -70,7 +71,7 @@ if __name__ == '__main__':
     # fine grained
     counts[:] = orig_counts
     with Timer() as t:
-        move_data_fine_grained(counts, src, dest, 100)
+        move_data_fine_grained(counts, src, dest, 100, threads)
     assert counts.sum() == total, "Wrong total after move_data_fine_grained"
     print("Fine grained correlated: {} seconds".format(t.interval))
 
@@ -81,6 +82,6 @@ if __name__ == '__main__':
     N = 10
     counts[:] = orig_counts
     with Timer() as t:
-        move_data_medium_grained(counts, src, dest, 100, N)
+        move_data_medium_grained(counts, src, dest, 100, N, threads)
     assert counts.sum() == total, "Wrong total after move_data_medium_grained"
     print("Medium grained correlated: {} seconds".format(t.interval))
