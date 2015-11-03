@@ -22,5 +22,5 @@ For 4 threads:
 
 3. Conclusion: 
 1) With instruction-level parallelism, the process is almost 9 times faster than that without instruction-level parallelism.
-2) In each case, When the number of thread increases from 1 to 2, the speed improves a lot. When the number of thread increases from 2 to 4, the improvement of speed is relatively small. The reason behind it remains further consideration.
+2) In each case, When the number of thread increases from 1 to 2, the speed improves a lot. When the number of thread increases from 2 to 4, the improvement of speed is relatively small. The reason behind it remains further consideration. It may lie in that there is some overhead in communications between multiple threads. When the number of threads increases, costs in communicating increase as well, leading to the improvement of speed is not that obvious.
 
