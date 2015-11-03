@@ -64,7 +64,7 @@ cdef void sub_update(FLOAT[:, ::1] XY,
         float eps = 1e-5
 
     # SUBPROBLEM 4: Add locking
-    #acquire(&locks[i])
+    acquire(&locks[i])
     XY1 = &(XY[i, 0])
     V1 = &(V[i, 0])
     #############################################################
@@ -86,7 +86,7 @@ cdef void sub_update(FLOAT[:, ::1] XY,
             # The j < i deals with deadlock since we only need to compare one direction.
             if j == -1 or j < i:
                 continue
-            #acquire(&locks[j])
+            acquire(&locks[j])
             XY2 = &(XY[j, 0])
             V2 = &(V[j, 0])
             if overlapping(XY1, XY2, R):
@@ -95,8 +95,8 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                 # give a slight impulse to help separate them
                 for dim in range(2):
                     V2[dim] += eps * (XY2[dim] - XY1[dim])
-            #release(&locks[j])
-    #release(&locks[i])
+            release(&locks[j])
+    release(&locks[i])
 
 
 cpdef update(FLOAT[:, ::1] XY,

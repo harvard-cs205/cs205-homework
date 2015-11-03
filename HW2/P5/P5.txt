@@ -1,17 +1,91 @@
 
+-------------------------------------------------------------
+
+Subproblem 1:
+4 threads:
+17.3175227085 simulation frames per second
+15.6057834696 simulation frames per second
+15.65068005 simulation frames per second
+16.4654913184 simulation frames per second
+17.1868121061 simulation frames per second
+17.0526504094 simulation frames per second
+16.9230247815 simulation frames per second
+16.6867072996 simulation frames per second
+15.6281703995 simulation frames per second
+16.490803721 simulation frames per second
+16.6800049313 simulation frames per second
+16.074071803 simulation frames per second
+16.6666825613 simulation frames per second
+16.7051167163 simulation frames per second
+15.6047383773 simulation frames per second
+16.4687238646 simulation frames per second
+16.4595467478 simulation frames per second
 
 
-Nongridded on MBA. I was getting around 800 frames per second. After doing the gridding, I got 2000 per second.
+
+1 Threads:
+9.23387711071 simulation frames per second
+8.17201686501 simulation frames per second
+8.99993777318 simulation frames per second
+8.32890639893 simulation frames per second
+8.80235383989 simulation frames per second
+9.02999013964 simulation frames per second
+8.39786244441 simulation frames per second
+9.65799720459 simulation frames per second
+9.02894045723 simulation frames per second
+8.0151347798 simulation frames per second
+8.92323468278 simulation frames per second
+9.33411668358 simulation frames per second
+9.39893737409 simulation frames per second
+8.29896260593 simulation frames per second
+
+
+Subproblem 2:
+ 
+We see a massive speed up with gridding! Compare these results to the ones above.
+
+
+4 Threads with Gridding
+557.008784802 simulation frames per second
+602.646377843 simulation frames per second
+593.316688475 simulation frames per second
+602.209623826 simulation frames per second
+462.32610373 simulation frames per second
+560.578804002 simulation frames per second
+442.804577638 simulation frames per second
+541.152740335 simulation frames per second
+599.199125696 simulation frames per second
+454.310054429 simulation frames per second
+537.95351356 simulation frames per second
+447.468794674 simulation frames per second
+369.845498511 simulation frames per second
+345.103146222 simulation frames per second
+502.591565577 simulation frames per second
+595.401235006 simulation frames per second
 
 
 
-
+1 Threads with Gridding
+296.601702826 simulation frames per second
+356.795032113 simulation frames per second
+320.369485376 simulation frames per second
+325.826399531 simulation frames per second
+333.970207091 simulation frames per second
+353.209504695 simulation frames per second
+248.998931413 simulation frames per second
+298.776358138 simulation frames per second
+305.983022071 simulation frames per second
+330.724560735 simulation frames per second
+296.120077378 simulation frames per second
+347.186645513 simulation frames per second
+315.163731997 simulation frames per second
+294.256589425 simulation frames per second
+292.896278657 simulation frames per second
+292.974022618 simulation frames per second
 
 -------------------------------------------------------------------
 
 Subproblem 3:
-
-I see around a 10% improvement when using one thread by doing the spatial coherence. I am using the Hilbert curve ordering. In particular, I see a jump on my MBA from around 8000/per second to around 9000 per second. I see very little if any benefit when using multiple threads.
 
 
 With 1 threads, we can see that there is a pretty substantial jump in performance by having special coherence.
