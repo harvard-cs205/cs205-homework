@@ -23,7 +23,7 @@ cdef void counts_to_output(AVX.float8 counts, np.uint32_t [:, :] out_counts, int
     int index
   AVX.to_mem(counts, &tmp_counts[0])
   for index in range(8):
-    out_counts[i][j*8 + index] = <int> tmp_counts[index]
+    out_counts[i][j*8 + index] = <int> tmp_counts[7-index]
 
 
 @cython.boundscheck(False)
@@ -55,7 +55,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
 
     # Define a bunch of 
     cdef:
-      AVX.float8 c_real, c_imag, z_real, z_imag, iter_count, ones, over_four, temp_real, temp_imag, mag, four, zero
+      AVX.float8 c_real, c_imag, z_real, z_imag, iter_count, ones, under_four, temp_real, temp_imag, mag, four, zero
     with nogil:
         for i in prange(in_coords.shape[0], num_threads=4, schedule='static', chunksize=1):
             for j in range(in_coords.shape[1]/8):
@@ -102,16 +102,20 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                 iter_count = AVX.float_to_float8(0.)
 
                 # 8 bits to store which data is still under 4 magnitude
-                over_four = AVX.float_to_float8(0.)
+                under_four = AVX.float_to_float8(-1)
 
                 for iter in range(max_iterations):
-
+                    #with gil:
+                      # print_AVX(under_four)
+                      # print "Now for the signs"
+                      # print AVX.signs(under_four)
+                      # raw_input()
                     # If all our values are greater than four then break
-                    if AVX.signs(over_four) == 255:
+                    if AVX.signs(under_four) == 0:
                       break
 
                     # Increment the iteration count only for those that are under four
-                    iter_count = AVX.add(iter_count, AVX.bitwise_andnot(over_four, ones))
+                    iter_count = AVX.add(iter_count, AVX.bitwise_and(under_four, ones))
 
                     # Store values for z^2
                     temp_real = AVX.sub(
@@ -139,7 +143,11 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                     # with gil:
                     #   print "Here"
                     #   print_AVX(over_four)
-                    over_four = AVX.less_than(four, mag)
+                    under_four = AVX.less_than(mag, four)
+                    
+                    # with gil:
+                    #   print_AVX(under_four)
+                    #   raw_input()
                     # with gil:
                     #   print "Magnitude!"
                     #   print_AVX(mag)
@@ -151,7 +159,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                     #    break
                     #z = z * z + c
                 #out_counts[i, j] = iter
-                    counts_to_output(iter_count, out_counts, i, j)
+                counts_to_output(iter_count, out_counts, i, j)
 
 
 

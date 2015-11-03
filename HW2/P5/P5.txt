@@ -1,0 +1,7 @@
+When running with 1 thread, there were between 8-10 SFPS, and with 4 threads there were 16-20 SFPS. This is a roughly 2x increase, which is less than what we would expect. Obviously there isn't always pure concurrency, since certain resources, like the grid, are written to simultaneously.
+
+Spatial Decomposition:
+Running 1 thread gives around 950 SFPS, 4 threads gave around 2300-2600 SFPS. Again you can see a roughly 2x increase which shows that the overhead factors are roughly the same. This dramatic increase in performance from the O(n^2) to the O(n) is largely due to the large n value (10,000) of this problem. The greater the n value, the bigger a difference asymptotic complexity makes. 
+
+Spatially Coherent Sorting:
+Using the Z-order sorting of two dimensional data gave around 1100 SFPS for 1 thread, and 2800-3500 SFPS for 4 threads. This is a fairly noticeable improvement from before. It's not orders of magnitude better, but consistently faster for all thread values. 

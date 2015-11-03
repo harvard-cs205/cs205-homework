@@ -16,9 +16,24 @@ from physics import update, preallocate_locks
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
+# The following two functions are copied exactly from https://en.wikipedia.org/wiki/Z-order_curve
+def less_msb(x, y):
+    return x < y and x < (x ^ y)
+
+def cmp_zorder(a, b):
+    j = 0
+    k = 0
+    x = 0
+    for k in range(2):
+        y = a[k] ^ b[k]
+        if less_msb(x, y):
+            j = k
+            x = y
+    return a[j] - b[j]
+
 if __name__ == '__main__':
-    num_balls = 10000
-    radius = 0.002
+    num_balls = 10
+    radius = 0.05
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -64,7 +79,7 @@ if __name__ == '__main__':
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
-                   radius, grid_size, locks_ptr,
+                   radius, grid_spacing, locks_ptr,
                    physics_step)
 
         # udpate our estimate of how fast the simulator runs
@@ -80,3 +95,24 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+
+            # Replace the positions array with an int converted list of grid values
+            grid_array = []
+            for i in range(len(positions)):
+                grid_array.append((int(positions[i][0]/grid_spacing), int(positions[i][1]/grid_spacing)))
+            z_values =[]
+            for index in range(len(grid_array)):
+                z_values.append((index, grid_array[index]))
+            z_values.sort(cmp_zorder, key=lambda x: x[1])
+            z_values = [x[0] for x in z_values]
+
+            positions = np.array(positions)[z_values]
+            velocities = np.array(velocities)[z_values]
+
+            # Reset the grid
+            grid[:, :] = -1
+            for index in range(len(positions)):
+                if 0 <= positions[index, 0] <= 1 and 0 <= positions[index, 1] <= 1:
+                    grid[int(positions[index, 0]/grid_spacing), 
+                         int(positions[index, 1]/grid_spacing)] = index
+
