@@ -12,3 +12,5 @@
 Doubling the number of threads from 1 to 2, more than halves the runtime.  Doubling the thread count from 2 to 4 almost halves the run time, but not quite.  As we increase the number of threads beyond 4, we see that the speed up becomes smaller and smaller.  Clearly it is hitting some other limit.
 
 I chose to use threading.Event() objects to control cooperation amongst the threads.  An indpendent event exists for each iteration-thread id combination.  Threads then wait on the events of their neighboring threads (wrapping around for first and last threads) for the same iteration to ensure that all filtering computation is ready for the thread for the next iteration.
+
+All threads may begin an iteration of filtering asynchronously as long as their neighboring threads for the previous iteration are complete.

@@ -19,16 +19,18 @@ def randcolor():
 if __name__ == '__main__':
     num_balls = 10000
     radius = 0.002
+    #num_balls = 500
+    #radius = .01
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
-    # make a hole in the center
+    # Make a hole in the center
     while True:
         distance_from_center = np.sqrt(((positions - 0.5) ** 2).sum(axis=1))
         mask = (distance_from_center < 0.25)
         num_close_to_center = mask.sum()
         if num_close_to_center == 0:
-            # everything is out of the center
+            # Everything is out of the center
             break
         positions[mask, :] = np.random.uniform(0 + radius, 1 - radius,
                                                (num_close_to_center, 2)).astype(np.float32)
@@ -65,7 +67,7 @@ if __name__ == '__main__':
         with Timer() as t:
             update(positions, velocities, grid,
                    radius, grid_size, locks_ptr,
-                   physics_step)
+                   physics_step, grid_spacing)
 
         # udpate our estimate of how fast the simulator runs
         physics_step = 0.9 * physics_step + 0.1 * t.interval
