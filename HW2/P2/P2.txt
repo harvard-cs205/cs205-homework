@@ -1,0 +1,78 @@
+##Before Any Updates (Baseline): ##
+
+Serial uncorrelated: 0.285079956055 seconds
+Fine grained uncorrelated: 0.328075885773 seconds
+Medium grained uncorrelated: 0.286208152771 seconds
+Serial correlated: 0.300370931625 seconds
+Fine grained correlated: 0.301996946335 seconds
+Medium grained correlated: 0.292552947998 seconds
+
+All above are essentially just serial code so unsurprising. The below times are with
+the corrected code. 
+
+##Parallelized and Locking With N = 10##
+
+Serial uncorrelated: 0.293849945068 seconds
+Fine grained uncorrelated: 5.90428090096 seconds
+Medium grained uncorrelated: 7.8376288414 seconds
+Serial correlated: 0.352483987808 seconds
+Fine grained correlated: 5.50264406204 seconds
+Medium grained correlated: 6.22283005714 seconds
+
+
+########## Analysis ###########
+
+It seems clear that objectively parallelizing is a poor idea in this instance since the overhead of having to acquire
+and release the locks seems to add a significant amount of time to our overall computation that makes it less efficient than
+the serial methods. In addition, the fine grained correlation performs better than the medium grained correlation in the instances by a fair margin perhaps because there are far fewer checks/if statements to execute (which can be very slow) in the fine grained case than there are in the medium-grained case. However, it is clear that medium grained does better on the correlated data sets than the uncorrelated data sets, which is in line with what we would expect. 
+
+I included histograms with this that show test results of how well we do in the medium grained case for values of N ranging from 2 to 28. It seems somewhat clear that the value for n does not matter as much for the uncorrelated case as it does in the correlated case, where values that are larger seem for N seem to work better. Specifically, N=22 seemed to be the value that optimized the amount of time in the Medium Grained Correlated case (you can see the raw data outputs below). For this reason, I would go ahead and say that N=20 is rougly a good choice for the medium-grained locking in both cases because it seems to work fairly well for the uncorrelated case, and also very well for the correlated case, perhaps because it is twice as big as the largest cap between source and destination elements (they are no more than 10 away). 
+
+
+###############################
+
+###Raw Data for Trials of N between 2 and 28 ###
+
+Serial uncorrelated: 0.291720867157 seconds
+Fine grained uncorrelated: 5.75429701805 seconds
+Medium grained uncorrelated for n=2: 7.56214308739 seconds
+Medium grained uncorrelated for n=4: 7.61707496643 seconds
+Medium grained uncorrelated for n=6: 7.67224287987 seconds
+Medium grained uncorrelated for n=8: 7.81411004066 seconds
+Medium grained uncorrelated for n=10: 7.6433339119 seconds
+Medium grained uncorrelated for n=12: 8.20277500153 seconds
+Medium grained uncorrelated for n=14: 10.2133159637 seconds
+Medium grained uncorrelated for n=16: 8.87466907501 seconds
+Medium grained uncorrelated for n=18: 8.3653129946 seconds
+Medium grained uncorrelated for n=20: 11.8634569645 seconds
+Medium grained uncorrelated for n=22: 8.18745493889 seconds
+Medium grained uncorrelated for n=24: 7.9994430542 seconds
+Medium grained uncorrelated for n=26: 8.15040802956 seconds
+Medium grained uncorrelated for n=28: 8.18677902222 seconds
+
+Serial correlated: 0.368692874908 seconds
+Fine grained correlated: 5.52311491966 seconds
+
+Medium grained correlated for n=2: 8.49938106537 seconds
+Medium grained correlated for n=4: 9.38237500191 seconds
+Medium grained correlated for n=6: 7.32173204422 seconds
+Medium grained correlated for n=8: 11.061825037 seconds
+Medium grained correlated for n=10: 10.0329499245 seconds
+Medium grained correlated for n=12: 5.85792803764 seconds
+Medium grained correlated for n=14: 5.8533718586 seconds
+Medium grained correlated for n=16: 8.37228012085 seconds
+Medium grained correlated for n=18: 7.4004471302 seconds
+Medium grained correlated for n=20: 5.7628660202 seconds
+Medium grained correlated for n=22: 5.20934510231 seconds
+Medium grained correlated for n=24: 5.2555038929 seconds
+Medium grained correlated for n=26: 5.2189950943 seconds
+Medium grained correlated for n=28: 5.47047805786 seconds
+
+
+## I generated the Histograms from the following two dictionaries: ##
+
+the uncorrelated dictionary is : 
+{2: 7.562143087387085, 4: 7.617074966430664, 6: 7.672242879867554, 8: 7.814110040664673, 10: 7.643333911895752, 12: 8.202775001525879, 14: 10.213315963745117, 16: 8.874669075012207, 18: 8.365312099456787, 20: 11.863456964492798, 22: 8.18745493888855, 24: 7.999443054199219, 26: 8.150408029556274, 28: 8.186779022216797}
+
+the correlated dictionary is : 
+{2: 8.499381065368652, 4: 9.382375001907349, 6: 7.321732044219971, 8: 11.061825037002563, 10: 10.032949924468994, 12: 5.857928037643433, 14: 5.853371858596802, 16: 8.37228012084961, 18: 7.400447130203247, 20: 5.762866020202637, 22: 5.209345102310181, 24: 5.25550389289856, 26: 5.218995094299316, 28: 5.470478057861328}
