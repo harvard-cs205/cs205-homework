@@ -15,15 +15,43 @@ import filtering
 from timer import Timer
 import threading
 
+
+def median_slice(tmpA, tmpB, i, iterations, semaphores):
+    for _iter in range(iterations):
+        #  number of threads = number of semaphore sets
+        n_slices = len(semaphores)
+
+        #  offset = current thread index
+        start_row = i
+
+        #  acquire semaphores from adjacent slices
+        semaphores[i-1][1].acquire()
+        semaphores[(i+1) % n_slices][0].acquire()
+
+        filtering.median_3x3(tmpA, tmpB, start_row, n_slices)
+
+        tmpA, tmpB = tmpB, tmpA
+
+        #  release semaphores to adjacent slices
+        semaphores[i][0].release()
+        semaphores[i][1].release()
+
 def py_median_3x3(image, iterations=10, num_threads=1):
     ''' repeatedly filter with a 3x3 median '''
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
 
-    for i in range(iterations):
-        filtering.median_3x3(tmpA, tmpB, 0, 1)
-        # swap direction of filtering
-        tmpA, tmpB = tmpB, tmpA
+    semaphores = [(threading.Semaphore(), threading.Semaphore()) for t in range(num_threads)]
+    threads = [
+        threading.Thread(target=median_slice, args=(tmpA, tmpB, i, iterations, semaphores))
+        for i in range(num_threads)
+    ]
+
+    for t in threads:
+        t.start()
+
+    for t in threads:
+        t.join()
 
     return tmpA
 
@@ -56,12 +84,14 @@ if __name__ == '__main__':
     from_numpy = numpy_median(input_image, 2)
     assert np.all(from_cython == from_numpy)
 
-    with Timer() as t:
-        new_image = py_median_3x3(input_image, 10, 8)
+    thread_counts = [1, 2, 4, 6, 8, 16, 32, 64]
+    for n_threads in thread_counts:
+        with Timer() as t:
+            new_image = py_median_3x3(input_image, 10, n_threads)
+        print("{} seconds for 10 filter passes with {} threads.".format(t.interval, n_threads))
 
-    pylab.figure()
-    pylab.imshow(new_image[1200:1800, 3000:3500])
-    pylab.title('after - zoom')
+    # pylab.figure()
+    # pylab.imshow(new_image[1200:1800, 3000:3500])
+    # pylab.title('after - zoom')
 
-    print("{} seconds for 10 filter passes.".format(t.interval))
-    pylab.show()
+    # pylab.show()

@@ -22,8 +22,7 @@ if __name__ == '__main__':
 
     total = orig_counts.sum()
 
-    N_values = [2, 5, 10, 50, 100, 1000]
-    N_values = [2, 5]
+    N_values = [2, 5, 10, 50, 100, 500, 1000]
 
     # serial move
     counts = orig_counts.copy()
@@ -95,8 +94,9 @@ if __name__ == '__main__':
         coarse_correlated[N] = t.interval
 
     # display results
-    values = [serial_correlated, fine_grained_correlated] + coarse_correlated.values()
-    labels = ['Serial', 'Fine Grained'] + ['Coarse (N=%d)' % n for n in coarse_correlated.keys()]
+    keys, values = zip(*sorted(coarse_correlated.items(), key = lambda x: x[0]))
+    values = [serial_correlated, fine_grained_correlated] + list(values)
+    labels = ['Serial', 'Fine Grained'] + ['N=%d' % n for n in keys]
     positions = np.arange(len(values))
     plt.bar(positions, values, align='center')
     plt.xticks(positions, labels)
@@ -104,8 +104,9 @@ if __name__ == '__main__':
     plt.title('Correlated Data Movement Times')
     plt.show()
 
-    values = [serial_uncorrelated, fine_grained_uncorrelated] + coarse_uncorrelated.values()
-    labels = ['Serial', 'Fine Grained'] + ['Coarse (N=%d)' % n for n in coarse_uncorrelated.keys()]
+    keys, values = zip(*sorted(coarse_uncorrelated.items(), key = lambda x: x[0]))
+    values = [serial_uncorrelated, fine_grained_uncorrelated] + list(values)
+    labels = ['Serial', 'Fine Grained'] + ['N=%d' % n for n in keys]
     positions = np.arange(len(values))
     plt.bar(positions, values, align='center')
     plt.xticks(positions, labels)

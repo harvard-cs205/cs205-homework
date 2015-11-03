@@ -1,0 +1,27 @@
+The serial approach performed much better than the parallel approach in both cases. This makes sense because the overhead of using the locks takes more time than simply moving the data.
+
+In the uncorrelated case the fine-grained locks performed better than any of coarse grained ones. In other words, no matter how few pieces of data were assigned to a lock, having less locks always reduced performance. This is a reasonable result because having more data per lock (a higher N) leads to more blocking. With uncorrelated data it makes sense to make N as small as possible (1)
+
+However, in the correlated case, the coarse-grained strategy can outperform the fine-grained. This is most liekly the result of many of the transactions only needing one lock (due to the correlation). When a transaction only needs one lock, there is less overhead but the chance of blocking does not substantially increase. The empirical results show that it's ideal to have ~20 pieces of data for each lock (N=20). 
+
+Full results: 
+
+Serial uncorrelated: 0.301871061325 seconds
+Fine grained uncorrelated: 5.13503217697 seconds
+Medium grained uncorrelated (N=2): 6.20680999756 seconds
+Medium grained uncorrelated (N=5): 6.23391604424 seconds
+Medium grained uncorrelated (N=10): 6.29745292664 seconds
+Medium grained uncorrelated (N=50): 7.0954709053 seconds
+Medium grained uncorrelated (N=100): 8.15248394012 seconds
+Medium grained uncorrelated (N=500): 18.702393055 seconds
+Medium grained uncorrelated (N=1000): 32.0013442039 seconds
+
+Serial correlated: 0.333223104477 seconds
+Fine grained correlated: 4.76677107811 seconds
+Medium grained correlated (N=2): 5.79337882996 seconds
+Medium grained correlated (N=5): 5.64563798904 seconds
+Medium grained correlated (N=10): 5.53476691246 seconds
+Medium grained correlated (N=50): 6.38927984238 seconds
+Medium grained correlated (N=100): 7.77994704247 seconds
+Medium grained correlated (N=500): 17.9112179279 seconds
+Medium grained correlated (N=1000): 31.2998280525 seconds
