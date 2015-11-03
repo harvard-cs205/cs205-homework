@@ -78,22 +78,35 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     for j in range (x_idx-1, x_idx+2):
         for k in range (y_idx-1, y_idx+2):
             index = Grid[j,k]
-            if index == i or index == -1:
-                continue  # Skip self
+            if index == i or index == -1 or index >= count or j < 0 or k < 0 \
+                    or j >= Grid.shape[0] or k >= Grid.shape[1]:
+                continue  # Skip self and check bounds
             XY2 = &(XY[index, 0])
             V2 = &(V[index, 0])
+
+            # Always lock lower lock first
+            if i > index :
+                acquire(&(locks[i]))
+                acquire(&(locks[index]))
+            else:
+                acquire(&(locks[index]))
+                acquire(&(locks[i]))
+
             if overlapping(XY1, XY2, R):
                 # SUBPROBLEM 4: Add locking
-                # acquire(&(locks[i]))
-                # acquire(&(locks[index]))
                 if not moving_apart(XY1, V1, XY2, V2):
                     collide(XY1, V1, XY2, V2)
-
                 # give a slight impulse to help separate them
                 for dim in range(2):
                     V2[dim] += eps * (XY2[dim] - XY1[dim])
-                # release(&(locks[index]))
-                # release(&(locks[i]))
+
+            if i > index:
+                release(&(locks[i]))
+                release(&(locks[index]))
+            else:
+                release(&(locks[index]))
+                release(&(locks[i]))
+
 
 cpdef update(FLOAT[:, ::1] XY,
              FLOAT[:, ::1] V,

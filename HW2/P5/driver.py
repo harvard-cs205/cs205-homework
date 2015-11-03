@@ -13,8 +13,10 @@ from timer import Timer
 from animator import Animator
 from physics import update, preallocate_locks
 
+
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
+
 
 # From: https://en.wikipedia.org/wiki/Z-order_curve
 def cmp_zorder(a, b):
@@ -28,13 +30,15 @@ def cmp_zorder(a, b):
                 x = y
         return a[j] - b[j]
 
+
 # From: https://en.wikipedia.org/wiki/Z-order_curve
 def less_msb(x, y):
         return x < y and x < (x ^ y)
 
+
 if __name__ == '__main__':
-    num_balls = 500 # 10000
-    radius = 0.01 # 0.002
+    num_balls = 500  # 10000
+    radius = 0.01  # 0.002
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -83,15 +87,16 @@ if __name__ == '__main__':
                    radius, grid_size, locks_ptr,
                    physics_step)
 
-            # index = np.ogrid[:grid.shape[0], :grid.shape[1]]
-            # index[0] = grid.argsort(0)
-            # index[1] = grid.argsort(1)
-            # grid = grid[index]
-            #
-            # ix = np.ogrid[:velocities.shape[0], :velocities.shape[1]]
-            # ix[0] = velocities.argsort(0)
-            # ix[1] = velocities.argsort(1)
-            # velocities = velocities[ix]
+            index = np.ogrid[:grid.shape[0], :grid.shape[1]]
+            index[0] = grid.argsort(0)
+            index[1] = grid.argsort(1)
+            old = grid
+            grid = grid[index]
+
+            ix = np.ogrid[:velocities.shape[0], :velocities.shape[1]]
+            ix[0] = velocities.argsort(0)
+            ix[1] = velocities.argsort(1)
+            velocities = velocities[ix]
 
         # udpate our estimate of how fast the simulator runs
         physics_step = 0.9 * physics_step + 0.1 * t.interval
