@@ -7,6 +7,7 @@ set_compiler.install()
 import pyximport
 pyximport.install()
 
+import matplotlib.pyplot as plt
 import numpy as np
 from timer import Timer
 from parallel_vector import move_data_serial, move_data_fine_grained, move_data_medium_grained
@@ -40,12 +41,20 @@ if __name__ == '__main__':
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################
-    N = 10
-    counts[:] = orig_counts
-    with Timer() as t:
-        move_data_medium_grained(counts, src, dest, 100, N)
+    Ns = range(1,51,2)
+    intervals = []
+    for N in Ns:
+        counts[:] = orig_counts
+        with Timer() as t:
+            move_data_medium_grained(counts, src, dest, 100, N)
+        intervals.append(t.interval)
     assert counts.sum() == total, "Wrong total after move_data_medium_grained"
-    print("Medium grained uncorrelated: {} seconds".format(t.interval))
+    #print("Medium grained uncorrelated: {} seconds".format(t.interval))
+    plt.plot(Ns, intervals, marker = '.')
+    plt.xlabel("N")
+    plt.ylabel("Time")
+    plt.title("Moving Uncorrelated Data")
+    plt.show()
 
     ########################################
     # Now use correlated data movement
@@ -74,9 +83,19 @@ if __name__ == '__main__':
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################
-    N = 10
-    counts[:] = orig_counts
-    with Timer() as t:
-        move_data_medium_grained(counts, src, dest, 100, N)
-    assert counts.sum() == total, "Wrong total after move_data_medium_grained"
-    print("Medium grained correlated: {} seconds".format(t.interval))
+    Ns = range(1,51,2)
+    intervals = []
+    for N in Ns:
+        counts[:] = orig_counts
+        with Timer() as t:
+            move_data_medium_grained(counts, src, dest, 100, N)
+        assert counts.sum() == total, "Wrong total after move_data_medium_grained"
+        #print("Medium grained correlated: {} seconds".format(t.interval))
+        intervals.append(t.interval)
+    plt.plot(Ns, intervals, marker = '.')
+    plt.xlabel("N")
+    plt.ylabel("Time")
+    plt.title("Moving Correlated Data")
+    plt.show()
+
+

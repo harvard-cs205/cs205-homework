@@ -1,0 +1,11 @@
+###### Performance on uncorrelated data ######
+Serial uncorrelated: 0.243279933929 seconds
+Fine grained uncorrelated: 5.97802305222 seconds
+Medium grained uncorrelated: 7.45749115944 seconds
+
+###### Performance on correlated data ######
+Serial correlated: 0.345690011978 seconds
+Fine grained correlated: 5.96004486084 seconds
+Medium grained correlated: 7.22283792496 seconds
+
+From the two plots attached (corresponding to correlated data and uncorrelated data respectively), I noticed that generally as N increases (the number of adjacent elements falling into the same lock increases), the time it takes increases with flutuation. I think this might be due to the fact that my machine (OSX 16GB Memory, 3.1GHz i7) can perform well enough with a serial method on the amount of data this problem provides. As N increases, the extra computational time and memory increases as well, which might not be a good trade-off in my machine. The best N, from the plot, for uncorrelated data, is 1, whereas the best N for correlated data is 9.

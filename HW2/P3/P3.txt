@@ -1,0 +1,11 @@
+non-avx parallel:
+
+# Thread = 1: 1074.656613 Million Complex FMAs in 4.01384401321 seconds, 267.737512834 million Complex FMAs / second,
+# Thread = 2: 1074.656613 Million Complex FMAs in 1.97863984108 seconds, 543.128967025 million Complex FMAs / second,
+# Thread = 4: 1074.656613 Million Complex FMAs in 1.29965496063 seconds, 826.878398923 million Complex FMAs / second
+
+avx parallel:
+
+# Thread = 1: 1074.926712 Million Complex FMAs in 0.620010852814 seconds, 1733.72241328 million Complex FMAs / second,
+# Thread = 2: 1074.905555 Million Complex FMAs in 0.306569099426 seconds, 3506.24233496 million Complex FMAs / second
+# Thread = 4: 1074.930116 Million Complex FMAs in 0.199064016342 seconds, 5399.92177266 million Complex FMAs / second

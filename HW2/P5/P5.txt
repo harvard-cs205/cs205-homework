@@ -1,0 +1,29 @@
+###################### 1 Thread ########################
+Subproblem 1: replace range with prange:
+13.4102344219 average simulation frames per second with 1000 iterations
+
+Subproblem 2: spatial decomposition:
+526.000628065 average simulation frames per second with 1000 iterations
+
+Subproblem 3: spatial coherent sorting:
+572.582165363 average simulation frames per second with 1000 iterations
+
+Subproblem 4: Locking:
+461.008823972 average simulation frames per second with 1000 iterations
+
+
+
+###################### 4 Threads ########################
+Subproblem 1: replace range with prange:
+19.4908942205 average simulation frames per second with 1000 iterations
+
+Subproblem 2: spatial decomposition:
+882.601256482 average simulation frames per second with 1000 iterations
+
+Subproblem 3: spatial coherent sorting:
+959.56498753 average simulation frames per second with 1000 iterations
+
+Subproblem 4: Locking:
+744.779292039 average simulation frames per second with 1000 iterations
+
+As we can see, the performance increases as the we finished each part of the subproblem, except for subproblem 4. Subproblem 4 uses locking, which will take extra time in this case, and hence reduce the performance. For spatial sorting, I used morton order, and the code was from wikipedia. Regarding the spatial decomposition, I checked three neaby grids to detect collision.
