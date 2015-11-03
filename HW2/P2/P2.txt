@@ -1,0 +1,35 @@
+
+The implementation results are as below:
+Time that it takes where N = 10:
+
+Serial uncorrelated: 0.326090097427 seconds
+Fine grained uncorrelated: 8.17703700066 seconds
+Medium grained uncorrelated: 10.2070510387 seconds
+
+Serial correlated: 0.400254964828 seconds
+Fine grained correlated: 7.37752103806 seconds
+Medium grained correlated: 9.12705206871 seconds
+
+For N = 20:
+
+Medium grained uncorrelated: 9.71635699272 seconds
+Medium grained correlated: 9.18580889702 seconds
+
+For N = 30:
+
+Medium grained uncorrelated: 9.9599480629 seconds
+Medium grained correlated: 9.5074300766 seconds
+
+For N = 40:
+
+Medium grained uncorrelated: 11.3880989552 seconds
+Medium grained correlated: 10.4099068642 seconds
+
+For N = 50:
+
+Medium grained uncorrelated: 10.8544569016 seconds
+Medium grained correlated: 9.97024989128 seconds
+
+As we can see, the fine grained and medium grained are significantly slower than serial. For medium-grained locking, N=10 is the best choice for uncorrelated, and N=20 is the best choice for correlated. In uncorrelated case, with N increasing from a small value, there is increasing probability that src and dest arrays are in the same lock, thus the code runs faster and achieved maximum at 10. After that, continuously increasing N slows down the speed since there is increasing contention between locks. The correlated case is maximized at 20 because values in dest are within 10 away from values in src array. 
+
+

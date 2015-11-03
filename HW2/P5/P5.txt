@@ -1,0 +1,8 @@
+
+Applying multi-threading, the performance with 1 thread is around 11-13 frames per second which is similar to the serial performance, whereas the performance is a bit better. 
+
+Applying spatial decomposition, the performance with 1 thread is around 1230-1250 frames per second. And the performance with 4 threads is around 1330-1360 frames per second. These gridded versions perform hundred times better than non-gridded versions. This is mainly due to the fact that the running time of the algorithm improves from O(N^2) to O(N). Performance with 4 threads is slightly better than that with 1 thread. 
+
+Applying spatially coherent sorting, the performance with 1 thread is around 1320-1350 frames per second, whereas that with 4 threads is around 1400-1420 frames per second. I used Morton ordering which maps (x,y) to binary representations that are spatially coherent. Performances with spatially coherent sorting are better than those without, because by sorting, balls whose coordinates are close are also close in memory, thus comparisons between balls to check collisions are less expensive. 4 threads out performs 1 thread a little bit.
+
+Applying locking for 4 threads with grid ding and sorting, the performance is around 850-870 frames per second, compared to that without locking which is around 1420-1450 frames per second. It is clearly that adding locks slows down the performance. This is possibly because each thread cannot enter collision part at the same time for a particle if the particle collides with another particle. 
