@@ -1,0 +1,27 @@
+With instruction-level parallelism:
+
+Threads = 1:
+1074.94829 Million Complex FMAs in 0.695778846741 seconds, 1544.9568423 million Complex FMAs / second
+
+Threads = 2:
+1074.94829 Million Complex FMAs in 0.343411922455 seconds, 3130.20084543 million Complex FMAs / second
+
+Threads = 4:
+1074.94829 Million Complex FMAs in 0.244723081589 seconds, 4392.50880228 million Complex FMAs / second 
+
+
+Without instruction level parallelism:
+
+Threads = 1: 
+1074.656613 Million Complex FMAs in 4.57774305344 seconds, 234.756866092 million Complex FMAs / second
+
+Threads = 2:
+1074.656613 Million Complex FMAs in 2.25634288788 seconds, 476.282491803 million Complex FMAs / second
+
+Threads = 4:
+1074.656613 Million Complex FMAs in 1.42459487915 seconds, 754.359452451 million Complex FMAs / second
+
+
+You'll notice that as we increase the number of threads in both cases, they both had better performance, roughly doubling whenever we doubled our number of threads (although the multiplier decreases the more threads we add on).
+
+In general, going from no AVX to AVX was close to an 8x increase in speed, especially in the beginning. However, we cannot reach exactly an 8x increase in speed because when we have 8 indices, the work is not guaranteed to be evenly distributed. As a result, the max iteration number is very well larger than the total divided by 8 (and in the worst case could be equivalent).

@@ -15,10 +15,25 @@ from physics import update, preallocate_locks
 
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
+    
+#from the wiki page on z-order curve
+def cmp_zorder(a, b):
+    j = 0
+    k = 0
+    x = 0
+    for k in range(2):
+        y = a[k] ^ b[k]
+        if less_msb(x, y):
+            j = k
+            x = y
+    return a[j] - b[j]
+    
+def less_msb(x, y):
+        return x < y and x < (x ^ y)
 
 if __name__ == '__main__':
-    num_balls = 10000
-    radius = 0.002
+    num_balls = 50
+    radius = 0.02
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -50,7 +65,7 @@ if __name__ == '__main__':
     # A matplotlib-based animator object
     animator = Animator(positions, radius * 2)
 
-    # simulation/animation time variablees
+    # simulation/animation time variables
     physics_step = 1.0 / 100  # estimate of real-time performance of simulation
     anim_step = 1.0 / 30  # FPS
     total_time = 0
@@ -64,10 +79,10 @@ if __name__ == '__main__':
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
-                   radius, grid_size, locks_ptr,
+                   radius, grid_spacing, locks_ptr,
                    physics_step)
 
-        # udpate our estimate of how fast the simulator runs
+        # update our estimate of how fast the simulator runs
         physics_step = 0.9 * physics_step + 0.1 * t.interval
         total_time += t.interval
 
@@ -80,3 +95,22 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+
+            position_indices = (positions / grid_spacing).astype(int) 
+            shifted = np.array(list(position_indices[1:]) + list(position_indices[:1]))
+            z_order = map(lambda x, y: cmp_zorder(x,y), position_indices, shifted)
+            position_indices = np.argsort(z_order)
+
+            # update values
+            positions = np.array(positions)[position_indices]
+            velocities = np.array(velocities)[position_indices]
+            
+            # reset
+            grid[:,:] = -1
+            
+            # update grid locations
+            for i in range(num_balls):
+                # check if within bounds
+                if positions[i,0] >= 0 and positions[i,1] >= 0 and positions[i,0] <= 1 and positions[i,1] <= 1:
+                    grid[(positions[i,0] / grid_spacing).astype(int),
+                         (positions[i,1] / grid_spacing).astype(int)] = i

@@ -10,7 +10,7 @@ cdef extern from "AVX.h" nogil:
     #     from one value
     float8 float_to_float8(float)
     #     from 8 values
-    float8 make_float8(float, float, float, float, float, float, float, float)
+    float8 make_float8(float, float, float, float, float, float8loat, float, float)
 
     # Arithmetic:
     #     Each of these operate on their 8 values independently, and return a

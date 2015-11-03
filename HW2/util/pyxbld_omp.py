@@ -12,7 +12,8 @@ def make_ext(modname, pyxfilename):
     from distutils.extension import Extension
     return Extension(name=modname,
                      sources=[pyxfilename],
-                     extra_compile_args=['-Wno-unused-function',
+                     extra_compile_args=['-mavx',
+                                         '-Wno-unused-function',
                                          '-std=gnu99',
                                          '-Ofast',
                                          '-march=native',
