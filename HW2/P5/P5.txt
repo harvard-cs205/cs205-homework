@@ -4,3 +4,5 @@ With prange in the three sections specified, FPS slowed considerably (see p5-pt1
 
 Part 2: Spatial decomposition
 
+Using the local grid search for this problem saw significant speedups.  With-grid 1-thread had a mode of a bit over
+5,000 FPS (see p5-pt2-1thread.png), compared to Non-grid 1-thread of about 1,800 FPS. With-grid 4-thread suffered from similar problems as in Part 1, and had a roughly equivalent mode to the With-grid 1-thread (slightly lower at around 4,500 FPS), but had a significant left tail, meaning that occasionally there were big slowdowns on some updates (see p5-pt2-4thread.png).  The same behavior was observed in Part 1, so I'm chalking it up to threads being weird.
