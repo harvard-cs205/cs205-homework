@@ -16,6 +16,31 @@ from physics import update, preallocate_locks
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
+
+# https://en.wikipedia.org/wiki/Z-order_curve
+def cmp_zorder(prev, curr):
+    """
+    :param a: list of 2
+    :param b: list of 2
+    :return: int
+    """
+    j = 0
+    k = 0
+    x = 0
+    a = prev[1]
+    b = curr[1]
+    for k in range(2):
+        y = a[k] ^ b[k]
+        if less_msb(x, y):
+            j = k
+            x = y
+    return a[j] - b[j]
+
+
+def less_msb(x, y):
+        return x < y and x < (x ^ y)
+
+
 if __name__ == '__main__':
     num_balls = 10000
     radius = 0.002
@@ -23,6 +48,7 @@ if __name__ == '__main__':
                                   (num_balls, 2)).astype(np.float32)
 
     # make a hole in the center
+    # @x: (0.5, 0.5) is the center. dims of space([0, 1], [0, 1])
     while True:
         distance_from_center = np.sqrt(((positions - 0.5) ** 2).sum(axis=1))
         mask = (distance_from_center < 0.25)
@@ -30,6 +56,7 @@ if __name__ == '__main__':
         if num_close_to_center == 0:
             # everything is out of the center
             break
+        # @x: redistribute balls in the center uniformly across the whole space, [0 + radius, 1 - radius
         positions[mask, :] = np.random.uniform(0 + radius, 1 - radius,
                                                (num_close_to_center, 2)).astype(np.float32)
 
@@ -64,7 +91,7 @@ if __name__ == '__main__':
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
-                   radius, grid_size, locks_ptr,
+                   radius, grid_spacing, locks_ptr,
                    physics_step)
 
         # udpate our estimate of how fast the simulator runs
@@ -80,3 +107,16 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+            # @x: get order
+            grid_positions = (positions / grid_spacing).astype(int)
+            i_positions = zip(range(len(grid_positions)), grid_positions)
+            i_positions.sort(cmp_zorder)
+            inds = [x[0] for x in i_positions]
+            positions = positions[inds]
+            velocities = velocities[inds]
+            inbound = np.array(filter(lambda x: x[0] > 0 and x[1] < 1, positions))
+            inbound_n = len(inbound)
+            grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
+            grid[(inbound[:, 0] / grid_spacing).astype(int),
+                 (inbound[:, 1] / grid_spacing).astype(int)] = np.arange(inbound_n)
+

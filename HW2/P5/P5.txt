@@ -1,0 +1,14 @@
+P5: 
+1. The speed is faster.
+More simulation frames per second is achieved. Because multiple threads work on physics at the same time.
+
+2. With O(N) algorithm, it is much faster than O(N^2).
+Sort the four modes in order as the first one with highest speed:
+O(N) + 4 threads > O(N) + 1 thread > O(N^2) + 4 threads > O(N^2) + 1 thread
+
+3. Sorting speeds up both 4 threads and 1 thread.
+Because data is arranged in sequential memory areas, so that data access is accelerated.
+So 4 threads, the effect is more obvious, since all access time for 4 threds all increased.
+
+4. Adding lockes increases variability in speed, and it reduced the speed for 4 threads strongly.
+For one thread, it has no sense to use locks, but if added, it will add extra overhead.
