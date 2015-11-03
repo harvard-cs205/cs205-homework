@@ -19,3 +19,6 @@ num_threads = 2
 
 num_threads = 4
 1077.290872 Million Complex FMAs in 0.562258958817 seconds, 1916.00481434 million Complex FMAs / second
+
+We see that there are some significant speed-up using AVX vs not. This is
+usually about a factor of 3 faster.
