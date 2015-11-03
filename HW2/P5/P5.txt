@@ -37,3 +37,24 @@ Running with 4 threads:
 We  see there's a speed-up from 1 to 4 threads and using spatial
 decomposition clearly achieves speed up over the pure multi-threading
 approach.
+
+SPATIALLY COHERENT SORTING
+
+Running with 1 thread:
+
+231.489699897 simulation frames per second
+197.676689603 simulation frames per second
+201.449994511 simulation frames per second
+225.662485793 simulation frames per second
+
+Running with 4 threads:
+
+384.402464645 simulation frames per second
+324.716500686 simulation frames per second
+317.15836146 simulation frames per second
+494.309577949 simulation frames per second
+
+The sorting improves performance as can be seen in the numbers above
+(compared to without sorting). This is because the algorithm now
+has more data locality via the Morter ordering, thus more coherent
+& efficient memory accesses in collision detection.

@@ -13,8 +13,33 @@ from timer import Timer
 from animator import Animator
 from physics import update, preallocate_locks
 
+
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
+
+
+# code to create morton interleaving bits is from:
+# http://code.activestate.com/recipes/577558-interleave-bits-aka-morton-ize-aka-z-order-curve/
+def part1by1(n):
+    n &= 0x0000ffff
+    n = (n | (n << 8)) & 0x00FF00FF
+    n = (n | (n << 4)) & 0x0F0F0F0F
+    n = (n | (n << 2)) & 0x33333333
+    n = (n | (n << 1)) & 0x55555555
+    return n
+
+
+def unpart1by1(n):
+    n &= 0x55555555
+    n = (n ^ (n >> 1)) & 0x33333333
+    n = (n ^ (n >> 2)) & 0x0f0f0f0f
+    n = (n ^ (n >> 4)) & 0x00ff00ff
+    n = (n ^ (n >> 8)) & 0x0000ffff
+    return n
+
+
+def interleave2(x, y):
+    part1by1(x) | (part1by1(y) << 1)
 
 if __name__ == '__main__':
     num_balls = 10000
@@ -80,3 +105,21 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+
+            # create sorted morton z-orders
+            z_positions = np.zeros(num_balls)
+            for i in range(num_balls):
+                p_x = int(positions[i, 0] / grid_spacing)
+                p_y = int(positions[i, 1] / grid_spacing)
+                z_positions[i] = interleave2(p_x, p_y)
+
+            z_sorted = np.argsort(z_positions)
+
+            # now update positions and velocities to the this sort order
+            positions = positions[z_sorted]
+            velocities = velocities[z_sorted]
+
+            # Update grid indices for balls based on x, y coordinates
+            grid[(positions[:, 0] / grid_spacing).astype(int),
+                 (positions[:, 1] / grid_spacing).astype(int)]\
+                = np.arange(num_balls)

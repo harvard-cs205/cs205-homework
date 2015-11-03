@@ -139,7 +139,7 @@ cpdef update(FLOAT[:, ::1] XY,
              uintptr_t locks_ptr,
              float t):
     cdef:
-        int parallelism = 4
+        int parallelism = 1
         int chunk_size = 2500
         int count = XY.shape[0]
         int i, j, dim
