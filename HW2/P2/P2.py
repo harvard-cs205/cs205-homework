@@ -10,6 +10,7 @@ pyximport.install()
 import numpy as np
 from timer import Timer
 from parallel_vector import move_data_serial, move_data_fine_grained, move_data_medium_grained
+import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
     ########################################
@@ -40,12 +41,19 @@ if __name__ == '__main__':
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################
-    N = 10
-    counts[:] = orig_counts
-    with Timer() as t:
-        move_data_medium_grained(counts, src, dest, 100, N)
-    assert counts.sum() == total, "Wrong total after move_data_medium_grained"
-    print("Medium grained uncorrelated: {} seconds".format(t.interval))
+    # A range of N values to test against
+    different_Ns = [2, 5, 10,20,50]
+    # Array to plot
+    uncorrelated_times = []
+    for N in different_Ns:
+        counts[:] = orig_counts
+        with Timer() as t:
+            move_data_medium_grained(counts, src, dest, 100, N)
+        assert counts.sum() == total, "Wrong total after move_data_medium_grained"
+        print("Medium grained uncorrelated: {} seconds".format(t.interval))
+        uncorrelated_times.append(t.interval)
+
+
 
     ########################################
     # Now use correlated data movement
@@ -74,9 +82,23 @@ if __name__ == '__main__':
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################
-    N = 10
-    counts[:] = orig_counts
-    with Timer() as t:
-        move_data_medium_grained(counts, src, dest, 100, N)
-    assert counts.sum() == total, "Wrong total after move_data_medium_grained"
-    print("Medium grained correlated: {} seconds".format(t.interval))
+    # Array to plot
+    correlated_times = []
+    for N in different_Ns:
+        counts[:] = orig_counts
+        with Timer() as t:
+            move_data_medium_grained(counts, src, dest, 100, N)
+        assert counts.sum() == total, "Wrong total after move_data_medium_grained"
+        print("Medium grained correlated: {} seconds".format(t.interval))
+        correlated_times.append(t.interval)
+
+    #uncorrelated_times = [8.02018904686,7.98845601082,8.32344985008,8.58538603783,9.4727640152]
+
+    #correlated_times = [8.17925286293,8.28549385071,8.05273008347,8.22479701042,8.9023911953]
+    plt.plot(different_Ns, uncorrelated_times)
+    plt.plot(different_Ns, correlated_times)
+    plt.xlabel("N value")
+    plt.ylabel("Seconds")
+    plt.legend(['Medium uncorrelated times', 'Medium correlated times'])
+    plt.show()
+

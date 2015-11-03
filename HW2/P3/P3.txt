@@ -1,0 +1,6 @@
+For the first part with simply introducing threading here were my results:
+4 threads: 1074.656613 Million Complex FMAs in 1.78885388374 seconds, 600.751477114 million Complex FMAs / second
+2 threads: 1074.656613 Million Complex FMAs in 3.19296813011 seconds, 336.569789991 million Complex FMAs / second
+1 thread: 1074.656613 Million Complex FMAs in 6.38915014267 seconds, 168.200244008 million Complex FMAs / second
+
+The performance speedup is quite good, when going from 1 to 4 threads the FMAs is multiplied by 3.57

@@ -18,7 +18,7 @@ import numpy as np
 # create coordinates, along with output count array
 def make_coords(center=(-0.575 - 0.575j),
                 width=0.0025,
-                count=4000):
+                count=2000):
 
     x = np.linspace(start=(-width / 2), stop=(width / 2), num=count)
     xx = center + (x + 1j * x[:, np.newaxis]).astype(np.complex64)
