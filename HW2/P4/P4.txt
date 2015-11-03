@@ -1,3 +1,8 @@
+For my implementation, I am processing the entire image before proceeding to the next iteration.
+As can be seen from the results, threading decreases the time it takes to process an image.
+
+To do this, I used a simple join statement for each thread. First I split the rows so that each thread gets an even share. Then I give each thread the rows it needs to process and call join for each one(This is done by passing offset,stepsize to prange in cython). This lets me wait for all the threads to finish one pass of the image before the next filter.
+
 ---Results---
 num_threads=1
 2.82585191727 seconds for 10 filter passes.
@@ -5,8 +10,5 @@ num_threads=2
 1.45732498169 seconds for 10 filter passes.
 num_threads=4
 0.882711172104 seconds for 10 filter passes.
-num_threads=8
-0.73614692688 seconds for 10 filter passes.
 
-I am processing the entire image before proceeding to the next iteration.
-As can be seen from the results, threading decreases the time it takes to process an image.
+

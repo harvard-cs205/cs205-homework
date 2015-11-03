@@ -15,6 +15,23 @@ from timer import Timer
 from animator import Animator
 from physics import update, preallocate_locks
 
+###############################
+#Morton encoding function pulled from https://en.wikipedia.org/wiki/Z-order_curve
+def cmp_zorder(a, b):
+        j = 0
+        k = 0
+        x = 0
+        for k in range(2):
+            y = a[k] ^ b[k]
+            if less_msb(x, y):
+                j = k
+                x = y
+        return a[j] - b[j]
+
+def less_msb(x, y):
+        return x < y and x < (x ^ y)
+###############################
+
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
@@ -56,14 +73,11 @@ if __name__ == '__main__':
     physics_step = 1.0 / 100  # estimate of real-time performance of simulation
     anim_step = 1.0 / 30  # FPS
     total_time = 0
-
     frame_count = 0
 
     # SUBPROBLEM 4: uncomment the code below.
     # preallocate locks for objects
     locks_ptr = preallocate_locks(num_balls)
-    #locks_ptr = 0
-
 
     toCheck = np.zeros((12,2),dtype=np.int32)
     while True:
@@ -76,16 +90,22 @@ if __name__ == '__main__':
         # udpate our estimate of how fast the simulator runs
         physics_step = 0.9 * physics_step + 0.1 * t.interval
         total_time += t.interval
+        #Sort by morton curve, pair each position with its index so we can sort corresponding velocities
+        tmppositions = zip((positions/grid_spacing).astype(int),range(num_balls))
+        tmppositions.sort(cmp=cmp_zorder,key=lambda x:x[0])
+        sortedIndices = map(lambda t:t[1],tmppositions)
+        positions = positions[sortedIndices]
+        velocities = velocities[sortedIndices]
+        #Reset and update grid values
+        grid[:] = -1
+        for i in range(num_balls):
+            _x = (positions[i,0]/grid_spacing).astype(int)
+            _y = (positions[i,1]).astype(int)
+            if 0 <= _x < grid_size and 0 <= _y < grid_size: 
+                grid[_x, _y] = i
 
         frame_count += 1
         if total_time > anim_step:
-            # sortedIndices = np.lexsort((positions[:,1],positions[:,0]))
-            # grid[(positions[:, 0] / grid_spacing).astype(int), (positions[:, 1] / grid_spacing).astype(int)] = -1
-            # #The line above causes IndexError: index 708 is out of bounds for axis 0 with size 708
-            # for idx,i in enumerate(sortedIndices):
-            #     grid[(positions[i][0]/grid_spacing).astype(int),(positions[i][1]/grid_spacing).astype(int)] = idx
-            # positions = positions[sortedIndices]
-            # velocities = velocities[sortedIndices]
             animator.update(positions)
             print("{} simulation frames per second".format(frame_count / total_time))
             frame_count = 0

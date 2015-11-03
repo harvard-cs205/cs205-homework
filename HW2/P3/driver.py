@@ -23,11 +23,10 @@ def make_coords(center=(-0.575 - 0.575j),
                 count=4000):
     x = np.linspace(start=(-width / 2), stop=(width / 2), num=count)
     xx = center + (x + 1j * x[:, np.newaxis]).astype(np.complex64)
-    #return xx, np.zeros_like(xx, dtype=np.float32)
-#Used for mandelbrotOld
-    #return xx, np.zeros_like(xx, dtype=np.uint32)
-#Used for mandelBrot2
     return xx, np.zeros_like(xx, dtype=np.float32)
+#Used for original mandelbrot
+    #return xx, np.zeros_like(xx, dtype=np.uint32)
+    
 
 if __name__ == '__main__':
     in_coords, out_counts = make_coords()
@@ -35,23 +34,8 @@ if __name__ == '__main__':
     in_coordsReal = np.real(in_coords)
     in_coordsImag = np.imag(in_coords)
     with Timer() as t:
-       mandelbrot.mandelbrot2(in_coordsReal,in_coordsImag, out_counts, 1024)
+       mandelbrot.mandelbrot(in_coordsReal,in_coordsImag, out_counts, 1024)
     seconds = t.interval
     print("Mandelbrot AVX {} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
     plt.imshow(np.log(out_counts))
     plt.show()
-
-
-    # with Timer() as t:
-    #    mandelbrot.mandelbrotOld(in_coords, out_counts, 1024)
-    # seconds = t.interval
-    # print("Serial Mandelbrot{} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
-    # plt.imshow(np.log(out_counts))
-    # plt.show()
-
-    
-    # cProfile.runctx("mandelbrot.mandelbrot2(in_coordsReal,in_coordsImag, out_counts, 1024)", globals(), locals(), "Profile.prof")
-    # s = pstats.Stats("Profile.prof")
-    # s.strip_dirs().sort_stats("time").print_stats()
-
-

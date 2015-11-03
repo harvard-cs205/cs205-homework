@@ -2,3 +2,5 @@
 *.pyc
 *.pyxbldc
 backup
+*.npz
+

@@ -83,10 +83,7 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
 	##########
 	with nogil:
 		for r in range(repeat):
-		#prange tells cython the order of loop can be executed in any order
 			for idx in prange(src.shape[0],num_threads=4):
-				#with gil:
-				#	print omp_get_num_threads()
 				acquire(&locks[src[idx]])
 				if counts[src[idx]] > 0:	
 					counts[src[idx]] -= 1
@@ -95,6 +92,7 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
 					counts[dest[idx]] += 1
 					release(&locks[dest[idx]])
 				else:
+					#Release so there is no deadlock
 					release(&locks[src[idx]])
 		
 
@@ -128,6 +126,7 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
 					counts[dest[idx]] += 1
 					release(&locks[dest[idx]/N])
 				else:
+					#Release so there is no deadlock
 					release(&locks[src[idx]/N])
 
 	free_N_locks(num_locks, locks)

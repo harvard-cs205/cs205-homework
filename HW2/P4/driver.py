@@ -32,7 +32,7 @@ def py_median_3x3(image, iterations=10, num_threads=4):
     ''' repeatedly filter with a 3x3 median '''
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
-    
+    #Have each thread work on every num_thread row
     for i in range(iterations):
         threads = []
         for nt in range(num_threads):
@@ -40,6 +40,7 @@ def py_median_3x3(image, iterations=10, num_threads=4):
         for t in threads:
             t.start()
         for t in threads:
+            #Wait for all previous threads to finish before going to next iteration
             t.join()
         # swap direction of filtering
         tmpA, tmpB = tmpB, tmpA

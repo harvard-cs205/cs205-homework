@@ -59,7 +59,7 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                      float R,
                      int counter,
                      UINT[:, ::1] Grid,
-                     int grid_size, INT[:,:] overlapping,omp_lock_t *locks) nogil:
+                     int grid_size, INT[:,:] overlapping,omp_lock_t *locks,int nt) nogil:
     cdef:
         FLOAT *XY1, *XY2, *V1, *V2
         int i, j, dim,c,l,f,ii,jj
@@ -72,8 +72,8 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     ############################################################
     # SUBPROBLEM 2: use the grid values to reduce the number of other
     # objects to check for collisions.
-
-    for l in prange(grid_size,num_threads=4):
+    #Use position of ball in grid to check for overlap
+    for l in prange(grid_size,num_threads=nt):
         for j in xrange(grid_size):
             currentBallInGrid = Grid[l,j]
             if currentBallInGrid != -1:
@@ -86,7 +86,7 @@ cdef void sub_update(FLOAT[:, ::1] XY,
 #            Check for overlap among balls 2 grid spaces away. Make sure not to check a pair twice
 #            Method for checking overlap, see simple figure below. 
 #            Current ball is the plus sign
-#            Potential overlap at positions marked x
+#            Potential overlap at positions marked x(Comparing plus sign with every x)
 #            Do not check positions marked with percent sign
 #               |% % + x x   
 #               |x x x x x   
@@ -141,10 +141,11 @@ cpdef update(FLOAT[:, ::1] XY,
 
         # bounce off of each other
         # I stuffed both loops into sub_update so only call it once
-        sub_update(XY, V, R, count, Grid, grid_size,toCheck,locks)
+        sub_update(XY, V, R, count, Grid, grid_size,toCheck,locks,nt)
 
         # SUBPROBLEM 2: update the grid values.
         for i in prange(count,schedule='static',chunksize=count/4,num_threads=nt):
+            #Reset original grid values
             roundedPositionX = <unsigned int>(XY[i,0]/grid_spacing)
             roundedPositionY = <unsigned int>(XY[i,1]/grid_spacing)
             if roundedPositionX >= 0 and roundedPositionY >= 0 and roundedPositionX < grid_size and roundedPositionY < grid_size:
@@ -152,7 +153,7 @@ cpdef update(FLOAT[:, ::1] XY,
 
             for dim in range(2):
                 XY[i, dim] += V[i, dim] * t
-
+            #Update new grid values
             roundedPositionX = <int>(XY[i,0]/grid_spacing)
             roundedPositionY = <int>(XY[i,1]/grid_spacing)
             if roundedPositionX >= 0 and roundedPositionY >= 0 and roundedPositionX < grid_size and roundedPositionY < grid_size:

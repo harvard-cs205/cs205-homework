@@ -25,7 +25,6 @@ if __name__ == '__main__':
     counts = orig_counts.copy()
     with Timer() as t:
         move_data_serial(counts, src, dest, 100)
-    #print counts.sum(),total
     assert counts.sum() == total, "Wrong total after move_data_serial"
     print("Serial uncorrelated: {} seconds".format(t.interval))
     serial_counts = counts.copy()
@@ -34,7 +33,6 @@ if __name__ == '__main__':
     counts[:] = orig_counts
     with Timer() as t:
         move_data_fine_grained(counts, src, dest, 100)
-    #print counts.sum(),total,counts
     assert counts.sum() == total, "Wrong total after move_data_fine_grained"
     print("Fine grained uncorrelated: {} seconds".format(t.interval))
 
@@ -42,7 +40,7 @@ if __name__ == '__main__':
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################
-    N = 20
+    N = 50
     print 'N=',N
     counts[:] = orig_counts
     with Timer() as t:
@@ -79,7 +77,6 @@ if __name__ == '__main__':
     # # You should explore different values for the number of locks in the medium
     # # grained locking
     # ########################################
-    N = 20
     counts[:] = orig_counts
     with Timer() as t:
         move_data_medium_grained(counts, src, dest, 100, N)

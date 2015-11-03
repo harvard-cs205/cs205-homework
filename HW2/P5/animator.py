@@ -15,7 +15,8 @@ class Animator(object):
         self.ax = ax
 
         diameters = np.ones(self.count) * diameter
-        colors = [randcolor() for _ in range(self.count)]
+        #colors = [randcolor() for _ in range(self.count)]
+        colors = [np.array([1.0, 0.0, 0.0]) for _ in range(self.count)]
         self.circles = EllipseCollection(widths=diameters,
                                          heights=diameters,
                                          angles=np.zeros_like(diameters),
