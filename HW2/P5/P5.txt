@@ -1,0 +1,57 @@
+All values are calculated from 120 trials
+
+No Grid : 
+  
+  No Multithreading
+  Average: 11.339241042691183 simulation frames per second
+  Standard Deviation : 0.62740793352776814
+
+  With Multithreading (4 Threads)
+  Average : 24.9164276509 simulation frames per second
+  Standard Deviation : 1.91116172534
+
+  As we see, we have roughly a little over 2x improvement in performance.  I'm a little surprised to see only 2x improvement since we have 4 threads, and the function we're timing doesn't seem to have a critical section but most likely, the static scheduler has some significant overhead that reduces performance.
+
+With Grid
+
+  No Multithreading
+  Average : 714.601143254 simulation frames per second
+  Standard Deviation : 42.0528478762
+
+  With Multithreading (4 Threads)
+  Average : 1491.09602144 simulation frames per second
+  Standard Deviation : 225.951796567
+
+  As we see, Grid greatly increases the performance of the algorithm for both multi-threaded and and single threaded applications.
+
+  The cause of this dramatic performance increase is the fact that the new algorithm is not only O(N) instead of O(N^2)
+
+  Note that we still observe only a 2x improvement from using 4 threads, suggesting the root cause of the slowdown is not from the sub_update step.
+
+
+With Grid + Spatial Coherent Sorting
+
+  No Multithreading
+  Average : 818.444678596 simulation frames per second
+  Standard Deviation : 56.7806459215
+
+  With Multithreading (4 Threads)
+  Average : 1732.87420214 simulation frames per second
+  Standard Deviation : 138.554155054
+
+  Using a Hilbert space-filling curve appears to have positively affect the speed as well, though not nearly as much as the Grid improvement.  Hilbert runs reasonably fast with numpy (0.003 seconds per run), which means we lose roughly 9% of our computation time if we actually factored the time for Hilbert sorting, which is accetable given the fact that gain is large enough.
+
+  The improvement is not surprising, since applying our spatially coherent sort allows balls that will probably interact with each other have values close to each other in memory.
+
+With Grid + Spatial Coherent Sorting + Locks
+  
+  No Multithreading
+  Average : 725.718533879 simulation frames per second
+  Standard Deviation : 36.8006655991
+
+  With Multithreading (4 Threads)
+  Average : 1623.34818255 simulation frames per second
+  Standard Deviation : 167.297883442
+
+  Locks decrease the speed as expected, but because of the optimizations, the code still runs faster than with just Grid.  I'm pretty surprised that the locks only decreased performance by roughly 10%.  Most likely, the reason why this is the case is because we have a large number of balls, which are finely-grained locked, so the chance of lock contention is low.
+  
