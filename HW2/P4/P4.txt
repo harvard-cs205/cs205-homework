@@ -1,0 +1,25 @@
+4 threads:
+1.87498497963 seconds for 10 filter passes.
+
+2 threads:
+1.81508517265 seconds for 10 filter passes.
+
+1 thread:
+3.30282878876 seconds for 10 filter passes.
+
+No multithreading:
+2.94609093666 seconds for 10 filter passes.
+
+Asynchronously:
+
+4 threads:
+1.76038193703 seconds for 10 filter passes.
+
+2 threads:
+1.90581583977 seconds for 10 filter passes.
+
+1 thread:
+3.36735010147 seconds for 10 filter passes.
+
+No multithreading:
+2.94609093666 seconds for 10 filter passes.

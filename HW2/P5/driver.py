@@ -17,8 +17,8 @@ def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
 if __name__ == '__main__':
-    num_balls = 10000
-    radius = 0.002
+    num_balls = 1000#500 #10000
+    radius = 0.002#0.01 #0.002
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -46,7 +46,6 @@ if __name__ == '__main__':
     grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
     grid[(positions[:, 0] / grid_spacing).astype(int),
          (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
-
     # A matplotlib-based animator object
     animator = Animator(positions, radius * 2)
 
@@ -60,23 +59,28 @@ if __name__ == '__main__':
     # SUBPROBLEM 4: uncomment the code below.
     # preallocate locks for objects
     locks_ptr = preallocate_locks(num_balls)
+    average = []
 
-    while True:
+    for i in range(10000):
         with Timer() as t:
             update(positions, velocities, grid,
                    radius, grid_size, locks_ptr,
-                   physics_step)
+                   physics_step, grid_spacing)
 
         # udpate our estimate of how fast the simulator runs
         physics_step = 0.9 * physics_step + 0.1 * t.interval
         total_time += t.interval
+        
 
         frame_count += 1
         if total_time > anim_step:
             animator.update(positions)
             print("{} simulation frames per second".format(frame_count / total_time))
+            average.append(frame_count / total_time)
             frame_count = 0
             total_time = 0
+
+    print "AVERAGE:", np.mean(average)
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
