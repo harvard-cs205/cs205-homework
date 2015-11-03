@@ -65,6 +65,8 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
 
 
                     mask = AVX.less_than(magnitude,cp2)
+                    if AVX.signs(mask)==0.0:
+                        break
                     iter_count = AVX.float_to_float8(1.0) 
                     iter_count_filtered = AVX.bitwise_and(mask,iter_count )
                     final_count = AVX.add(final_count,iter_count_filtered) 
