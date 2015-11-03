@@ -63,10 +63,35 @@ if __name__ == '__main__':
     locks_ptr = preallocate_locks(num_balls)
 
     chunk = num_balls/4
-    nthread = 4
+    nthread = 1
     SFPS = []
     ct = 0
 
+    def rot(n,x,y,rx,ry):
+        if (ry == 0):
+            if (rx == 1):
+                x = n-1 - x
+                y = n-1 - y
+            
+
+            #Swap x and y
+            t = x
+            x = y
+            y = t
+        return x,y
+
+    #convert (x,y) to d
+    def xy2d (n, x, y):
+        s = n/2
+        d = 0
+        while s > 0:
+            rx = int(x & s > 0)
+            ry = int(y & s > 0)
+            d += s * s * ((3 * rx) ^ ry)
+            x,y = rot(s, x, y, rx, ry)
+            s /= 2
+        return d
+    
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
@@ -87,6 +112,16 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+            gridx = (positions[:, 0] / grid_spacing).astype(int)
+            gridy = (positions[:, 1] / grid_spacing).astype(int)
+            hilberted = np.argsort([xy2d(grid_size,x,y) for x,y in zip(gridx,gridy)])
+            positions = positions[hilberted,:]
+            gridx = (positions[:, 0] / grid_spacing).astype(int)
+            gridy = (positions[:, 1] / grid_spacing).astype(int)
+            grid[gridx,gridy] = np.arange(num_balls)
+            velocities[:] = velocities[hilberted,:]
+           
+        # plotting FPS histograms
         if ct > 100000:
             fig, ax = plt.subplots()
             ax.hist(SFPS, bins=100)
@@ -96,8 +131,6 @@ if __name__ == '__main__':
             ax.set_xlim([0,10000])
             fig.savefig('threads{}.png'.format(nthread))
             
-            
-            #img = mpimg.imread("foo.png")
-            #mpimg.imsave("out.png", img)
             break
-        ct += 1
+
+        ct += 1 # this is so we know when to break after enough time to collect a good histogram
