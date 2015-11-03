@@ -16,6 +16,29 @@ from physics import update, preallocate_locks
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
+def rot(n, x, y, rx, ry):
+    if ry == 0:
+        if rx == 1:
+            x = n-1 - x
+            y = n-1 - y
+        t  = x;
+        x = y;
+        y = t;
+    return x, y
+
+
+def xy2d (n, x, y):
+    rx = ry = s = d = 0
+    s = n/2
+    while s > 0:
+        rx = (x & s) > 0;
+        ry = (y & s) > 0;
+        d += s * s * ((3 * rx) ^ ry);
+        x, y = rot(s, x, y, rx, ry);
+        s /= 2
+    return d
+
+
 if __name__ == '__main__':
     num_balls = 500
     radius = 0.01
@@ -46,7 +69,8 @@ if __name__ == '__main__':
     grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
     grid[(positions[:, 0] / grid_spacing).astype(int),
          (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
-
+    print grid
+    print np.sum(grid)
     # A matplotlib-based animator object
     animator = Animator(positions, radius * 2)
 
@@ -74,9 +98,23 @@ if __name__ == '__main__':
         frame_count += 1
         if total_time > anim_step:
             animator.update(positions)
-            print("{} simulation frames per second".format(frame_count / total_time))
+            #print("{} simulation frames per second".format(frame_count / total_time))
             frame_count = 0
             total_time = 0
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+            hilbert_nums = [xy2d(grid_size, int(x), int(y)) for x, y in positions/grid_spacing]
+            order = np.argsort(hilbert_nums)
+            # Reset the grid
+            grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
+            positions = positions[order]
+            velocities = velocities[order]
+            # Get the grid indicies for the positions.
+            x_positions = (positions[:, 0] / grid_spacing).astype(int)
+            y_positions = (positions[:, 1] / grid_spacing).astype(int)
+            mask = (x_positions < grid_size) & (y_positions < grid_size) & (x_positions >= 0) & (y_positions >= 0)
+            # Make sure to only update positions within the grid.
+            grid[x_positions[mask], y_positions[mask]] = np.arange(num_balls)[mask]
+
+

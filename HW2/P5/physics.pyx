@@ -75,21 +75,20 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     grid_x = <int> (XY[i, 0]/grid_spacing)
     grid_y = <int> (XY[i, 1]/grid_spacing)
 
-    for x_val in range(max(0, grid_x-1), min(grid_size, grid_x+2)):
-        for y_val in range(max(0, grid_y-1), min(grid_size, grid_y+2)):
+    # check 2 squares away in either direction
+    for x_val in range(max(0, grid_x-2), min(grid_size, grid_x+3)):
+        for y_val in range(max(0, grid_y-2), min(grid_size, grid_y+3)):
             if x_val == grid_x and y_val == grid_y:
                 continue
             j = Grid[x_val, y_val]
             if j == -1:
                 continue
-    #for j in range(i + 1, count):
             XY2 = &(XY[j, 0])
             V2 = &(V[j, 0])
             if overlapping(XY1, XY2, R):
                 # SUBPROBLEM 4: Add locking
                 if not moving_apart(XY1, V1, XY2, V2):
                     collide(XY1, V1, XY2, V2)
-
                 # give a slight impulse to help separate them
                 for dim in range(2):
                     V2[dim] += eps * (XY2[dim] - XY1[dim])
@@ -107,7 +106,7 @@ cpdef update(FLOAT[:, ::1] XY,
         int i, j, dim
         FLOAT *XY1, *XY2, *V1, *V2
         # SUBPROBLEM 4: uncomment this code.
-        # omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
+        omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
 
     assert XY.shape[0] == V.shape[0]
     assert XY.shape[1] == V.shape[1] == 2
@@ -117,7 +116,7 @@ cpdef update(FLOAT[:, ::1] XY,
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
-        for i in prange(count, schedule='static', num_threads=4, chunksize=125):
+        for i in prange(count, schedule='static', num_threads=1, chunksize=125):
             for dim in range(2):
                 if (((XY[i, dim] < R) and (V[i, dim] < 0)) or
                     ((XY[i, dim] > 1.0 - R) and (V[i, dim] > 0))):
@@ -127,7 +126,7 @@ cpdef update(FLOAT[:, ::1] XY,
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
-        for i in prange(count, schedule='static', num_threads=4, chunksize=125):
+        for i in prange(count, schedule='static', num_threads=1, chunksize=125):
             sub_update(XY, V, R, i, count, Grid, grid_size, grid_spacing)
 
         # update positions
@@ -135,10 +134,10 @@ cpdef update(FLOAT[:, ::1] XY,
         # SUBPROBLEM 1: parallelize this loop over 4 threads (with static
         #    scheduling).
         # SUBPROBLEM 2: update the grid values.
-        for i in prange(count, schedule='static', num_threads=4, chunksize=125):
+        for i in prange(count, schedule='static', num_threads=1, chunksize=125):
             if (<int> (XY[i, 0]/grid_spacing) < grid_size) and (<int> (XY[i, 1]/grid_spacing) < grid_size):
                 if (<int> (XY[i, 0]/grid_spacing) >= 0) and (<int> (XY[i, 1]/grid_spacing) >= 0):
-                    Grid[<int> (XY[i, 0]/grid_spacing), <int> (XY[i, 1]/grid_spacing)] = -1
+                    Grid[<int> (XY[i, 0]/grid_spacing), <int> (XY[i, 1]/grid_spacing)] = <unsigned int> -1
             for dim in range(2):
                 XY[i, dim] += V[i, dim] * t
             if (<int> (XY[i, 0]/grid_spacing) < grid_size) and (<int> (XY[i, 1]/grid_spacing) < grid_size):

@@ -1,0 +1,8 @@
+Nongridded on MBA. I was getting around 800 frames per second. After doing the gridding, I got 2000 per second.
+
+
+Subproblem 3:
+
+I see around a 10% improvement when using one thread by doing the spatial coherence. I am using the Hilbert curve ordering. In particular, I see a jump on my MBA from around 8000/per second to around 9000 per second. I see very little if any benefit when using multiple
+
+Sub problem 4:
