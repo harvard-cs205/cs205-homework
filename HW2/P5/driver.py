@@ -16,6 +16,8 @@ from physics import update, preallocate_locks
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
+
+# Used for Hilbert ordering
 def rot(n, x, y, rx, ry):
     if ry == 0:
         if rx == 1:
@@ -26,7 +28,7 @@ def rot(n, x, y, rx, ry):
         y = t;
     return x, y
 
-
+# Used for Hilbert Ordering
 def xy2d (n, x, y):
     rx = ry = s = d = 0
     s = n/2

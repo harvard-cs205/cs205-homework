@@ -88,7 +88,7 @@ We see a massive speed up with gridding! Compare these results to the ones above
 
 Subproblem 3:
 
-In both cases, special coherence seemed to basically double the performance from subproblem 2.
+In both cases, special coherence seemed to basically double the performance from subproblem 2. For my choice of spatial sorting, I used the Hilbert ordering. This worked quite well, as it makes sure that elements that are close to eachother in coordinate space are close in memory too. I implemented it in Python by converting the C code on the Wikipedia page to Python.
 
 With 1 threads, we can see that there is a pretty substantial jump in performance by having special coherence.
 
