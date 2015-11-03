@@ -35,13 +35,15 @@ def py_median_3x3(image, iterations=10, num_threads=1):
 
 def py_median_3x3_threads(image, iterations=10, num_threads=1):
     ''' repeatedly filter with a 3x3 median '''
+
     tmpA = image.copy() 
     tmpB = np.empty_like(tmpA)
 
-
-    #Initialize the events one event per (threadid, iteration step) tuple
-    e = [threading.Event() for _ in range(num_threads*iterations)]
-    e = np.reshape(e,(num_threads,iterations))
+    events_matrix = [threading.Event() for _ in range(num_threads*iterations)]
+    # set every events to clear (isSet() == False)
+    map(lambda t: t.clear(), events_matrix)
+    events_matrix = np.reshape(events_matrix,(num_threads,iterations))
+    events_sum = np.zeros((num_threads,iterations))
 
 
     # Create the treads, append them into a list
@@ -49,51 +51,47 @@ def py_median_3x3_threads(image, iterations=10, num_threads=1):
     threads = []
     for thread_id in range(num_threads):
     	# create the threads, pass the function and the inputs
-        t = threading.Thread(target=filter_image, 
-            args=(tmpA, tmpB, iterations, thread_id, num_threads, e))
+
+      	t = threading.Thread(target=filter_image, 
+            args=(tmpA, tmpB, iterations, thread_id, num_threads,
+             events_matrix, events_sum))
         threads.append(t)
-        # threads start working now
-        t.start()
+    # all threads start working now
+    print 'threads start working now'
+    map(lambda t:t.start(), threads)
     # kill all the threads because the work is done
     print 'now joining all the threads'
-    if e
     map(lambda t: t.join(),threads)
 
     return tmpA
     
-def filter_image(tmpA, tmpB, iterations, thread_id,num_threads, e ):
+def filter_image(tmpA, tmpB, iterations, thread_id,num_threads, events_matrix,events_sum ):
 
     
-    for i in range(iterations):
-        # no wait at 1st iteration
-        if i > 0 :
-            # if first line just wait for the next one
-            if thread_id == 0:
-                e[thread_id+1,i-1].wait()
-            # if last line just wait for the one before
-            elif thread_id == num_threads-1:
-                e[thread_id-1,i-1].wait()
-            # else wait for line before and after
-            else :
-                e[thread_id+1,i-1].wait()
-                e[thread_id-1,i-1].wait()
+	for i in range(iterations):
+		# look when iteration >0
+		if i>0:
 
-        # do the job        
-        logging.debug('starting iteration %s with thread_id %s', i, thread_id)
-        filtering.median_3x3(tmpA, tmpB, thread_id, num_threads)
-        logging.debug('ending iteration %s with thread_id %s',  i, thread_id)
+			while not (events_matrix[thread_id, i-1].isSet() 
+				and events_matrix[max(thread_id-1,0),i-1].isSet()
+				and events_matrix[min(thread_id +1, num_threads-1),i-1].isSet()):
+	 	 		 print('thread_id {}, iteration {} is waiting'.format(thread_id,i))
+	 	 		 # wait a bit for the previous iteration to be fully completed
+	 	 		 events_matrix[thread_id,i].wait(1)
+	 	 		 print('thread_id {}, iteration {} is no longer waiting'.format(thread_id,i))
 
 
-        # swap direction of filtering
-        tmpA, tmpB = tmpB, tmpA
+
+		filtering.median_3x3(tmpA,tmpB,thread_id,num_threads)  			
 
 
-        #awakes all the thread waiting for it
-        if num_threads>1:
-            e[thread_id,i].set()
+		# swap direction of filtering once iteration is done
+		events_matrix[thread_id,i].set()
+		print('thread_id {}, iteration {} is set {}'.format(thread_id,i,events_matrix[thread_id,i].isSet()))
+		tmpA, tmpB = tmpB, tmpA
 
 
-    return tmpA
+	return tmpA
 
 def numpy_median(image, iterations=10):
     ''' filter using numpy '''
@@ -120,14 +118,14 @@ if __name__ == '__main__':
     pylab.title('before - zoom')
 
     # verify correctness
-    from_cython = py_median_3x3_threads(input_image, iterations=2, num_threads=2)
+    from_cython = py_median_3x3_threads(input_image, iterations=2, num_threads=3)
     from_numpy = numpy_median(input_image, 2)
     assert np.all(from_cython == from_numpy)
     print 'FIRST TEST IS PASSED'
     print 'NOW DOING THE REAL IMAGE PROCESSING'
 
     with Timer() as t:
-        new_image = py_median_3x3_threads(input_image, 10, 8)
+        new_image = py_median_3x3_threads(input_image, 10, 4)
 
     pylab.figure()
     pylab.imshow(new_image[1200:1800, 3000:3500])
