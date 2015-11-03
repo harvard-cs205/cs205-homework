@@ -1,0 +1,11 @@
+## Serial
+* Unsuprisingly, serial moving was by far the fastest, finishing in just a fraction of a second for both correlated and uncorrelated moves. The fact that this approach was the fastest shows that the overhead introduced by running multiple threads with locks outweighs the gains of parallelism in this case.
+
+## Fine-grained locking
+* Fine-grained locking ran in about 6 seconds. As expected, there was no discernable difference in times for fine-grained correlated and uncorrelated moves. This makes sense because fine-grained locking uses a lock for each piece of data, so the fact that data is moving only between indices near each other does not allow for increase in concurrency or decrease in overhead.
+
+## Medium-grained locking
+* Medium-grained locking — uncorrelated
+    * Performance in moving uncorrelated data with medium-grained got worse as N (the number of adjacent items per lock) increased. This means that the overhead saved by reducing the number of locks was outweighed by the loss in concurrency due to having fewer locks. One would expect this problem to be particularly bad when moving uncorrelated data. Looking at the graph in P2.png, the optimal N appears to be 1 - 5. After this point, performance deteriorates rapidly as N increases.
+* Medium-grained locking — correlated
+    * When moving correlated data, there was a clear optimal N: 20. This is what one would expect, since any move of correlated data is +/- 10 indices from the source. So, splitting up locks in groups of 20 allows a large savings in overhead vs. fine-grained locking, but retains a good level of concurrency, because, on average, moves happen between indices on the same lock. 

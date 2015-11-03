@@ -13,6 +13,30 @@ from timer import Timer
 from animator import Animator
 from physics import update, preallocate_locks
 
+
+def less_msb(x, y):
+    """
+    Helper for cmp_zorder, from https://en.wikipedia.org/wiki/Z-order_curve
+    """
+    return x < y and x < (x ^ y)
+
+
+def cmp_zorder(a, b):
+    """
+    Morton ordering function, adapted from https://en.wikipedia.org/wiki/Z-order_curve
+    """
+    j = 0
+    k = 0
+    x = 0
+    dim = 2
+    for k in range(dim):
+        y = a[1][k] ^ b[1][k]
+        if less_msb(x, y):
+            j = k
+            x = y
+    return a[1][j] - b[1][j]
+
+
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
@@ -80,3 +104,16 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+
+            positions_sorted = zip(xrange(positions.shape[0]), (positions / grid_spacing).astype(int))
+            positions_sorted.sort(cmp_zorder)
+            indices = map(lambda x: x[0], positions_sorted)
+            velocities = velocities[indices]
+            positions = positions[indices]
+
+            # fix grid
+            for i in range(num_balls):
+                if 0 <= positions[i, 0] <= 1 and 0 <= positions[i, 1] <= 1:
+                    grid_x = int(positions[i, 0] / grid_spacing)
+                    grid_y = int(positions[i, 1] / grid_spacing)
+                    grid[grid_x, grid_y] = i

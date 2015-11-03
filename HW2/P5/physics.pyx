@@ -5,6 +5,7 @@ from libc.math cimport sqrt
 from libc.stdint cimport uintptr_t
 cimport cython
 from omp_defs cimport omp_lock_t, get_N_locks, free_N_locks, acquire, release
+from cython.parallel import prange
 
 # Useful types
 ctypedef np.float32_t FLOAT
@@ -55,13 +56,16 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                      float R,
                      int i, int count,
                      UINT[:, ::1] Grid,
-                     float grid_spacing) nogil:
+                     float grid_spacing,
+                     omp_lock_t *locks) nogil:
     cdef:
         FLOAT *XY1, *XY2, *V1, *V2
-        int j, dim
+        int j, dim, gx, gy, grid_size
         float eps = 1e-5
 
     # SUBPROBLEM 4: Add locking
+    # lock i while we check for collisions
+    acquire(&locks[i])
     XY1 = &(XY[i, 0])
     V1 = &(V[i, 0])
     #############################################################
@@ -69,17 +73,38 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     ############################################################
     # SUBPROBLEM 2: use the grid values to reduce the number of other
     # objects to check for collisions.
-    for j in range(i + 1, count):
-        XY2 = &(XY[j, 0])
-        V2 = &(V[j, 0])
-        if overlapping(XY1, XY2, R):
-            # SUBPROBLEM 4: Add locking
-            if not moving_apart(XY1, V1, XY2, V2):
-                collide(XY1, V1, XY2, V2)
+    
+    gx = <int>(XY1[0] / grid_spacing)
+    gy = <int>(XY1[1] / grid_spacing)
 
-            # give a slight impulse to help separate them
-            for dim in range(2):
-                V2[dim] += eps * (XY2[dim] - XY1[dim])
+    grid_size = <int>(1.0 / grid_spacing) + 1
+    
+    # look at cells up to two x values away
+    for j in xrange(gx + 1, gx + 3):
+        # only look at reachable cells
+        for k in xrange(gy + 1, gy + 3 - (j - gx - 1)):
+            if j < grid_size and k < grid_size:
+                # we've found a collision, so now we have to lock the colliding
+                # object as well
+                acquire(&locks[Grid[j,k]])
+
+                XY2 = &(XY[Grid[j, k], 0])
+                V2 = &(V[Grid[j, k], 0])
+
+                if overlapping(XY1, XY2, R):
+                    # SUBPROBLEM 4: Add locking
+                    if not moving_apart(XY1, V1, XY2, V2):
+                        collide(XY1, V1, XY2, V2)
+
+                    # give a slight impulse to help separate them
+                    for dim in xrange(2):
+                        V2[dim] += eps * (XY2[dim] - XY1[dim])
+
+                # we're done fixing the collision, so we can release the lock
+                # on the colliding object
+                release(&locks[Grid[j, k]])
+    # release lock on i
+    release(&locks[i])
 
 cpdef update(FLOAT[:, ::1] XY,
              FLOAT[:, ::1] V,
@@ -90,20 +115,23 @@ cpdef update(FLOAT[:, ::1] XY,
              float t):
     cdef:
         int count = XY.shape[0]
-        int i, j, dim
+        int i, j, dim, chunk_size, num_threads, gx, gy
         FLOAT *XY1, *XY2, *V1, *V2
         # SUBPROBLEM 4: uncomment this code.
-        # omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
+        omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
 
     assert XY.shape[0] == V.shape[0]
     assert XY.shape[1] == V.shape[1] == 2
+
+    chunk_size = count / 4
+    num_threads = 4
 
     with nogil:
         # bounce off of walls
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
-        for i in range(count):
+        for i in prange(count, schedule='static', chunksize=chunk_size, num_threads=num_threads):
             for dim in range(2):
                 if (((XY[i, dim] < R) and (V[i, dim] < 0)) or
                     ((XY[i, dim] > 1.0 - R) and (V[i, dim] > 0))):
@@ -113,17 +141,36 @@ cpdef update(FLOAT[:, ::1] XY,
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
-        for i in range(count):
-            sub_update(XY, V, R, i, count, Grid, grid_spacing)
+        for i in prange(count, schedule='static', chunksize=chunk_size, num_threads=num_threads):
+            sub_update(XY, V, R, i, count, Grid, grid_spacing, locks)
 
         # update positions
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads (with static
         #    scheduling).
         # SUBPROBLEM 2: update the grid values.
-        for i in range(count):
+        for i in prange(count, schedule='static', chunksize=chunk_size, num_threads=num_threads):
+
+            # if this object is in the grid, clear it
+            if XY[i, 0] >= 0 and XY[i, 0] <= 1 and XY[i, 1] >= 0 and XY[i, 1] <= 1:
+                # find spot for this object on grid
+                gx = <int>(XY[i, 0] / grid_spacing)
+                gy = <int>(XY[i, 1] / grid_spacing)
+
+                # clear object
+                Grid[gx, gy] = -1
+
             for dim in range(2):
                 XY[i, dim] += V[i, dim] * t
+
+            # if this object is in the grid, set it
+            if XY[i, 0] >= 0 and XY[i, 0] <= 1 and XY[i, 1] >= 0 and XY[i, 1] <= 1:
+                # find spot for this object on grid
+                gx = <int>(XY[i, 0] / grid_spacing)
+                gy = <int>(XY[i, 1] / grid_spacing)
+
+                # set object
+                Grid[gx, gy] = i
 
 
 def preallocate_locks(num_locks):
