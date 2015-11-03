@@ -1,0 +1,48 @@
+----Parallelized, no grid, num_balls=10000 radius=0.002---
+I got around 14 fps using 1 thread, around 22 fps using 2 threads, and around 30 fps using 4 threads
+
+---Parallelized, with grid, num_balls=10000 radius=0.002---
+4 threads
+2362.83651611 simulation frames per second
+2287.42409519 simulation frames per second
+2350.20013051 simulation frames per second
+2 threads
+1342.68332243 simulation frames per second
+1311.18561989 simulation frames per second
+1312.74319086 simulation frames per second
+1 threads
+695.688173827 simulation frames per second
+642.624652077 simulation frames per second
+718.166872374 simulation frames per second
+
+---Parallelized, with grid, with Morton sorting, num_balls = 10000 radius=0.002---
+I chose to use Morton order to sort the points. The comparison function was found on Wikipedia.
+4 threads 
+2977.04843564 simulation frames per second
+3004.7714918 simulation frames per second
+2835.36048729 simulation frames per second
+2 threads
+1368.74609787 simulation frames per second
+1359.39789613 simulation frames per second
+1328.30154686 simulation frames per second
+1 thread
+829.452439472 simulation frames per second
+886.182970632 simulation frames per second
+827.442099033 simulation frames per second
+
+There was a noticeable increase in fps for 1 and 4 threads when using morton sorting and a slight difference for 2 threads.
+
+---Parallelized, with grid, with lock, with morton sorting, num_balls=10000 radius=0.002---
+I found that running with locks slowed the program down a bit. This may be due to the overhead of acquiring and releasing locks.
+4 threads
+2713.69828653 simulation frames per second
+2662.40438203 simulation frames per second
+2673.70726352 simulation frames per second
+2 threads
+1311.28810067 simulation frames per second
+1359.33085334 simulation frames per second
+1333.69851398 simulation frames per second
+1 thread
+731.091991689 simulation frames per second
+739.470102468 simulation frames per second
+762.025211728 simulation frames per second

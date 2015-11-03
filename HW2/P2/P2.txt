@@ -1,0 +1,55 @@
+After testing, I found that serial execution was the fastest of the three. My guess is that the overhead of acquiring/releasing locks trumps the speedup gained from parallel execution.
+
+I didn't see much difference in execution time for correlated and uncorrelated. In fact, medium grained correlated had a slightly longer execution time. 
+
+	---Results with num_threads=4, N=10---
+Serial uncorrelated: 0.000482082366943 seconds
+Fine grained uncorrelated: 0.00493502616882 seconds
+Medium grained uncorrelated: 0.0139079093933 seconds
+Serial correlated: 0.000234127044678 seconds
+Fine grained correlated: 0.0041618347168 seconds
+Medium grained correlated: 0.0184750556946 second
+
+--Results with num_threads=4, N=20---
+Serial uncorrelated: 0.000226974487305 seconds
+Fine grained uncorrelated: 0.00472497940063 seconds
+Medium grained uncorrelated: 0.0173051357269 seconds
+Serial correlated: 0.000232934951782 seconds
+Fine grained correlated: 0.00413203239441 seconds
+Medium grained correlated: 0.0157570838928 seconds
+
+--Results with num_threads=4, N=50---
+Serial uncorrelated: 0.000347852706909 seconds
+Fine grained uncorrelated: 0.00603604316711 seconds
+Medium grained uncorrelated: 0.0145161151886 seconds
+Serial correlated: 0.000228881835938 seconds
+Fine grained correlated: 0.00416421890259 seconds
+Medium grained correlated: 0.0255928039551 seconds
+
+--Results with num_threads=4, N=80---
+Serial uncorrelated: 0.000235080718994 seconds
+Fine grained uncorrelated: 0.00479197502136 seconds
+Medium grained uncorrelated: 0.0153050422668 seconds
+Serial correlated: 0.000230073928833 seconds
+Fine grained correlated: 0.00413513183594 seconds
+Medium grained correlated: 0.0246541500092 seconds
+
+--Results with num_threads=4, N=90---
+Serial uncorrelated: 0.000248193740845 seconds
+Fine grained uncorrelated: 0.00489091873169 seconds
+Medium grained uncorrelated: 0.0156679153442 seconds
+Serial correlated: 0.000231981277466 seconds
+Fine grained correlated: 0.00414800643921 seconds
+Medium grained correlated: 0.0246689319611 seconds
+
+--Results with num_threads=4, N=100---
+Serial uncorrelated: 0.000813007354736 seconds
+Fine grained uncorrelated: 0.00867915153503 seconds
+Medium grained uncorrelated: 0.0169939994812 seconds
+Serial correlated: 0.000267028808594 seconds
+Fine grained correlated: 0.00433588027954 seconds
+Medium grained correlated: 0.0234479904175 seconds
+
+
+
+
