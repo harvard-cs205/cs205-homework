@@ -4,4 +4,9 @@ With four threads, the simulation runs at about 21-24 frames per second, while w
 
 SUBPROBLEM 2: SPATIAL DECOMPOSITION
 ----
-With four threads, the gridded simulation runs at 1500-1900 frames/second, and with a single thread, 600-700 frames/second - an enormous speedup relative to the ungridded code! Because there are a large number of objects, the real-time difference between a O(n^2) and a O(n) algorithm for detecting collisions is very significant.
+With four threads, the gridded simulation runs at 1500-1900 frames/second, and with a single thread, 600-700 frames/second - an enormous speedup relative to the ungridded code (65-75x faster)! Because there are a large number of objects, the real-time difference between a O(n^2) and a O(n) algorithm for detecting collisions is very significant.
+
+SUBPROBLEM 3: SPATIALLY COHERENT SORTING
+----
+With four threads, the sorted simulation runs at 1800-2100 frames/second, and with one thread, it runs at 650-850 frames/second - in both cases about a 15% speedup on top of the gridded simulation without sorting. Having the objects sorted in a spatially coherent order increases the likelihood of coalesced memory reads when retrieving the positions and velocities of objects in adjacent grid squares.
+However, we're only timing the actual update step, not the time it takes to sort, so it's unclear whether this results in overall better performance. We only perform the sort when we update the animation, rather than on every physics step, but that's still a sort every 1/30 of a second or so, which could significantly slow down our simulation overall (even if it can't be measured in the speed of the update itself).
