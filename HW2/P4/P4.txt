@@ -1,0 +1,15 @@
+1. Results
+For 1 threads: 12.1930088997 seconds for 10 filter passes.
+For 2 threads: 7.48504090309 seconds for 10 filter passes.
+For 4 threads: 7.43479013443 seconds for 10 filter passes.
+For 8 threads: 7.12330198288 seconds for 10 filter passes.
+Since I ran these codes in the virtual machine, the time spent is quite long.
+Using 2 threads instead of 1 thread, the speed improves a lot. But from 2 to 4 threads or from 4 to 8 threads, the improvement of speed is relatively small. The reason may lie in that there is some overhead in communications between multiple threads.
+
+2. Conclusion
+The codes in driver.py allow threads to begin an iteration of filtering asychronously.
+We firstly set up an array of threading.Event() with the size of (num_threads,iterations). Notice that their internal flags are initial False.
+For iteration 1, we firstly use Event.set() to set the internal flags of all n threads at iteration 1 as True. Similarly in the remaining iterations, we use Event.set() to mark that this Event has been completed. 
+Notice that for iteration i, thread n must wait until thread n-1, n, n+1 complete iteration i-1. Therefore, we still need to modify a little bit. Here, Event.wait() is an easy way to make it. 
+For the event of iteration i thread j, that is Event[j,i], using Event[j-1,i-1].wait() and Event[j+1,i-1].wait() to ensure that only the internal flags of Event[j-1,i-1] and Event[j+1,i-1] are set as True, Event[j,i] can start. Notice that there are two special cases: thread 0 and thread (# of threads -1), which only need to wait for one thread. 
+

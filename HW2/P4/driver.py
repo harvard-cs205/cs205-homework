@@ -19,14 +19,52 @@ def py_median_3x3(image, iterations=10, num_threads=1):
     ''' repeatedly filter with a 3x3 median '''
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
+    
+    if num_threads == 1:
+        for i in range(iterations):
+            filtering.median_3x3(tmpA, tmpB, 0, num_threads)
+            # swap direction of filtering
+            tmpA, tmpB = tmpB, tmpA
 
-    for i in range(iterations):
-        filtering.median_3x3(tmpA, tmpB, 0, 1)
-        # swap direction of filtering
-        tmpA, tmpB = tmpB, tmpA
-
+    else:
+        #Set up (num_threads,iterations) threading events with the internal flag as False initially
+        times = num_threads*iterations 
+        processes = np.array([threading.Event()]*times).reshape((num_threads,iterations))
+       
+        #Set up multiple threads
+        threads = []  
+        for thread_j in range(num_threads):
+            x = threading.Thread(target=f, args=(thread_j, num_threads, tmpA, tmpB, processes, iterations))
+            x.start()
+            threads.append(x)
+        for x in threads:
+            x.join()
+        
+    #Return filtered image
     return tmpA
-
+    
+def f(j, num_threads, tmpA, tmpB, processes, iterations):
+    for i in range(iterations):
+        if i==0:
+            pass
+        else:
+            # iteration i thread 0 after completed iteration i-1 thread 1
+            if j == 0:
+                processes[j+1,i-1].wait()
+            # iteration i thread (num_threads-1) after completed iteration i-1 thread (num_thread-2)
+            elif j == num_threads-1:
+                processes[j-1,i-1].wait()
+            # iteration i thread j after completed iteration i-1 thread j-1, j+1
+            else:
+                processes[j-1,i-1].wait()
+                processes[j+1,i-1].wait()
+           
+        filtering.median_3x3(tmpA, tmpB, j, num_threads)
+        #set the internal flag to true
+        processes[j,i].set()
+    	# swap direction of filtering
+        tmpA, tmpB = tmpB, tmpA
+    
 def numpy_median(image, iterations=10):
     ''' filter using numpy '''
     for i in range(iterations):
