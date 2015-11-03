@@ -1,0 +1,38 @@
+The results are showed as following:
+uncorrelated data:
+Serial uncorrelated: 0.234759092331 seconds
+Fine grained uncorrelated: 6.64988994598 seconds
+('N= ', 1)
+Medium grained uncorrelated: 7.46750092506 seconds
+('N= ', 2)
+Medium grained uncorrelated: 7.33613705635 seconds
+('N= ', 5)
+Medium grained uncorrelated: 8.15461802483 seconds
+('N= ', 10)
+Medium grained uncorrelated: 6.98962879181 seconds
+('N= ', 20)
+Medium grained uncorrelated: 7.20181894302 seconds
+('N= ', 50)
+Medium grained uncorrelated: 7.4577589035 seconds
+('N= ', 100)
+Medium grained uncorrelated: 8.49353504181 seconds
+
+correlated data:
+Serial correlated: 0.299633026123 seconds
+Fine grained correlated: 6.33276104927 seconds
+('N= ', 1)
+Medium grained correlated: 7.18672704697 seconds
+('N= ', 2)
+Medium grained correlated: 8.95311999321 seconds
+('N= ', 5)
+Medium grained correlated: 7.03599596024 seconds
+('N= ', 10)
+Medium grained correlated: 7.43090796471 seconds
+('N= ', 20)
+Medium grained correlated: 7.42757701874 seconds
+('N= ', 50)
+Medium grained correlated: 8.30321097374 seconds
+('N= ', 100)
+Medium grained correlated: 9.80360889435 seconds
+
+From the results, we can see that in both of uncorrelated and correlated problem, serial result is the fastest. I think that's because acquiring and releasing locks are costing time in medium and fine grained method, while serial method has nothing to do with locks. The find grained result is closed to the result of medium method when N=1. For the medium method, we can see increasing the value of N is not always helping to speed up. The best N in this problem should be about 10.

@@ -1,0 +1,7 @@
+The results are showed as following:
+
+1 thread:  3.39990720749 seconds for 10 filter passes.
+2 treahds: 1.80069234546 seconds for 10 filter passes.
+4 threads: 1.60292343712 seconds for 10 filter passes.
+
+In this problem, I did the parallelizing by running multiple threads on the exchange step and then joined them together before going to the next iteration. From the result, we can see that the amount of time decreased dramatically when the number of threads changed from 1 to 2. However, when it came to 4, the difference of time was slight.

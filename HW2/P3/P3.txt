@@ -1,0 +1,21 @@
+The results are showed as following:
+
+1) threads = 1
+i) without AVX
+1074.656613 Million Complex FMAs in 4.29220914841 seconds, 250.373776264 million Complex FMAs / second
+ii) with AVX
+1074.94829 Million Complex FMAs in 0.629445953369 seconds, 1515.19405375 million Complex FMAs / second
+
+threads = 2
+i) without AVX
+1074.656613 Million Complex FMAs in 2.17540884018 seconds, 494.002135668 million Complex FMAs / second
+ii) with AVX
+1074.94829 Million Complex FMAs in 0.351073026657 seconds, 3061.8937041 million Complex FMAs / second
+
+threads = 4
+i) without AVX
+1074.656613 Million Complex FMAs in 1.11793398857 seconds, 961.288076028 million Complex FMAs / second
+ii) with AVX
+1074.94829 Million Complex FMAs in 0.198133010864 seconds, 5334.52602516 million Complex FMAs / second
+
+From the results, we can see the throughput increased proportional to the number of threads being used.
