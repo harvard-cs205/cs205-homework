@@ -1,10 +1,11 @@
-#cython: boundscheck=False, wraparound=False
+#cython: boundscheck=True, wraparound=False
 
 cimport numpy as np
 from libc.math cimport sqrt
 from libc.stdint cimport uintptr_t
 cimport cython
 from omp_defs cimport omp_lock_t, get_N_locks, free_N_locks, acquire, release
+from cython.parallel import prange
 
 # Useful types
 ctypedef np.float32_t FLOAT
@@ -50,81 +51,154 @@ cdef inline void collide(FLOAT *x1, FLOAT *v1,
         v1[dim] -= change_v1[dim]
         v2[dim] += change_v1[dim]  # conservation of momentum
 
+# Function to rectify grid index boundaries        
+cdef int correct_bounds(int grid_ind, int grid_sz) nogil:
+        # Make sure we're not indexing outside the grid    
+    if grid_ind < 0:
+        grid_ind = 0
+    if grid_ind > grid_sz - 1:
+        grid_ind = grid_sz - 1
+    return grid_ind
+    
 cdef void sub_update(FLOAT[:, ::1] XY,
                      FLOAT[:, ::1] V,
                      float R,
                      int i, int count,
                      UINT[:, ::1] Grid,
-                     float grid_spacing) nogil:
+                     float grid_size,
+                     omp_lock_t *locks) nogil:
     cdef:
         FLOAT *XY1, *XY2, *V1, *V2
-        int j, dim
+        int j, dim, grid_ind_x1, grid_ind_y1, 
+        int x_search_grid_i, y_search_grid_i, probe_grid_x, probe_grid_y
         float eps = 1e-5
-
+        UINT obj_ind, dummy_max = -1
+        
     # SUBPROBLEM 4: Add locking
+    acquire(&(locks[i]))
     XY1 = &(XY[i, 0])
     V1 = &(V[i, 0])
     #############################################################
     # IMPORTANT: do not collide two balls twice.
     ############################################################
-    # SUBPROBLEM 2: use the grid values to reduce the number of other
-    # objects to check for collisions.
-    for j in range(i + 1, count):
-        XY2 = &(XY[j, 0])
-        V2 = &(V[j, 0])
-        if overlapping(XY1, XY2, R):
-            # SUBPROBLEM 4: Add locking
-            if not moving_apart(XY1, V1, XY2, V2):
-                collide(XY1, V1, XY2, V2)
 
-            # give a slight impulse to help separate them
-            for dim in range(2):
-                V2[dim] += eps * (XY2[dim] - XY1[dim])
+
+#==============================================================================
+#     for j in range(i + 1, count):
+#         XY2 = &(XY[j, 0])
+#         V2 = &(V[j, 0])
+#         
+# #        overlap_wrap(XY1, V1, XY2, V2, R, eps, grid_size, i, j)
+#         if overlapping(XY1, XY2, R):
+#             # SUBPROBLEM 4: Add locking
+#             if not moving_apart(XY1, V1, XY2, V2):
+#                 collide(XY1, V1, XY2, V2)
+# 
+#             # give a slight impulse to help separate them
+#             for dim in range(2):
+#                 V2[dim] += eps * (XY2[dim] - XY1[dim])
+#==============================================================================
+                
+    # Find the grid coordinates of the current particle
+    grid_ind_x1 = <int>(XY1[0] * grid_size)
+    grid_ind_y1 = <int>(XY1[1] * grid_size)
+        
+    # Make sure we're not indexing outside the grid   
+    grid_ind_x1 = correct_bounds(grid_ind_x1, Grid.shape[0])
+    grid_ind_y1 = correct_bounds(grid_ind_y1, Grid.shape[0])
+        
+    # Only check the 5 by 5 window around the center space
+    for x_search_grid_i in range(-2, 3):
+        for y_search_grid_i in range(-2, 3):
+            # Determine which square we are looking at
+            probe_grid_x = grid_ind_x1 + x_search_grid_i
+            probe_grid_y = grid_ind_y1 + y_search_grid_i
+
+            # Check the grid location only if the probing location is a valid one
+            # and if it's not in the center
+            if (probe_grid_x == correct_bounds(probe_grid_x, Grid.shape[0])
+            and probe_grid_y == correct_bounds(probe_grid_y, Grid.shape[0])
+            and not (x_search_grid_i == 0 and y_search_grid_i == 0)
+            and Grid[probe_grid_x, probe_grid_y] != i):
+
+                # Check out the probing spot
+                obj_ind = Grid[probe_grid_x, probe_grid_y]
+
+                # If it's not empty, 
+                # and make sure we don't count collisions twice.
+                if (obj_ind != dummy_max
+                and obj_ind >= i + 1 
+                and obj_ind < count): 
+                    acquire(&(locks[obj_ind]))
+                    XY2 = &(XY[obj_ind, 0])
+                    V2 = &(V[obj_ind, 0])
+                    if overlapping(XY1, XY2, R):
+                        # SUBPROBLEM 4: Add locking
+                        if not moving_apart(XY1, V1, XY2, V2):
+                            collide(XY1, V1, XY2, V2)
+    
+                        # give a slight impulse to help separate them
+                        for dim in range(2):
+                            V2[dim] += eps * (XY2[dim] - XY1[dim])
+                    release(&(locks[obj_ind]))
+    release(&(locks[i]))
+
+
 
 cpdef update(FLOAT[:, ::1] XY,
              FLOAT[:, ::1] V,
              UINT[:, ::1] Grid,
              float R,
-             float grid_spacing,
+             float grid_size,
              uintptr_t locks_ptr,
              float t):
     cdef:
         int count = XY.shape[0]
-        int i, j, dim
-        FLOAT *XY1, *XY2, *V1, *V2
-        # SUBPROBLEM 4: uncomment this code.
-        # omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
-
+        int i, j, dim, n_threads = 4, chunksz
+        FLOAT *XY1, *XY2, *V1, *V2, prev_pos[2]
+        omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
+        
+    chunksz = <int>(round(R / n_threads))
     assert XY.shape[0] == V.shape[0]
     assert XY.shape[1] == V.shape[1] == 2
 
+    
     with nogil:
         # bounce off of walls
-        #
-        # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
-        # scheduling.
-        for i in range(count):
+        for i in prange(count, 
+                    schedule='static', 
+                    chunksize=chunksz,
+                    num_threads=n_threads):
             for dim in range(2):
                 if (((XY[i, dim] < R) and (V[i, dim] < 0)) or
                     ((XY[i, dim] > 1.0 - R) and (V[i, dim] > 0))):
                     V[i, dim] *= -1
 
         # bounce off of each other
-        #
-        # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
-        # scheduling.
-        for i in range(count):
-            sub_update(XY, V, R, i, count, Grid, grid_spacing)
+        for i in prange(count, 
+                        schedule='static', 
+                        chunksize=chunksz,
+                        num_threads=n_threads):
+            sub_update(XY, V, R, i, count, Grid, grid_size, locks)
 
         # update positions
-        #
-        # SUBPROBLEM 1: parallelize this loop over 4 threads (with static
-        #    scheduling).
-        # SUBPROBLEM 2: update the grid values.
-        for i in range(count):
+        for i in prange(count, 
+                        schedule='static', 
+                        chunksize=chunksz,
+                        num_threads=n_threads):
             for dim in range(2):
-                XY[i, dim] += V[i, dim] * t
+                # Record the previous particle position 
+                # so that we can update the grid
+                prev_pos[dim] = XY[i, dim]
 
+                XY[i, dim] += V[i, dim] * t
+            # Move object i to the new grid spot                
+            Grid[correct_bounds(<int>(prev_pos[0] * grid_size), 
+                                Grid.shape[0]),
+                 correct_bounds(<int>(prev_pos[1] * grid_size), 
+                                Grid.shape[0])] = -1
+            Grid[correct_bounds(<int>(XY[i, 0] * grid_size), Grid.shape[0]),
+                 correct_bounds(<int>(XY[i, 1] * grid_size), Grid.shape[0])] = i
 
 def preallocate_locks(num_locks):
     cdef omp_lock_t *locks = get_N_locks(num_locks)

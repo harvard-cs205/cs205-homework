@@ -1,0 +1,11 @@
+Multithreading subproblem:
+Increasing the number of threads from 1 to 4 to perform the simulation frame updates increases the frame rate over 3-fold from about 5 frames per second to about 17 frames per second, a substantial improvement.
+
+Spatial decomposition subproblem:
+Implementing the spatial decomposition for overlap detection increases the frame rate from about 5 frames per second to about 350 frames per second for 1 thread, and about 17 fps to about 850. The improvement is massive! The reason for this speed up from implementing the spatial decomposition is the change in the efficiency of the algorithm from quadratic to linear. The speed up from the extra threads is about 3-fold, as we saw earlier.
+
+Spatial coherence subproblem:
+I implemented morton ordering to sort the ball positions such that spatially close balls would be closer together. This yields a mild improvement to about 900 fps on 4 threads, and maybe about 375 fps for 1 thread. There may be better ways to promote spatial coherence, but the improvement here is marginal.
+
+Locks subproblem:
+I implemented locks to protect reading & writing the velocities of balls during their collisions (locking 2 balls per thread at a time). Deadlocks are avoided as long as we always lock the lower index ball first. Performance drops a bit, because of the overhead from communicating with the locks, to about 650 from 900 for 4 threads. 
