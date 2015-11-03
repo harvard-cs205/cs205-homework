@@ -1,5 +1,4 @@
 #cython: boundscheck=False, wraparound=False
-#yup
 cimport numpy as np
 from libc.math cimport sqrt
 from libc.stdint cimport uintptr_t
@@ -10,8 +9,6 @@ from cython.parallel import parallel, prange
 # Useful types
 ctypedef np.float32_t FLOAT
 ctypedef np.uint32_t UINT
-
-@cython.boundscheck(True)
 
 cdef inline int overlapping(FLOAT *x1,
                             FLOAT *x2,
@@ -83,7 +80,6 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     size = <unsigned int> ((1.0 / grid_spacing) + 1)
 
     # iterate over all points that are at most 2 away
-    # with gil: print("dang collide")
     for idx in range(x_coord + 1, x_coord + 3): 
         for idy in range(y_coord + 1, y_coord + 4 - (idx - x_coord)): 
         
@@ -97,8 +93,8 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                     
                     # SUBPROBLEM 4: Add locking
                     acquire(&(locks[Grid[idx, idy]]))
+
                     if not moving_apart(XY1, V1, XY2, V2):
-                        # with gil: print "dang collide"
                         collide(XY1, V1, XY2, V2)
                     
                     # give a slight impulse to help separate them

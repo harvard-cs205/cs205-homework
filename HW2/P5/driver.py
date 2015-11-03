@@ -16,7 +16,7 @@ from physics import update, preallocate_locks
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
     
-#from the wiki page on z-order curve
+# from the wiki page on z-order curve
 def cmp_zorder(a, b):
     j = 0
     k = 0
@@ -105,10 +105,10 @@ if __name__ == '__main__':
             positions = np.array(positions)[position_indices]
             velocities = np.array(velocities)[position_indices]
             
-            # reset
+            # reset the grid
             grid[:,:] = -1
             
-            # update grid locations
+            # iterate through balls and update
             for i in range(num_balls):
                 # check if within bounds
                 if positions[i,0] >= 0 and positions[i,1] >= 0 and positions[i,0] <= 1 and positions[i,1] <= 1:
