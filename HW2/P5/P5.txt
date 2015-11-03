@@ -39,6 +39,7 @@ Subproblem 1:
 9.39893737409 simulation frames per second
 8.29896260593 simulation frames per second
 
+--------------------------------------------------------------
 
 Subproblem 2:
  
@@ -133,12 +134,7 @@ With 4 threads, we can see a big increase in performance with the spacial cohere
 
 
 
-
-
-
-
-
---------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
 
 Sub problem 4 (Locking with 4 threads):
 I ran the simulation with the full number of balls and the true radius. Note that I ran this code on a Macbook Air (2013), so these results were a decent amount slower than when I borrowed my friend's Macbook Pro and ran it on there. 
