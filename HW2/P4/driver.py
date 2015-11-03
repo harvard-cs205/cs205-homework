@@ -95,34 +95,42 @@ def numpy_median(image, iterations=10):
 if __name__ == '__main__':
     input_image = np.load('image.npz')['image'].astype(np.float32)
 
-    pylab.gray()
+    # pylab.gray()
 
-    pylab.imshow(input_image)
-    pylab.title('original image')
+    # pylab.imshow(input_image)
+    # pylab.title('original image')
 
-    pylab.figure()
-    pylab.imshow(input_image[1200:1800, 3000:3500])
-    pylab.title('before - zoom')
+    # pylab.figure()
+    # pylab.imshow(input_image[1200:1800, 3000:3500])
+    # pylab.title('before - zoom')
 
     # verify correctness
     from_cython = py_median_3x3_threading(input_image, 2, 5)
     from_numpy = numpy_median(input_image, 2)
     assert np.all(from_cython == from_numpy), "Not equal to numpy"
 
-    with Timer() as t:
-        new_image_threading = py_median_3x3_threading(input_image, 10, 8)
+    with Timer() as t_1:
+        new_image_threading = py_median_3x3_threading(input_image, 10, 1)
+
+    with Timer() as t_2:
+        new_image_threading = py_median_3x3_threading(input_image, 10, 2)
+
+    with Timer() as t_4:
+        new_image_threading = py_median_3x3_threading(input_image, 10, 4)
 
     with Timer() as tt:
         new_image_no_threading = py_median_3x3(input_image, 10, 1)
 
     assert np.all(new_image_threading == new_image_no_threading), "not equal to non-threading version"
 
-    pylab.figure()
-    pylab.imshow(new_image_threading[1200:1800, 3000:3500])
-    pylab.title('after - zoom')
+    # pylab.figure()
+    # pylab.imshow(new_image_threading[1200:1800, 3000:3500])
+    # pylab.title('after - zoom')
 
-    print("{} seconds for 10 filter passes with threading.".format(t.interval))
-    print("{} seconds for 10 filter passes without threading.".format(tt.interval))
+    print("One way parallelism: {} seconds for 10 filter passes with threading.".format(t_1.interval))
+    print("Two way parallelism: {} seconds for 10 filter passes with threading.".format(t_2.interval))
+    print("Four way parallelism: {} seconds for 10 filter passes with threading.".format(t_4.interval))
+    print("Baseline: {} seconds for 10 filter passes without threading.".format(tt.interval))
 
     pylab.show()
 

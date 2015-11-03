@@ -1,0 +1,11 @@
+
+Below are the results I found for 1, 2, and 4 way parallelism along with a baseline test with the given code. 
+
+One way parallelism: 3.8034620285 seconds for 10 filter passes with threading.
+Two way parallelism: 2.61184000969 seconds for 10 filter passes with threading.
+Four way parallelism: 1.67748498917 seconds for 10 filter passes with threading.
+Baseline: 3.65289092064 seconds for 10 filter passes without threading.
+
+In order to execute this program, I implemented a 2 dimensional array of Events which controls threads by thread identification and iteration.These events allowed me to place conditional statements on each thread, essentially establishing barriers that must be met before a thread could move onto the next iteration of smoothing. The barrier, through Events, on each thread, required each thread and their neighbors to have fully completed the previous iteration prior to executing the next iteration. After each iteration, all threads 'set' the Event, comminucating to all other threads through the Events array that they had just completed the proper iteration. 
+
+From the data above it is clear that parallelism does improve computational performance, but there is a fixed cost associated with the logic associated with the thread sychronization provided by the Events. This is seen by the poor performance of the single threaded parallel funciton compared to the baseline function. 
