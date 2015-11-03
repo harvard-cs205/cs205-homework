@@ -1,0 +1,19 @@
+Without instruction-level parallelism:
+1 thread:
+1074.656613 Million Complex FMAs in 4.56836414337 seconds, 235.238824943 million Complex FMAs / second
+
+2 threads:
+1074.656613 Million Complex FMAs in 2.35377597809 seconds, 456.567074779 million Complex FMAs / second
+
+4 threads:
+1074.656613 Million Complex FMAs in 1.23364090919 seconds, 871.125953258 million Complex FMAs / second
+
+With instruction-level parallelism:
+1 thread:
+1074.948292 Million Complex FMAs in 0.711071968079 seconds, 1511.72924859 million Complex FMAs / second
+
+2 thread:
+1074.948292 Million Complex FMAs in 0.357582092285 seconds, 3006.15806885 million Complex FMAs / second
+
+4 thread:
+1074.948292 Million Complex FMAs in 0.175825119019 seconds, 6113.73561412 million Complex FMAs / second

@@ -1,0 +1,24 @@
+For fine grained lock and medium grained lock, it takes much more time than serial version in both correlated and uncorrelated case, due to a lot of overhead. Here is one result with N=10 for medium grained lock:
+
+Serial uncorrelated: 0.245481014252 seconds
+Fine grained uncorrelated: 4.79588294029 seconds
+Medium grained uncorrelated: 5.32975411415 seconds
+Serial correlated: 0.272443056107 seconds
+Fine grained correlated: 4.33650183678 seconds
+Medium grained correlated: 4.09460902214 seconds 
+
+The time for medium grained locking on correlated data is expectedly less than that on uncorrelated data, because the src and dest are no more than 10 elements away, so when I lock with 10 adjacent elements, I only need to lock once for both src and dest, thus reduce the time.
+
+To find an appropriate N, I tested N in range(1,50,3), and get the image P2.png.
+In the image, the N didn't seem to reduce the time for uncorrelated data, but for correlated data, it seems N=34 would be a good choice. But note that the time is still much more than serial version.
+
+With N=34, the result is:
+
+Serial uncorrelated: 0.243481874466 seconds
+Fine grained uncorrelated: 4.7035369873 seconds
+Medium grained uncorrelated: 5.74308109283 seconds
+Serial correlated: 0.274203062057 seconds
+Fine grained correlated: 4.46500205994 seconds
+Medium grained correlated: 3.3696000576 seconds
+
+In this result you can really tell the effect of the correlation of the data.

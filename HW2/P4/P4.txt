@@ -1,0 +1,12 @@
+Performance:
+serial: 
+3.14122104645 seconds for 10 filter passes
+
+2 threads:
+1.63222002983 seconds for 10 filter passes
+
+4 threads:
+1.09681010246 seconds for 10 filter passes
+
+My implementation of multithreading is simple. In one iteration, every thread filters certain rows of the image. For every iteration, I wait for all the threads to complete and then start the next iteration all at once. To do this, I used Event objects in the threading module.
+Each thread has an event, called worker_event, and they are stored in a list. And there's an main_event which is used by main thread to monitor all the threads. When a thread is done one iteration, it notifies the main thread by seting its worker_event to be ture, and also waits for the main_event. And the main thread will wait for all the worker_events. When they are all done, the main thread will set the main_event to be true and then all the threads can run the next iteration. And the main thread will clear the main_event, to prepare for the next round.

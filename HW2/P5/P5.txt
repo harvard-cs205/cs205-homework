@@ -1,0 +1,78 @@
+(All the results are taken from 3 iterations)
+
+1. Multithreading:
+Using 4 threads, the performance is 2x faster. Some of the results are shown as follows:
+
+Serial:
+13.1518340368 simulation frames per second
+12.8244607176 simulation frames per second
+12.8404005523 simulation frames per second
+
+using 4 threads:
+29.3281310091 simulation frames per second
+28.6656733963 simulation frames per second
+22.7210400867 simulation frames per second
+
+It's actually slower than I expected, because I thought it would be about 4x faster. But maybe due to the overhead, the performance isn't that ideal.
+
+2. Spatial decomposition
+Some results:
+
+Serial, non-grided:
+13.1518340368 simulation frames per second
+12.8244607176 simulation frames per second
+12.8404005523 simulation frames per second
+
+Serial, grided:
+1617.79141578 simulation frames per second
+1605.31590698 simulation frames per second
+1569.05977018 simulation frames per second
+
+4 threads, non-grided:
+29.3281310091 simulation frames per second
+28.6656733963 simulation frames per second
+22.7210400867 simulation frames per second
+
+4 threads, grided:
+2154.8542071 simulation frames per second
+2000.9282561 simulation frames per second
+2022.94272603 simulation frames per second
+
+As you could see, the griding largely improves the performance.
+For serial version, the griding enables over 100x more fps, while for 4 threads version, it brings about 70x more fps.
+This is expected because the griding reduces large amount of unnecessary computations (only check collision for a constant number of neighbors), reducing the Update algorithm from O(N^2) to O(N).
+
+
+3. Spatially Coherent Sorting
+For this part, I didn't use the complex z-ordering or hilbert ordering. Rather, I simply sort the balls by their x-coordinates in each row of the grid. For example, if I have 3 balls in the first row of the grid, from left to right, I assign them number 0, 1, 2. In the second row, suppose there're 2 balls, so from left to right, I assign them number 3 and 4, and so on. And I use the resulting indices to reorder the positions array and velocities array.
+
+This kind of ordering isn't as good as z-ordering and hilbert ordering, but still it makes sense and it's simple. The balls near in space are also near in memory. And indeed I got a performance gain of about 700 fps for serial version and about 400 fps for 4 threads version. This gain is expected because the sorting will reduce I/O time when reading/writing positions and velocities.
+
+Here's the performance I got:
+
+Serial, grided, with sorting: 
+2288.42900062 simulation frames per second
+2306.3894479 simulation frames per second
+2282.99360968 simulation frames per second
+
+4 threads, grided, with sorting:
+2450.13590933 simulation frames per second
+2461.70709321 simulation frames per second
+2523.18423735 simulation frames per second
+
+
+4. Locking
+The locking decreases the fps quite much, as expected:
+
+4 threads, grided, with sorting, with locking:
+1670.53828537 simulation frames per second
+1614.04037082 simulation frames per second
+1686.87214151 simulation frames per second
+
+4 threads, grided, with sorting, without locking:
+2450.13590933 simulation frames per second
+2461.70709321 simulation frames per second
+2523.18423735 simulation frames per second
+
+
+
