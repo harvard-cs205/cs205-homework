@@ -1,0 +1,11 @@
+1. Multithreading without Instruction-level Parallelism
+num_threads=4: 1074.677197 Million Complex FMAs in 2.04164409637 seconds, 526.37832368 million Complex FMAs / second
+num_threads=2: 1074.677197 Million Complex FMAs in 3.35357999802 seconds, 320.456705263 million Complex FMAs / second
+num_threads=1: 1074.677197 Million Complex FMAs in 6.18445491791 seconds, 173.770722119 million Complex FMAs / second
+
+2. Multithreading with Instruction-level Parallelism
+
+num_threads=4: 1074.94829 Million Complex FMAs in 0.412628173828 seconds, 2605.12577226 million Complex FMAs / second
+num_threads=2: 1074.94829 Million Complex FMAs in 0.628328084946 seconds, 1710.80732464 million Complex FMAs / second
+num_threads=1: 1074.94829 Million Complex FMAs in 1.06235384941 seconds, 1011.85522187 million Complex FMAs / second
+
