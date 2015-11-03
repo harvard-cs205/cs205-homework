@@ -1,3 +1,11 @@
+For this problem, we perform embarassingly parallel work by
+having threads perform filtering pass within each iteration.
+Because each thread works on separate set of lines, there is
+no need for synchronization, thus we get simple and easy
+speedup. Alternatively (not implemented), one could spawn N
+standing threads and have each thread lock the current row it's
+working on. This way we'd be able to achieve asynchronous execution.
+
 18.1305727959 seconds for 10 filter passes, using 1 threads
 18.2412829399 seconds for 10 filter passes, using 2 threads
 20.6675288677 seconds for 10 filter passes, using 4 threads

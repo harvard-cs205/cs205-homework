@@ -57,7 +57,9 @@ Running with 4 threads:
 The sorting improves performance as can be seen in the numbers above
 (compared to without sorting). This is because the algorithm now
 has more data locality via the Morter ordering, thus more coherent
-& efficient memory accesses in collision detection.
+& efficient memory accesses in collision detection. For this problem
+we use the Morton sort order by interleaving bits for each dimension
+of the data points.
 
 LOCKING
 
