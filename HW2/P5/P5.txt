@@ -10,3 +10,7 @@ SUBPROBLEM 3: SPATIALLY COHERENT SORTING
 ----
 With four threads, the sorted simulation runs at 1800-2100 frames/second, and with one thread, it runs at 650-850 frames/second - in both cases about a 15% speedup on top of the gridded simulation without sorting. Having the objects sorted in a spatially coherent order increases the likelihood of coalesced memory reads when retrieving the positions and velocities of objects in adjacent grid squares.
 However, we're only timing the actual update step, not the time it takes to sort, so it's unclear whether this results in overall better performance. We only perform the sort when we update the animation, rather than on every physics step, but that's still a sort every 1/30 of a second or so, which could significantly slow down our simulation overall (even if it can't be measured in the speed of the update itself).
+
+SUBPROBLEM 4: LOCKING
+----
+With four threads, the sorted/gridded simulation with locks runs at about 900-1300 frames/second, while one thread runs at 400-500 frames/second (although concurrency is not an issue when running with just one thread, and it doesn't really make sense to run a single thread with locks, there's still overhead in acquiring and releasing the locks, even when no other thread exists to ever have the lock you need). This roughly offsets the performance benefits conferred by sorting, but has the advantage of presumably representing physical reality more closely, since updates to position & velocity on a collision could be lost without locking.
