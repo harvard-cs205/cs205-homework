@@ -1,4 +1,4 @@
-Please see the images in this directory, which indicate the relationships between N and the time it took. There are two images because one goes from 1 to 30 in steps of 3, and other goes 0 to 60 in steps of 6
+Please see the images (NvsTime_1to30.png and NvsTime_1to60.png) in this directory, which indicate the relationships between N and the time it took. There are two images because one goes from 1 to 30 in steps of 3, and other goes 0 to 60 in steps of 6 to see a bigger set of values.
 
 Uncorrelated testing:
 In the uncorrelated data, it seems like N=10 is the best. It makes sense that larger N lead to a slow down, since it would mean threads are often waiting on eachother. If N is too big, then threads will wait more often. If they are too small, you will have more locking than needed.

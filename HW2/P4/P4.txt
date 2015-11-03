@@ -2,7 +2,6 @@ Original times:
 Main: 4.49185609818 seconds for 10 filter passes.
 
 
-
 Multithreaded times:
 
 See performancebynumthreads.png for a graph of the data
@@ -26,7 +25,7 @@ Threads: 4. Time: 2.11611104012 seconds for 10 filter passes.
 Threads: 4. Time: 2.1030728817 seconds for 10 filter passes.
 
 
-This shows that increasing from one to two threads leads to a substantial increase in performance, around 2x, but the increase to four threads does not substantially increase performance from two threads.
+This shows that increasing from one to two threads leads to a substantial increase in performance, around 2x, but the increase to four threads does not substantially increase performance from two threads. I suspect this may have to do with my having a Macbook Air. That being said, there are slighy performance gains with 4 threads.
 
 Overview of Implementation Choice. I did the extra credit approach - letting thread n start iteration i as soon as threads n, n-1, and n+1 have finished iteration i-1 without waiting for other threads. 
 

@@ -1,3 +1,6 @@
+
+As a overview, we can see that with 1, 2, and 4 threads, having instruction level parallelism makes things way faster. For 1 thread, I got around a 6x speed up. For 2 threads, I got a 4-5x speedup. For 4 threads, I got a 3x speedup. In fact, the single threaded version with instruction level parallelism is faster than the 4-threaded version without parallelism.
+
 With Instruction Level Parallelism
 See with_instruction_parallelism.png for a graph of this.
 
