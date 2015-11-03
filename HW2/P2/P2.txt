@@ -1,0 +1,66 @@
+1. Test with N=10 for medium-grained locking. 
+
+Serial uncorrelated: 0.621865987778 seconds
+Fine grained uncorrelated: 4.14542388916 seconds
+Medium grained uncorrelated: 6.33603310585 seconds
+Serial correlated: 0.599576950073 seconds
+Fine grained correlated: 3.26947712898 seconds
+Medium grained correlated: 5.03506493568 seconds
+
+We found that multithreads with locks is generally slower than serial method. 
+
+2. A good N to choose for medium-grained locking
+
+N=2:
+Serial uncorrelated: 0.552830934525 seconds
+Fine grained uncorrelated: 3.74735784531 seconds
+Medium grained uncorrelated: 5.42724585533 seconds
+Serial correlated: 0.60458612442 seconds
+Fine grained correlated: 3.19351291656 seconds
+Medium grained correlated: 4.81763195992 seconds
+
+N=5:
+Serial uncorrelated: 0.52624297142 seconds
+Fine grained uncorrelated: 4.19267201424 seconds
+Medium grained uncorrelated: 6.24133515358 seconds
+Serial correlated: 0.622041940689 seconds
+Fine grained correlated: 3.48266196251 seconds
+Medium grained correlated: 5.46712303162 seconds
+
+N=10:
+Serial uncorrelated: 0.621865987778 seconds
+Fine grained uncorrelated: 4.14542388916 seconds
+Medium grained uncorrelated: 6.33603310585 seconds
+Serial correlated: 0.599576950073 seconds
+Fine grained correlated: 3.26947712898 seconds
+Medium grained correlated: 5.03506493568 seconds
+
+N=15:
+Serial uncorrelated: 0.536740064621 seconds
+Fine grained uncorrelated: 4.15401697159 seconds
+Medium grained uncorrelated: 7.16819095612 seconds
+Serial correlated: 0.594739198685 seconds
+Fine grained correlated: 3.3279531002 seconds
+Medium grained correlated: 5.04245996475 seconds
+
+N=20:
+Serial uncorrelated: 0.528571128845 seconds
+Fine grained uncorrelated: 3.90106987953 seconds
+Medium grained uncorrelated: 7.511729002 seconds
+Serial correlated: 0.591313123703 seconds
+Fine grained correlated: 3.35465312004 seconds
+Medium grained correlated: 5.24604582787 seconds
+
+N=100: (i.e. coarse-grained locking)
+Serial uncorrelated: 0.538098096848 seconds
+Fine grained uncorrelated: 4.00114703178 seconds
+Medium grained uncorrelated: 11.4654550552 seconds
+Serial correlated: 0.602041959763 seconds
+Fine grained correlated: 3.43929409981 seconds
+Medium grained correlated: 7.28474116325 seconds
+
+From the test above, we found that it always takes less time for correlated data than uncorrelated one with medium-grained locking. That could because the source and destination in correlated data have a higher propability to be in the same lock region. In addition, time for correlated data is relatively stable when increasing N. While, time for uncorrelated could become much higher. For example, in the case of N=100, calculate time is three times higher than N=1. 
+Since fine-grained locking can be considered as a N=1 medium-grained locking, a good choice for both cases is fine locking. If we want to use less locks, 2<=N<=10 could also be a possible choice. 
+
+
+
