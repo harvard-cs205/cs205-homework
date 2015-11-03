@@ -1,3 +1,0 @@
-from pyxbld_omp import make_ext
-
-_ = make_ext
