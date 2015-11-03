@@ -11,4 +11,5 @@ Threads_num = 1: 1074.635011 Million Complex FMAs in 1.07523608208 seconds, 999.
 Threads_num = 2: 1074.635011 Million Complex FMAs in 0.643891096115 seconds, 1668.97013716 million Complex FMAs / second
 Threads_num = 4: 1074.635011 Million Complex FMAs in 0.38684296608 seconds, 2777.96187401 million Complex FMAs / second
 
-
+We can see using multithreading increase performance by roughly 1.5- 2 times, and instruction-level parallelism increase
+FMAs by nearly 7 times.
