@@ -15,49 +15,43 @@ import filtering
 from timer import Timer
 import threading
 
-def py_median_3x3(image, iterations=10, num_threads=1):
-    ''' repeatedly filter with a 3x3 median '''
-    events = []
-    for i in range(num_threads):
-        iter_list = []
-        for j in range(iterations):
-            iter_list.append(threading.Event())
-        events.append(iter_list)
 
+def py_median_3x3(image, iterations=10, num_threads=1):
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
-    threads=[]
-    for i in range(num_threads):
-        t=threading.Thread(target=thread_median,args=(tmpA,tmpB,i,num_threads,iterations,events))
-        threads.append(t)
-        t.start()
 
-    tmpA, tmpB = tmpB, tmpA
+    events = []
+    for i in range(num_threads):
+        tmp = []
+        for j in range(iterations):
+            tmp.append(threading.Event())
+        events.append(tmp)
+
+    threads=[None]*num_threads
+    for i in range(num_threads):
+        threads[i] = threading.Thread(target=thread_median,args=(tmpA, tmpB, i, num_threads, iterations, events))
+        threads[i].start()
     return tmpA
 
 
-
-def thread_median(tmpA,tmpB,i,num_threads,iterations,e):
-    filtering.median_3x3(tmpA,tmpB,i,num_threads)
-    e[i][0].set()
-    for j in range(1,iterations):
-        if num_threads != 1:
-            # if not np.all([event.isSet() for event in e[:][j-1]]):
-            #     print "waiting on %d" % i
-            #     e[i][j].wait()
-            while(not e[i][j].isSet()): # while the event is not set,
-                if i == 0:
-                    if e[i+1][j-1].isSet() and e[i][j-1].isSet():
-                        e[i][j].set()
-                elif i == num_threads-1:
-                    if e[i-1][j-1].isSet() and e[i][j-1].isSet():
-                        e[i][j].set()
-                else:
-                    if e[i-1][j-1].isSet() and e[i+1][j-1].isSet() and e[i][j-1].isSet():
-                        e[i][j].set()
-
-        filtering.median_3x3(tmpA,tmpB,i,num_threads)
-        tmpA[i::num_threads,:],tmpA[i::num_threads,:]=tmpA[i::num_threads,:],tmpA[i::num_threads,:]
+def thread_median(tmpA, tmpB, offset, step, iterations, events):
+    filtering.median_3x3(tmpA, tmpB, offset, step)
+    tmpA,tmpB = tmpB, tmpA
+    events[offset][0].set()
+    for i in range(1,iterations):
+        if step != 1:
+            if offset == 0:
+                events[offset+1][i-1].wait()
+                filtering.median_3x3(tmpA, tmpB, offset, step)
+            elif offset == step-1:
+                events[offset-1][i-1].wait()
+                filtering.median_3x3(tmpA, tmpB, offset, step)
+            else:
+                events[offset-1][i-1].wait()
+                events[offset+1][i-1].wait()
+                filtering.median_3x3(tmpA, tmpB, offset, step)
+            events[offset][i].set()
+            tmpA,tmpB = tmpB, tmpA
 
 
 
