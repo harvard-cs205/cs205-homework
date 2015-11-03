@@ -1,0 +1,39 @@
+# Problem 3.
+
+Without instruction-level parallelism (no AVX):
+1 thread:
+1074.656613 Million Complex FMAs in 5.11930394173 seconds, 209.922408443 million Complex FMAs / second
+Speedup = 1.00 (reference)
+
+2 threads:
+1074.656613 Million Complex FMAs in 2.77257609367 seconds, 387.602207006 million Complex FMAs / second
+Speedup = 1.85
+
+3 threads:
+1074.656613 Million Complex FMAs in 1.86488294601 seconds, 576.259553071 million Complex FMAs / second
+Speedup = 2.75
+
+4 threads:
+1074.656613 Million Complex FMAs in 1.49637913704 seconds, 718.171342008 million Complex FMAs / second
+Speedup = 3.42
+
+The speedups due to increasing the number of threads correlate positively, although not at the "theoretical" speedup one would expect from Amdahl's law. That is, adding a second thread does not lead to 2x performance (instead, 1.85), which is likely from overhead due to multithreading.
+
+With instruction-level parallelism (with AVX):
+1 thread:
+1074.972516 Million Complex FMAs in 0.693426132202 seconds, 1550.23363857 million Complex FMAs / second
+Speedup: 7.38 (compared to single-thread non-AVX); 1.00 (compared to single-thread AVX)
+
+2 threads:
+1074.972516 Million Complex FMAs in 0.360143899918 seconds, 2984.84165981 million Complex FMAs / second
+Speedup: 14.21 (compared to single-thread non-AVX); 7.70 (compared to 2-thread non-AVX); 1.93 (compared to single-thread AVX)
+
+3 threads:
+1074.972516 Million Complex FMAs in 0.286373138428 seconds, 3753.74772195 million Complex FMAs / second
+Speedup: 17.88 (compared to single-thread non-AVX); 6.51 (compared to 3-thread non-AVX); 2.42 (compared to single-thread AVX)
+
+4 threads:
+1074.972516 Million Complex FMAs in 0.227069139481 seconds, 4734.11983002 million Complex FMAs / second
+Speedup: 22.55 (compared to single-thread non-AVX); 6.59 (compared to 4-thread non-AVX); 3.05 (compared to single-thread AVX)
+
+With instruction-level parallelism via AVX, we see a speedup close to 8x, although this speedup seems to have less of an effect with increasing numbers of threads. 
