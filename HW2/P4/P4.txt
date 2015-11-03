@@ -1,0 +1,9 @@
+num_threads=1: 3.74788999557 seconds for 10 filter passes.
+num_threads=2: 2.33801412582 seconds for 10 filter passes.
+num_threads=3: 1.94620609283 seconds for 10 filter passes.
+num_threads=4: 2.08724498749 seconds for 10 filter passes.
+
+For verification, I use 15 iterations in the numpy vs. cython comparison. Parallel performance works well for 2 or 3 threads, and a bit less better for 4 threads. 
+In order to control cooperation between threads, I allow threads to begin an iteration of filtering synchronously. Using threads from the threading module in Python, we instantiate a thread with filtering.median_3x3 as a target function and call start() to let it work. To ensure start an iteration synchronously, we use join() method to block all the calling thread until they all finish. 
+
+
