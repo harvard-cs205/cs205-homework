@@ -16,6 +16,19 @@ from physics import update, preallocate_locks
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
+def cmp_zorder(a, b): #https://en.wikipedia.org/wiki/Z-order_curve
+        j = 0
+        k = 0
+        x = 0
+        dim=len(a)
+        for k in range(dim):
+            y = a[k] ^ b[k]
+            if x < y and x < (x ^ y):
+                j = k
+                x = y
+        return a[j] - b[j]
+
+
 if __name__ == '__main__':
     num_balls = 10000
     radius = 0.002
@@ -64,7 +77,7 @@ if __name__ == '__main__':
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
-                   radius, grid_size, locks_ptr,
+                   radius, grid_spacing, locks_ptr,
                    physics_step)
 
         # udpate our estimate of how fast the simulator runs
@@ -80,3 +93,15 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+            grid1=(positions/grid_spacing).astype("int")
+            grid2=grid1[::-1]
+            order=[]
+            for i in range(grid1.shape[0]):
+                order.append(cmp_zorder(grid1[i], grid2[i]))
+            index=np.argsort(order)
+            positions=positions[index]
+            velocities=velocities[index]
+            grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
+            for i in range(num_balls):
+                if positions[i, 0]>=0 and positions[i, 0]<=1 and positions[i, 1]>=0 and positions[i, 1]<=0:
+                    grid[(positions[i, 0]/grid_spacing).astype(int), (positions[i, 1]/grid_spacing).astype(int)]=i

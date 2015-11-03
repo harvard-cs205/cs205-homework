@@ -1,0 +1,70 @@
+1. Multithreading
+serial performance:
+3.30574333244 simulation frames per second
+2.65721440975 simulation frames per second
+2.86545302507 simulation frames per second
+2.85754462461 simulation frames per second
+2.87388571342 simulation frames per second
+
+4 threads:
+5.46719918246 simulation frames per second
+5.15046773271 simulation frames per second
+5.34631107055 simulation frames per second
+4.80924261639 simulation frames per second
+4.30865129676 simulation frames per second
+
+With 4 threads, we saw a faster performence, but only 1.5~2 times faster than serial case. 
+
+2. Spatial decomposition
+serial performance:
+359.060381235 simulation frames per second
+278.726483742 simulation frames per second
+307.084815932 simulation frames per second
+299.805342743 simulation frames per second
+343.701502322 simulation frames per second
+299.538681279 simulation frames per second
+312.215572428 simulation frames per second
+
+4 threads:
+229.365447597 simulation frames per second
+29.8801319361 simulation frames per second
+52.0617645599 simulation frames per second
+72.2894124541 simulation frames per second
+42.655818731 simulation frames per second
+24.3754264228 simulation frames per second
+218.926533914 simulation frames per second
+
+Instead of checking all j > i for collisions, we use grid to only check objects up to two grid squares away. It helps to convert the algorithm from O(N^2)to O(N). Do tests in VirtralBox, we found performance is much faster with grid. However, 4 treads with grid becomes slower than serial with grid and the number of simulation per second is quite unstable. I guess the reason is that the workload on each thread is not balanced. 
+
+3. Spatially Coherent Sorting
+serial performance:
+458.10287181 simulation frames per second
+405.025941688 simulation frames per second
+371.222831933 simulation frames per second
+406.723205009 simulation frames per second
+402.739715505 simulation frames per second
+
+4 threads:
+157.310979841 simulation frames per second
+51.5558942652 simulation frames per second
+238.42957131 simulation frames per second
+57.3113705771 simulation frames per second
+908.079924573 simulation frames per second
+
+Performance for sorting is slightly better. We found sorting in 4 threads preforms much better than without sorting, but we still have a unbalanced number of simulation. 
+
+4. Locking
+120.190961974 simulation frames per second
+24.5556648401 simulation frames per second
+36.6845003039 simulation frames per second
+438.750026152 simulation frames per second
+468.928761591 simulation frames per second
+79.7032532685 simulation frames per second
+779.632703251 simulation frames per second
+856.981526625 simulation frames per second
+973.710908976 simulation frames per second
+979.512918681 simulation frames per second
+988.221806439 simulation frames per second
+
+By adding locks for 4 threads, it performances slightly better but there is still the problem of unbalanced simulation number. 
+
