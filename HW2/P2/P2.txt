@@ -1,0 +1,12 @@
+
+
+Characterize the performance of each approach (coarse, medium, and fine-grained lock- ing) on the two cases in P2.py: random data exchanges and correlated data exchanges.
+
+ I executed experiments under 6 different combinations of lock refinment and found the serial versions to run much faster than any of the multi threaded version. Of the threaded versions the uncorrleated medium grained version appeared to run the fastest. I belive this is becase the process is not overburdened by logic of the locks. When considering the number of threads to be used, performance appears to be optimized at about 4 threads for all multi threaded versions of the funciton. I would suggest a thread count of 4 for running these functions. Please see the plot: "P2_plot_threads.png" for all data. 
+
+
+Suggestions for a good N to choose for medium-grained locking in the two cases explored (uncorrelated and correlated transfers) and your justification for that choice (or why you were unable to find a good value).
+
+When considering the comparative performance of the divisor of the threads, it appears for the data that an N = 15 will work the best. The correlated data proved to be much faster than the uncorrelated data, which makes sense due to the close range of the source and destinations. I belive this makes sense if you look at the random distritbution of the correlated data, the range is unform with a difference of 20, so it a divisor of 15 would work well. To view all of the data see the plot, "P2_plot_locks.png."
+
+Additionally, I wored on this problem during office hours with TF Kevin Chen and collaborated, in concept, with Patrick Day. 
