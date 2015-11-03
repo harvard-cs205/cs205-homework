@@ -37,3 +37,5 @@ Speedup: 17.88 (compared to single-thread non-AVX); 6.51 (compared to 3-thread n
 Speedup: 22.55 (compared to single-thread non-AVX); 6.59 (compared to 4-thread non-AVX); 3.05 (compared to single-thread AVX)
 
 With instruction-level parallelism via AVX, we see a speedup close to 8x, although this speedup seems to have less of an effect with increasing numbers of threads. 
+
+There are slight differences in the numbers of complex FMAs between the AVX and the non-AVX runs, although there are no noticeable differences in the obtained picture. It is possible that this is due to differences in computational precision specific to AVX. 
