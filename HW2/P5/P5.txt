@@ -100,7 +100,11 @@ Feifeis-MacBook-Pro:P5-2 feifeipeng$ python driver.py
 
 
 
-Spatially Coherent Sorting: after doing spatially Coherent Sorting, the number of simulation frames per second decreases around 0.5 times compared to the spatial decomposition case.
+Spatially Coherent Sorting: after doing spatially Coherent Sorting, the number of simulation frames per second decreases around 0.5 times compared to the spatial decomposition case. I use the Morton Z-order method.
+Morton order, or Morton code is a function which maps multidimensional data 
+to one dimension while preserving locality of the data points. 
+It was introduced in 1966 by G. M. Morton. 
+This method should result in good spatial coherence.
 
 Feifeis-MacBook-Pro:P5-3 feifeipeng$ python driver.py
 927.923495786 simulation frames per second
