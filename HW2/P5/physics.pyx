@@ -56,13 +56,15 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                      float R,
                      int i, int count,
                      UINT[:, ::1] Grid,
-                     float grid_spacing) nogil:
+                     float grid_spacing,
+                     omp_lock_t *locks) nogil:
     cdef:
         FLOAT *XY1, *XY2, *V1, *V2
         int j, dim, x_loc, y_loc, x, y
         float eps = 1e-5
 
     # SUBPROBLEM 4: Add locking
+    acquire(&(locks[i]))
     XY1 = &(XY[i, 0])
     V1 = &(V[i, 0])
     #############################################################
@@ -83,12 +85,15 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                     V2 = &(V[j, 0])
                     if overlapping(XY1, XY2, R):
                         # SUBPROBLEM 4: Add locking
+                        acquire(&(locks[j]))
                         if not moving_apart(XY1, V1, XY2, V2):
                             collide(XY1, V1, XY2, V2)
 
                         # give a slight impulse to help separate them
                         for dim in range(2):
                             V2[dim] += eps * (XY2[dim] - XY1[dim])
+                        release(&(locks[j]))
+    release(&(locks[i])) # work done, release lock
 
 cdef void sub_update_original(FLOAT[:, ::1] XY,
                      FLOAT[:, ::1] V,
@@ -134,7 +139,7 @@ cpdef update(FLOAT[:, ::1] XY,
         int i, j, dim, x_loc, y_loc
         FLOAT *XY1, *XY2, *V1, *V2
         # SUBPROBLEM 4: uncomment this code.
-        # omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
+        omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
 
     assert XY.shape[0] == V.shape[0]
     assert XY.shape[1] == V.shape[1] == 2
@@ -155,7 +160,7 @@ cpdef update(FLOAT[:, ::1] XY,
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
         for i in prange(count, chunksize = count/4, schedule='static', num_threads=4):
-            sub_update(XY, V, R, i, count, Grid, grid_spacing)
+            sub_update(XY, V, R, i, count, Grid, grid_spacing, locks)
 
         # update positions
         #
@@ -207,7 +212,7 @@ cpdef update_original(FLOAT[:, ::1] XY,
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
         for i in range(count):
-            sub_update(XY, V, R, i, count, Grid, grid_spacing)
+            sub_update_original(XY, V, R, i, count, Grid, grid_spacing)
 
         # update positions
         #
