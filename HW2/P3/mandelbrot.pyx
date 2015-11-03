@@ -19,6 +19,7 @@ cdef void print_complex_AVX(AVX.float8 real,
         float imag_parts[8]
         int i
 
+
     AVX.to_mem(real, &(real_parts[0]))
     AVX.to_mem(imag, &(imag_parts[0]))
     with gil:
@@ -28,11 +29,12 @@ cdef void print_complex_AVX(AVX.float8 real,
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cpdef mandelbrot(np.complex64_t [:, :] in_coords,
-                 np.uint32_t [:, :] out_counts,
+                 np.uint32_t [:, :] out_counts, int threads,
                  int max_iterations=511):
     cdef:
        int i, j, iter
        np.complex64_t c, z
+       
 
        # To declare AVX.float8 variables, use:
        # cdef:
@@ -47,7 +49,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     assert in_coords.shape[0] == out_counts.shape[0], "Input and output arrays must be the same size"
     assert in_coords.shape[1] == out_counts.shape[1],  "Input and output arrays must be the same size"
 
-    for i in prange(in_coords.shape[0], nogil=True, num_threads=8, schedule=static):
+    for i in prange(in_coords.shape[0], nogil=True, num_threads=threads, schedule=static):
         for j in range(in_coords.shape[1]):
             c = in_coords[i, j]
             z = 0
@@ -63,7 +65,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
 
 
 # An example using AVX instructions
-cpdef mandelbrot_AVX(np.complex64_t [:,:] in_coords, np.uint32_t [:,:] out_counts):
+cpdef mandelbrot_AVX(np.complex64_t [:,:] in_coords, np.uint32_t [:,:] out_counts, int threads):
 
 
     cdef:
@@ -81,13 +83,14 @@ cpdef mandelbrot_AVX(np.complex64_t [:,:] in_coords, np.uint32_t [:,:] out_count
         AVX.float8 ones = AVX.float_to_float8(1)
         float out_vals[8]
         float [:] out_view = out_vals
+        
 
     coords_1 = np.real(in_coords)
     coords_2 = np.imag(in_coords)
 
 
 
-    for j in prange(in_coords.shape[0], nogil=True, num_threads=8, schedule=static):
+    for j in prange(in_coords.shape[0], nogil=True, num_threads=threads, schedule=static):
       for i in range(0, in_coords.shape[1], 8):
 
         #pull out the real components

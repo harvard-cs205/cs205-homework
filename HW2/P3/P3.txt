@@ -1,0 +1,14 @@
+Below is the results with and without instruction level paralellism:
+
+
+1 Thread Serial Result: 1074.656613 Million Complex FMAs in 5.94016385078 seconds, 180.91363134 million Complex FMAs / second
+
+2 Thread Result: 1074.656613 Million Complex FMAs in 4.07737898827 seconds, 263.565544457 million Complex FMAs / second
+
+4 Thread Result: 1074.656613 Million Complex FMAs in 3.09720182419 seconds, 346.976617606 million Complex FMAs / second
+
+AVX Result 1 Thread: 923.223468 Million Complex FMAs in 3.09720182419 seconds, 298.083082862 million Complex FMAs / second
+
+AVX Result 2 Thread: 923.223468 Million Complex FMAs in 3.09720182419 seconds, 298.083082862 million Complex FMAs / second
+
+AVX Result 4 Thread: 923.223468 Million Complex FMAs in 3.09720182419 seconds, 298.083082862 million Complex FMAs / second
