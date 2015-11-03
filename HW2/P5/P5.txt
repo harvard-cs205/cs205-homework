@@ -1,2 +1,33 @@
 original
-2872.91344583 simulation frames per second
+
+threads = 1
+7.89202594358 simulation frames per second
+7.25005877066 simulation frames per second
+6.91219153656 simulation frames per second
+8.28700926639 simulation frames per second
+8.73232997237 simulation frames per second
+7.46552561928 simulation frames per second
+
+threads = 4
+12.5111231752 simulation frames per second
+
+P2
+
+threads = 1
+714.730057299 simulation frames per second
+621.610789219 simulation frames per second
+757.715318019 simulation frames per second
+
+threads = 4
+945.654775912 simulation frames per second
+918.354774231 simulation frames per second
+
+P3
+
+823.231168249 simulation frames per second
+1006.37992733 simulation frames per second
+567.904565084 simulation frames per second
+890.132427844 simulation frames per second
+602.193154937 simulation frames per second
+1002.60367277 simulation frames per second
+1066.22799684 simulation frames per second
