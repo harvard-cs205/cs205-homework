@@ -1,0 +1,36 @@
+1. Results output:
+
+Serial uncorrelated: 0.31954407692 seconds
+Fine grained uncorrelated: 10.1825520992 seconds
+Medium grained uncorrelated, N = 5: 13.9770109653 seconds
+Medium grained uncorrelated, N = 10: 12.9965867996 seconds
+Medium grained uncorrelated, N = 20: 17.2248439789 seconds
+Medium grained uncorrelated, N = 30: 14.9419939518 seconds
+Medium grained uncorrelated, N = 50: 27.8181297779 seconds
+Medium grained uncorrelated, N = 100: 29.8969151974 seconds
+
+Serial correlated: 0.438256025314 seconds
+Fine grained correlated: 9.72517609596 seconds
+Medium grained correlated, N = 5: 11.570389986 seconds
+Medium grained correlated, N = 10: 10.8273630142 seconds
+Medium grained correlated, N = 20: 11.3159341812 seconds
+Medium grained correlated, N = 30: 10.6570670605 seconds
+Medium grained correlated, N = 50: 10.9837880135 seconds
+Medium grained correlated, N = 100: 14.3211650848 seconds
+
+2. What we can observe from the output and figure:
+1) Performance
+Serial > Fine grained parallel > Medium grained parallel
+correlated > uncorrelated
+Note that fine grained and medium grained are significantly slower than serial, my slow cpu also made the parallel cases perform worse.
+Also fine-grained case is faster than medium-grained case since in the former each job has there own lock and does not need to wait for
+others, whereas in the latter jobs oftne have to wait becuase other jobs own locks for memory.
+
+In the correlated version, as the src and dest are within 10 elements distance, there is a high chance that the src and dest is within the same lock,
+thus the possibility of one thread waiting for the other descreases.
+
+2) N choice for medium-grained locking
+I tested the performance of medium-grained locking using N = 5, 10, 20, 30, 50, 100
+As shown in the output figure, the tansfer time goes up and down between N = 5 ~ 30, and reached minimum (best performance) in N = 30 in both
+correlated and uncorrelated cases; when N > 30,  the transfer time increases with number of locks. Overall, a good N should be chosen form 10 -30
+depending on different machines and src, dest distribution.
