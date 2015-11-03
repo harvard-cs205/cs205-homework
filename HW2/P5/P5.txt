@@ -1,0 +1,30 @@
+Problem 1- Multithreading
+With 1 thread, the speed is 3-4 frames per second.
+With 4 threads, the speed is 6-7 frames per second.
+The speed of 4 threads is roughly 1.5 times the speed of 1 thread.
+As expected, the speed increases, but it is smaller than 4x since there is some overhead in communications between threads.
+
+Problem 2- Spatial decomposition
+With 1 thread, the speed is 140-150 frames per second.
+With 4 threads, the speed is 600 frames per second.
+The speed of 4 threads is roughly 3 times the speed of 1 thread.
+As expected, modifying algorithms from O(N^2) to O(N) improves the performance a lot. Using 1 thread, the speed with gridding is 40 times that without gridding; using 4 threads, the speed with gridding is 100 times that without gridding.
+We can find that improving algorithms is very important in speeding up. When we improve the time complexity of algorithms and use multithreading at the same time, we can achieve a much better overall performance.
+
+Problem 3- Coherent Sorting
+Here, I use Morton ordering and refer to the codes from Wikipedia. 
+With 1 thread, the speed is about 1100 frames per second.
+With 4 threads, the speed is about 1000 frames per second.
+Again, the speed with sorting is much faster than the speed without sorting no matter using 1 or 4 threads.
+Unexpectedly, using 4 threads is slower than using 1 thread. I think there may be two reasons. Firstly, communications between threads produce a lot of overhead, hurting the overal performance. Secondly, I ran these codes on the virtual machine, which cannot perform well for computation-intensive tasks.
+
+Problem 4- Locking
+With 1 thread, the speed is about 900 frames per second.
+With 4 threads, the speed is about 800 frames per second.
+With locking, the speed slows down than without locking. I think the reason is that "acquire" and "release" of the locks produce some overhead, making the speed slower.
+
+Conclusion:
+1. Although using multithreading increases the speed, the best way to improve performance is to find a better algorithm, which has a smaller time complexity.
+2. When we turn to an algorithm with a smaller time complexity, we should at the same time make sure that it will not produce relatively large overhead. Much overhead may offset the benefits of the advanced algorithm.
+3. Using multithreading not necessarily performs better than a single thread. We should take the overhead of communications between threads (and the configuration of the computer) into consideration.
+
