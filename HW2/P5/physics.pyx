@@ -1,4 +1,4 @@
-#cython: boundscheck=True, wraparound=False
+#cython: boundscheck=False, wraparound=False
 
 cimport numpy as np
 from libc.math cimport sqrt
@@ -86,7 +86,6 @@ cdef void sub_update(FLOAT[:, ::1] XY,
             XY2 = &(XY[j, 0])
             V2 = &(V[j, 0])
             if overlapping(XY1, XY2, R):
-                # SUBPROBLEM 4: Add locking
                 if not moving_apart(XY1, V1, XY2, V2):
                     collide(XY1, V1, XY2, V2)
 
