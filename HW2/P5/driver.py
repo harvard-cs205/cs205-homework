@@ -40,8 +40,8 @@ def xy2d (n, x, y):
 
 
 if __name__ == '__main__':
-    num_balls = 500
-    radius = 0.01
+    num_balls = 10000
+    radius = 0.002
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -69,8 +69,6 @@ if __name__ == '__main__':
     grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
     grid[(positions[:, 0] / grid_spacing).astype(int),
          (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
-    print grid
-    print np.sum(grid)
     # A matplotlib-based animator object
     animator = Animator(positions, radius * 2)
 
@@ -98,7 +96,7 @@ if __name__ == '__main__':
         frame_count += 1
         if total_time > anim_step:
             animator.update(positions)
-            #print("{} simulation frames per second".format(frame_count / total_time))
+            print("{} simulation frames per second".format(frame_count / total_time))
             frame_count = 0
             total_time = 0
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the

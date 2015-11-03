@@ -1,4 +1,4 @@
-#cython: boundscheck=True, wraparound=False
+#cython: boundscheck=False, wraparound=False
 
 cimport numpy as np
 from libc.math cimport sqrt
@@ -57,13 +57,14 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                      int i, int count,
                      UINT[:, ::1] Grid,
                      int grid_size,
-                     float grid_spacing) nogil:
+                     float grid_spacing, omp_lock_t *locks) nogil:
     cdef:
         FLOAT *XY1, *XY2, *V1, *V2
         int j, dim, grid_x, grid_y, x_val, y_val
         float eps = 1e-5
 
     # SUBPROBLEM 4: Add locking
+    #acquire(&locks[i])
     XY1 = &(XY[i, 0])
     V1 = &(V[i, 0])
     #############################################################
@@ -80,18 +81,23 @@ cdef void sub_update(FLOAT[:, ::1] XY,
         for y_val in range(max(0, grid_y-2), min(grid_size, grid_y+3)):
             if x_val == grid_x and y_val == grid_y:
                 continue
+            
             j = Grid[x_val, y_val]
-            if j == -1:
+            # The j < i deals with deadlock since we only need to compare one direction.
+            if j == -1 or j < i:
                 continue
+            #acquire(&locks[j])
             XY2 = &(XY[j, 0])
             V2 = &(V[j, 0])
             if overlapping(XY1, XY2, R):
-                # SUBPROBLEM 4: Add locking
                 if not moving_apart(XY1, V1, XY2, V2):
                     collide(XY1, V1, XY2, V2)
                 # give a slight impulse to help separate them
                 for dim in range(2):
                     V2[dim] += eps * (XY2[dim] - XY1[dim])
+            #release(&locks[j])
+    #release(&locks[i])
+
 
 cpdef update(FLOAT[:, ::1] XY,
              FLOAT[:, ::1] V,
@@ -127,7 +133,7 @@ cpdef update(FLOAT[:, ::1] XY,
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
         for i in prange(count, schedule='static', num_threads=1, chunksize=125):
-            sub_update(XY, V, R, i, count, Grid, grid_size, grid_spacing)
+            sub_update(XY, V, R, i, count, Grid, grid_size, grid_spacing, locks)
 
         # update positions
         #
