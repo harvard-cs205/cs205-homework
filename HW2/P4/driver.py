@@ -27,6 +27,32 @@ def py_median_3x3(image, iterations=10, num_threads=1):
 
     return tmpA
 
+
+def py_median_3x3_multithread(image, iteration=10, num_threads=1):
+    tempA = image.copy()
+    tempB = np.empty_like(tempA)
+
+    for i in range(iteration):
+        # initiate the thread_list
+        thread_list = []
+        for j in range(num_threads):
+            # create new thread to do the filtering
+            new_thread = threading.Thread(target = filtering.median_3x3,
+                                          args = (tempA, tempB, j, num_threads))
+            new_thread.start()
+            thread_list.append(new_thread)
+
+        # join all the threads together
+        for thread in thread_list:
+            thread.join()
+        # swap direction of filtering
+        tempA, tempB = tempB, tempA
+
+    return tempA
+
+
+
+
 def numpy_median(image, iterations=10):
     ''' filter using numpy '''
     for i in range(iterations):
@@ -57,7 +83,7 @@ if __name__ == '__main__':
     assert np.all(from_cython == from_numpy)
 
     with Timer() as t:
-        new_image = py_median_3x3(input_image, 10, 8)
+        new_image = py_median_3x3_multithread(input_image, 10, 8)
 
     pylab.figure()
     pylab.imshow(new_image[1200:1800, 3000:3500])

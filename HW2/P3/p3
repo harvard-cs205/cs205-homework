@@ -1,0 +1,16 @@
+Your results for 1, 2, and 4 threads, with and without instruction-level parallelism.
+
+N = 1
+Old, 1074.656613 Million Complex FMAs in 4.71178102493 seconds, 228.078641031 million Complex FMAs / second
+New, 1074.94829 Million Complex FMAs in 0.720548152924 seconds, 1491.8479572 million Complex FMAs / second
+
+N = 2
+Old, 1074.656613 Million Complex FMAs in 2.24649190903 seconds, 478.371014239 million Complex FMAs / second
+New, 1074.94829 Million Complex FMAs in 0.45839381218 seconds, 2345.03228761 million Complex FMAs / second
+
+N = 4
+Old, 1074.656613 Million Complex FMAs in 1.17717695236 seconds, 912.910001206 million Complex FMAs / second
+New, 1074.94829 Million Complex FMAs in 0.258741140366 seconds, 4154.53177829 million Complex FMAs / second
+
+We are consistently getting 5-6x speed up with the AVX. This is less than 8 (theoretical maximum speedup), but still pretty good.
+As the number of threads gets bigger, the speedup is decreasing, from 6+ when N=1 to 4- when N = 4 (show also in the graph).

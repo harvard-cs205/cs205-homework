@@ -1,0 +1,20 @@
+Your writeup comparing 1, 2, and 4-way parallel performance, and discus-
+sion of your implementation choices to control cooperation between threads
+
+N = 1
+T = 3.97963690758
+
+N = 2
+T = 2.78399991989
+
+N = 4
+T = 1.81781697273
+
+N = 8
+T = 2.14809894562
+
+Shown in the results above (and the graph), I got linear'ish speedup when adding more threads.
+
+I used a start/join method to coordinate different threads. I don't have to worry about betwee-iterations
+because the whole picture is processed before the next iteration (threads) starts. However, a faster approach
+may be able to compute across different iterations at the same time.
