@@ -58,3 +58,25 @@ The sorting improves performance as can be seen in the numbers above
 (compared to without sorting). This is because the algorithm now
 has more data locality via the Morter ordering, thus more coherent
 & efficient memory accesses in collision detection.
+
+LOCKING
+
+Running with 1 thread:
+199.411331622 simulation frames per second
+220.277506433 simulation frames per second
+207.854898657 simulation frames per second
+178.377284133 simulation frames per second
+
+Running with 4 threads:
+
+264.363552325 simulation frames per second
+378.907680868 simulation frames per second
+205.950715143 simulation frames per second
+287.43071736 simulation frames per second
+
+With locking, we can see that the 4-thread version seems to slow
+down slightly, which is due to the threads having to wait for others
+before doing work. For the 1-thread variant, we note that locking
+does not seem to have much effect, which is due to the fact that
+there's only 1 thread running so locking is rendered useless in this
+scenario.
