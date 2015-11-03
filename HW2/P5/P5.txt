@@ -1,0 +1,39 @@
+MULTITHREADING
+
+Running with 1 thread:
+
+4.98833167028 simulation frames per second
+4.82090608995 simulation frames per second
+4.88935517413 simulation frames per second
+4.8519465376 simulation frames per second
+
+Running with 4 threads:
+
+12.9356410604 simulation frames per second
+11.3836758954 simulation frames per second
+10.6175234662 simulation frames per second
+10.3843310465 simulation frames per second
+11.5414888377 simulation frames per second
+
+We can clearly see a nice speedup as in this part the threads
+are free to do own work without any contention.
+
+SPATIAL DECOMPOSITION
+
+Running with 1 thread:
+
+75.7404473551 simulation frames per second
+97.9068271874 simulation frames per second
+57.839172604 simulation frames per second
+56.2348445743 simulation frames per second
+
+Running with 4 threads:
+
+152.793321393 simulation frames per second
+154.430402739 simulation frames per second
+241.834061044 simulation frames per second
+184.103739748 simulation frames per second
+
+We  see there's a speed-up from 1 to 4 threads and using spatial
+decomposition clearly achieves speed up over the pure multi-threading
+approach.

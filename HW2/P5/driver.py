@@ -64,7 +64,7 @@ if __name__ == '__main__':
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
-                   radius, grid_size, locks_ptr,
+                   radius, grid_spacing, locks_ptr,
                    physics_step)
 
         # udpate our estimate of how fast the simulator runs
