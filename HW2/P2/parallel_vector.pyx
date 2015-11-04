@@ -107,8 +107,8 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
                     release(&locks[dest[idx]])
                     release(&locks[src[idx]])
                else:
-                    release(&locks[dest[idx]])
                     release(&locks[src[idx]])
+                    release(&locks[dest[idx]])
 
 
    free_N_locks(counts.shape[0], locks)
@@ -134,7 +134,7 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
    with nogil:
        for r in prange(repeat, num_threads=4):
            for idx in range(src.shape[0]):
-                # divide by N to get the lock ids
+                # divide by N to get the lock idx
                 src_locki = src[idx] / N
                 dst_locki = dest[idx] / N
                 # acquire the locks
