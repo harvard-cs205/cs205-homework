@@ -13,7 +13,21 @@ import pylab
 
 import filtering
 from timer import Timer
-import threading
+from threading import Semaphore, Thread
+
+def parallel_median_3x3(tmpA, tmpB, iters, line, num_threads, semaphores):
+    for i in range(iters):
+        top = semaphores[(line + 1) % num_threads][0]
+        top.acquire()
+
+        bottom = semaphores[line - 1][1]
+        bottom.acquire()
+
+        filtering.median_3x3(tmpA, tmpB, line, num_threads)
+        tmpA, tmpB = tmpB, tmpA
+
+        semaphores[line][0].release()
+        semaphores[line][1].release()
 
 def py_median_3x3(image, iterations=10, num_threads=1):
     ''' repeatedly filter with a 3x3 median '''
@@ -24,6 +38,19 @@ def py_median_3x3(image, iterations=10, num_threads=1):
         filtering.median_3x3(tmpA, tmpB, 0, 1)
         # swap direction of filtering
         tmpA, tmpB = tmpB, tmpA
+
+    # List of [top, bottom] semaphores
+    # semaphores = [[Semaphore(1), Semaphore(1)] for i in range(num_threads)]
+    # threads = []
+    # for i in range(num_threads):
+    #     threads.append(Thread(target = parallel_median_3x3, name = "Thread" + str(i),
+    #                             args = (tmpA, tmpB, iterations, i, num_threads, semaphores)))
+
+    # for thread in threads:
+    #     thread.start()
+
+    # for thread in threads:
+    #     thread.join()
 
     return tmpA
 
