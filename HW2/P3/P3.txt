@@ -1,0 +1,153 @@
+
+
+Multithreading
+
+num threads:  1
+1074.652832 Million Complex FMAs in 5.04761886597 seconds, 212.902927209 million Complex FMAs / second
+
+num threads:  2
+1074.652832 Million Complex FMAs in 2.54001998901 seconds, 423.088336568 million Complex FMAs / second
+
+num threads:  4
+1074.652832 Million Complex FMAs in 1.29837203026 seconds, 827.692531074 million Complex FMAs / second
+
+Discussion: As expected, the runtime of the mandelbrot computations gets reduced by about a factor of 2
+as the number of threads doubles. Since the threads run independently in parallel, the runtime is 
+inversely proportional to the number of threads and the speed up is not exactly 2 due to message 
+passing and other overhead. 
+
+Instruction-level Parallelism
+
+num threads:  1
+1074.94829 Million Complex FMAs in 1.15263199806 seconds, 932.60320016 million Complex FMAs / second
+
+num threads:  2
+1074.94829 Million Complex FMAs in 0.648010969162 seconds, 1658.84273748 million Complex FMAs / second
+
+num threads:  4
+
+1074.94829 Million Complex FMAs in 0.346281051636 seconds, 3104.26540789 million Complex FMAs / second
+
+Discussion: As with in multithreading part, the runtime approximately gets reduced by a factor of 2
+as the number of threads doubles. The runtimes are less than the corresponding runtimes in the first 
+part because AVX commands allow the code to loop over 8 columns at a time while the first part loops
+over 1 column at a time. The AVX runtime is not exactly 8 times faster than the multithreading counterpart
+because more commands are required to do the arithmetic (AVX commands are low level) and any other AVX 
+processing overhead.
+
+
+
+Note: the number of complex FMAs slightly differs when using AVX functions. Below is an example
+for one pixel with corresponding complex value (-0.576250016689, -0.576250016689) and the 
+magnitude of z = z^2 + c after 52 iterations (with AVX) and 50 iterations (without AVX). For this
+pixel, AVX took two more iterations for the magnitude squared to exceed 4.
+
+52 iterations
+0.0 
+0.664123058319 
+0.339786499739 
+0.522493362427 
+0.999634981155 
+0.112303510308 
+0.66665327549 
+0.578255355358 
+0.455838352442 
+1.38703882694 
+0.381829798222 
+0.957165658474 
+0.0202732384205
+0.643655955791 
+0.308124512434 
+0.499261796474 
+0.896700620651 
+0.0832057073712 
+0.741167902946 
+0.511798679829 
+0.640607774258 
+1.57846832275 
+0.608305156231 
+0.0646836459637 
+0.566530585289 
+0.362080127001 
+0.363906383514 
+0.831388235092 
+0.0010619709501 
+0.66371512413 
+0.341655164957 
+0.521241605282 
+1.00245916843 
+0.111041769385 
+0.660513043404 
+0.572645902634 
+0.444285750389 
+1.35676777363 
+0.347567826509 
+0.938396394253 
+0.0201484560966 
+0.675161004066 
+0.306590288877 
+0.550324678421 
+0.953748583794 
+0.149163767695 
+0.7982224226 
+0.691498160362 
+0.774912238121 
+2.24493288994 
+2.07166624069 
+3.62110710144 
+
+50 Iterations
+0.0
+0.664128163469
+0.339786650152
+0.522504205747
+0.999647615971
+0.112319348749
+0.666670148136
+0.578298432454
+0.455865257099
+1.38715967833
+0.381993677231
+0.957419544272
+0.0203420081989
+0.643510702637
+0.308086233163
+0.499051345652
+0.896350559124
+0.0829871172538
+0.741121873172
+0.511205021728
+0.640592189048
+1.57702550331
+0.60654176672
+0.0641870386517
+0.566487686806
+0.358511084276
+0.365630496714
+0.826362492046
+0.00128792280955
+0.664504000409
+0.342237770386
+0.522417519084
+1.00530472125
+0.112753134714
+0.65900717397
+0.575910616222
+0.440117184748
+1.35429964578
+0.350259943891
+0.969056733711
+0.0312587305461
+0.682127869783
+0.289222546775
+0.566099958604
+0.929087561621
+0.175468553639
+0.882684953684
+0.750107459626
+1.04658769982
+3.02660853215
+4.8961705019
+
+
+
