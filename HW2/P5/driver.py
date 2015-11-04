@@ -16,9 +16,35 @@ from physics import update, preallocate_locks
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
+### Subproblem 3 ###
+### Z-Order Implementation ###
+# Referenced from https://en.wikipedia.org/wiki/Z-order_curve
+def cmp_zorder(arr1, arr2, dim=2):
+        j = 0
+        k = 0
+        x = 0
+        a = arr1[1]
+        b = arr2[1]
+        for k in range(dim):
+            y = a[k] ^ b[k]
+            if less_msb(x, y):
+                j = k
+                x = y
+        return a[j] - b[j]
+
+def less_msb(x, y):
+        return x < y and x < (x ^ y)
+
+
 if __name__ == '__main__':
+    # Real Balls
     num_balls = 10000
     radius = 0.002
+
+    # Test Balls
+    # num_balls = 10
+    # radius = 0.05
+    
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -41,6 +67,7 @@ if __name__ == '__main__':
     # Each square in the grid stores the index of the object in that square, or
     # -1 if no object.  We don't worry about overlapping objects, and just
     # store one of them.
+    # Grid Shape (708, 708)
     grid_spacing = radius / np.sqrt(2.0)
     grid_size = int((1.0 / grid_spacing) + 1)
     grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
@@ -64,8 +91,7 @@ if __name__ == '__main__':
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
-                   radius, grid_size, locks_ptr,
-                   physics_step)
+                   radius, locks_ptr, physics_step, grid_spacing, grid_size)
 
         # udpate our estimate of how fast the simulator runs
         physics_step = 0.9 * physics_step + 0.1 * t.interval
@@ -77,6 +103,31 @@ if __name__ == '__main__':
             print("{} simulation frames per second".format(frame_count / total_time))
             frame_count = 0
             total_time = 0
+            
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+            
+            # Create ball grid positions based on the grid spacing
+            grid_pos = (positions/grid_spacing).astype(int)
+
+            # Create ball grid positions based on the grid spacing
+            grid_pos = (positions/grid_spacing).astype(int)
+
+            # Zip an original index together with positons
+            pos_arr = zip(xrange(num_balls), grid_pos)
+            
+            # Sort the array based on the Zorder, and get the order indexs
+            pos_arr.sort(cmp_zorder)
+            z_idx = [idx for idx, pos in pos_arr]
+            
+            # Update position and Velocity
+            positions = positions[z_idx]; velocities = velocities[z_idx]
+
+            # Ensure that all balls are inside [0,1]
+            inside = np.array(filter(lambda x: x[0] > 0 and x[1] < 1, positions))
+            num_inside = len(inside)
+
+            # Update the inside balls
+            grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
+            grid[(inside[:, 0]/grid_spacing).astype(int), (positions[:, 1]/grid_spacing).astype(int)] = np.array(range(num_inside))
