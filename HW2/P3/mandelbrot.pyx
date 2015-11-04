@@ -5,23 +5,15 @@ import numpy
 cimport AVX
 from cython.parallel import prange
 
-#######
-#Don't forget to delete the function after testing
-#this function was used for print AVX for debugging
-#######
-
-cdef void print_AVX(AVX.float8 x, int index=7, int include_below = 1) nogil:
-    cdef:
-        float x_temp[8]
-        int i
-
-    AVX.to_mem(x, &(x_temp[0]))
-    with gil:
-        if include_below == 1:
-            for i in range(index+1):
-                print("{}: {}".format(i, x_temp[i]))
-        else:
-            print("{}: {}".format(index, x_temp[index]))
+#############################################################
+#
+#Submitted by Xingchi Dai
+#Harvard University
+#CS205
+#Homework 2
+#Problem 3
+#
+#############################################################
 
 
 
@@ -53,6 +45,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     assert in_coords.shape[1] == out_counts.shape[1],  "Input and output arrays must be the same size"
 
     #without AVX
+    #for the AVX, prange is added to run in parallel
     #for i in prange(in_coords.shape[0], nogil=True, schedule='static', chunksize = 1, num_threads = 4):
     #    for j in range(in_coords.shape[1]):
     #        c = in_coords[i, j]
@@ -64,13 +57,13 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     #        out_counts[i, j] = iter
 
 
-
     #with AVX
-    for i in prange(in_coords.shape[0], nogil=True, schedule='static', chunksize = 1, num_threads = 4):
+    for i in prange(in_coords.shape[0], nogil=True, schedule='static', chunksize = 1, num_threads = 1):
         #divide y into 8 (start, end, step)
         for j in range(0,in_coords.shape[1],8):
 
             #get the real parts of in_coords and store them into cr
+            #we divided all columns into 8 parts and calculated them in parallel
             c_r = AVX.make_float8((in_coords[i,j+7].real),
                                  (in_coords[i,j+6].real),
                                  (in_coords[i,j+5].real),
@@ -120,15 +113,19 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                     break
                 #else we could update the z value
                 else:
+                    #when calculating z_i, we have to use the original real part
+                    #so I used an temporary variable to store it
                     z_r_temp = z_r
+                    #z_real = z_real ^ 2 - z_imag ^2 + c_real
                     z_r = AVX.add(AVX.sub(AVX.mul(z_r,z_r),AVX.mul(z_i,z_i)),c_r)
+                    #z_i = 2 * z_real * z_imag + c_imag
                     z_i = AVX.add(AVX.mul(AVX.mul(AVX.float_to_float8(2.0),z_r_temp),z_i),c_i)
 
                     #also update counters which has 1(which still satisfy out condition)
                     #we only need to increment certain counters which satisfy our conditions
                     counters = AVX.add(AVX.bitwise_and(cond,AVX.float_to_float8(1.0)),counters)
 
-        #print_AVX(counters)
+                #output the result
                 counts_to_output(counters, out_counts, i, j)
 
 
