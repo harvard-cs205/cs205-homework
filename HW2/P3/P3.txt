@@ -20,9 +20,13 @@ With Instruction-level Parallelism
   4117995793.52 million Complex FMAs / second
 
 2 threads:
-  11560639453.7 Million Complex FMAs in 1.43554806709 seconds, 
+  11560639453.7 Million Complex FMAs in 1.43554806709 seconds,
   8053119027.31 million Complex FMAs / second
 
 4 threads:
   11560639453.7 Million Complex FMAs in 0.838935852051 seconds,
   13780123266.2 million Complex FMAs / second
+
+Something is clearly awry with my instruction-level parallelism,
+because 11560639453.7 million is hardly feasible, but if you compare
+the FMA/sec, you'll see it doubles each time from 1 to 2 and 2 to 4 threads. 

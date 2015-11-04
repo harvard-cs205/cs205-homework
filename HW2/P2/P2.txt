@@ -1,0 +1,37 @@
+
+Serial uncorrelated: 0.449347019196 seconds
+Fine grained uncorrelated: 7.44703817368 seconds
+Serial correlated: 0.60852599144 seconds
+Fine grained correlated: 8.3396229744 seconds
+
+N=2
+
+Medium grained uncorrelated: 9.11361789703 seconds
+Medium grained correlated: 8.49990415573 seconds
+
+N=10
+
+Medium grained uncorrelated: 12.4721779823 seconds
+Medium grained correlated: 9.39465212822 seconds
+
+N=100
+
+Medium grained uncorrelated: 9.03037905693 seconds
+Medium grained correlated: 10.9456300735 seconds
+
+N=250
+
+Medium grained uncorrelated: 10.2885241508 seconds
+Medium grained correlated: 23.4930269718 seconds
+
+N=1000
+
+Medium grained uncorrelated: 8.77434301376 seconds
+Medium grained correlated: 47.7998268604 seconds
+
+The serial implementation works better than both medium and fine grained,
+presumably due to the high overhead cost of setting up the problem, and
+the fact that the parallelized computations are not particularly heavy.
+
+When we increase N, the uncorrelated time stays roughly the same, but
+the correlated time increases as N does. 

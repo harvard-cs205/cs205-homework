@@ -15,26 +15,28 @@ import filtering
 from timer import Timer
 import threading
 
-
+# Worked with Abhishek Malali 
 def py_median_3x3(image, iterations=10, num_threads=1):
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
-
+    # initialize events
     events = []
     for i in range(num_threads):
         tmp = []
         for j in range(iterations):
             tmp.append(threading.Event())
         events.append(tmp)
-
+    #initialize threads
     threads=[None]*num_threads
     for i in range(num_threads):
+        # start up threads
         threads[i] = threading.Thread(target=thread_median,args=(tmpA, tmpB, i, num_threads, iterations, events))
         threads[i].start()
     return tmpA
 
 
 def thread_median(tmpA, tmpB, offset, step, iterations, events):
+    # start the first iterations all at once
     filtering.median_3x3(tmpA, tmpB, offset, step)
     tmpA,tmpB = tmpB, tmpA
     events[offset][0].set()
@@ -52,6 +54,8 @@ def thread_median(tmpA, tmpB, offset, step, iterations, events):
                 filtering.median_3x3(tmpA, tmpB, offset, step)
             events[offset][i].set()
             tmpA,tmpB = tmpB, tmpA
+
+
 
 
 
@@ -80,7 +84,7 @@ if __name__ == '__main__':
     pylab.title('before - zoom')
 
     # verify correctness
-    from_cython = py_median_3x3(input_image, 2, 5)
+    from_cython = py_median_3x3(input_image, 2, 4)
     from_numpy = numpy_median(input_image, 2)
     print from_cython-from_numpy
     assert np.all(from_cython == from_numpy)

@@ -1,5 +1,5 @@
 # boundscheck=False, wraparound=False
-
+# Worked with Abhishek Malali, Isadora Nun, Avery Faller, Christian Junge
 cimport numpy as np
 from libc.math cimport sqrt
 from libc.stdint cimport uintptr_t
@@ -39,7 +39,6 @@ cdef inline void collide(FLOAT *x1, FLOAT *v1,
         float change_v1[2]
         float len_x1_m_x2, dot_v_x
         int dim
-    # https://en.wikipedia.org/wiki/Elastic_collision#Two-dimensional_collision_with_two_moving_objects
     for dim in range(2):
         x1_minus_x2[dim] = x1[dim] - x2[dim]
         v1_minus_v2[dim] = v1[dim] - v2[dim]
@@ -57,10 +56,11 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                      int i, int count,
                      UINT[:, ::1] Grid,
                      float grid_spacing,
-                     float grid_size) nogil:
+                     float grid_size,
+                     omp_lock_t *locks) nogil:
     cdef:
         FLOAT *XY1, *XY2, *V1, *V2
-        int j, dim,k, x_tmp, y_tmp
+        int j, dim,k, x_tmp, y_tmp, ball_index
         float eps = 1e-5
         float locX,locY
 
@@ -73,7 +73,7 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     # SUBPROBLEM 2: use the grid values to reduce the number of other
     # objects to check for collisions.
 
-    # iterate over 24 spaces to look for ballz
+    # iterate over 5x5 spaces to look for balls
     for j in range(-2,3):
         for k in range(-2,3):
             x_tmp = <int>(XY1[0]*(grid_size))+k
@@ -81,20 +81,24 @@ cdef void sub_update(FLOAT[:, ::1] XY,
             # stay in bounds
             if x_tmp > 0 and x_tmp < grid_size -1 and \
                 y_tmp > 0 and y_tmp < grid_size -1:
-                if Grid[x_tmp,y_tmp] != -1:
-                    XY2 = &(XY[Grid[x_tmp,y_tmp], 0])
+                if Grid[x_tmp,y_tmp] != -1: # if there's a ball
+                    ball_index = Grid[x_tmp,y_tmp]
+                    XY2 = &(XY[Grid[x_tmp,y_tmp], 0]) # get that position
                     V2 = &(V[Grid[x_tmp,y_tmp], 0])
-                    if XY1 != XY2 and overlapping(XY1, XY2, R):
-                        # SUBPROBLEM 4: Add locking
+                    if XY1 != XY2 and overlapping(XY1, XY2, R): # make sure not same spot
+                        if i < ball_index: # locks
+                            acquire(&(locks[i]))
+                            acquire(&(locks[ball_index]))
+                        else:
+                            acquire(&(locks[ball_index]))
+                            acquire(&(locks[i]))
                         if not moving_apart(XY1, V1, XY2, V2):
                             collide(XY1, V1, XY2, V2)
-                        # give a slight impulse to help separate them
+                        release(&locks[i])
+                        release(&locks[ball_index])
                         for dim in range(2):
                             V2[dim] += eps * (XY2[dim] - XY1[dim])
-
-
-            # Grid[<int>(XY1[0]*(grid_size)),<int>(XY1[1]*(grid_size))]
-
+    #
     # for j in range(i + 1, count):
     #     XY2 = &(XY[j, 0])
     #     V2 = &(V[j, 0])
@@ -120,7 +124,7 @@ cpdef update(FLOAT[:, ::1] XY,
         int i, j, dim
         FLOAT *XY1, *XY2, *V1, *V2
         # SUBPROBLEM 4: uncomment this code.
-        # omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
+        omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
 
     assert XY.shape[0] == V.shape[0]
     assert XY.shape[1] == V.shape[1] == 2
@@ -141,7 +145,7 @@ cpdef update(FLOAT[:, ::1] XY,
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
         for i in prange(count,schedule='static', chunksize=int(count/4),num_threads=4):
-            sub_update(XY, V, R, i, count, Grid, grid_spacing, grid_size)
+            sub_update(XY, V, R, i, count, Grid, grid_spacing, grid_size,locks)
 
         # update positions
         #

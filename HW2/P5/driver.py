@@ -16,9 +16,25 @@ from physics import update, preallocate_locks
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
+def cmp_zorder(a, b):
+    #borrowed from wikipedia
+        j = 0
+        k = 0
+        x = 0
+        for k in range(2):
+            y = a[1][k] ^ b[1][k]
+            if less_msb(x, y):
+                j = k
+                x = y
+        return a[1][j] - b[1][j]
+
+def less_msb(x, y):
+        return x < y and x < (x ^ y)
+
+
 if __name__ == '__main__':
     num_balls = 10000
-    radius = 0.002
+    radius = .002
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -64,8 +80,8 @@ if __name__ == '__main__':
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
-                   radius, grid_size, locks_ptr,
-                   physics_step)
+                   radius, grid_spacing, locks_ptr,
+                   physics_step, grid_size)
 
         # udpate our estimate of how fast the simulator runs
         physics_step = 0.9 * physics_step + 0.1 * t.interval
@@ -77,6 +93,13 @@ if __name__ == '__main__':
             print("{} simulation frames per second".format(frame_count / total_time))
             frame_count = 0
             total_time = 0
-            # SUBPROBLEM 3: sort objects by location.  Be sure to update the
-            # grid if objects' indices change!  Also be sure to sort the
-            # velocities with their object positions!
+            sort = [(i,(positions[i,:]/grid_spacing).astype(int)) for i in range(num_balls)]
+            sort.sort(cmp_zorder)
+            sort = [i for i,j in sort]
+            #update sorted positions/velocities
+            positions = positions[sort]
+            velocities = velocities[sort]
+            #update grid with sorted list
+            grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
+            grid[(positions[:, 0] / grid_spacing).astype(int),
+                    (positions[:, 1] / grid_spacing).astype(int)] = sort

@@ -52,7 +52,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     #                 z_i = AVX.add(AVX.mul(AVX.float_to_float8(2.0),AVX.mul(z_r_prev,z_i_prev)),c_i)
     #             out_counts[i, j] = iter
     with nogil:
-        for i in prange(in_coords.shape[0],schedule='static',chunksize=1,num_threads=4):
+        for i in prange(in_coords.shape[0],schedule='static',chunksize=1,num_threads=1):
             for j in range(in_coords.shape[1]):
                 if j % 8 == 0:
                     c_r = AVX.make_float8(in_real[i,j], \
@@ -79,11 +79,12 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                         mag_sq = AVX.add(AVX.mul(z_i,z_i),AVX.mul(z_r,z_r))
                         # curr_sign is the float8 array of >4's
                         curr_sign = AVX.greater_than(mag_sq,AVX.float_to_float8(4.0))
+                        t = AVX.bitwise_and(curr_sign,AVX.float_to_float8(1.0))
                         # if you've got at least one that's not 0
-                        if AVX.signs(curr_sign) != 0:
-                            t = AVX.bitwise_and(curr_sign,AVX.float_to_float8(1.0))
+                        if AVX.signs(AVX.greater_than(AVX.sub(t,prev_sign),AVX.float_to_float8(0.0))) != 0:
                             # take elements that have just changed to 1 and multiply then by iter and add them to iter
                             iter_array = AVX.add(AVX.mul(AVX.sub(t,prev_sign),AVX.float_to_float8(iter)),iter_array)
+                            # update prev_sign to be previous signs
                             prev_sign = t
                             if AVX.signs(curr_sign) == all_true:
                                 break
@@ -91,6 +92,8 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                         z_r = AVX.add(AVX.sub(AVX.mul(z_r_prev,z_r_prev),AVX.mul(z_i,z_i)),c_r)
                         z_i = AVX.add(AVX.mul(AVX.float_to_float8(2.0),AVX.mul(z_r_prev,z_i)),c_i)
                     counts_to_output(iter_array, out_counts, i, j)
+
+
 cdef void counts_to_output(AVX.float8 counts, np.uint32_t [:, :] out_counts, int i, int j) nogil:
     cdef:
         float tmp_counts[8]
