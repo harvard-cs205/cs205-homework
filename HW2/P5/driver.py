@@ -38,8 +38,8 @@ def less_msb(x, y):
 
 
 if __name__ == '__main__':
-    num_balls = 500  # 10000
-    radius = 0.01  # 0.002
+    num_balls = 10000  # 500
+    radius = 0.002  # 0.01
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -88,26 +88,13 @@ if __name__ == '__main__':
                    radius, grid_size, locks_ptr,
                    physics_step)
 
-            new_grid = np.array(sorted(grid, cmp=cmp_zorder))
-
-
-            for i in xrange(grid.shape[0]):
-                for j in xrange(grid.shape[1]):
-
-
-
-            # Make translation table
-            translate = np.zeros(shape=(num_balls), dtype=np.int32) - 1
-            for i in xrange(grid.shape[0]):
-                for j in xrange(grid.shape[1]):
-                    old_index = grid[i, j]
-                    new_index = new_grid[i, j]
-                    if old_index == 4294967295:
-                        continue    # skip -1 as unint
-                    translate[old_index] = new_index
-
-            velocities = velocities[translate]
-            grid = new_grid
+            # Key and sort positions list
+            keyed_list = [(i, (positions[i][0], positions[i][1])) for i in xrange(num_balls)]
+            sorted_list = sorted(keyed_list, cmp=cmp_zorder, key=lambda x: (int(x[1][0] / grid_spacing), int(x[1][1] / grid_spacing)))
+            index = np.array([n for (n, _) in sorted_list])
+            positions = positions[index]
+            velocities = velocities[index]
+            grid[(positions[:, 0] / grid_spacing).astype(int), (positions[:, 1] / grid_spacing).astype(int)] = index
 
         # udpate our estimate of how fast the simulator runs
         physics_step = 0.9 * physics_step + 0.1 * t.interval

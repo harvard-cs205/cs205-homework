@@ -12,10 +12,12 @@ driver.py).
 
 SORTING
 -------
-Sorting seems to even out the peaks in performance that were observed ealier. With four threads I reached about 350
-frames per second, with 1 thread around the same. Since this part of the code is serial, it makes sense.
+Sorting seems to even out the peaks in performance that were observed ealier. With four threads I reached about 70
+frames per second, with 1 thread this is about a quarter lower. Since this part of the code is serial and Python-bound,
+ it makes sense that the difference is not too big.
 
 LOCKING
 -------
 Locking affects the simulation in that it ensures integrity of the data underlying it. It affects performance only a
-little, by only 10% or so.
+little, by only 10% or so, on my machine: introducing locking made the frame count go from about 75 to 70 frames per
+second on my machine.
