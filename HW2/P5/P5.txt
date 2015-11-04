@@ -20,7 +20,7 @@ With the locks, the performance decrease to between 700 and 900 frames per secon
 
 Explanation of choice for spatial sorting:
 
-I employed Hilbert spatial coherent ordering because it appeared to be the most straightforward and effective method for ordering the balls in space. I believe Hilbert is more efficient with respect to physical memory access as well. 
+I employed Morton spatial coherent ordering because it appeared to be the most straightforward and effective method for ordering the balls in space. I believe Hilbert is more efficient with respect to physical memory access as well. 
 
 
 
