@@ -5,11 +5,13 @@ from libc.math cimport sqrt
 from libc.stdint cimport uintptr_t
 cimport cython
 from omp_defs cimport omp_lock_t, get_N_locks, free_N_locks, acquire, release
+from cython.parallel import parallel, prange, threadid
 
 # Useful types
 ctypedef np.float32_t FLOAT
 ctypedef np.uint32_t UINT
 
+# checks if two balls are overlapping via Euclidean distance
 cdef inline int overlapping(FLOAT *x1,
                             FLOAT *x2,
                             float R) nogil:
@@ -18,7 +20,7 @@ cdef inline int overlapping(FLOAT *x1,
         float dy = x1[1] - x2[1]
     return (dx * dx + dy * dy) < (4 * R * R)
 
-
+# checks if two balls are moving away from each other
 cdef inline int moving_apart(FLOAT *x1, FLOAT *v1,
                              FLOAT *x2, FLOAT *v2) nogil:
     cdef:
@@ -29,7 +31,7 @@ cdef inline int moving_apart(FLOAT *x1, FLOAT *v1,
     # check if delta and velocity in same direction
     return (deltax * vrelx + deltay * vrely) > 0.0
 
-
+# determine the new velocities (conservation of momentum) due to a collision
 cdef inline void collide(FLOAT *x1, FLOAT *v1,
                          FLOAT *x2, FLOAT *v2) nogil:
     cdef:
@@ -50,6 +52,8 @@ cdef inline void collide(FLOAT *x1, FLOAT *v1,
         v1[dim] -= change_v1[dim]
         v2[dim] += change_v1[dim]  # conservation of momentum
 
+
+# for ball i, update the velocity vector given possible two-body collisions
 cdef void sub_update(FLOAT[:, ::1] XY,
                      FLOAT[:, ::1] V,
                      float R,
@@ -58,8 +62,9 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                      float grid_spacing) nogil:
     cdef:
         FLOAT *XY1, *XY2, *V1, *V2
-        int j, dim
+        int j, k, dim
         float eps = 1e-5
+        unsigned int gx, gy, grid_size
 
     # SUBPROBLEM 4: Add locking
     XY1 = &(XY[i, 0])
@@ -69,18 +74,33 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     ############################################################
     # SUBPROBLEM 2: use the grid values to reduce the number of other
     # objects to check for collisions.
-    for j in range(i + 1, count):
-        XY2 = &(XY[j, 0])
-        V2 = &(V[j, 0])
-        if overlapping(XY1, XY2, R):
-            # SUBPROBLEM 4: Add locking
-            if not moving_apart(XY1, V1, XY2, V2):
-                collide(XY1, V1, XY2, V2)
 
-            # give a slight impulse to help separate them
-            for dim in range(2):
-                V2[dim] += eps * (XY2[dim] - XY1[dim])
+    grid_size = <unsigned int> (1.0 / grid_spacing + 1)
+    gx = <unsigned int> (XY[i,0] / grid_spacing)
+    gy = <unsigned int> (XY[i,1] / grid_spacing)
 
+    # iterate through a 5 x 5 square on the grid
+    for j in range(gx - 2, gx + 3):
+        for k in range(gy - 2, gy + 3):
+            # ensure j,k are in the grid, and only collide with larger indices (avoid double collisions)
+            if ((0 <= j < grid_size) and (0 <= k < grid_size) and (i < Grid[j,k] < count)):
+                # obtain position and velocity for nearby neighbors
+                XY2 = &(XY[Grid[j,k], 0])
+                V2 = &(V[Grid[j,k], 0])
+                # check if overlapping
+                if overlapping(XY1, XY2, R):
+                    # if overlapping, check if moving away
+                    # SUBPROBLEM 4: Add locking
+                    if not moving_apart(XY1, V1, XY2, V2):
+                        # adjust velocities accordingly due to the collision
+                        collide(XY1, V1, XY2, V2)
+
+                    # give a slight impulse to help separate them
+                    for dim in range(2):
+                        V2[dim] += eps * (XY2[dim] - XY1[dim])
+
+
+# update the position and velocity vectors of all balls
 cpdef update(FLOAT[:, ::1] XY,
              FLOAT[:, ::1] V,
              UINT[:, ::1] Grid,
@@ -90,7 +110,7 @@ cpdef update(FLOAT[:, ::1] XY,
              float t):
     cdef:
         int count = XY.shape[0]
-        int i, j, dim
+        int i, j, dim, thrds = 1, chunk_size = count / 4
         FLOAT *XY1, *XY2, *V1, *V2
         # SUBPROBLEM 4: uncomment this code.
         # omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
@@ -100,32 +120,33 @@ cpdef update(FLOAT[:, ::1] XY,
 
     with nogil:
         # bounce off of walls
-        #
-        # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
-        # scheduling.
-        for i in range(count):
+        # parallelize this loop over 4 threads, with static scheduling.
+        for i in prange(count, num_threads=thrds, schedule="static", chunksize=chunk_size):
             for dim in range(2):
                 if (((XY[i, dim] < R) and (V[i, dim] < 0)) or
                     ((XY[i, dim] > 1.0 - R) and (V[i, dim] > 0))):
                     V[i, dim] *= -1
 
         # bounce off of each other
-        #
-        # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
-        # scheduling.
-        for i in range(count):
+        # parallelize this loop over 4 threads, with static scheduling.
+        for i in prange(count, num_threads=thrds, schedule="static", chunksize=chunk_size):
             sub_update(XY, V, R, i, count, Grid, grid_spacing)
 
-        # update positions
-        #
-        # SUBPROBLEM 1: parallelize this loop over 4 threads (with static
-        #    scheduling).
-        # SUBPROBLEM 2: update the grid values.
-        for i in range(count):
+        # update the grid values
+        # parallelize this loop over 4 threads (with static scheduling).
+        for i in prange(count, num_threads=thrds, schedule="static", chunksize=chunk_size):
+            # if the object is in the grid, then take it out of its current position
+            if (0 <= XY[i,0] <= 1 and 0 <= XY[i,1] <= 1):
+                Grid[<unsigned int> (XY[i,0] / grid_spacing), <unsigned int> (XY[i,1] / grid_spacing)] = -1
+            # update positions based on updated velocities
             for dim in range(2):
                 XY[i, dim] += V[i, dim] * t
+            # update grid, if the object is now in the grid
+            if (0 <= XY[i,0] <= 1 and 0 <= XY[i,1] <= 1):
+                Grid[<unsigned int> (XY[i,0] / grid_spacing), <unsigned int> (XY[i,1] / grid_spacing)] = i
 
 
+# initialize locks for use
 def preallocate_locks(num_locks):
     cdef omp_lock_t *locks = get_N_locks(num_locks)
     assert 0 != <uintptr_t> <void *> locks, "could not allocate locks"
