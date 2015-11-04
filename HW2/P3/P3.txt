@@ -16,3 +16,5 @@ N = 4:
 1074.957423 Million Complex FMAs in 0.156079053879 seconds, 6887.26255244 million Complex FMAs / second
 
 Clearly form the data we could see that if we add only prange parallelization to the function, it provides a linear speed up. But if we add avx, it provides a 8x speed up and with a linear speed up. So in the optimal case, it could produce 8*4 = 32 times speed up. You won't get exactly an 8x speedup because the work isn't evenly distributed.
+
+Furthurmore, the parallelism provides nearly perfect linear scale speed up, and I think this is exactly what we are looking for.

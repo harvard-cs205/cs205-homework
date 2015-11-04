@@ -1,5 +1,5 @@
-I used the start/join method along with a list of semaphores to finish this problem. I think the start/join might be sufficient for this problem too because one of my friends used only start/join without semaphores to get almost the same speed up. I used start/join method because it is the most convinient way to solve this problem. 
-Semaphores are used to secured syncronization and solve the race problem.
+I used the start/join method along with a list of semaphores to finish this problem. I think the start/join might be sufficient for this problem too because one of my friends used only start/join without semaphores to get almost the same speed up. I used start/join method because it is the most convenient way to solve this problem. 
+Semaphores are used to secured synchronization and solve the race problem.
 
 For N = 1:
 3.49263596535 seconds for 10 filter passes.
