@@ -81,9 +81,13 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
   ##########
   with nogil:
     for r in range(repeat):
+      # loop in parallel with 4 threads
       for idx in prange(src.shape[0], num_threads=4):
+      	# need to make sure we lock in order! always lock the smaller idx first
         minlock = min(src[idx], dest[idx])
         maxlock = max(src[idx], dest[idx])
+
+        # if the lock is the same, great, don't need to lock both locks!
         if minlock == maxlock:
           omp_set_lock(&locks[minlock])
           if counts[src[idx]] > 0:
@@ -121,6 +125,7 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
   with nogil:
     for r in range(repeat):
       for idx in prange(src.shape[0], num_threads=4):
+      	# We will use one lock per N indices.
         minlock = min(src[idx]/N, dest[idx]/N)
         maxlock = max(src[idx]/N, dest[idx]/N)
         if minlock == maxlock:
