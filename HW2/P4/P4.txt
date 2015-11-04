@@ -1,0 +1,33 @@
+# Methods
+
+The synchronous method just creates threads at iteration to filter and wait for them to finish before updating the image.
+
+The asynchronous use event because we only need to know when the neighbors finished the previous iteration, we do not need to lock any data. I use one event per thread per iteration. Though, I think it is possible to use only one event per thread and then to clear it after each iteration but I don’t try this version.
+
+
+# ## Performance
+
+————————— 2 iterations
+
+Serial version in 0.760133981705 seconds
+Numpy version in 12.5820930004 seconds
+
+Sync version in 0.719932794571 seconds with 1 threads.
+Async version in 0.727391958237 seconds with 1 threads.
+Sync version in 0.55847287178 seconds with 2 threads.
+Async version in 0.431370973587 seconds with 2 threads.
+Sync version in 0.358500003815 seconds with 4 threads.
+Async version in 0.36866402626 seconds with 4 threads.
+
+_________ 10 iterations
+
+Sync version in 3.46021699905 seconds with 1 threads.
+Async version in 3.43095612526 seconds with 1 threads.
+Sync version in 1.82300400734 seconds with 2 threads.
+Async version in 1.81348586082 seconds with 2 threads.
+Sync version in 1.65510702133 seconds with 4 threads.
+Async version in 1.6370639801 seconds with 4 threads.
+
+# ## Analysis
+
+The multithreading version are faster, 2times faster for 4 threads in comparaison to 1 thread. It seems that all the work cannot be done in parallel. The difference between sync and async is not obvious, if we considered only 2 iterations. Async is even longer because of the time needed to handle the events. Then it becomes a little faster on 10 iterations.

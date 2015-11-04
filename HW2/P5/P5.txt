@@ -1,0 +1,42 @@
+For each performance study, I aggregated an average number of simulation frames per second over 200 iterations of the animator to have an accurate value. The average value and the frequency plot are provided.
+
+NB: The difference subproblem may be commented in the code and some function may be redundant because I wrote my code to be able to run each of the configuration only while (un)commenting some part.
+
+## Parallel performance
+
+With 1 thread: average simulation frames per second of 11
+With 4 threads: average simulation frames per second of 16
+
+I provided the plot of the simulations over 200 iterations, we see an improvement with 4 threads. We multiplied by 4 the number of threads but it just increased the number of simulations of 1/3. This may be explained because of the time wasted to set and launch the threads as we are setting them for each of the 3 subparts of the function update 
+
+
+
+## Spatial decomposition performance  
+
+With 1 thread: average simulation frames per second of 487
+With 4 threads: average simulation frames per second of 610
+
+The number of simulations has been multiplied by 65 on average in the gridded case. In theory, we changed the complexity of our program for O(N^2) to O(N) because we are visiting a fixed number of cells (10 because we are considering the 5*5 square center on the current ball) for each balls (before we were visiting all the possible balls and using only those with a higher count and an overlapping).
+
+
+
+## Spatial sorting choice
+
+I choose the Hilbert ordering, the computation seems not to be too heavy.
+
+## Spatial Coherent Sorting performance  
+
+With 1 thread: average simulation frames per second of 677
+With 4 threads: average simulation frames per second of 958
+
+The difference between the two cases of threads is more obvious than previously with still a global improvement added by the sorting.
+
+
+## Locking performance (with 4 threads, sorting and griding)
+
+With 1 thread: average simulation frames per second of 424
+With 4 threads: average simulation frames per second of 680
+
+The execution time is larger in the locks case because some threads need to wait to acquire the lock. Otherwise the code is exactly the same in the two case. 
+But the time lost enables to come up with an accurate collision updates for each of the situation. In particular if three balls are in a collision (A hits B and B hits), we are sure that the velocities are correctly updated
+

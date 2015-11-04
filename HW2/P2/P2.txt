@@ -1,0 +1,19 @@
+# ## Time logs
+
+Serial uncorrelated: 0.2906229496 seconds
+Fine grained uncorrelated: 8.40734219551 seconds
+Medium grained uncorrelated: 11.883658886 seconds
+Serial correlated: 0.391420125961 seconds
+Fine grained correlated: 8.02646708488 seconds
+Medium grained correlated: 10.7812769413 seconds
+
+# ## Locking explained
+
+Fine grained: one lock per ceil.
+
+Medium grained: the same lock is shared for each group of ceils of indices between k * N and (k+1) * N in the array.
+
+# ## Medium Grained Value analysis
+
+I plot over 4 iterations the minimum and the average value of the execution time for 12 values of N in both cases, correlated and uncorrelated.
+It seems that for the uncorrelated a bigger value, around 10 is more suited, and for the correlated mostly around 5.

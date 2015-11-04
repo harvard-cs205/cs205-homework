@@ -1,0 +1,7 @@
+# ## Multithreading without AVX
+
+Over 4 iterations I plot the min and the average execution time (which are actually pretty close). 4 threads run 4 times faster than 1 thread, it seems that only a few amount of time is lost in communications and settings.
+
+# ## Multithreading with AVX
+
+On average, this version is 6 times faster than the one without AVX for the same number of threads. Its less than 8 times because of the time taken to do the consecutive operations and objects creation in AVX. Then, comparing the time over the number of thread show more time used for communications and system works than without AVX.

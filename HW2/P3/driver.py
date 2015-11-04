@@ -27,12 +27,50 @@ def make_coords(center=(-0.575 - 0.575j),
 
 if __name__ == '__main__':
     in_coords, out_counts = make_coords()
-
+    num_threads = 1
     with Timer() as t:
-        mandelbrot.mandelbrot(in_coords, out_counts, 1024)
+        mandelbrot.mandelbrot(in_coords, out_counts, 1024, num_threads)
     seconds = t.interval
 
     print("{} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
 
     plt.imshow(np.log(out_counts))
+    plt.show()
+
+    print'---------------------AVX case'
+    in_coords, out_counts = make_coords()
+
+    with Timer() as t:
+        mandelbrot.mandelbrot_avx(in_coords, out_counts, 1024, num_threads)
+    seconds = t.interval
+
+    print("{} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
+
+    plt.imshow(np.log(out_counts))
+    plt.show()
+
+    # ## Multithreading study
+    # Comparing performance with regards to the number of threads
+    performance = []
+    for num_threads in [1, 2, 4]:
+        # Several iterations to smooth the performance plot
+        performance_temp = []
+        for _ in xrange(4):
+            with Timer() as t:
+                mandelbrot.mandelbrot_avx(in_coords, out_counts, 1024, num_threads)
+            seconds = t.interval
+            performance_temp.append(seconds)
+
+            print("{} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
+        performance.append(performance_temp)
+
+    # Plot the performance
+    plt.plot([1, 2, 4], [min(e) for e in performance], label='Minimum')
+    plt.plot([1, 2, 4], [np.mean(e) for e in performance], label='Average')
+
+    plt.xlabel('Number of threads')
+    plt.ylabel('Execution Time')
+    plt.title('Execution time wrt the number of threads over 4 iterations with AVX')
+
+    plt.legend(loc=1)
     plt.show()
