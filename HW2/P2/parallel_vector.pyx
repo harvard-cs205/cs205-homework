@@ -42,9 +42,12 @@ cdef void free_N_locks(int N, omp_lock_t *locks) nogil:
 
     free(<void *> locks)
 
+# My function for checking lock conditions for fine grain
 cdef void check_lock(int idx, omp_lock_t *locks, np.int32_t[:] counts, 
     np.int32_t[:] src, np.int32_t[:] dest) nogil:
     
+    # If the source index is greater, grab it's lock first
+    # This prevents deadlocking
     if src[idx] > dest[idx]:
         acquire(&locks[src[idx]])
         acquire(&locks[dest[idx]])
@@ -53,6 +56,8 @@ cdef void check_lock(int idx, omp_lock_t *locks, np.int32_t[:] counts,
         release(&locks[src[idx]])
         release(&locks[dest[idx]])
 
+    # If the destination's index is greater, grab it first
+    # Also prevents deadlocking
     elif src[idx] < dest[idx]:
         acquire(&locks[dest[idx]])
         acquire(&locks[src[idx]])
@@ -61,6 +66,8 @@ cdef void check_lock(int idx, omp_lock_t *locks, np.int32_t[:] counts,
         release(&locks[src[idx]])
         release(&locks[dest[idx]])
 
+    # If the indexs are equal, only grab one lock
+    # This prevents double locking   
     else:
         acquire(&locks[src[idx]]) 
         counts[dest[idx]] += 1
@@ -68,9 +75,12 @@ cdef void check_lock(int idx, omp_lock_t *locks, np.int32_t[:] counts,
         release(&locks[src[idx]])
 
 
+# My Function Updated for course grain locking
 cdef void check_lock_med(int idx, int N, omp_lock_t *locks, np.int32_t[:] counts, 
     np.int32_t[:] src, np.int32_t[:] dest) nogil:
     
+    # We must now check for the index/N as that cooresponds to the
+    # number of locks that are available
     if src[idx]/N > dest[idx]/N:
         acquire(&locks[src[idx]/N])
         acquire(&locks[dest[idx]/N])
@@ -116,7 +126,8 @@ cpdef move_data_serial(np.int32_t[:] counts,
 cpdef move_data_fine_grained(np.int32_t[:] counts,
                              np.int32_t[:] src,
                              np.int32_t[:] dest,
-                             int repeat):
+                             int repeat,
+                             int threads):
    cdef:
        int idx, r
        omp_lock_t *locks = get_N_locks(counts.shape[0])
@@ -128,7 +139,7 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
    ##########
 
    for r in xrange(repeat):
-       for idx in prange(src.shape[0], nogil=True, num_threads=4): 
+       for idx in prange(src.shape[0], nogil=True, num_threads=threads): 
            if counts[src[idx]] > 0:
                check_lock(idx, locks, counts, src, dest)
 
@@ -139,7 +150,8 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
                                np.int32_t[:] src,
                                np.int32_t[:] dest,
                                int repeat,
-                               int N):
+                               int N,
+                               int threads):
    cdef:
        int idx, r
        int num_locks = (counts.shape[0] + N - 1) / N  # ensure enough locks
@@ -153,7 +165,7 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
    ##########
    
    for r in xrange(repeat):
-       for idx in prange(src.shape[0], nogil=True, num_threads=4):
+       for idx in prange(src.shape[0], nogil=True, num_threads=threads):
            if counts[src[idx]] > 0:
                check_lock_med(idx, N, locks, counts, src, dest)
 

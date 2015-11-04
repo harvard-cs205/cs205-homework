@@ -1,0 +1,42 @@
+### Part A ###
+
+# Uncorrelated
+Serial uncorrelated: 0.327378034592 seconds
+Fine grained uncorrelated: 8.42167806625 seconds
+
+Number of Locks: 1
+Medium grained uncorrelated: 9.59998893738 seconds
+Number of Locks: 2
+Medium grained uncorrelated: 10.9623169899 seconds
+Number of Locks: 4
+Medium grained uncorrelated: 11.0328228474 seconds
+Number of Locks: 5
+Medium grained uncorrelated: 11.3029088974 seconds
+Number of Locks: 10
+Medium grained uncorrelated: 9.50029206276 seconds
+
+
+# Correlated 
+Serial correlated: 0.472969055176 seconds
+Fine grained correlated: 7.73167490959 seconds
+
+Number of Locks: 1
+Medium grained correlated: 9.56373286247 seconds
+Number of Locks: 2
+Medium grained correlated: 8.43163609505 seconds
+Number of Locks: 4
+Medium grained correlated: 8.61915707588 seconds
+Number of Locks: 5
+Medium grained correlated: 8.97014594078 seconds
+Number of Locks: 10
+Medium grained correlated: 11.4742889404 seconds
+
+For this part of the problem, we fixed the number of threads to 4 and changed the amount of locks available to the medium grained data move. We can see from the plotted results that there is not much difference in execution time for the uncorrelated data move, i.e. the amount of data we lock for each thread does not change the performance of the data move. For the correlated data, we see that additional locks increase the performance. This makes sense as we increase the number of locks, there is additional data for threads to operate. The ideal amount of locks should be N=20 as this would ensure that the source and destination are no more than 10 elements away from one another in either direction. However, my results tell a different story. There is a bad performance "spikes" at N = 10 and 20. Based on the results I would pick N between 10 and 20.
+
+### Part B ###
+
+Serial uncorrelated: 0.36355805397 seconds
+Serial correlated: 0.428131818771 seconds
+
+In part B we were required to fix the number of locks to 10 and see how performance varies as we enumerate the amount of the threads available to move data. From the plot we can see that there is a point of diminishing returns after 4 threads. The performance is improved by 4 threads but decreases very quickly as we increase the number of threads. Moreover, the threaded results are much worse than the serial results, this is due to the communication needed between threads to move the data.
+
