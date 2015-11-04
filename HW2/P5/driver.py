@@ -89,5 +89,5 @@ if __name__ == '__main__':
             total_steps +=1
 
         # quit after 8 measurements
-        if total_steps > 8:
+        if total_steps > 20:
             break
