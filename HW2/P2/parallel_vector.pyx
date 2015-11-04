@@ -82,8 +82,9 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
     
     with nogil:              
             for r in range(repeat):
-                for idx in prange(src.shape[0],num_threads=4):       
-           
+                
+                #Parallelize over 4 threads                
+                for idx in prange(src.shape[0],num_threads=4):
                     if counts[src[idx]] > 0:
                         
                         acquire(&(locks[dest[idx]]))       #acquire lock
@@ -113,18 +114,21 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
     #  to parallelize data movement.  Be sure to avoid deadlock, as well as
     # double-locking.
     ##########
+    
     with nogil:
             for r in range(repeat):
+                
+                #Parallelize over 4 threads                  
                 for idx in prange(src.shape[0],num_threads=4):  
                     if counts[src[idx]] > 0:
                         
-                        acquire(&(locks[dest[idx]/N]))       #acquire lock
+                        acquire(&(locks[dest[idx]/N]))       #acquire locks
                         counts[dest[idx]] += 1
-                        release(&(locks[dest[idx]/N]))       #release lock
+                        release(&(locks[dest[idx]/N]))       #release locks
                         
-                        acquire(&(locks[src[idx]/N]))        #acquire lock
+                        acquire(&(locks[src[idx]/N]))        #acquire locks
                         counts[src[idx]] -= 1 
-                        release(&(locks[src[idx]/N]))        #release lock
-    
+                        release(&(locks[src[idx]/N]))        #release locks
+            
 
     free_N_locks(num_locks, locks)

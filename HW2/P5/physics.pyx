@@ -101,7 +101,7 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                             acquire(&(locks[j]))
                             acquire(&(locks[i]))  
    
-                         if not moving_apart(XY1, V1, XY2, V2):
+                        if not moving_apart(XY1, V1, XY2, V2):
                                                     
                             collide(XY1, V1, XY2, V2)
                             
