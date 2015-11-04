@@ -40,8 +40,8 @@ def less_msb(x, y):
 
 
 if __name__ == '__main__':
-    num_balls = 500
-    radius = 0.01
+    num_balls = 10000
+    radius = 0.002
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -115,6 +115,3 @@ if __name__ == '__main__':
                 if (positions[i,0] >= 0) and (positions[i,1] >= 0) and (positions[i,0] <= grid_size) and (positions[i,1] <= grid_size):
                     grid[(positions[i,0] / grid_spacing).astype(int),
                          (positions[i,1] / grid_spacing).astype(int)] = i
-
-
-
