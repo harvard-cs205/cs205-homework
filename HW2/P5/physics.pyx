@@ -63,6 +63,8 @@ cdef void sub_update(FLOAT[:, ::1] XY,
         float eps = 1e-5
 
     # SUBPROBLEM 4: Add locking
+
+    # original code
     #XY1 = &(XY[i, 0])
     #V1 = &(V[i, 0])
     # for j in range(i + 1, count):
@@ -99,7 +101,8 @@ cdef void sub_update(FLOAT[:, ::1] XY,
             j = Grid[x, y]
 
             # only update if pair not visited yet
-            if j < i:
+            # (this here excludes also the case where gx == x, gy == y)
+            if j > i:
                 XY2 = &(XY[j, 0])
                 V2 = &(V[j, 0])
                 if overlapping(XY1, XY2, R):
@@ -128,7 +131,7 @@ cpdef update(FLOAT[:, ::1] XY,
         FLOAT *XY1, *XY2, *V1, *V2
         int gx, gy
         # SUBPROBLEM 4: uncomment this code.
-        # omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
+        omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
 
     assert XY.shape[0] == V.shape[0]
     assert XY.shape[1] == V.shape[1] == 2
