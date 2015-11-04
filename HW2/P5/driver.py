@@ -26,7 +26,7 @@ def d_hilbert(x,y,n):
         rx = (x & s) > 0
         ry = (y & s) > 0
         d += (s**2)*((3 * rx) ^ ry)
-        x, x = rot(s,x,y,rx,ry)
+        x, y = rot(s,x,y,rx,ry)
         s /= 2
     return d
     
