@@ -20,19 +20,8 @@ cdef AVX.float8 z_mag(AVX.float8 z_r, AVX.float8 z_i) nogil:
     cdef AVX.float8 z_mag_squ = AVX.add(z_r_mag, z_i_mag)
     return AVX.sqrt(z_mag_squ)
 
-# cdef void assign_values_to_matrix(AVX.float8 iter, np.uint32_t *to_big_matrix, int j_start, int j_end) nogil:
-#     cdef float *iter_view = <float *> malloc(8*sizeof(float))
-
-#     AVX.to_mem(iter, iter_view)
-
-#     # Now assign appropriately
-#     cdef int j
-#     cdef int count = 0
-#     for j in range(j_start, j_end):
-#         to_big_matrix[j] = <np.uint32_t> iter_view[count]
-#         count += 1
-
-#     free(iter_view)
+# FUNCTION DEFINED TO SERVE AS HELPER FUNCTION IN PRINTING AVX FLOATS.
+# THIS FUNCTION WAS MAINLY USED FOR DEBUGGING
 
 # cdef void print_float8(AVX.float8 f8) nogil:
 #     cdef float *iter_view = <float *> malloc(8*sizeof(float))
@@ -79,9 +68,6 @@ cpdef mandelbrot_avx(np.complex64_t [:, :] in_coords,
     
     cdef AVX.float8 z_magnitude
 
-    cdef AVX.float8 z_2
-    z_2=AVX.float_to_float8(2.0)
-
     cdef AVX.float8 not_go_mask
 
     cdef AVX.float8 z_r_temp1, z_r_temp2, z_r_temp3, z_i_temp1,z_r_temp
@@ -92,15 +78,17 @@ cpdef mandelbrot_avx(np.complex64_t [:, :] in_coords,
 
     cdef AVX.float8 mask_t
 
-    cdef AVX.float8 z_4,z_1,z_0
+    # DEFINING FUNCTIONS IN AVX FLOATS TO BE SET INTO THE LATER EQUATIONS AS INITIALIZATIONS
+    cdef AVX.float8 z_4,z_1,z_0,z_2
     z_4=AVX.float_to_float8(4.0)
     z_1=AVX.float_to_float8(1)
     z_0=AVX.float_to_float8(0.0)
+    z_2=AVX.float_to_float8(2.0)
     
     
     for i in prange(in_coords.shape[0],nogil=True ,num_threads=nthreads, schedule='static', chunksize=1):
         for j in range(0,in_coords.shape[1],8):
-            # CREATING THE FLOAT 8 INDEX ADJUSTED FROM J
+            # ADAPTATION FOR PREVIOUS IMPLEMENTATION (PLEASE IGNORE THIS LINE)
             j_s=j
 
             # CREATING THE REAL COMPONENT OF C BASED ON THE REAL PART COORDINATES IN
@@ -131,11 +119,7 @@ cpdef mandelbrot_avx(np.complex64_t [:, :] in_coords,
             iter_float8=z_0
 
             for ii in range(max_iterations):
-                # OBTAINING THE MAGNITUDE OF THE COMPLEX VALUE Z
-      
-
-                # THIS PART COMPARES THE MAGINITUDE OF Z AND MULTIPLIES THE VALUES
-                # OF -NAN TO OBTAIN THAT IT IS EITHER 1 OR 0 DEPENDIGN ON THE THE COMPARISSON
+                # CREATING THE MASK COMPARING THE MAGNITUDE OF Z TO 2^2 WHICH IS 4. 
                 mask_t=AVX.less_than(AVX.fmadd(z_i, z_i, AVX.mul(z_r,z_r)), z_4)
 
                 # THIS COMPARE USES THE ABOVE TO KNOW IF WE SHOULE EXIT THE CODE 
@@ -146,22 +130,22 @@ cpdef mandelbrot_avx(np.complex64_t [:, :] in_coords,
 
                 # CREATING FLOAT 8 FOR THE REAL AND UPDATIND THE VALUES
                 # WITH THE ADDED C THROUGH THE EQUATION
-                # Z= Z*Z+C
+                # Z_R= RE(Z*Z+C)=Z_R^2-Z_I^2+C_R
                 z_r_temp=z_r
                 z_r=AVX.add(AVX.sub(AVX.mul(z_r,z_r),AVX.mul(z_i,z_i)),c_real)
 
                 # CREATING FLOAT 8 FOR THE IMAGINARY PART OF C FOR THE 
-                # EQUATION DESCRIBED ABOVE
+                # EQUATION DESCRIBED ABOVE BUT APPLIED TO IMAGINARY SUCH THAT
+                # Z_I=Z_R*Z_I*2
                 z_i=AVX.fmadd(AVX.mul(z_r_temp,z_i), z_2, c_imag)
 
-                
-                
-             
                 # ONCE WE OBTAIN THE VALUE ABOVE WE CAN ADD THE MASK TO THE ITERATION
                 # AS THE MASK WILL EITHER BE 1 OR 0 DEPENDING ON THE INDEQUALITY 
                 # BOOLEAN RESULT FROM THE PART ABOVE
                 iter_float8 = AVX.add(iter_float8,AVX.bitwise_and(mask_t, z_1))
-                
+            
+            # THIS PORTION TRANSFERS ALL OF THE DATA STORED IN AVX INTO THE OUT_COUNTS ARRAYS
+            # TO BE EXPORTED TO THE OUTSIDE FUNCTION PERFORMING THE COMPUTATION
             for k in range(8):
                 out_counts[i,j+k]= <np.uint32_t> ((<np.float32_t*> &iter_float8)[k])
             

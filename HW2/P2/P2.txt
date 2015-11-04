@@ -1,0 +1,21 @@
+Problem 2 Written Answers
+By Matheus C Fernandes
+
+The three scales of locking were implemented and the resutls from the simulations are as follows:
+
+(Medium grained used N=10)
+Serial uncorrelated: 0.252437829971 seconds
+Fine grained uncorrelated: 6.49865412712 seconds
+Medium grained uncorrelated: 14.1277370453 seconds
+Serial correlated: 0.309020996094 seconds
+Fine grained correlated: 6.64740586281 seconds
+Medium grained correlated: 6.88494491577 seconds
+
+
+In the medium-grained locking, I would suggest using a value of around N=30 as it seems to obtain the fastest for both cases, correlated and uncorrelated. (shown in the attached graphs: "MediumGranedCorrelated.png" and "MediumGrainedUncorrelated.png", respectively)
+
+In the medium grained sense, the corrleation plays a significant factor on the speedup. For the optimum N mentioned above, the speed up is of around magnitude 4 seconds. If done in a loop, this could be a significant impact on the performance of the code. However, this contrasts with the relation of correlated vs uncorrelated data for the Fine granded and serial code. The serial and the fine do not see a major speedup or slowdown on the corrlation of the data. 
+
+Thus, in summary, the best one as can be seen from the above results is the serial uncorrelated code. Nominally depending on the type of data, the different types of medium and fine grained locking could be a better option. Furthermore, the medium grained locking is heavily influneced by the type of data passed along as well as the N passed into the computation. 
+
+Please see attached graphs for reference.
