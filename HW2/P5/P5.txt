@@ -1,0 +1,15 @@
+Subproblem 1:
+=============
+N = 4: 18 FPS
+N = 2: 17 FPS
+N = 1: 11 FPS
+
+Subproblem 2:
+=============
+N = 1: 593 FPS
+N = 4: 981 FPS
+
+Subproblem 3:
+=============
+N = 1: 982 FPS
+N = 4: 1162 FPS

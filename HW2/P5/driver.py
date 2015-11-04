@@ -16,9 +16,39 @@ from physics import update, preallocate_locks
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
+def getHilbert(N, x, y):
+    factor = 10000000 # Scale everything by factor so we can work with integers
+    x = int( x * factor )
+    y = int( y * factor )
+    N = int( N * factor )
+    rx, ry = None, None
+    s, d = N/2, 0
+
+    while s > 0:
+        rx = (x & s) > 0
+        ry = (y & s) > 0
+        d += s * s * ((3 * rx) ^ ry)
+        x, y = hilbertFlip(s, x, y, rx, ry)
+        s /= 2
+
+    return d
+
+def hilbertFlip(n, x, y, rx, ry):
+    if ry == 0:
+        if rx == 1:
+            x = n-1 - x
+            y = n-1 - y
+        x, y = y, x
+
+    return x, y
+
 if __name__ == '__main__':
     num_balls = 10000
     radius = 0.002
+
+    # Testing parameters
+    # num_balls = 500
+    # radius = 0.01
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -64,7 +94,7 @@ if __name__ == '__main__':
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
-                   radius, grid_size, locks_ptr,
+                   radius, grid_spacing, locks_ptr,
                    physics_step)
 
         # udpate our estimate of how fast the simulator runs
@@ -80,3 +110,16 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+
+            # Get Hilbert mapping
+            # Reference: https://en.wikipedia.org/wiki/Hilbert_curve
+            hM = [getHilbert(grid_size, positions[p, 1], positions[p, 0]) for p in xrange(len(positions))]
+            order = np.argsort(hM)
+            positions = positions[order, :]
+            velocities = velocities[order, :]
+            grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
+            grid[(positions[:, 0] / grid_spacing).astype(int),
+                 (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
+
+
+
