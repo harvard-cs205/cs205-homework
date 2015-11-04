@@ -1,0 +1,24 @@
+
+Discussion:
+
+The resuts below indicate that runtime approximately halves as the number
+of threads doubles. This makes sense because each thread works independently
+on different rows in the image. 
+
+I control cooperation between threads by creating an array of Events with 
+length equal to the number of threads. Each thread sets the corresponding 
+Event after the filtering. The main thread can only finish an iteration once
+all 4 Events are set, at which point the main thread clears all 4 Events for 
+the next iteration which then is allowed to start. 
+
+Results:
+
+Num Threads:  1
+3.32647919655 seconds for 10 filter passes.
+
+Num Threads:  2
+1.72211122513 seconds for 10 filter passes.
+
+Num Threads:  4
+0.958344936371 seconds for 10 filter passes.
+
