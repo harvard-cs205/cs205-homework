@@ -1,0 +1,56 @@
+
+Discussion:
+
+The serial version performs faster than the fine and medium grained lock versions 
+(both use 4 threads). In this case, the time to set and unset locks and the collision 
+wait times involved between threads accessing the same memory locations outweighed 
+the speedups from multithreading. The fine grained version with correlated data
+performs faster than the fine grained version with uncorrelated data because there 
+are less collisions between threads with correlated data. This is because source and 
+destinations are at most 10 apart and the source and destination arrays are divided 
+into 4 contiguous equal segments between the threads. 
+
+For the medium grained case, performance gets better as the number of adjacent elements
+managed by 1 lock (N) gets smaller because smaller N results in less memory collisions 
+between threads. Since the source and destination pairs are at most 10 apart, making N 
+much larger than 10 leads to too many unnecessary locking collisions between threads 
+and thus slower runtime. The medium grained version performs faster on the correlated
+data because there is less of a chance of source/destination indices in separate threads 
+intersecting (higher probability of 4 independent numbers intersecting than 2 correlated
+pairs intersecting). A good N to choose for the correlated case is 10 and a good N to 
+choose for the uncorrelated case is 5. Both of these points are when the returns start to 
+diminish as N decreases. 
+
+Results:
+
+Serial uncorrelated: 0.357121944427 seconds
+Serial correlated: 0.36826300621 seconds
+Fine grained uncorrelated: 4.9652159214 seconds
+Fine grained correlated: 3.51403903961 seconds
+
+N: 5
+Medium grained uncorrelated: 7.20404291153 seconds
+Medium grained correlated: 5.03997206688 seconds
+
+N:  10
+Medium grained uncorrelated: 8.4119849205 seconds
+Medium grained correlated: 5.54998087883 seconds
+
+N: 15
+Medium grained uncorrelated: 10.9000000954 seconds
+Medium grained correlated: 6.43062090874 seconds
+
+N:  25
+Medium grained uncorrelated: 14.1509180069 seconds
+Medium grained correlated: 7.02779078484 seconds
+
+N: 50
+Medium grained uncorrelated: 15.5147249699 seconds
+Medium grained correlated: 7.36333608627 seconds
+
+N:  100
+Medium grained uncorrelated: 21.6095018387 seconds
+Medium grained correlated: 11.1360821724 seconds
+
+
+
