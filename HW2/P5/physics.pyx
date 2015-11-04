@@ -110,7 +110,7 @@ cpdef update(FLOAT[:, ::1] XY,
              float t):
     cdef:
         int count = XY.shape[0]
-        int i, j, dim, thrds = 1, chunk_size = count / 4
+        int i, j, dim, thrds = 4, chunk_size = count / 4
         FLOAT *XY1, *XY2, *V1, *V2
         # SUBPROBLEM 4: uncomment this code.
         # omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
