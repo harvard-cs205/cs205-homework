@@ -16,9 +16,20 @@ from physics import update, preallocate_locks
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
+def part1by1(n):
+    n&= 0x0000ffff
+    n = (n | (n << 8)) & 0x00FF00FF
+    n = (n | (n << 4)) & 0x0F0F0F0F
+    n = (n | (n << 2)) & 0x33333333
+    n = (n | (n << 1)) & 0x55555555
+    return n
+
+def interleave2((i, xy)):
+    return part1by1(xy[0]) | (part1by1(xy[1]) << 1)
+
 if __name__ == '__main__':
-    num_balls = 10000
-    radius = 0.002
+    num_balls = 500
+    radius = 0.015
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -60,11 +71,10 @@ if __name__ == '__main__':
     # SUBPROBLEM 4: uncomment the code below.
     # preallocate locks for objects
     locks_ptr = preallocate_locks(num_balls)
-
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
-                   radius, grid_size, locks_ptr,
+                   radius, grid_spacing, locks_ptr,
                    physics_step)
 
         # udpate our estimate of how fast the simulator runs
@@ -80,3 +90,10 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+            glocations = (positions / grid_spacing).astype(int)
+            sorted_indices = map(lambda (i, value): i, sorted(enumerate(locations), key=interleave2))
+
+            velocities = velocities[sorted_indices]
+            positions = positions[sorted_indices]
+            grid[(positions[:, 0] / grid_spacing).astype(int),
+               (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
