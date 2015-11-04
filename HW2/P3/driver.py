@@ -29,10 +29,19 @@ if __name__ == '__main__':
     in_coords, out_counts = make_coords()
 
     with Timer() as t:
+        mandelbrot.mandelbrot_original(in_coords, out_counts, 1024)
+    seconds = t.interval
+    print "Original"
+    print("{} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
+
+    print "Parallel"
+    with Timer() as t:
         mandelbrot.mandelbrot(in_coords, out_counts, 1024)
     seconds = t.interval
 
     print("{} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
+
+
 
     plt.imshow(np.log(out_counts))
     plt.show()
