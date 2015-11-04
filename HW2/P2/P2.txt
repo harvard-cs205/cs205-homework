@@ -1,0 +1,14 @@
+As the P2.png plot shows, the serial code is clearly faster than the multi-threaded code in this instance, regardless
+ of whether the numbers are correlated or not. There is not much difference between the computation time of the
+ serial code in the uncorrelated versus correlated case.
+
+ The fine-grained locking benefited slightly (but noticeably) from having the numbers correlated, possibly due to
+ faster access to memory since it's more likely to be in cache rather than main memory.
+
+ For medium-grained locking, it was clear that the correlation of the numbers had a big effect. As N grew larger, the
+  number of locks got smaller, and there became more contention over the lower number of locks. The correlated case
+  was more efficient because as N grew larger, it became more likely that the source and destination numbers were
+  going to be using the same lock, so there was less overall contention. Nevertheless, as N grew larger, it was
+  clear that the overall computation time grew as well, regardless of whether the numbers were correlated or not.
+  Therefore, a lower N is more ideal for medium-grained locking in this case (i.e. N=1 is the fastest) for both the
+  uncorrelated case, and the correlated case.

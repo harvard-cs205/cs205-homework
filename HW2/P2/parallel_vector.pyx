@@ -72,19 +72,44 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
                              int repeat):
    cdef:
        int idx, r
+       int maxV, minV
        omp_lock_t *locks = get_N_locks(counts.shape[0])
 
    ##########
    # Your code here
    # Use parallel.prange() and a lock for each element of counts to parallelize
    # data movement.  Be sure to avoid deadlock, and double-locking.
+
    ##########
    with nogil:
-       for r in range(repeat):
-           for idx in range(src.shape[0]):
-               if counts[src[idx]] > 0:
-                   counts[dest[idx]] += 1
-                   counts[src[idx]] -= 1
+           for r in prange(repeat, num_threads = 4):
+               for idx in range(src.shape[0]):
+                   # No change to counts
+                   if src[idx] == dest[idx]:
+                       continue
+
+                   # Impose locking order A then B where A < B
+                   minV = src[idx] if src[idx] < dest[idx] else dest[idx]
+                   maxV = src[idx] if src[idx] > dest[idx] else dest[idx]
+
+                   acquire(&locks[minV])
+                   if maxV == src[idx]: # Best we can do is like in the medium-grained locking
+                       acquire(&locks[maxV])
+
+                       if counts[src[idx]] > 0:
+                           counts[dest[idx]] += 1
+                           counts[src[idx]] -= 1
+
+                       release(&locks[maxV])
+                   else:
+                       if counts[src[idx]] > 0:
+
+                           acquire(&locks[maxV]) # Lock only when we are actually using the resource
+                           counts[dest[idx]] += 1
+                           release(&locks[maxV])
+
+                           counts[src[idx]] -= 1
+                   release(&locks[minV])
 
    free_N_locks(counts.shape[0], locks)
 
@@ -96,6 +121,7 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
                                int N):
    cdef:
        int idx, r
+       int minV, maxV
        int num_locks = (counts.shape[0] + N - 1) / N  # ensure enough locks
        omp_lock_t *locks = get_N_locks(num_locks)
 
@@ -106,10 +132,26 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
    # double-locking.
    ##########
    with nogil:
-       for r in range(repeat):
-           for idx in range(src.shape[0]):
-               if counts[src[idx]] > 0:
-                   counts[dest[idx]] += 1
-                   counts[src[idx]] -= 1
+           for r in prange(repeat, num_threads = 4):
+               for idx in range(src.shape[0]):
+                   # No change to counts
+                   if src[idx] == dest[idx]:
+                       continue
+
+                   # Impose locking order A then B where A < B
+                   minV = src[idx] / N if src[idx] < dest[idx] else dest[idx] / N
+                   maxV = src[idx] / N if src[idx] > dest[idx] else dest[idx] / N
+
+                   acquire(&locks[minV])
+                   if minV < maxV: # If we have to use a second lock
+                       acquire(&locks[maxV])
+
+                   if counts[src[idx]] > 0:
+                       counts[dest[idx]] += 1
+                       counts[src[idx]] -= 1
+
+                   if minV < maxV:
+                        release(&locks[maxV])
+                   release(&locks[minV])
 
    free_N_locks(num_locks, locks)
