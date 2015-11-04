@@ -19,6 +19,11 @@ def randcolor():
 if __name__ == '__main__':
     num_balls = 10000
     radius = 0.002
+
+    # for test purposes
+    #num_balls = 500
+    #radius = 0.01
+
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -61,6 +66,7 @@ if __name__ == '__main__':
     # preallocate locks for objects
     locks_ptr = preallocate_locks(num_balls)
 
+    total_steps = 0
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
@@ -80,3 +86,8 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+            total_steps +=1
+
+        # quit after 8 measurements
+        if total_steps > 8:
+            break

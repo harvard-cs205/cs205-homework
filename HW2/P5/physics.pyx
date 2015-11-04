@@ -5,6 +5,7 @@ from libc.math cimport sqrt
 from libc.stdint cimport uintptr_t
 cimport cython
 from omp_defs cimport omp_lock_t, get_N_locks, free_N_locks, acquire, release
+from cython.parallel import prange
 
 # Useful types
 ctypedef np.float32_t FLOAT
@@ -81,6 +82,8 @@ cdef void sub_update(FLOAT[:, ::1] XY,
             for dim in range(2):
                 V2[dim] += eps * (XY2[dim] - XY1[dim])
 
+@cython.boundscheck(False)
+@cython.wraparound(False)
 cpdef update(FLOAT[:, ::1] XY,
              FLOAT[:, ::1] V,
              UINT[:, ::1] Grid,
@@ -90,7 +93,7 @@ cpdef update(FLOAT[:, ::1] XY,
              float t):
     cdef:
         int count = XY.shape[0]
-        int i, j, dim
+        int i, j, dim, csize, nthreads
         FLOAT *XY1, *XY2, *V1, *V2
         # SUBPROBLEM 4: uncomment this code.
         # omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
@@ -98,12 +101,17 @@ cpdef update(FLOAT[:, ::1] XY,
     assert XY.shape[0] == V.shape[0]
     assert XY.shape[1] == V.shape[1] == 2
 
+    # set here threads & chunksize
+    csize = int(0.25 * count)
+    nthreads = 4
+
     with nogil:
         # bounce off of walls
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
-        for i in range(count):
+        #for i in range(count):
+        for i in prange(count, schedule='static', num_threads=nthreads, chunksize=csize):
             for dim in range(2):
                 if (((XY[i, dim] < R) and (V[i, dim] < 0)) or
                     ((XY[i, dim] > 1.0 - R) and (V[i, dim] > 0))):
@@ -113,7 +121,7 @@ cpdef update(FLOAT[:, ::1] XY,
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
-        for i in range(count):
+        for i in prange(count, schedule='static', num_threads=nthreads, chunksize=csize):
             sub_update(XY, V, R, i, count, Grid, grid_spacing)
 
         # update positions
@@ -121,7 +129,7 @@ cpdef update(FLOAT[:, ::1] XY,
         # SUBPROBLEM 1: parallelize this loop over 4 threads (with static
         #    scheduling).
         # SUBPROBLEM 2: update the grid values.
-        for i in range(count):
+        for i in prange(count, schedule='static', num_threads=nthreads, chunksize=csize):
             for dim in range(2):
                 XY[i, dim] += V[i, dim] * t
 

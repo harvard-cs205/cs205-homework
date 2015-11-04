@@ -1,0 +1,56 @@
+Multithreading (without Grid)
+===
+
+For one thread and the performance setting (10000, 0.002) around 13-14 frames per second are achieved.
+
+13.6457375614 simulation frames per second
+13.3155466947 simulation frames per second
+13.9012203286 simulation frames per second
+14.0524466036 simulation frames per second
+13.23295442 simulation frames per second
+13.8392989125 simulation frames per second
+14.2006981335 simulation frames per second
+13.8373813153 simulation frames per second
+13.6152620115 simulation frames per second
+
+Using four threads, the performance increased to 18-19 frames per second.
+
+17.505442404 simulation frames per second
+18.330466401 simulation frames per second
+19.0755964671 simulation frames per second
+19.3292133848 simulation frames per second
+18.6936934528 simulation frames per second
+18.2928918469 simulation frames per second
+19.796498813 simulation frames per second
+18.1831360818 simulation frames per second
+19.1890492181 simulation frames per second
+
+This gives a relatively small speed up factor of only around 1.3 - 1.5. (With an optimized algorithm something over 3x would be great). This values are retrieved using 1/4 as chunksize.
+
+Interestingly, using a smaller chunksize (i.e. setting it to one element) yields
+
+1 Thread
+--------
+13.3913476581 simulation frames per second
+13.9473537197 simulation frames per second
+13.9814793826 simulation frames per second
+13.4387163336 simulation frames per second
+13.6524445023 simulation frames per second
+14.2875284435 simulation frames per second
+13.1373337593 simulation frames per second
+12.3892799438 simulation frames per second
+12.8160748497 simulation frames per second
+
+4 Threads
+---------
+24.6232747639 simulation frames per second
+26.3824230568 simulation frames per second
+26.9027747489 simulation frames per second
+25.1775567414 simulation frames per second
+25.9558151912 simulation frames per second
+24.340345522 simulation frames per second
+26.1122358771 simulation frames per second
+25.8786248427 simulation frames per second
+25.2276822769 simulation frames per second
+
+which roughly resembles a speed up of 2x. This means, that indeed data locality seems to have an enormous effect. With a better sorting of the data, also in the case of larger chunksizes better speedups should be achievable.
