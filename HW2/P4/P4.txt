@@ -1,0 +1,21 @@
+Computation time
+===================
+The computation time for 1, 2, and 4 threads was 3.59s, 1.86s, and 1.64s respectively. I have also included a plot in P4
+.png.
+
+There is a significant time reduction from 1 to 2 threads, but only a marginal difference between 2 threads and 4
+threads. I think this may be due to memory contention at higher thread counts since there are a lot of memory accesses
+ in this problem (both reading and writing.) Once the computation no longer became the bottleneck through a greater
+ number of threads, memory access became the limiting factor.
+
+
+Thread Cooperation
+===================
+I chose a fairly simple solution that is similar to the way the consumer/producer model works. Since the
+threads just run through their instructions once per iteration, it is a matter of coordinating the threads
+and the main program so they alternate their tasks until completion.
+
+Both the threads and the main program have an Event object associated with them (so 2 Events.) These Events can wake
+up any thread that is waiting on that Event. I also include a shared variable that reflects how many threads are
+still working on their task for the current iteration. When this variable becomes 0, then it is time to wake up the
+main program and begin preparing for the next iteration.

@@ -23,16 +23,16 @@ st = threading.Event()
 def runThread(tmpA, tmpB, ID, nThreads, iter):
     global rem
     for i in xrange(iter):
-        st.wait() # Wait for the signal
-        for r in xrange(ID, len(tmpA), nThreads):
+        st.wait() # Wait for the signal to begin current iteration
+        for r in xrange(ID, len(tmpA), nThreads): # Compute the rows this thread is responsible for
             uRow = max(0,r-1)
             dRow = min(r+2, tmpA.shape[0])
             offset = int(r > 0)
             filtering.median_3x3(tmpA[uRow:dRow, :], tmpB[uRow:dRow, :], offset, 2)
 
         mtx_rem.acquire()
-        rem -= 1
-        if rem == 0:
+        rem -= 1 # Update remaining threads
+        if rem == 0: # All threads complete, notify main
             fin.set()
             fin.clear()
         mtx_rem.release()
@@ -45,30 +45,25 @@ def py_median_3x3(image, iterations=10, num_threads=1):
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
     event = threading.Event()
+
+    # Reference: http://stackoverflow.com/questions/21174416/threading-advice-for-web-crawler-scheduling-with-single-list
     threads = [threading.Thread(target=runThread, args=(tmpA, tmpB, i, num_threads, iterations)) for i in xrange(
         num_threads)]
 
-    for t in threads:
+    for t in threads: # Start all the threads
         t.start()
 
     for i in range(iterations):
-        mtx_rem.acquire()
+        mtx_rem.acquire() # Update number of remaining threads yet to complete their tasks
         rem = num_threads
         mtx_rem.release()
 
-        st.set()
+        st.set() # Start all the threads
         st.clear()
 
-        fin.wait()
+        fin.wait() # Wait until the threads have finished
 
         tmpA, tmpB = tmpB, tmpA
-        # for r in xrange(image.shape[0]):
-        #     uRow = max(0,r-1)
-        #     dRow = min(r+2,image.shape[0])
-        #     offset = int(r > 0)
-        #     filtering.median_3x3(tmpA[uRow:dRow, :], tmpB[uRow:dRow, :], offset, 2)
-        # swap direction of filtering
-
 
     return tmpA
 
@@ -100,15 +95,8 @@ if __name__ == '__main__':
     from_cython = py_median_3x3(input_image, 2, 5)
     from_numpy = numpy_median(input_image, 2)
 
-    # res = (from_cython == from_numpy)
-    #
-    # for i in xrange( len(from_cython) ):
-    #     for j in xrange( len(from_cython) ):
-    #         if not res[i, j]:
-    #             print 'No match: at ', i, ' ' , j, ' with ', res[i,j]
-    #             print from_cython[i, j], ' vs ', from_numpy[i, j]
-
     assert np.all(from_cython == from_numpy)
+    print 'Test passed'
 
     with Timer() as t:
         new_image = py_median_3x3(input_image, 10, 8)
