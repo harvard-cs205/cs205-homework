@@ -115,7 +115,6 @@ if __name__ == '__main__':
             #We fill the grid with the new positions
             grid[(positions[:, 0] / grid_spacing).astype(int), (positions[:, 1] / grid_spacing).astype(int)] = sorted_idx
 
-            
 
 
     print "AVERAGE:", np.mean(average)

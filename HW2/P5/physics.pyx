@@ -128,7 +128,7 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     #        # give a slight impulse to help separate them
     #        for dim in range(2):
     #            V2[dim] += eps * (XY2[dim] - XY1[dim])
-                        
+                                    
     
 cpdef update(FLOAT[:, ::1] XY,
              FLOAT[:, ::1] V,

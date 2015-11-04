@@ -85,6 +85,7 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
 
                 if counts[src[idx]] > 0:
                     
+                    #We lock the elements corresponding to the destination and source indexes. We always lock the smallest index before to avoid deadlocks.
                     if dest[idx] < src[idx]:
                         acquire(&(locks[dest[idx]]))
                         acquire(&(locks[src[idx]]))
@@ -92,11 +93,13 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
                         acquire(&(locks[src[idx]]))
                         acquire(&(locks[dest[idx]]))
                     else:
+                        #In case the indexes are the same we just lock it once to avoid double locking.
                         acquire(&(locks[dest[idx]]))
 
                     counts[dest[idx]] += 1
                     counts[src[idx]] -= 1
-
+                    
+                    #The releasing order is not important.
                     if dest[idx] == src[idx]:
                         release(&(locks[dest[idx]]))
                     else:
@@ -128,6 +131,7 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
                 
                 if counts[src[idx]] > 0:
                     
+                    #We repite the same procedure than for the previous question but now we do it by groups of adjacent elements.
                     if dest[idx]/N < src[idx]/N:
                         acquire(&(locks[dest[idx]/N]))
                         acquire(&(locks[src[idx]/N]))

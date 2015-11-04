@@ -5,11 +5,12 @@ import numpy
 cimport AVX
 from cython.parallel import prange
 
-
+#We adapt the magnitude_squared function for an AVX.float8 element (we follow magnitude_squared = z_real^2 + z_imag^2)
 cdef AVX.float8 magnitude_squared(AVX.float8 z_real, AVX.float8 z_imag) nogil:
     return AVX.fmadd(z_real, z_real, AVX.mul(z_imag, z_imag))
 
 
+#We create a function to copy the temporary tmp_counts buffer to the out_counts array. 
 cdef void counts_to_output(AVX.float8 counts,
                       np.uint32_t [:, :] out_counts,
                       int i, int j) nogil:
@@ -54,7 +55,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                 iterations = AVX.float_to_float8(0.0)
                 ones = AVX.float_to_float8(1.0)
                 
-                    
+                #We create two arrays of 8 elements, one for the real part of the complex numbers and one for the imaginary part.
                 c_real = AVX.make_float8((in_coords[i,j*8+7]).real,
                              (in_coords[i,j*8+6]).real,
                              (in_coords[i,j*8+5]).real,
@@ -80,25 +81,29 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                 
                 
                 for iter in range(max_iterations):
-                        
+                    
+                    #We flag the elements in the array in which magnitude_squared(element) > 4:
                     mask = AVX.greater_than(AVX.float_to_float8(4), magnitude_squared(z_real, z_imag))
+                    #We create an array "accepted" with ones for the elements in which magnitude_squared(element) <= 4 and 0 for the other ones.
                     accepted = AVX.bitwise_and(mask, ones)
                     
-                    
+                    #We update in each iteration the values of accepted so we keep track of the numbers of iterations an element has had magnitude_squared(element) <= 4. 
                     iterations = AVX.add(accepted, iterations)
                         
+                    #If all the elements have values such that magnitude_squared(element) > 4 we stop iterating. 
                     if AVX.signs(mask) == 0:
                         break
                     
-                    # (a+bj)(a+bj)
-                    # a^2 + jab + jab + j^2b^2
-                    #(a^2 - b^2) + j(2ab)
+                    #We update the values of z_real and z_imag by following z = z * z + c. Lets z be a complex number such as z = a+bj:
+                    # z*z = (a+bj)(a+bj)
+                    # z*z = a^2 + jab + jab + j^2b^2
+                    # z*z = (a^2 - b^2) + j(2ab)
                     z_real_tmp = AVX.add(AVX.fmsub(z_real, z_real, AVX.mul(z_imag, z_imag)), c_real)
                     z_imag = AVX.fmadd(AVX.float_to_float8(2.0), AVX.mul(z_real, z_imag), c_imag)
                     
                     z_real = z_real_tmp
              
-                        
+                #We pass the calculated values to the array out_counts.        
                 counts_to_output(iterations, out_counts, i, j) 
                 
 
