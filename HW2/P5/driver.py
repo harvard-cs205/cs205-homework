@@ -124,11 +124,11 @@ if __name__ == '__main__':
             velocities = velocities[zorder]
             
             # MAKING SURE THAT THE POSITION OF EACH BALL IS WITHIN THE BOUNDS OF THE DOMAIN
-            inbound = np.array(filter(lambda x: x[0] > 0 and x[1] < 1, positions))
+            newPositions = np.array(filter(lambda x: x[0] > 0 and x[1] < 1, positions))
 
             # RECREATE THE REORDERD GRID BASED ON THE POINTS WITHINT THE SPACE
             grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
-            grid[(inbound[:, 0] / grid_spacing).astype(int),
-                 (inbound[:, 1] / grid_spacing).astype(int)] = np.arange(len(inbound))
+            grid[(newPositions[:, 0] / grid_spacing).astype(int),
+                 (newPositions[:, 1] / grid_spacing).astype(int)] = np.arange(len(newPositions))
 
 
