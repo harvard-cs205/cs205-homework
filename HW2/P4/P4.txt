@@ -3,6 +3,8 @@ My results shows performance increasing with the number of threads (although the
 
 My design makes each thread responsible for every n_threads row of the image. I allowed threads to begin asynchronously by creating two semaphores for each thread, one to regulate the slice above it and one to regulate the slice below it. These semaphores are acquired when an adjacent slice is trying to start filtering down a row and released when a slice finishes filtering a row. This approach ensures correctness and prevents deadlock because the semaphores prevent any one row from processed before its adjacencies - the total number of times the upper and lower semaphores have been released correspond to a row's progress, and the number of times they have been acquired correspond to the progress of neighboring rows. 
 
+In other words, a row's lower semaphore keeps track of how many iterations in comparison to its lower neighbor. Since the semaphore is never allowed to drop below 0 the neighbor cannot iterate past the row. 
+
 3.47082209587 seconds for 10 filter passes with 1 threads.
 1.77308177948 seconds for 10 filter passes with 2 threads.
 1.00484704971 seconds for 10 filter passes with 4 threads.

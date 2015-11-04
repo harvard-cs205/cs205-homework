@@ -16,9 +16,29 @@ from physics import update, preallocate_locks
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
+#  Morton coding function from the following python recipe:
+#  http://code.activestate.com/recipes/577558-interleave-bits-aka-morton-ize-aka-z-order-curve/
+#  Maps two dimensional point to one dimension while preserving locality of data
+def part1by1(n):
+    n &= 0x0000ffff
+    n = (n | (n << 8)) & 0x00FF00FF
+    n = (n | (n << 4)) & 0x0F0F0F0F
+    n = (n | (n << 2)) & 0x33333333
+    n = (n | (n << 1)) & 0x55555555
+    return n
+
+def morton_code((x, y)):
+    return part1by1(x) | (part1by1(y) << 1)
+
+
 if __name__ == '__main__':
+    #  testing values
+    num_balls = 500
+    radius = .01
+
     num_balls = 10000
     radius = 0.002
+
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -41,7 +61,7 @@ if __name__ == '__main__':
     # Each square in the grid stores the index of the object in that square, or
     # -1 if no object.  We don't worry about overlapping objects, and just
     # store one of them.
-    grid_spacing = radius / np.sqrt(2.0)
+    grid_spacing = radius * np.sqrt(2.0)
     grid_size = int((1.0 / grid_spacing) + 1)
     grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
     grid[(positions[:, 0] / grid_spacing).astype(int),
@@ -64,7 +84,7 @@ if __name__ == '__main__':
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
-                   radius, grid_size, locks_ptr,
+                   radius, grid_spacing, locks_ptr,
                    physics_step)
 
         # udpate our estimate of how fast the simulator runs
@@ -80,3 +100,13 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+
+
+            locations = (positions / grid_spacing).astype(int)   
+            #  sort using morton coding as key         
+            indices = np.argsort(map(morton_code, locations))
+            positions = np.array(positions)[indices]
+            velocities = np.array(velocities)[indices]
+
+            grid[(positions[:, 0] / grid_spacing).astype(int),
+                 (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)

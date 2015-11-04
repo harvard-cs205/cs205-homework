@@ -4,6 +4,8 @@ In the uncorrelated case the fine-grained locks performed better than any of coa
 
 However, in the correlated case, the coarse-grained strategy can outperform the fine-grained. This is most liekly the result of many of the transactions only needing one lock (due to the correlation). When a transaction only needs one lock, there is less overhead but the chance of blocking does not substantially increase. The empirical results show that it's ideal to have ~20 pieces of data for each lock (N=20). 
 
+Another note - I just acquired locks before accessing individual elements of the data rather than locking the decremented and incremented element at once. This means that my transactions are no longer atomic (it's possible for only half of the transaction to happen if the program is halted). However, this prevents some blocking and it will always turn out correct in the end if the program terminates. 
+
 Full results: 
 
 Serial uncorrelated: 0.301871061325 seconds

@@ -1,0 +1,18 @@
+Multithreading
+
+Using four threads increased performance from around ~10 frames per second to ~25 frames per second on my machine.
+
+Grid
+
+Changing to the grid based method substantially increased performance. With 1 thread it ran at around 550 fps and with four threads it ran at around 1600 fps.
+
+Using the grid method, our simulation only has to check the seven adjacent grid cells for possible collisions (O7N)=O(N) rather than checking every other ball (ON^2). Multithreading sped up both the grid and non-grid version by around 2.5 to 3x. The constant factor makes sense since neither the original version nor the grid version have any locks or other mechanisms that would block threads. 
+
+Sorting
+
+Sorting by Morton code further increased performance to 750 fps with one thread and 2100 fps with four threads. 
+This makes sense because the sorting ensures that balls close to each other on the grid will also be close to each other in memory. 
+
+Locking 
+
+Adding locks decreased performance to around 450 fps with one thread and 1250 fps with four threads. Since the locks decreased performance by roughly the same percentage in the single threaded and multithreaded case, it appears that most of the slowdown is caused by overhead rather than blocking. 
