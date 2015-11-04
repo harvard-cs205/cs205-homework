@@ -16,11 +16,7 @@ cdef np.float64_t magnitude_squared(np.complex64_t z) nogil:
 cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                  np.uint32_t [:, :] out_counts,
                  int max_iterations=511):
-    cdef:
-       int i, j, iter
-       np.complex64_t c, z
-
-
+    
        # To declare AVX.float8 variables, use:
        # cdef:
        #     AVX.float8 v1, v2, v3
@@ -34,54 +30,62 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     assert in_coords.shape[0] == out_counts.shape[0], "Input and output arrays must be the same size"
     assert in_coords.shape[1] == out_counts.shape[1],  "Input and output arrays must be the same size"
 
-    
-    # out_counts = mandel_multi(in_coords, out_counts, max_iterations)
-    out_counts = mandel_cal(in_coords, out_counts, max_iterations)
+    #out_counts = serial_mandel(in_coords, out_counts, max_iterations)
+    #out_counts = mandel_multi(in_coords, out_counts, 4, max_iterations)
+    out_counts = mandel_AVX(in_coords, out_counts, 4, max_iterations)
 
-cpdef serial_code():
-    # Serial Code
-    # with nogil:
-    #     for i in range(in_coords.shape[0]):
-    #         for j in range(in_coords.shape[1]):
-    #             c = in_coords[i, j]
-    #             z = 0
-    #             for iter in range(max_iterations):
-    #                 if magnitude_squared(z) > 4:
-    #                     break
-    #                 z = z * z + c
-    #             out_counts[i, j] = iter
-    return 0
-
-cpdef mandel_multi(np.complex64_t [:, :] in_coords, 
+cpdef serial_mandel(np.complex64_t [:, :] in_coords, 
                    np.uint32_t [:, :] out_counts,
                    int max_iterations=511):
-  cdef:
+    cdef:
        int i, j, iter
        np.complex64_t c, z
 
-  # Completed Multithreading Code
-  for i in prange(in_coords.shape[0], nogil=True, schedule='static', chunksize=1, num_threads=1):
-      for j in xrange(in_coords.shape[1]):
-          c = in_coords[i, j]
-          z = 0
-          for iter in xrange(max_iterations):
-              if magnitude_squared(z) > 4:
-                  break
-              z = z * z + c
-          out_counts[i, j] = iter
+    # Serial Code
+    with nogil:
+        for i in range(in_coords.shape[0]):
+            for j in range(in_coords.shape[1]):
+                c = in_coords[i, j]
+                z = 0
+                for iter in range(max_iterations):
+                    if magnitude_squared(z) > 4:
+                        break
+                    z = z * z + c
+                out_counts[i, j] = iter
+    
+    return out_counts
 
-  return out_counts
+cpdef mandel_multi(np.complex64_t [:, :] in_coords, 
+                   np.uint32_t [:, :] out_counts,
+                   int threads,
+                   int max_iterations=511):
+    cdef:
+        int i, j, iter
+        np.complex64_t c, z
 
-cpdef mandel_cal(np.complex64_t [:, :] in_coords,
+    # Completed Multithreading Code
+    for i in prange(in_coords.shape[0], nogil=True, schedule='static', chunksize=1, num_threads=threads):
+        for j in xrange(in_coords.shape[1]):
+            c = in_coords[i, j]
+            z = 0
+            for iter in xrange(max_iterations):
+                if magnitude_squared(z) > 4:
+                    break
+                z = z * z + c
+            out_counts[i, j] = iter
+
+    return out_counts
+
+cpdef mandel_AVX(np.complex64_t [:, :] in_coords,
                  np.uint32_t [:, :] out_counts,
+                 int threads,
                  int max_iterations=511):
     
     cdef:
         AVX.float8 real_avx, imag_avx, complex_avx
-        AVX.float8 z_real, z_imag
+        AVX.float8 z_real, z_imag, z_r_tmp
         AVX.float8 mag_real_avx, mag_imag_avx, mag_tot_avx
         AVX.float8 cutoff_avx, two_avx, one_avx, mask_avx, compare_avx, count_avx, c_plus_one
-        AVX.float8 z_x2_cr, z_r, z_i, z_xy
 
         np.float32_t [:,:] real_np, imag_np
 
@@ -100,16 +104,19 @@ cpdef mandel_cal(np.complex64_t [:, :] in_coords,
     mag_imag_avx = AVX.float_to_float8(0)
     mag_tot_avx = AVX.float_to_float8(0)
     
-    # Initialize cutoff AVX vector 
+    # Initialize cutoff=4, two=2, one=1, compare and mask AVX vectors
     cutoff_avx = AVX.float_to_float8(4)
     two_avx = AVX.float_to_float8(2)
     one_avx = AVX.float_to_float8(1)
     compare_avx = AVX.float_to_float8(0)
     mask_avx = AVX.float_to_float8(0)
     
-    for i in prange(in_coords.shape[0], nogil=True, schedule='static', chunksize=1, num_threads=4):
+    for i in prange(in_coords.shape[0], nogil=True, schedule='static', chunksize=1, num_threads=threads):
     #for i in xrange(in_coords.shape[0]):
         for j in range(0, in_coords.shape[1], 8):
+            
+            # Initialize the Real and Imag parts of the AVX values
+            # c = in_coords[i, j]
             real_avx = AVX.make_float8(real_np[i, j], real_np[i, j+1], real_np[i, j+2], real_np[i, j+3],
               real_np[i, j+4], real_np[i, j+5], real_np[i, j+6], real_np[i, j+7])
             imag_avx = AVX.make_float8(imag_np[i, j], imag_np[i, j+1], imag_np[i, j+2], imag_np[i, j+3],
@@ -118,33 +125,29 @@ cpdef mandel_cal(np.complex64_t [:, :] in_coords,
             # z = 0
             z_real = AVX.float_to_float8(0)
             z_imag = AVX.float_to_float8(0)
-            z_x2_cr = AVX.float_to_float8(0)
-            z_xy = AVX.float_to_float8(0)
-            z_r = AVX.float_to_float8(0)
-            z_i = AVX.float_to_float8(0)
-
+            z_r_tmp = AVX.float_to_float8(0)
             count_avx = AVX.float_to_float8(0)
-            # c_plus_one = AVX.float_to_float8(0)
-            # compare_avx = AVX.float_to_float8(0)
-
+            
             for iter in range(max_iterations):
                 # Compute Magnitude 
                 mag_real_avx = AVX.mul(z_real, z_real)
                 mag_tot_avx = AVX.fmadd(z_imag, z_imag, mag_real_avx)
                
-                # Only modify if less than 4
+                # Only modify AVX values if less than 4
                 compare_avx = AVX.less_than(mag_tot_avx, cutoff_avx)
                 mask_avx = AVX.bitwise_and(one_avx, compare_avx)
                 count_avx = AVX.add(count_avx, mask_avx)
 
+                # Break if all values are great than 4
                 if not AVX.signs(compare_avx):
                   break
 
-                z_r = AVX.fmsub(z_real, z_real, AVX.fmsub(z_imag, z_imag, real_avx))
+                # Update Z_real and Z_complex
+                z_r_tmp = AVX.fmsub(z_real, z_real, AVX.fmsub(z_imag, z_imag, real_avx))
                 z_imag = AVX.fmadd(two_avx, AVX.mul(z_real, z_imag), imag_avx)
-                z_real = z_r
-              
-                #AVX.to_mem(count_avx, &())
+                z_real = z_r_tmp
+            
+            # Update outcounts
             for k in range(8):
                 out_counts[i,j+k] = <np.uint32_t> ((<np.float32_t*> &count_avx)[k])
 
