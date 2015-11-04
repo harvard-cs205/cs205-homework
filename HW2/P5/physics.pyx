@@ -1,4 +1,4 @@
-#cython: boundscheck=False, wraparound=False
+#cython: boundscheck=True, wraparound=False
 
 import numpy as np
 cimport numpy as np
@@ -227,9 +227,6 @@ cpdef update(FLOAT[:, ::1] XY,
 			if (coord[0]!=old_coord[i,0]) | (coord[1]!=old_coord[i,1]):
 				Grid[ coord[0],coord[1] ] = i # update grid with new coords for ball i
 				Grid[ old_coord[i,0],old_coord[i,1] ] = -1 # remove ball from previous grid coords
-
-
-	#free_N_locks(XY.shape[0],locks)
 
 
 def preallocate_locks(num_locks):

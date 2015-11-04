@@ -99,7 +99,7 @@ if __name__ == '__main__':
 
     # prange() vars
     chunk = num_balls/4
-    nthread = 4
+    nthread = 1
     
     # histogram vars
     SFPS = []
@@ -141,16 +141,18 @@ if __name__ == '__main__':
             grid[gridx,gridy] = np.arange(num_balls)
             velocities[:] = velocities[hilberted,:]
            
-        # plotting FPS histograms
+        ''' The rest of this code collects data for histograms. 
+            It stops the animation after a certain number of iterations, and saves a histogram image to file.
+        ''' 
         if ct > ct_max:
             fig, ax = plt.subplots()
-            ax.hist(SFPS, bins=20)
-            ax.set_title("Histogram of simulation FPS, {} threads, part {}".format(nthread,part), fontsize=16)
-            ax.set_xlabel("Simulation Frames Per Second", fontsize=14)
-            ax.set_ylabel("Frequency", fontsize=14)
-            ax.set_xlim([0,1000])
+            ax.hist(SFPS, bins=15)
+            ax.set_title("Simulation FPS, {} threads, part {}".format(nthread,part), fontsize=18)
+            ax.set_xlabel("Frames Per Second", fontsize=15)
+            ax.set_ylabel("Frequency", fontsize=15)
+            ax.set_xlim([0,450])
             ax.set_ylim([0,10])
-            fig.savefig('p5-pt{}-{}threads.png'.format(part,nthread))
+            fig.savefig('balls10k/p5-pt{}-{}threads.png'.format(part,nthread))
             
             break
         ct += 1 # this is so we know when to break after enough iterations have passed to collect a good histogram
