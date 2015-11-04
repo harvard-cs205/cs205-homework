@@ -66,7 +66,7 @@ if __name__ == '__main__':
     # A matplotlib-based animator object
     animator = Animator(positions, radius * 2)
 
-    # simulation/animation time variablees
+    # simulation/animation time variables
     physics_step = 1.0 / 100  # estimate of real-time performance of simulation
     anim_step = 1.0 / 30  # FPS
     total_time = 0

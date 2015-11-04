@@ -1,12 +1,26 @@
 
 P2. 
 
+Here I experimented with three scales of locking. It is clear that the number of locks affects the time it takes. For fine grained, we lock at every index whereas medium grained allows us to lock a set of N locks at a time. We also are able to compare correlated and uncorrelated locking. From the plot i have included, we see that correlated movement decreases the time necessary to complete the task. Please see below for more on my experiments regarding number of locks to use in medium grained locking. 
+
+For the initial code set-up where N = 10:
+
+Serial uncorrelated: 0.247 seconds
+Fine grained uncorrelated: 4.692 seconds
+Medium grained uncorrelated: 5.902seconds
+
+Serial correlated: 0.278 seconds
+Fine grained correlated: 4.321 seconds
+Medium grained correlated: 5.150 seconds
+
+In this instance, we see that serial is the fastest (likely due to not having to spend time acquiring and releasing locks). Then, in medium grained, it is likely longer than fine grained because there would be times the threads would have to wait for a particular set of 10 locks to be released before work can resume. 
+
 #######################
 # Medium/Uncorrelated #
 #######################
-I experimented with various values of N locks. Specifically, I tried over the range(1,33). For medium grained uncorrelated, There seems to be a linear trend of increasing time as N increases. 
+I experimented with various values of N locks. Specifically, I tried over the range(1,33). For medium grained uncorrelated, There seems to be a linear trend of increasing time as N increases. Please refer to my plots which depict the time it takes for various values of N. Since N continues to increase in this case, it appears that a lower value of N is best.
 
 #####################
 # Medium/Correlated #
 #####################
-For medium grained correlated, there appears to be a minimum around 14 locks. Overall, in the way in which correlated works, the increments are of 10 and thus two locks are at most 20 locks away from each other. Thus, perhaps a value of 20 here would have made more sense.
+For medium grained correlated, there appears to be a minimum around 14 locks. Please see my plots which depict the time it takes for various values of N. This makes sense that there exists a minimum whereas above I did not find one. In correlated movement, we are looking grabbing certain sets of locks at a time, so there is a way to optimize which/how many locks we grab for optimization. If we grab too few, we may not be taking full advantage of the correlated movement. If we take too many, we may be overdoing it, undermining the advantages of correlated. thus, we need to find the right balance which appears to be around 15-20 locks from my plot. 

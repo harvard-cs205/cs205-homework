@@ -1,4 +1,4 @@
-P5. For this problem I collaborated with Taylor Killian, Christian Junge, Reinier Maat, and Abishek.
+P5. For this problem I collaborated with Taylor Killian, Christian Junge, Reinier Maat, and Abhishek Malali.
  
 ################
 # Subproblem 1 #
@@ -22,13 +22,13 @@ When we introduce the grid, we see that performance increases.
 1 Thread: ~700 simulation frames per second
 4 Threads: ~1800 simulation frames per second
 
-As we can see, there is a significant speed up relative to the speeds listed above in Subproblem 1. 
+As we can see, there is a significant speed up relative to the speeds listed above in Subproblem 1. Specifically, we have reduced this from a O(N^2) algorithm to an O(N) algorithm.
 
 ################
 # Subproblem 3 # 
 ################
 
-To sort, I built off of the code provided in the Hilbert filtering wikipedia article. First, i created a tuple of our balls and their positions. Then I called the cmp_zsort function (Hilbert filtering) on that array of positions. I then updated the positions and velocities based off of the new output from the filtering.
+To sort, I built off of the code provided in the Hilbert filtering wikipedia article. First, i created a tuple of our balls and their positions. Then I called the cmp_zsort function (Hilbert filtering) on that array of positions. I then updated the positions and velocities based off of the new output from the filtering. Finally, a new grid was computed.
 
 1 Thread: ~900 simulation frames per second
 4 Threads ~2200 simulation frames per second
@@ -39,7 +39,7 @@ As we can see, there is a speed up relative to the speeds listed above in Subpro
 # Subproblem 4 # 
 ################
 
-Without Locks: ~2200 simulation frames per second (same as above)
+Without Locks: ~2200 simulation frames per second (same benchmark as above)
 With Locks: ~2200 simulation frames per second 
 
-Here there seems to be no reduction in performance when locks are implemented.
+Here there seems to be no reduction in performance when locks are implemented. this makes sense. I did not expect locking to necessarily increase the speed here. Instead, locking ensures we don’t update a ball out of sequence now that we have switched from the original O(N^2) algorithm to the spatial decomposition O(N) method. 

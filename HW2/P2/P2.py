@@ -97,7 +97,7 @@ if __name__ == '__main__':
         assert counts.sum() == total, "Wrong total after move_data_medium_grained"
         print("Medium grained correlated: {} seconds".format(t.interval))
         T2.append(t.interval)
-    
+        
     #Make plot comparing performance for uncorr and corr.
     plt.plot(N,T,label="Medium grained uncorrelated time")
     plt.plot(N2,T2,label="Medium grained correlated time")
