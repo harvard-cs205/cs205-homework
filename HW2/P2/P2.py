@@ -110,4 +110,4 @@ if __name__ == '__main__':
     plt.ylabel('Time')
     plt.title('Medium-Grained Performance on Correlated and Uncorrelated Data')
     plt.legend()
-    plt.show()
+    plt.savefig('P2.png')
