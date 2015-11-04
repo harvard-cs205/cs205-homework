@@ -1,4 +1,4 @@
-Author: Xingchi Dai
+Author: Xingchi Dai Harvard University
 Class: CS205
 Homework 2
 Problem 2: Parallel Vector Updates

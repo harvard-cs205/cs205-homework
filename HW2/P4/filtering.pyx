@@ -1,5 +1,16 @@
 #cython: boundscheck=False, wraparound=False
 
+###########################################
+#
+#Submitted by: Xingchi Dai
+#Harvard University
+#CS205
+#Homework 2
+#
+############################################
+
+
+
 cimport numpy as np
 import numpy as np
 from libc.math cimport sqrt

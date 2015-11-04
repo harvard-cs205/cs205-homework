@@ -37,20 +37,29 @@ def py_median_3x3(image, iterations=10, num_threads=1):
     #reshape the events, and access it in the future
     Events = np.array(Events).reshape((num_threads,iterations))
 
-    #at the first iteration
-    #we shall create all threads in the form of
+    #after the events are created, we need to create threads
+    #Threads event structure is created
+
     Threads=[]
     for x_thread in range(num_threads):
+        #call the parallelComputeImage method for every thread
+        #x_thread here means the nth thread
         thread = threading.Thread(target=parallelComputeImage,args=(x_thread,num_threads,tmpA,tmpB,Events,iterations))
-        thread.start();
+        #start the thread and put the thread into the array
+        thread.start()
         Threads.append(thread)
 
-    #we actually need to kill the last thread
-    Threads[num_threads-1].join()
+    # kill the last thread, here I thought we could just kill the last thread
+    # however, since sometime, we cannot predict threads' order
+    # it is safe to kill all threads one by one
+    for th in range(num_threads):
+        Threads[th].join()
+
     return tmpA
 
 
 #this function is used for processing image in multiple threads
+#The Events data structure needs to be passed in
 def parallelComputeImage(x_thread,num_threads,tmpA,tmpB,Events,iterations):
     #create a function for processing image in multiple threads
     #all threads will run parallel
@@ -82,8 +91,6 @@ def parallelComputeImage(x_thread,num_threads,tmpA,tmpB,Events,iterations):
         Events[x_thread,i].set()
         #swap in the single thread, and run everything again until we hit the max_iteration
         tmpA, tmpB = tmpB, tmpA
-
-
 
     return tmpA
 
@@ -117,7 +124,7 @@ if __name__ == '__main__':
     assert np.all(from_cython == from_numpy)
 
     with Timer() as t:
-        new_image = py_median_3x3(input_image, 10, 8)
+        new_image = py_median_3x3(input_image, 10, 4)
 
     pylab.figure()
     pylab.imshow(new_image[1200:1800, 3000:3500])
