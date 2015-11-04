@@ -9,6 +9,7 @@ import pyximport
 pyximport.install()
 
 import numpy as np
+import functools
 from timer import Timer
 from animator import Animator
 from physics import update, preallocate_locks
@@ -19,21 +20,21 @@ def randcolor():
 
 
 # From: https://en.wikipedia.org/wiki/Z-order_curve
-def cmp_zorder(a, b):
-        j = 0
-        k = 0
-        x = 0
-        for k in range(dim):
-            y = a[k] ^ b[k]
-            if less_msb(x, y):
-                j = k
-                x = y
-        return a[j] - b[j]
+def cmp_zorder(a, b, dim=2):
+    j = 0
+    k = 0
+    x = 0
+    for k in range(dim):
+        y = a[k] ^ b[k]
+        if less_msb(x, y):
+            j = k
+            x = y
+    return int(a[j] - b[j])
 
 
 # From: https://en.wikipedia.org/wiki/Z-order_curve
 def less_msb(x, y):
-        return x < y and x < (x ^ y)
+    return x < y and x < (x ^ y)
 
 
 if __name__ == '__main__':
@@ -87,16 +88,26 @@ if __name__ == '__main__':
                    radius, grid_size, locks_ptr,
                    physics_step)
 
-            # index = np.ogrid[:grid.shape[0], :grid.shape[1]]
-            # index[0] = grid.argsort(0)
-            # index[1] = grid.argsort(1)
-            # old = grid
-            # grid = grid[index]
-            #
-            # ix = np.ogrid[:velocities.shape[0], :velocities.shape[1]]
-            # ix[0] = velocities.argsort(0)
-            # ix[1] = velocities.argsort(1)
-            # velocities = velocities[ix]
+            new_grid = np.array(sorted(grid, cmp=cmp_zorder))
+
+
+            for i in xrange(grid.shape[0]):
+                for j in xrange(grid.shape[1]):
+
+
+
+            # Make translation table
+            translate = np.zeros(shape=(num_balls), dtype=np.int32) - 1
+            for i in xrange(grid.shape[0]):
+                for j in xrange(grid.shape[1]):
+                    old_index = grid[i, j]
+                    new_index = new_grid[i, j]
+                    if old_index == 4294967295:
+                        continue    # skip -1 as unint
+                    translate[old_index] = new_index
+
+            velocities = velocities[translate]
+            grid = new_grid
 
         # udpate our estimate of how fast the simulator runs
         physics_step = 0.9 * physics_step + 0.1 * t.interval
