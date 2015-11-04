@@ -1,19 +1,40 @@
 results
 
-Synchronized
-With 1
-11.5626029968 seconds for 10 filter passes.
-With 2
-6.26903891563 seconds for 10 filter passes.
-With 4
-7.02819085121 seconds for 10 filter passes.
+After a few runs, my best results are:
 
-Asynchronized (result from the python code extra.py)
-With 1
-9.98658490181 seconds for 10 filter passes.
-With 2
-8.23876690865 seconds for 10 filter passes.
-With 4
-7.04103112221 seconds for 10 filter passes.
+Synchronized (result from driver.py)
+With 1 threads
+9.84096980095 seconds for 10 filter passes.
+With 2 threads
+5.13529586792 seconds for 10 filter passes.
+With 4 threads
+5.13137698174 seconds for 10 filter passes.
+
+Asynchronized (result from extra.py)
+With 1 threads
+9.83806610107 seconds for 10 filter passes.
+With 2 threads
+6.78150510788 seconds for 10 filter passes.
+With 4 threads
+5.18362188339 seconds for 10 filter passes.
+
 
 discussion
+We see that my version where I do as many joins as there are iterations (driver.py)
+is doing better than my 'asynchrnized' code (extra.py) for extra credit.
+Does it mean the hours I spent trying figuring out the events business was complete waste?
+Well, I don't know but let me develop on that.
+My first implementation was using a list of list of events, one event per thread and one list of thread per iterations.
+I was only using wait and set.
+Then I figured out that by using clear I can get rid of the list of events for each iteration and keep only one (at least on my computer).
+I would say that there might be a case when one thread goes from the line wait to clear (because the event has just been sent).
+If all the other threads are very very fast, they could have finished one whole cycle, while our slow thread is just passing from wait to clear.
+Once our slow thread clears, it is already too late and it is lagging 1 iteration behind.
+But luckily it did not happen on my computer.
+Honestly, I don't think I understand the pointer business under the hood that makes:
+"tmpA, tmpB = tmpB, tmpA" work at a thread level where we actually only changed a few lines.
+If you have an explanation, please let me know!
+But I am happy it works.
+
+We see from the results that going from 1 thread to 2 doubles the speed, and from 2 to 4 does not change much.
+It is related to the fact that my computer can properly simulate only 2 virtual threads.

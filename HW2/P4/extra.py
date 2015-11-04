@@ -93,11 +93,11 @@ if __name__ == '__main__':
     print("Asynchronized")
     for N in [1,2,4]:
         with Timer() as t:
-            new_image = py_median_3x3(input_image, 10, 8)
+            new_image = py_median_3x3(input_image, 10, N)
 
-        pylab.figure()
-        pylab.imshow(new_image[1200:1800, 3000:3500])
-        pylab.title('after - zoom')
+        # pylab.figure()
+        # pylab.imshow(new_image[1200:1800, 3000:3500])
+        # pylab.title('after - zoom')
         print("With {} threads".format(N))
         print("{} seconds for 10 filter passes.".format(t.interval))
-        pylab.show()
+        # pylab.show()

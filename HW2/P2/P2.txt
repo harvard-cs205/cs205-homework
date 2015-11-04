@@ -48,3 +48,14 @@ Medium grained uncorrelated: 16.2846899033 seconds
 
 
 Discussion:
+We see that the parallel program is performed 10 times poorer that the serial program.
+It is not depressing thou.
+The reason is most likely communication cost.
+Also my computer has only one CPU, that can only simulate two threads properly.
+Interestingly, the Medium grained with one lock, which is equivalent to a fine grained is slower than the fine grain,
+It might be because of the extra cost of choosing which lock to use.
+It is still still surprising.
+Correlated is slightly longer than uncorrelated on average.
+In the case of the medium grain, it makes sense because different threads might need the same lock at the same time in the correlated case.
+Varying the number of locks does not change the performance much.
+It is hard to say if there is an optimum. I don't have much intuition about it.
