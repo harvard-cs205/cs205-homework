@@ -71,7 +71,7 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
                              np.int32_t[:] dest,
                              int repeat):
    cdef:
-       int idx, r
+       int idx, r, src_dst_comp
        omp_lock_t *locks = get_N_locks(counts.shape[0])
 
    ##########
@@ -80,11 +80,36 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
    # data movement.  Be sure to avoid deadlock, and double-locking.
    ##########
    with nogil:
-       for r in range(repeat):
+       for r in prange(repeat, num_threads=4):
            for idx in range(src.shape[0]):
+               if src[idx] < dest[idx]: 
+                  acquire(&locks[src[idx]])
+                  acquire(&locks[dest[idx]])
+                  src_dst_comp = 1
+               elif src[idx] > dest[idx]:
+                  acquire(&locks[dest[idx]])
+                  acquire(&locks[src[idx]])
+                  src_dst_comp = 2
+               else:
+                # they are equal, acquire only once 
+                  acquire(&locks[src[idx]])
+                  src_dst_comp = 0
+
+               # do the swap
                if counts[src[idx]] > 0:
                    counts[dest[idx]] += 1
                    counts[src[idx]] -= 1
+
+               # release the locks, reverse order
+               if src_dst_comp == 0:
+                    release(&locks[src[idx]])
+               elif src_dst_comp == 1:
+                    release(&locks[dest[idx]])
+                    release(&locks[src[idx]])
+               else:
+                    release(&locks[dest[idx]])
+                    release(&locks[src[idx]])
+
 
    free_N_locks(counts.shape[0], locks)
 
@@ -98,6 +123,7 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
        int idx, r
        int num_locks = (counts.shape[0] + N - 1) / N  # ensure enough locks
        omp_lock_t *locks = get_N_locks(num_locks)
+       int src_locki, dst_locki, src_dst_comp
 
    ##########
    # Your code here
@@ -106,10 +132,38 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
    # double-locking.
    ##########
    with nogil:
-       for r in range(repeat):
+       for r in prange(repeat, num_threads=4):
            for idx in range(src.shape[0]):
-               if counts[src[idx]] > 0:
-                   counts[dest[idx]] += 1
-                   counts[src[idx]] -= 1
+                # divide by N to get the lock ids
+                src_locki = src[idx] / N
+                dst_locki = dest[idx] / N
+                # acquire the locks
+                # we need to acquire the lock for each item we are touching 
+                # do it in the same order 
+                if src_locki < dst_locki:
+                    acquire(&locks[src_locki])
+                    acquire(&locks[dst_locki])
+                    src_dst_comp = 1
+                elif src_locki > dst_locki:
+                    acquire(&locks[dst_locki])
+                    acquire(&locks[src_locki])
+                    src_dst_comp = 2
+                else: 
+                    acquire(&locks[src_locki])                    
+                    src_dst_comp = 0
 
+                # do the swap 
+                if counts[src[idx]] > 0:
+                    counts[dest[idx]] += 1
+                    counts[src[idx]] -= 1
+
+                # release the locks in reverse order  
+                if src_dst_comp == 0:
+                    release(&locks[src_locki])
+                elif src_dst_comp == 1:
+                    release(&locks[dst_locki])
+                    release(&locks[src_locki])
+                else:
+                    release(&locks[src_locki])
+                    release(&locks[dst_locki])
    free_N_locks(num_locks, locks)
