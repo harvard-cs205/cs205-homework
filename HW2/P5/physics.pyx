@@ -56,11 +56,13 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                      float R,
                      int i, int count,
                      UINT[:, ::1] Grid,
-                     float grid_spacing) nogil:
+                     float grid_spacing,
+                     uintptr_t locks_ptr,) nogil:
     cdef:
         FLOAT *XY1, *XY2, *V1, *V2
         int j, dim, gx, gy, grid_size
         float eps = 1e-5
+        omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
 
     # SUBPROBLEM 4: Add locking
 
@@ -110,18 +112,18 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                     if not moving_apart(XY1, V1, XY2, V2):
 
                         # use locks for both i, j
-                        acquire(locks[i])
-                        acquire(locks(j))
+                        acquire(&locks[i])
+                        acquire(&locks[j])
                         collide(XY1, V1, XY2, V2)
-                        release(locks[j])
-                        release(locks[i])
+                        release(&locks[j])
+                        release(&locks[i])
 
                     # lock only for j
-                    acquire(locks[j])        
+                    acquire(&locks[j])        
                     # give a slight impulse to help separate them
                     for dim in range(2):
                         V2[dim] += eps * (XY2[dim] - XY1[dim])
-                    release(locks[j])
+                    release(&locks[j])
 
     
 
@@ -168,7 +170,7 @@ cpdef update(FLOAT[:, ::1] XY,
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
         for i in prange(count, schedule='static', num_threads=nthreads, chunksize=csize):
-            sub_update(XY, V, R, i, count, Grid, grid_spacing)
+            sub_update(XY, V, R, i, count, Grid, grid_spacing, locks_ptr)
 
         # reset all grid indices
         for i in prange(grid_size, schedule='static', num_threads=nthreads):
