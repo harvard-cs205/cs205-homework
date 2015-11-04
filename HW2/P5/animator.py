@@ -34,3 +34,5 @@ class Animator(object):
     def update(self, positions):
         self.circles.set_offsets(positions)
         plt.draw()
+        plt.pause(.0001)
+
