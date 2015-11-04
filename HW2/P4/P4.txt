@@ -1,0 +1,24 @@
+1 thread:
+3.26142191887 seconds for 10 filter passes.
+
+2 threads:
+1.54785704613 seconds for 10 filter passes.
+
+4 threads:
+0.845188856125 seconds for 10 filter passes.
+
+I collaborated with Dev Rishi on this question
+
+At first, I tried to make a list of events, one for each (iteration, thread_index) pair. 
+I did the extra credit so every thread n will only have to wait for thread n-1 and thread n+1 to be done with the previous iteration. The way that I check that is by waiting until 
+event[iteration-1][thread-1] and event[iteration-1][thread+1] are done,
+and once a thread is done with an iteration, I set its event to be true.
+
+This design means that threads can work asynchronously, we don't have to wait for an entire iteration to be done for any thread to make progress on another iteration. 
+However, this approach meant that I needed num_iterations*num_threads events, which is expensive. 
+
+So I wrote another version that only required 2*num_threads.
+You can find that version in the commented code. Basically, we only need one list of events for even-numbered iterations, and one for odd-numbered iterations. 
+Once a thread is done, it checks if the other threads are done with its previous iteration, and if so, they update the previous (and next, since there are only two lists of threads) iteration's event to be false.
+
+This approach requires fewer events and therefore requires less space and less overhead. However, even though the assert statement always succeeded, I wasn't sure that the threading logic was 100% bulletproof, so I decided to leave it commented out. If you have time to look at it, I'd appreciate it if you could let me know if it was correct or not:)
