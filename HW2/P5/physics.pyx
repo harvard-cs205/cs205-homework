@@ -1,4 +1,4 @@
-#cython: boundscheck=True, wraparound=False
+#cython: boundscheck=False, wraparound=False
 
 import numpy as np
 cimport numpy as np
@@ -58,16 +58,18 @@ cdef void sub_update(FLOAT[:, ::1] XY,
 					 float R,
 					 int i, int count,
 					 UINT[:, ::1] Grid,
-					 float grid_spacing) nogil:
+					 float grid_spacing,
+					 omp_lock_t *locks) nogil:
 	cdef:
 		FLOAT *XY1, *XY2, *V1, *V2
-		int j, k, ct, dim, center_x, center_y, offset, gridmax, gridmin, neighbors[48] # boo hard-coding!
+		int j, k, ct, dim, center_x, center_y, offset, gridmax, gridmin, neighbors[48] # boo hard-coding! because C.
 		float eps = 1e-5
 
 	# SUBPROBLEM 4: Add locking
-
+	acquire(&( locks[ i ] ))
 	XY1 = &(XY[i, 0])
 	V1  = &( V[i, 0])
+	release(&( locks[ i ] ))
 
 	'''
 	SUBPROBLEM 2: use the grid values to reduce the number of other objects to check for collisions.
@@ -89,11 +91,14 @@ cdef void sub_update(FLOAT[:, ::1] XY,
 	ct = 0
 	for j in range(-offset,offset+1):
 		for k in range(-offset,offset+1):
+			# make sure we're not trying to check the target ball
 			if (j!=0) | (k!=0):
+				# check to see if neighbor coord brings us outside the grid
 				if ( center_x+j < gridmin ) | ( center_x+j >= gridmax ) | ( center_y+k < gridmin ) | ( center_y+k >= gridmax ):
 					neighbors[ct] = 999
 				else:
 					neighbors[ct] = Grid[center_x+j,center_y+k]
+					# keep all duds the same value
 					if neighbors[ct] == -1:
 						neighbors[ct] = 999
 				ct += 1
@@ -120,6 +125,18 @@ cdef void sub_update(FLOAT[:, ::1] XY,
 			V2  = &( V[neighbor, 0])
 			if overlapping(XY1, XY2, R):
 				# SUBPROBLEM 4: Add locking
+
+				# sort ball indexes to prevent deadlock
+				a = i  if i < neighbor else neighbor
+				b = neighbor if i < neighbor else i
+
+				# locking
+				acquire(&( locks[ a ] ))
+				# only lock b if a!=b to prevent double-locking
+				if a != b:
+					acquire(&( locks[ b ] ))
+
+				# address collisions
 				if not moving_apart(XY1, V1, XY2, V2):
 					collide(XY1, V1, XY2, V2)
 
@@ -127,6 +144,10 @@ cdef void sub_update(FLOAT[:, ::1] XY,
 				for dim in range(2):
 					V2[dim] += eps * (XY2[dim] - XY1[dim])
 
+				# release lock(s)
+				release(&( locks[ a ] ))
+				if a != b:
+					release(&( locks[ b ] ))
 
 cpdef update(FLOAT[:, ::1] XY,
 			 FLOAT[:, ::1] V,
@@ -143,7 +164,7 @@ cpdef update(FLOAT[:, ::1] XY,
 		np.int64_t[:,:] old_coord = np.zeros((XY.shape[0],2), dtype=int)
 		FLOAT *XY1, *XY2, *V1, *V2
 		# SUBPROBLEM 4: uncomment this code.
-		# omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
+		omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
 
 	assert XY.shape[0] == V.shape[0]
 	assert XY.shape[1] == V.shape[1] == 2
@@ -153,6 +174,7 @@ cpdef update(FLOAT[:, ::1] XY,
 		#
 		# SUBPROBLEM 1: parallelize this loop over 4 threads, with static
 		# scheduling.
+		''' See note in P5.txt re: why we only use prange() once here '''
 		for i in range(count):
 			for dim in range(2):
 				if (((XY[i, dim] < R) and (V[i, dim] < 0)) or
@@ -164,7 +186,7 @@ cpdef update(FLOAT[:, ::1] XY,
 		# SUBPROBLEM 1: parallelize this loop over 4 threads, with static
 		# scheduling.
 		for i in prange(count, num_threads=nthread, schedule='static', chunksize=chunk):
-			sub_update(XY, V, R, i, count, Grid, grid_spacing)
+			sub_update(XY, V, R, i, count, Grid, grid_spacing, locks)
 
 		# update positions
 		#
@@ -206,6 +228,8 @@ cpdef update(FLOAT[:, ::1] XY,
 				Grid[ coord[0],coord[1] ] = i # update grid with new coords for ball i
 				Grid[ old_coord[i,0],old_coord[i,1] ] = -1 # remove ball from previous grid coords
 
+
+	#free_N_locks(XY.shape[0],locks)
 
 
 def preallocate_locks(num_locks):

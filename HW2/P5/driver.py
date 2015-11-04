@@ -18,9 +18,44 @@ import matplotlib.pyplot as plt
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
+''' Hilbert Ordering functions
+
+    The following functions, rot() and xy2d(), are taken directly from the Hilbert Curve Wikipedia entry.
+    (https://en.wikipedia.org/wiki/Hilbert_curve#Applications_and_mapping_algorithms)
+
+    See explanation in link for full commenting on specific parts of each function.
+
+    The original code was in C, this is a slight modification to adapt to Python.
+    These functions are for use in part 3, "Spatially Coherent Sorting".
+'''
+def rot(n,x,y,rx,ry):
+    if (ry == 0):
+        if (rx == 1):
+            x = n-1 - x
+            y = n-1 - y
+        #Swap x and y
+        t = x
+        x = y
+        y = t
+    return x,y
+
+#convert (x,y) to d
+def xy2d (n, x, y):
+    s = n/2
+    d = 0
+    while s > 0:
+        rx = int(x & s > 0)
+        ry = int(y & s > 0)
+        d += s * s * ((3 * rx) ^ ry)
+        x,y = rot(s, x, y, rx, ry)
+        s /= 2
+    return d
+''' END Hilbert functions '''
+
+
 if __name__ == '__main__':
-    num_balls = 500
-    radius = 0.01
+    num_balls = 10000
+    radius = 0.002
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -62,36 +97,16 @@ if __name__ == '__main__':
     # preallocate locks for objects
     locks_ptr = preallocate_locks(num_balls)
 
+    # prange() vars
     chunk = num_balls/4
-    nthread = 1
+    nthread = 4
+    
+    # histogram vars
     SFPS = []
     ct = 0
+    ct_max = 400
+    part = 4
 
-    def rot(n,x,y,rx,ry):
-        if (ry == 0):
-            if (rx == 1):
-                x = n-1 - x
-                y = n-1 - y
-            
-
-            #Swap x and y
-            t = x
-            x = y
-            y = t
-        return x,y
-
-    #convert (x,y) to d
-    def xy2d (n, x, y):
-        s = n/2
-        d = 0
-        while s > 0:
-            rx = int(x & s > 0)
-            ry = int(y & s > 0)
-            d += s * s * ((3 * rx) ^ ry)
-            x,y = rot(s, x, y, rx, ry)
-            s /= 2
-        return d
-    
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
@@ -112,6 +127,11 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+            ''' Hilbert Ordering steps:
+                (1) Hilbert works best on integers. So we first convert ball XY position to Grid coords.
+                (2) Apply sorting function, and use np.argsort() to get the newly ordered indices.
+                (3) Shuffle positions, grid, and velocities with the new sorting.
+            '''
             gridx = (positions[:, 0] / grid_spacing).astype(int)
             gridy = (positions[:, 1] / grid_spacing).astype(int)
             hilberted = np.argsort([xy2d(grid_size,x,y) for x,y in zip(gridx,gridy)])
@@ -122,15 +142,15 @@ if __name__ == '__main__':
             velocities[:] = velocities[hilberted,:]
            
         # plotting FPS histograms
-        if ct > 100000:
+        if ct > ct_max:
             fig, ax = plt.subplots()
-            ax.hist(SFPS, bins=100)
-            ax.set_title("Histogram of simulation FPS, {} threads".format(nthread), fontsize=16)
+            ax.hist(SFPS, bins=20)
+            ax.set_title("Histogram of simulation FPS, {} threads, part {}".format(nthread,part), fontsize=16)
             ax.set_xlabel("Simulation Frames Per Second", fontsize=14)
             ax.set_ylabel("Frequency", fontsize=14)
-            ax.set_xlim([0,10000])
-            fig.savefig('threads{}.png'.format(nthread))
+            ax.set_xlim([0,1000])
+            ax.set_ylim([0,10])
+            fig.savefig('p5-pt{}-{}threads.png'.format(part,nthread))
             
             break
-
-        ct += 1 # this is so we know when to break after enough time to collect a good histogram
+        ct += 1 # this is so we know when to break after enough iterations have passed to collect a good histogram
