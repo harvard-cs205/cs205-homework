@@ -13,7 +13,9 @@ from timer import Timer
 from animator import Animator
 from physics import update, preallocate_locks
 
-# convert x,y to d
+# Convert a set of coordinates to a distance.
+# Taken from: https://en.wikipedia.org/wiki/Hilbert_curve
+# and adapted to python.
 def xy2d (n, x, y):
     d = 0
     s = n/2
@@ -25,7 +27,8 @@ def xy2d (n, x, y):
         s /= 2
     return d
 
-# rotate/flip a quadrant appropriately
+# Rotate/flip a quadrant appropriately, helper
+# function for xy2d.
 def rot(n, x, y, rx, ry):
     if (ry == 0):
         if (rx == 1):
@@ -101,17 +104,24 @@ if __name__ == '__main__':
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
 
+            # Map every point to its corresponding d in the hilbert ordering.
             x = map(lambda b: xy2d(grid_size, int(b[0]), int(b[1])), positions)
+
+            # Sort based on this ordering.
             res = np.argsort(x)
+
+            # Reorder the positions and velocities lists (praise numpy indexing syntax).
             positions = positions[res]
             velocities = velocities[res]
 
+            # Reinitialize the grid and make sure that nothing out of bounds is attempting to
+            # be added to the grid.
             grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
             x_positions = (positions[:,0]/grid_spacing).astype(int)
             y_positions = (positions[:,1]/grid_spacing).astype(int)
-            z = x_positions[((x_positions < grid_size) & (x_positions >= 0)) & ((y_positions < grid_size) & (y_positions >= 0))]
-            q = y_positions[((x_positions < grid_size) & (x_positions >= 0)) & ((y_positions < grid_size) & (y_positions >= 0))]
-            grid[z, q] = np.arange(num_balls)[((x_positions < grid_size) & (x_positions >= 0)) & ((y_positions < grid_size) & (y_positions >= 0))]
-            # for i in range(len(res)):
-            #     # grid at this place should be res[i]
-            #     grid[positions[res[i]][0]/grid_spacing, positions[res[i]][1]/grid_spacing] = i
+            filtered_x = x_positions[((x_positions < grid_size) & (x_positions >= 0)) \
+                     & ((y_positions < grid_size) & (y_positions >= 0))]
+            filtered_y = y_positions[((x_positions < grid_size) & (x_positions >= 0)) & \
+                     ((y_positions < grid_size) & (y_positions >= 0))]
+            grid[filtered_x, filtered_y] = np.arange(num_balls)[((x_positions < grid_size) \
+                     & (x_positions >= 0)) & ((y_positions < grid_size) & (y_positions >= 0))]

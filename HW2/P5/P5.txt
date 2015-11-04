@@ -1,0 +1,3 @@
+ P5/P5.txt: Your writeup comparing performance in each of the subproblems above, and an explanation of your choice for spatial sorting.
+
+ 

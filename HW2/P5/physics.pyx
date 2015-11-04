@@ -64,6 +64,7 @@ cdef void sub_update(FLOAT[:, ::1] XY,
         float eps = 1e-5
 
     # SUBPROBLEM 4: Add locking
+    # Acquire the lock on ball i.
     acquire(&locks[i])
     XY1 = &(XY[i, 0])
     V1 = &(V[i, 0])
@@ -77,11 +78,18 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     grid_y = <int> (XY[i, 1]/grid_spacing)
     for xv in range(max(grid_x - 2, 0), min(grid_x + 3, grid_size)):
         for yv in range(max(grid_y - 2, 0), min(grid_y + 3, grid_size)):
+
+            # Don't want to collide with ourselves!
             if xv == grid_x and yv == grid_y:
                 continue
             j = Grid[xv, yv]
+
+            # Note: the j < i condition here exists to prevent out of
+            # order locking: j > i always so we always lock smaller
+            # numbers before larger ones.
             if j == -1 or j < i:
                 continue
+            # Acquire the lock on ball j.
             acquire(&locks[j])
             XY2 = &(XY[j, 0])
             V2 = &(V[j, 0])
@@ -118,7 +126,7 @@ cpdef update(FLOAT[:, ::1] XY,
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
-        for i in prange(count, num_threads=4, schedule='static', chunksize=125):
+        for i in prange(count, num_threads=4, schedule='static', chunksize=count/4):
             for dim in range(2):
                 if (((XY[i, dim] < R) and (V[i, dim] < 0)) or
                     ((XY[i, dim] > 1.0 - R) and (V[i, dim] > 0))):
@@ -128,7 +136,7 @@ cpdef update(FLOAT[:, ::1] XY,
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
-        for i in prange(count, num_threads=4, schedule='static',chunksize=125):
+        for i in prange(count, num_threads=4, schedule='static',chunksize=count/4):
             sub_update(XY, V, R, i, count, Grid, grid_spacing, grid_size, locks)
 
         # update positions
@@ -136,11 +144,17 @@ cpdef update(FLOAT[:, ::1] XY,
         # SUBPROBLEM 1: parallelize this loop over 4 threads (with static
         #    scheduling).
         # SUBPROBLEM 2: update the grid values.
-        for i in prange(count, num_threads=4, schedule='static',chunksize=125):
+        for i in prange(count, num_threads=4, schedule='static', chunksize=count/4):
+            # Must be careful about grid updates: don't want to do any out of bounds accesses for things which organically
+            # left.
             if (<int> (XY[i, 0]/grid_spacing) < grid_size) and (<int> (XY[i, 1]/grid_spacing) < grid_size) and (<int> (XY[i, 1]/grid_spacing) >= 0) and (<int> (XY[i, 0]/grid_spacing)) >= 0:
                 Grid[<int> (XY[i, 0]/grid_spacing), <int> (XY[i, 1]/grid_spacing)] = -1
+            
+            # Actually update the positions.
             for dim in range(2):
                 XY[i, dim] += V[i, dim] * t
+
+            # Tell the grid where the new ball is.
             if (<int> (XY[i, 0]/grid_spacing) < grid_size) and (<int> (XY[i, 1]/grid_spacing) < grid_size) and (<int> (XY[i, 1]/grid_spacing) >= 0) and (<int> (XY[i, 0]/grid_spacing)) >= 0:
                 Grid[<int> (XY[i, 0]/grid_spacing), <int> (XY[i, 1]/grid_spacing)] = i
 
