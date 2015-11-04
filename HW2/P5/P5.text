@@ -1,23 +1,37 @@
 For all the following results we run the algorithm for 1000 iterations and take an average of the simulation frames per second.
 
+---------------------------------------------------
 Multithreading:
 
 For 1 thread:
-5.34661775091 simulation frames per second
+11.616414682 simulation frames per second
 
 For 2 threads:
-8.77800008371
+18.8793143804
 
 For 4 threads:
-8.35898376155 simulation frames per second
+19.0222181909 simulation frames per second
 
+---------------------------------------------------
 Spatial decomposition:
 
 For 1 thread:
-6891.04918303 simulation frames per second
+622.29688615 simulation frames per second
 
 For 2 threads:
-7885.8477857 simulation frames per second
+1064.79896209 simulation frames per second
 
 For 4 threads:
-3527.8577946 simulation frames per second
+1113.46555376 simulation frames per second
+
+---------------------------------------------------
+Spatially coherent sorting
+
+For 1 thread:
+671.119352374 simulation frames per second
+
+For 2 threads:
+1118.20316526 simulation frames per second
+
+For 4 threads:
+1301.31017701 simulation frames per second

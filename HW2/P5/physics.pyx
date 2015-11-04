@@ -57,7 +57,8 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                      int i, int count,
                      UINT[:, ::1] Grid,
                      float grid_size,
-                     float grid_spacing) nogil:
+                     float grid_spacing,
+                     omp_lock_t *locks) nogil:
     cdef:
         FLOAT *XY1, *XY2, *V1, *V2
         int j, dim, x, y, grid_x, grid_y
@@ -71,7 +72,7 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     ############################################################
     # SUBPROBLEM 2: use the grid values to reduce the number of other
     # objects to check for collisions.
-    
+
     grid_x = <int>(XY1[0]/grid_spacing)
     grid_y = <int>(XY1[1]/grid_spacing)
     
@@ -86,35 +87,49 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                 if y >= 0 and y < grid_size:
                     
                     #We get the value of the grid neighbor
-                    j = Grid[x,y]
-                    
-                    #We check that the grid is not empty in that position and that we not checking the i object
-                    if j != -1 and j != i:
-                        #We get the coordinates and velocities of the neighbor
-                        XY2 = &(XY[j, 0])
-                        V2 = &(V[j, 0])
-                        
-                        if overlapping(XY1, XY2, R):
-                   
-                            if not moving_apart(XY1, V1, XY2, V2):
-                                collide(XY1, V1, XY2, V2)
-                        # give a slight impulse to help separate them
-                        for dim in range(2):
-                            V2[dim] += eps * (XY2[dim] - XY1[dim])
+                    if (grid_x <x) or (grid_x == x and grid_y <y):
+                        j = Grid[x,y]
 
-    
- #   for j in range(i + 1, count):
-  #      XY2 = &(XY[j, 0])
-   #     V2 = &(V[j, 0])
+                        #We check that the grid is not empty in that position and that we not checking the i object
+                        if j != -1 and j != i:
+                            #We get the coordinates and velocities of the neighbor
+                            XY2 = &(XY[j, 0])
+                            V2 = &(V[j, 0])
+
+                            if overlapping(XY1, XY2, R):
+                                
+                                #We lock the balls i and j, starting with the small index first to avoid deadlocks.
+                                if i < j:
+                                    acquire(&(locks[i]))
+                                    acquire(&(locks[j]))
+                                else:
+                                    acquire(&(locks[j]))
+                                    acquire(&(locks[i]))    
+
+                                if not moving_apart(XY1, V1, XY2, V2):
+                                    collide(XY1, V1, XY2, V2)
+                                
+                                # give a slight impulse to help separate them
+                                for dim in range(2):
+                                    V2[dim] += eps * (XY2[dim] - XY1[dim])
+                                
+                                #We release the locks (the order of the release is not important)
+                                release(&(locks[i]))
+                                release(&(locks[j]))
+                                                    
+    #for j in range(i + 1, count):
+    #    XY2 = &(XY[j, 0])
+    #    V2 = &(V[j, 0])
     #    if overlapping(XY1, XY2, R):
-     #       # SUBPROBLEM 4: Add locking
-      #      if not moving_apart(XY1, V1, XY2, V2):
-       #         collide(XY1, V1, XY2, V2)
+    #        # SUBPROBLEM 4: Add locking
+    #        if not moving_apart(XY1, V1, XY2, V2):
+    #            collide(XY1, V1, XY2, V2)
 
-            # give a slight impulse to help separate them
-        #    for dim in range(2):
-         #       V2[dim] += eps * (XY2[dim] - XY1[dim])
-
+    #        # give a slight impulse to help separate them
+    #        for dim in range(2):
+    #            V2[dim] += eps * (XY2[dim] - XY1[dim])
+                        
+    
 cpdef update(FLOAT[:, ::1] XY,
              FLOAT[:, ::1] V,
              UINT[:, ::1] Grid,
@@ -128,7 +143,7 @@ cpdef update(FLOAT[:, ::1] XY,
         int i, j, dim
         FLOAT *XY1, *XY2, *V1, *V2
         # SUBPROBLEM 4: uncomment this code.
-        # omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
+        omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
 
     assert XY.shape[0] == V.shape[0]
     assert XY.shape[1] == V.shape[1] == 2
@@ -149,7 +164,7 @@ cpdef update(FLOAT[:, ::1] XY,
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
         for i in prange(count, schedule='static',chunksize=1/4*count ,num_threads = 1):  #range(count):
-            sub_update(XY, V, R, i, count, Grid, grid_size, grid_spacing)
+            sub_update(XY, V, R, i, count, Grid, grid_size, grid_spacing, locks)
 
         # update positions
         #
@@ -158,25 +173,20 @@ cpdef update(FLOAT[:, ::1] XY,
         # SUBPROBLEM 2: update the grid values.
         for i in prange(count, schedule='static',chunksize=1/4*count ,num_threads = 1): 
             
-            #We check that we are not out of bounds
-            if XY[i,0]>=0 and XY[i,0]<= 1 and XY[i,1]>=0 and XY[i,1]<= 1:
-                #We set the grid in the i position to be -1 (the ball is not in that position anymore)
-                Grid[<int>(XY[i, 0] / grid_spacing),<int>(XY[i, 1] / grid_spacing)] = -1
+            
+            #We set the grid in the i position to be -1 (the ball is not in that position anymore)
+            Grid[<int>(XY[i, 0] / grid_spacing),<int>(XY[i, 1] / grid_spacing)] = -1
                 
             #We update the position of i
             for dim in range(2):
                 XY[i, dim] += V[i, dim] * t
             
             #We set the new position in the grid
-            if XY[i,0]>=0 and XY[i,0]<= 1 and XY[i,1]>=0 and XY[i,1]<= 1:
-                Grid[<int>(XY[i, 0] / grid_spacing),<int>(XY[i, 1] / grid_spacing)] = i
-                        
-        #Grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
-       
-
-
+            Grid[<int>(XY[i, 0] / grid_spacing),<int>(XY[i, 1] / grid_spacing)] = i
+                               
 
 def preallocate_locks(num_locks):
     cdef omp_lock_t *locks = get_N_locks(num_locks)
     assert 0 != <uintptr_t> <void *> locks, "could not allocate locks"
     return <uintptr_t> <void *> locks
+

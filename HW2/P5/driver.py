@@ -16,8 +16,24 @@ from physics import update, preallocate_locks
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
+#Morton code adapted from https://en.wikipedia.org/wiki/Z-order_curve
+def less_msb(x, y):
+        return x < y and x < (x ^ y)
+
+def cmp_zorder(a, b):
+        j = 0
+        k = 0
+        x = 0
+        for k in range(2):
+            y = a[1][k] ^ b[1][k]
+            if less_msb(x, y):
+                j = k
+                x = y
+        return a[1][j] - b[1][j]
+ 
+
 if __name__ == '__main__':
-    num_balls = 1000#500 #10000
+    num_balls = 10000#500 #10000
     radius = 0.002#0.01 #0.002
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
@@ -61,7 +77,7 @@ if __name__ == '__main__':
     locks_ptr = preallocate_locks(num_balls)
     average = []
 
-    for i in range(10000):
+    for i in range(1000):
         with Timer() as t:
             update(positions, velocities, grid,
                    radius, grid_size, locks_ptr,
@@ -80,7 +96,26 @@ if __name__ == '__main__':
             frame_count = 0
             total_time = 0
 
-    print "AVERAGE:", np.mean(average)
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+
+            #We concatenate the index of the ball with its position
+            sorted_idx = [(i, (positions[i,:]/grid_spacing).astype(int)) for i in xrange(len(positions))]
+            # #We get the indexes of the sorting
+            sorted_idx.sort(cmp_zorder)
+            sorted_idx = [i[0] for i in sorted_idx]
+
+            positions = positions[sorted_idx]
+            velocities = velocities[sorted_idx]
+
+            #We reset the grid
+            grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
+
+            #We fill the grid with the new positions
+            grid[(positions[:, 0] / grid_spacing).astype(int), (positions[:, 1] / grid_spacing).astype(int)] = sorted_idx
+
+            
+
+
+    print "AVERAGE:", np.mean(average)
