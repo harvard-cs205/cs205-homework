@@ -1,19 +1,29 @@
-Part 1:
+Compare the performance of each of the subproblems:
+
+Subproblem 5.1:
 
 With the inital parallel implementation I get between 5 and 6 frames per second performance for both the 1 and 4 threaded version. I believe the fixed overhead costs associated with the multi threading are washing out optimal performance, which could be improved with addtional threads.
 
-Part 2:
+Subproblem 5.2:
 
 With the grid spacing O(n) update, I get vastly improved performance, with between 900 and 1100 frames per second with 1 thread and between 1400 and 1800 frames per second, with 4 threads. The improved algorithm for assessing impacts defeinatley makes and enourmous diffrernece. The threading also appears to have a signficant impact givin this algorithm, which facilitates parallelism more effectively than the original search method. 
 
 
-Part 3: 
+Subproblem 5.3: 
 
 Employing Morton spaceing, with the grid enabled, I achieve between 600 and 700 frames per second with single threaded and between 1100 to 1300 frames per second performance with the simulation with 4 threads.
 
-Part 4: 
+Subproblem 5.4: 
 
 With the locks, the performance decrease to between 700 and 900 frames per second. This makes sense since locks are restricting the operation of threads.  
+
+
+Explanation of choice for spatial sorting:
+
+I employed Hilbert spatial coherent ordering because it appeared to be the most straightforward and effective method for ordering the balls in space. I believe Hilbert is more efficient with respect to physical memory access as well. 
+
+
+
 
 Citation:
 
