@@ -19,8 +19,6 @@ def py_median_3x3(image, iterations=10, num_threads=1):
     ''' repeatedly filter with a 3x3 median '''
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
-
-    print 'num_thread', num_threads
     for i in range(iterations):
         threads = []
         for tid in range(num_threads):
@@ -46,14 +44,14 @@ def numpy_median(image, iterations=10):
 if __name__ == '__main__':
     input_image = np.load('image.npz')['image'].astype(np.float32)
 
-    pylab.gray()
+    # pylab.gray()
 
-    pylab.imshow(input_image)
-    pylab.title('original image')
+    # pylab.imshow(input_image)
+    # pylab.title('original image')
 
-    pylab.figure()
-    pylab.imshow(input_image[1200:1800, 3000:3500])
-    pylab.title('before - zoom')
+    # pylab.figure()
+    # pylab.imshow(input_image[1200:1800, 3000:3500])
+    # pylab.title('before - zoom')
 
     # verify correctness
     from_cython = py_median_3x3(input_image, 2, 5)
@@ -62,11 +60,12 @@ if __name__ == '__main__':
 
     num_threads = 4
     with Timer() as t:
+        print 'num_threads', num_threads
         new_image = py_median_3x3(input_image, 10, num_threads)
 
-    pylab.figure()
-    pylab.imshow(new_image[1200:1800, 3000:3500])
-    pylab.title('after - zoom')
+    # pylab.figure()
+    # pylab.imshow(new_image[1200:1800, 3000:3500])
+    # pylab.title('after - zoom')
 
     print("{} seconds for 10 filter passes.".format(t.interval))
     pylab.show()
