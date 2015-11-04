@@ -108,11 +108,20 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                 if overlapping(XY1, XY2, R):
                     # SUBPROBLEM 4: Add locking
                     if not moving_apart(XY1, V1, XY2, V2):
-                        collide(XY1, V1, XY2, V2)
 
+                        # use locks for both i, j
+                        acquire(locks[i])
+                        acquire(locks(j))
+                        collide(XY1, V1, XY2, V2)
+                        release(locks[j])
+                        release(locks[i])
+
+                    # lock only for j
+                    acquire(locks[j])        
                     # give a slight impulse to help separate them
                     for dim in range(2):
                         V2[dim] += eps * (XY2[dim] - XY1[dim])
+                    release(locks[j])
 
     
 
