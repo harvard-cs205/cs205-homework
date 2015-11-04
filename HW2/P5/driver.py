@@ -104,14 +104,3 @@ if __name__ == '__main__':
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
             # at first, we create a
-            grid_loc = (positions/grid_spacing).astype(int)
-            morton = map(lambda a,b: cmp_zorder(a,b), grid_loc, np.array(list(grid_loc[1:])+list(grid_loc[:1])))
-            grid[:] = -1
-            grid_index = np.argsort(morton)
-            velocities, positions= velocities[grid_index], positions[grid_index]
-
-            #let's update our grid values
-            for i in range(num_balls):
-                if (positions[i,0] >= 0) and (positions[i,1] >= 0) and (positions[i,0] <= grid_size) and (positions[i,1] <= grid_size):
-                    grid[(positions[i,0] / grid_spacing).astype(int),
-                         (positions[i,1] / grid_spacing).astype(int)] = i

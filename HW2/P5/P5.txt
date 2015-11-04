@@ -7,8 +7,23 @@ Problem 5: Simulation and domain decomposition
 Part2:Multithreading
 Performance:
 
+1 thread:
+5.30881548837 simulation frames per second
+5.40018050797 simulation frames per second
+5.41002962789 simulation frames per second
+5.25063781738 simulation frames per second
+5.39368750257 simulation frames per second
+5.46699252481 simulation frames per second
 
+4 threads:
 
+10.6414713292 simulation frames per second
+11.1193694709 simulation frames per second
+11.8052638541 simulation frames per second
+10.9182311353 simulation frames per second
+10.7273122537 simulation frames per second
+11.4661753208 simulation frames per second
+11.8020749211 simulation frames per second
 
 
 Part3: Spatial decomposition

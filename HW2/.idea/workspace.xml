@@ -24,8 +24,8 @@
       <file leaf-file-name="physics.pyx" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/P5/physics.pyx">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-3.3703704">
-              <caret line="180" column="93" selection-start-line="180" selection-start-column="93" selection-end-line="180" selection-end-column="93" />
+            <state vertical-scroll-proportion="-19.481482">
+              <caret line="141" column="93" selection-start-line="141" selection-start-column="93" selection-end-line="141" selection-end-column="93" />
               <folding />
             </state>
           </provider>
@@ -34,9 +34,11 @@
       <file leaf-file-name="driver.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/P5/driver.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="2.7407408">
-              <caret line="79" column="0" selection-start-line="79" selection-start-column="0" selection-end-line="79" selection-end-column="0" />
-              <folding />
+            <state vertical-scroll-proportion="-22.777779">
+              <caret line="82" column="17" selection-start-line="82" selection-start-column="6" selection-end-line="82" selection-end-column="17" />
+              <folding>
+                <element signature="e#0#10#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -44,8 +46,8 @@
       <file leaf-file-name="P5.txt" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/P5/P5.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.37625417">
-              <caret line="23" column="24" selection-start-line="23" selection-start-column="24" selection-end-line="23" selection-end-column="24" />
+            <state vertical-scroll-proportion="-0.32943144">
+              <caret line="26" column="0" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -66,9 +68,9 @@
         <option value="$PROJECT_DIR$/P2/P2.txt" />
         <option value="$PROJECT_DIR$/P4/driver.py" />
         <option value="$PROJECT_DIR$/P4/P4.txt" />
+        <option value="$PROJECT_DIR$/P5/driver.py" />
         <option value="$PROJECT_DIR$/P5/physics.pyx" />
         <option value="$PROJECT_DIR$/P5/P5.txt" />
-        <option value="$PROJECT_DIR$/P5/driver.py" />
       </list>
     </option>
   </component>
@@ -372,7 +374,15 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager />
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/P5/driver.py</url>
+          <line>90</line>
+        </line-breakpoint>
+      </breakpoints>
+      <option name="time" value="1" />
+    </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
@@ -533,26 +543,28 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/P5/physics.pyx">
+    <entry file="file://$PROJECT_DIR$/P5/driver.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-3.3703704">
-          <caret line="180" column="93" selection-start-line="180" selection-start-column="93" selection-end-line="180" selection-end-column="93" />
-          <folding />
+        <state vertical-scroll-proportion="-22.777779">
+          <caret line="82" column="17" selection-start-line="82" selection-start-column="6" selection-end-line="82" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/P5/driver.py">
+    <entry file="file://$PROJECT_DIR$/P5/physics.pyx">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="2.7407408">
-          <caret line="79" column="0" selection-start-line="79" selection-start-column="0" selection-end-line="79" selection-end-column="0" />
+        <state vertical-scroll-proportion="-19.481482">
+          <caret line="141" column="93" selection-start-line="141" selection-start-column="93" selection-end-line="141" selection-end-column="93" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/P5/P5.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.37625417">
-          <caret line="23" column="24" selection-start-line="23" selection-start-column="24" selection-end-line="23" selection-end-column="24" />
+        <state vertical-scroll-proportion="-0.32943144">
+          <caret line="26" column="0" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
           <folding />
         </state>
       </provider>
