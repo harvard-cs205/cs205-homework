@@ -101,14 +101,14 @@ if __name__ == '__main__':
             # the wiki code also expects integers, so we convert
             # to grid positions  
             # SUBPROBLEM 3
-            grid_positions = zip(range(num_balls), (positions/grid_spacing).astype(int).tolist())
-            grid_positions.sort(morton_order_sort)
+            grid_indices = zip(range(num_balls), (positions/grid_spacing).astype(int).tolist())
+            grid_indices.sort(morton_order_sort)
             # want to get the sorted indices, don't care about positions 
-            sorted_positioni = [x[0] for x in grid_positions]
+            sorted_idx = [x[0] for x in grid_indices]
             
             # shuffle positions/velocities to the new oridering
-            positions = positions[sorted_positioni]
-            velocities = velocities[sorted_positioni]
+            positions = positions[sorted_idx]
+            velocities = velocities[sorted_idx]
             # clear grid as old indices are no longer valid 
             grid[:, :] = -1
             # update grid with new positions 
