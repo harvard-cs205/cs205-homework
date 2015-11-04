@@ -1,0 +1,38 @@
+All of these results are averaged over many runs
+
+subproblem 1: multithreading
+1 thread, 11.8 frames per second
+4 threads, 24.67 frames per second
+
+The performance is better with 4 threads as expected. However, it's only around twice as good, probably because of scheduling overhead. 
+
+subproblem 2: grid
+
+Without the grid:
+	1 thread, 11.8 frames per second
+	4 threads, 24.67 frames per second
+We already discussed the difference of performance here
+
+With the grid:
+	1 thread, 1713.45 frames per second
+	4 threads, 2452.7 frames per second
+
+It seems like the grid makes the performance much much better, which makese sense because we have just turned our O(N^2) algorithm into a O(N) algorithm. Instead of having to look at all other balls for each ball, we only have to look at every ball's vicinity, to check if there are other balls there.
+
+It also looks like multi-threading is even less efficient now with a speedup of around 50%. My hypothesis is that this is because there are fewer operations happening inside each run of the outer loop (since we only check the vicinity, not all the other balls), so the scheduling overhead is amortized over fewer instructions. 
+
+
+subproblem 3: sorting
+1 thread, 2329.93 frames per second
+4 threads, 3183.8 frames per second
+
+The performance for 1 thread increases from 1713 to 2329, and the performance for 4 threads increases from 2452 to 3183.
+Thus, an increase of around 30-35% in performance. 
+This is to be expected, since now that balls that are spatially close to each other are also close to each other in memory, that means that when the checks are made on balls in each other's vicinity, and the collide function is called on balls that are closer to each other etc., these balls are probably located in the same cache lines in the L1 or L2 cache, so the cpu does not have to evict the cache and go to memory to fetch the data. This improves our I/O latency, and thus we see the improvement in performance.
+
+subproblem 4: locking
+without locks: 3183.8
+with locks: 2079.12
+
+The performance with the locks drops by around 33%. 
+This makes sense because in order to maintain correctness, threads have to wait for each other so that they're not overwriting each other's actions, and this causes first of all an overhead of locking, and then idle time with threads waiting for each other.  

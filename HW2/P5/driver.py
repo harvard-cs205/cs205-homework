@@ -61,7 +61,7 @@ if __name__ == '__main__':
     # SUBPROBLEM 4: uncomment the code below.
     # preallocate locks for objects
     locks_ptr = preallocate_locks(num_balls)
-
+    # array that will become array of d values from Hilbert curve
     ds_array = np.zeros(num_balls).astype(np.uint32)
     while True:
         with Timer() as t:
@@ -82,10 +82,18 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+            
+            # get d values from Hilbert curve function
+            # multiply positions by a large power of 2 because hilbert function requires integers
+            # and a power of 2 as arguments
             get_ds_from_positions(256, (positions*256).astype(np.uint32), ds_array, num_balls)
+            # get order of indices in ascending d values
             ordered_indices = np.argsort(ds_array)
+            # reorder positions based on ordered indices
             positions = positions[ordered_indices]
+            # reorder velocities based on ordered indices
             velocities = velocities[ordered_indices]
+            # recompute grid values now that positions have changed
             grid[(positions[:, 0] / grid_spacing).astype(int),
                 (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
 

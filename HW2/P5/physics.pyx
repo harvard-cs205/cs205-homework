@@ -11,10 +11,11 @@ from cython.parallel import parallel, prange
 ctypedef np.float32_t FLOAT
 ctypedef np.uint32_t UINT
 
-
+# get function form hilbert_curve c code, taken from wikipedia page on Hilbert curve
 cdef extern from "hilbert_curve.c":
     int xy2d(int n, int x, int y)
 
+# returns the d values for the 2d positions array
 cpdef get_ds_from_positions(int n, UINT[:, ::1] positions, UINT[:] result, int length):
     cdef:
         int i
@@ -99,10 +100,17 @@ cdef void sub_update(FLOAT[:, ::1] XY,
 
     xgrid = <int> (XY[i, 0] / grid_spacing)
     ygrid = <int> (XY[i, 1] / grid_spacing)
-                
+    
+    # we only check x and y values greater than x in order to avoid colliding the same balls
+    # twice, once for lower values of x and y, then for the higher values
+    # check x, x+1 and x+2 
     for x in range(xgrid, xgrid+3):
+        # check y values making sure that distance from original (x,y) is at most 2
         for y in range(ygrid, ygrid+3-(x-xgrid)):
             gridsize = <int> ((1.0 / grid_spacing) + 1)
+            # check that we are checking for valid grid squares, and that (x,y) is not the original
+            # square because then we might think that a ball is colliding with itself
+            # check that ballnumber is a valid ball
             if x < gridsize and y < gridsize and (x != xgrid or y != ygrid) and Grid[x,y] < count:
                 j = Grid[x, y]
                 XY2 = &(XY[j, 0])
@@ -119,6 +127,7 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                     release(&(locks[j]))
     release(&(locks[i]))
 
+# checks that a ball is in the grid
 cdef int in_grid(int i, FLOAT[:, ::1] XY) nogil:
     return (XY[i, 0] >= 0 and XY[i, 0] <= 1 and XY[i, 1] >=0 and XY[i, 1] <= 1)
 
