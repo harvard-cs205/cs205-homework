@@ -1,15 +1,23 @@
-P4. I collaborated with Taylor Killian on this problem.
+P4. For this question, I collaborated with Taylor Killian.
+
+##########################
+# Performance Comparison #
+##########################
 
 Below are the times I found for varying amounts of threads:
 
-3.15920305252 seconds for 10 filter passes with 1 thread.
-1.61410880089 seconds for 10 filter passes with 2 threads.
-0.867569923401 seconds for 10 filter passes with 4 threads.
-0.781377077103 seconds for 10 filter passes with 8 threads.
+3.16 seconds for 10 filter passes with 1 thread.
+1.61 seconds for 10 filter passes with 2 threads.
+0.87 seconds for 10 filter passes with 4 threads.
+0.78 seconds for 10 filter passes with 8 threads.
 
-My code runs slowest with only 1 thread and reduces time as threads increase. Note, there does seem to be diminishing returns as the number of threads increases.
+My code runs slowest with only 1 thread and time reduces as threads increase. Note, there does seem to be diminishing returns as the number of threads increases.
 
-My primitives strategy is as follows. The goal is to ensure that no thread begins iterating on another pass unless threads n+1 and n-1 have finished the current iteration count. To do this, i first set up a 2D array of events that are all initially set to false that represent the 10 iterations per row in the image. Then, I only permit a thread to continue if the n+1 and n-1 threads had finished. To set a thread as finished, I set the iteration to true with .set() when an iteration completes. 
+##################
+# Thread Control #
+##################
 
-This methodology satisfies the extra credit condition that threads can contniue working as long as the n+1 and n-1 condition has been met. Note, I had to account for a few edge cases. First, the 0th thread does not have a n-1 thread to worry about. Similarly, the nth thread does not have a n+1 thread to worry about. And, finally, if there is only 1 thread, then these n+1 and n-1 conditoins no longer apply.
+My primitives strategy is as follows. The goal is to ensure that no thread begins iterating on another pass until neighboring threads n+1 and n-1 have finished the prior iteration pass. To do this, I first set up a 2D array of events that are all initially set to false that represent the 10 iterations per row in the image. Then, I only permit a thread to continue if the n+1 and n-1 threads had finished. To set a thread as finished, I set the iteration event for that thread to true with .set() when that iteration completed. 
+
+This methodology satisfies the extra credit condition that threads can continue working as long as the n+1 and n-1 condition has been met. Note, I had to account for a few edge cases. First, the 0th thread does not have a n-1 thread to worry about. Similarly, the nth thread does not have a n+1 thread to worry about. And, finally, if there is only 1 thread, then these n+1 and n-1 conditions no longer apply.
 

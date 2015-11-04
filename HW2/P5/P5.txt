@@ -1,5 +1,4 @@
-P5. 
-For this problem I collaborated with Taylor Killian.
+P5. For this problem I collaborated with Taylor Killian, Christian Junge, Reinier Maat, and Abishek.
  
 ################
 # Subproblem 1 #
@@ -28,3 +27,19 @@ As we can see, there is a significant speed up relative to the speeds listed abo
 ################
 # Subproblem 3 # 
 ################
+
+To sort, I built off of the code provided in the Hilbert filtering wikipedia article. First, i created a tuple of our balls and their positions. Then I called the cmp_zsort function (Hilbert filtering) on that array of positions. I then updated the positions and velocities based off of the new output from the filtering.
+
+1 Thread: ~900 simulation frames per second
+4 Threads ~2200 simulation frames per second
+
+As we can see, there is a speed up relative to the speeds listed above in Subproblem 2.
+
+################
+# Subproblem 4 # 
+################
+
+Without Locks: ~2200 simulation frames per second (same as above)
+With Locks: ~2200 simulation frames per second 
+
+Here there seems to be no reduction in performance when locks are implemented.

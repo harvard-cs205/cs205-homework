@@ -1,8 +1,8 @@
 P3. For this question, I collaborated with Virgile Audi and Taylor Killian.
 
-################
-#    No AVX    #
-################
+##########
+# No AVX #
+##########
 
 Performance increases significantly when I change the number of threads (without instruction level parallelism):
 1 Thread: 4.65 seconds
@@ -10,9 +10,9 @@ Performance increases significantly when I change the number of threads (without
 4 Threads: 1.22 seconds
 From these results, it would appear that the speed up is about proportional to the number of threads that we implement.
 
-################
-#      AVX     #
-################
+#######
+# AVX #
+#######
 
 When instruction level parallelism is added, performance increases even more.
 

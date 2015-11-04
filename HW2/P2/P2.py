@@ -41,8 +41,12 @@ if __name__ == '__main__':
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################    
+    
+    #Initialize Time array and number of N locks to run
     N = range(1,33)
     T=[]
+    
+    #Run code for each lock number n in N
     for n in N:
         print "n is ", n
         counts[:] = orig_counts
@@ -79,8 +83,12 @@ if __name__ == '__main__':
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################    
+    
+    #Initialize Time array and number of N locks to run    
     N2 = range(1,33)
     T2=[]
+    
+    #Run code for each lock number n in N    
     for n in N2:
         print "n is ", n
         counts[:] = orig_counts
@@ -90,6 +98,7 @@ if __name__ == '__main__':
         print("Medium grained correlated: {} seconds".format(t.interval))
         T2.append(t.interval)
     
+    #Make plot comparing performance for uncorr and corr.
     plt.plot(N,T,label="Medium grained uncorrelated time")
     plt.plot(N2,T2,label="Medium grained correlated time")
     plt.xlabel("N")

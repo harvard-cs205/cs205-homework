@@ -23,7 +23,7 @@ def threaded_work(iterations,num_threads,n,tmpA,tmpB,Events):
     filtering.median_3x3(tmpA, tmpB, n, num_threads)
     tmpA, tmpB = tmpB, tmpA
     
-    #set initial pass event, 0, for all threads
+    #set initial pass event for all threads
     Events[n,init].set()
 
     #account for the edge cases

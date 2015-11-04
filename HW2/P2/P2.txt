@@ -1,3 +1,11 @@
-I experimented with various values of N locks. Specifically, I tried over the range(1,33). For medium grained uncorrelated, I found a minimal time to be around 4 seconds, but overall there seems to be a linear trend of increasing time as N increases. So, perhaps time is minimized when the number of locks, N, is minimized and my graph happens to depict some delta/error that is just coincidence. 
+P2.
 
-For medium grained correlated, there appears to be a minimum at 14 locks. Overall, in the way in which correlated works, the increments are of 10 and thus two locks are at most 20 locks away from eachother. Thus, perhaps a value of 20 here would have made more sense. Then again, there may be other factors involved resulting to my minimum at N = 14 locks. 
+#######################
+# Medium/Uncorrelated #
+#######################
+I experimented with various values of N locks. Specifically, I tried over the range(1,33). For medium grained uncorrelated, There seems to be a linear trend of increasing time as N increases. 
+
+#####################
+# Medium/Correlated #
+#####################
+For medium grained correlated, there appears to be a minimum around 14 locks. Overall, in the way in which correlated works, the increments are of 10 and thus two locks are at most 20 locks away from each other. Thus, perhaps a value of 20 here would have made more sense.
