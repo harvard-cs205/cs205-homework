@@ -13,12 +13,27 @@ from timer import Timer
 from animator import Animator
 from physics import update, preallocate_locks
 
+# copied from wikipedia
+def cmp_zorder(a, b):
+        j = 0
+        k = 0
+        x = 0
+        for k in range(2):
+            y = a[k] ^ b[k]
+            if less_msb(x, y):
+                j = k
+                x = y
+        return a[j] - b[j]
+
+def less_msb(x, y):
+        return x < y and x < (x ^ y)
+
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
 if __name__ == '__main__':
-    num_balls = 10000
-    radius = 0.002
+    num_balls = 100
+    radius = 0.001
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -77,6 +92,21 @@ if __name__ == '__main__':
             print("{} simulation frames per second".format(frame_count / total_time))
             frame_count = 0
             total_time = 0
+
+            grid_positions = (positions / grid_spacing).astype(int)
+
+            to_sort = zip([tuple(x) for x in grid_positions], range(len(grid_positions)))
+            to_sort.sort(key = lambda x: x[0], cmp = cmp_zorder)
+
+            new_indices = [x[1] for x in to_sort] 
+
+            positions = positions[new_indices]
+            velocities = velocities[new_indices]
+
+            grid = (-1 * np.ones(grid.shape)).astype(np.uint32)
+
+            for i in range(len(positions)): 
+                grid[positions[i, 0], positions[i,1]] = i
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
