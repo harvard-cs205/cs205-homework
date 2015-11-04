@@ -1,0 +1,27 @@
+The results below and in the plot P3.png show a clear speed up from additional threads, and from the use of
+instruction-level parallelization. While the use of instruction-level parallelization does not quite achieve the
+theoretical 8x speed up, it gets up to nearly 6x when there is a single thread. As the threads increase, the
+advantage of the instruction-level parallelization also diminishes, probably because there is contention for the CPU
+since this is a compute-bound task (I have a dual-core laptop with hyper-threading.)
+
+With instruction-level parallelization
+==============================================
+N = 4
+1106.315373 Million Complex FMAs in 0.251657009125 seconds, 4396.12382285 million Complex FMAs / second
+
+N = 2
+1105.580879 Million Complex FMAs in 0.349807024002 seconds, 3160.54510956 million Complex FMAs / second
+
+N = 1
+1105.450087 Million Complex FMAs in 0.698529958725 seconds, 1582.53783276 million Complex FMAs / second
+
+Without instruction-level parallelization
+==============================================
+N = 4
+1074.691142 Million Complex FMAs in 1.11600708961 seconds, 962.978776749 million Complex FMAs / second
+
+N = 2
+1074.691142 Million Complex FMAs in 1.84247589111 seconds, 583.286406722 million Complex FMAs / second
+
+N = 1
+1074.691142 Million Complex FMAs in 3.96591591835 seconds, 270.981827181 million Complex FMAs / second
