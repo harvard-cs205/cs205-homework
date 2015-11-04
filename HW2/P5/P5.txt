@@ -5,4 +5,15 @@ With prange in the three sections specified, FPS slowed considerably (see p5-pt1
 Part 2: Spatial decomposition
 
 Using the local grid search for this problem saw significant speedups.  With-grid 1-thread had a mode of a bit over
-5,000 FPS (see p5-pt2-1thread.png), compared to Non-grid 1-thread of about 1,800 FPS. With-grid 4-thread suffered from similar problems as in Part 1, and had a roughly equivalent mode to the With-grid 1-thread (slightly lower at around 4,500 FPS), but had a significant left tail, meaning that occasionally there were big slowdowns on some updates (see p5-pt2-4thread.png).  The same behavior was observed in Part 1, so I'm chalking it up to threads being weird.
+5,000 FPS (see p5-pt2-1thread.png), compared to Non-grid 1-thread of about 1,800 FPS. With-grid 4-thread suffered from similar problems as in Part 1, and had a roughly equivalent mode to the With-grid 1-thread (slightly lower at around 4,500 FPS), but had a significant left tail, meaning that occasionally there were big slowdowns on some updates (see p5-pt2-4thread.png).  The same behavior was observed in Part 1, so I'm chalking it up to threads being weird.  
+
+
+Part 3: Spatially-Coherent Sorting
+
+I implemented Hilbert sorting, modified from the C code provided on the Hilbert Curve Wikipedia entry.  Sorting slowed down my FPS rate by about 10-12% for both 1-thread and 4-thread cases (see p5-pt3-1thread.png and p5-pt3-4thread.png).  Curiously, the raw FPS numbers for Hilbert-sorted were about the same as another student reported in @471, although in his case it was an improvement from Part 2.  I'm not sure what to make of that, but in talking with Ray about this, he said it was definitely possible to see this kind of variation between two machines and implementations.  
+
+It may be worth keeping in mind that I only have one of the 3 loops inside the update function running with prange(), due to the issues from Part 1.  That means I'm not taking full advantage of the multithreading boost that is supposed to be happening in the 4-thread case, so it may explain, at least in part, why the lackluster improvements.
+
+
+Part 4: Locking
+
