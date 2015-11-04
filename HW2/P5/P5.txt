@@ -1,0 +1,75 @@
+Part 1:
+    Performance with 1 thread:
+        9.91139467839 simulation frames per second
+        9.90245583881 simulation frames per second
+        9.88816853461 simulation frames per second
+        9.88914771816 simulation frames per second
+        9.87838735357 simulation frames per second
+        Average: 9.894 simulation frames per second
+    
+    Performance with 4 threads:
+        22.5982554161 simulation frames per second
+        22.5825598174 simulation frames per second
+        22.5820734806 simulation frames per second
+        22.5835325537 simulation frames per second
+        22.5739304532 simulation frames per second
+        Average: 22.584 simulation frames per second
+    
+    On average, we achieve more than twice as many simulations per second using 4 threads instead of 1.
+    
+Part 2 Griding:
+    Performance with 1 thread:
+        564.017863588 simulation frames per second
+        558.31588387 simulation frames per second
+        560.870008305 simulation frames per second
+        559.605749717 simulation frames per second
+        561.826908435 simulation frames per second
+        Average: 560.927 simulation frames per second
+    
+    Performance with 4 threads:
+        1605.25901881 simulation frames per second
+        1616.10606007 simulation frames per second
+        1647.96407723 simulation frames per second
+        1634.40684691 simulation frames per second
+        1630.7097212 simulation frames per second
+        Average: 1626.889 simulation frames per second
+
+    On average, we achieve close to three times as many simulations per second using 4 threads instead of 1.  The addition of griding improves performance substantially from part 1.
+
+Part 3 Griding and Sorting:
+    Performance with 1 thread:
+        587.927474576 simulation frames per second
+        588.79820313 simulation frames per second
+        587.351159843 simulation frames per second
+        587.026452064 simulation frames per second
+        586.226492889 simulation frames per second
+    Average: 587.466 simulation frames per second
+    
+    Performance with 4 threads:
+        1817.21198347 simulation frames per second
+        1810.33293945 simulation frames per second
+        1821.81848218 simulation frames per second
+        1796.67335385 simulation frames per second
+        1823.8834323 simulation frames per second
+    Average: 1813.984 simulation frames per second
+    
+    Sorting improves performance over griding, with a proportionally larger increase when using 4 threads.  I chose to use Morton order rather than Hilbert for sorting; to quote wikipedia using Hilbert ordering, "points that have nearby d  values will also have nearby (x,y) values.  The converse can't always be true. There will sometimes be points where the (x,y) coordinates are close but their d values are far apart."  The whole point of sorting is to try to assign nearby (x,y) values nearby d values.  Thus, Hilbert's sorting may not be effective.  
+    
+Part 4:
+    Performance with 4 threads, griding and sorting and without locking:
+        1817.21198347 simulation frames per second
+        1810.33293945 simulation frames per second
+        1821.81848218 simulation frames per second
+        1796.67335385 simulation frames per second
+        1823.8834323 simulation frames per second
+    Average: 1813.984 simulation frames per second
+    
+    Performance with 4 threads, griding and sorting and locking:
+        1405.08690725 simulation frames per second
+        1396.80359382 simulation frames per second
+        1377.08580646 simulation frames per second
+        1346.46682409 simulation frames per second
+        1461.19098775 simulation frames per second
+    Average: 1397.326 simulation frames per second
+
+    Using locking, we see performance decrease from performance without locking.  This is expected as threads will have to wait to access resources.
