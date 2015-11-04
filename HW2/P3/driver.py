@@ -8,7 +8,7 @@ set_compiler.install()
 import pyximport
 pyximport.install()
 
-import mandelbrot2
+import mandelbrot
 from timer import Timer
 
 import pylab as plt
@@ -29,7 +29,7 @@ if __name__ == '__main__':
     in_coords, out_counts = make_coords()
 
     with Timer() as t:
-        mandelbrot2.mandelbrot(in_coords, out_counts, 1024)
+        mandelbrot.mandelbrot(in_coords, out_counts, 1024)
     seconds = t.interval
 
     print("{} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))

@@ -49,7 +49,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
 
     with nogil:
        
-        for i in prange(in_coords.shape[0], schedule='static',chunksize=1,num_threads = 1):
+        for i in prange(in_coords.shape[0], schedule='static',chunksize=1,num_threads = 4):
             for j in range(in_coords.shape[1]/8):
                 
                 iterations = AVX.float_to_float8(0.0)
@@ -84,7 +84,8 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                     
                     #We flag the elements in the array in which magnitude_squared(element) > 4:
                     mask = AVX.greater_than(AVX.float_to_float8(4), magnitude_squared(z_real, z_imag))
-                    #We create an array "accepted" with ones for the elements in which magnitude_squared(element) <= 4 and 0 for the other ones.
+                    
+                    #We invert mask and select off values. The array has ones for the elements in which magnitude_squared(element) <= 4 and 0 for the rest.
                     accepted = AVX.bitwise_and(mask, ones)
                     
                     #We update in each iteration the values of accepted so we keep track of the numbers of iterations an element has had magnitude_squared(element) <= 4. 
@@ -103,7 +104,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                     
                     z_real = z_real_tmp
              
-                #We pass the calculated values to the array out_counts.        
+                #We pass the calculated values to the memory (array out_counts).        
                 counts_to_output(iterations, out_counts, i, j) 
                 
 

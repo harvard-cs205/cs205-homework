@@ -131,7 +131,7 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
                 
                 if counts[src[idx]] > 0:
                     
-                    #We repite the same procedure than for the previous question but now we do it by groups of adjacent elements.
+                    #We repite the same procedure than for the previous question but now we do it by groups of N adjacent elements.
                     if dest[idx]/N < src[idx]/N:
                         acquire(&(locks[dest[idx]/N]))
                         acquire(&(locks[src[idx]/N]))

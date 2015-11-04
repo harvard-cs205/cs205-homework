@@ -1,25 +1,36 @@
-4 threads:
-1.87498497963 seconds for 10 filter passes.
+#############
+# PROBLEM 4 #
+#############
 
-2 threads:
-1.81508517265 seconds for 10 filter passes.
+The method I chose to control the cooperation between threads is Events. Events are a simple way to communicate between threads since they manage an internal flag that callers can either set() or clear(). Other threads can wait() for the flag to be set(), effectively blocking progress until allowed to continue.
+Specifically, I created a list of N threads and a list of N events (with N = number of threads). For each thread i, every time an iteration starts we clear the event i. Once the filtering is done we set the event (we flag that the filtering for that thread and iteration is done). Then, for the synchronous case, we wait for all the threads that are in that same iteration to be done (by using wait()). For the asynchronous case we only wait for the threads that are filtering the rows t-1 and t-1.
 
-1 thread:
-3.30282878876 seconds for 10 filter passes.
-
-No multithreading:
-2.94609093666 seconds for 10 filter passes.
-
-Asynchronously:
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+Synchronously: threads do not start an iteration of filtering before the data for that iteration is ready.
 
 4 threads:
-1.76038193703 seconds for 10 filter passes.
+1.69841694832 seconds for 10 filter passes.
 
 2 threads:
-1.90581583977 seconds for 10 filter passes.
+1.73714494705 seconds for 10 filter passes. 
 
 1 thread:
-3.36735010147 seconds for 10 filter passes.
+3.16685605049 seconds for 10 filter passes.
 
-No multithreading:
-2.94609093666 seconds for 10 filter passes.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+Asynchronously: Threads are allowed to begin an interation of filtering asynchronously (i.e., thread n interation i can start as soon as threads n, n-1
+and n+1 have completed iteration i-1, without waiting for any other threads to complete iteration i-1).
+
+4 threads:
+1.52040696144 seconds for 10 filter passes.
+
+2 threads:
+1.71161985397 seconds for 10 filter passes.
+
+1 thread:
+3.0926527977 seconds for 10 filter passes.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+As we can see in the results the process gets about 2 times faster when going from 1 thread to 4 threads. Also, it is slightly faster when using the asynchronous method. Nevertheless, this effect can only be seen for 4 threads since for 2 threads or less the procedure is the same than the synchronous. In order to see the improvement more clearly we would need to have a machine with more cores.

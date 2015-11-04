@@ -1,3 +1,7 @@
+#############
+# PROBLEM 5 #
+#############
+
 For all the following results we run the algorithm for 1000 iterations and take an average of the simulation frames per second.
 
 ---------------------------------------------------
@@ -34,4 +38,13 @@ For 2 threads:
 1118.20316526 simulation frames per second
 
 For 4 threads:
+1301.31017701 simulation frames per second
+
+---------------------------------------------------
+Locking
+
+With locking:
+1082.52741634 simulation frames per second
+
+Without locking:
 1301.31017701 simulation frames per second

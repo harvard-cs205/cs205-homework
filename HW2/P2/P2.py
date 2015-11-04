@@ -8,6 +8,7 @@ import pyximport
 pyximport.install()
 
 import numpy as np
+import matplotlib.pyplot as plt
 from timer import Timer
 from parallel_vector import move_data_serial, move_data_fine_grained, move_data_medium_grained
 
@@ -47,7 +48,9 @@ if __name__ == '__main__':
     # assert counts.sum() == total, "Wrong total after move_data_medium_grained"
     # print("Medium grained uncorrelated: {} seconds".format(t.interval))
 
-    for i in [1]:
+    performance = []
+    Ns = [1,2,3,4,5,6,7,8,9,10]
+    for i in Ns:
         N = i 
         counts[:] = orig_counts
         with Timer() as t:
@@ -55,6 +58,14 @@ if __name__ == '__main__':
         assert counts.sum() == total, "Wrong total after move_data_medium_grained"
         print "N", N
         print("Medium grained uncorrelated: {} seconds".format(t.interval))
+        performance.append(t.interval)
+
+    plt.scatter(Ns, performance)
+    plt.xlabel('N')
+    plt.ylabel('Time (seconds)')
+    plt.title('Running time versus N value for correlated values')
+    plt.savefig('performance_uncorrelated.png')
+
 
     ########################################
     # Now use correlated data movement
@@ -84,7 +95,10 @@ if __name__ == '__main__':
     # grained locking
     ########################################
     
-    for i in [16,17,18,19,20,21,22,23,24]:
+    performance = []
+    Ns2 = [5,10,18,19,20, 21,22,23,24,25,50,100]
+    
+    for i in Ns2: #,18,19,20,21,22,23,24,50,100]
         N = i     
         counts[:] = orig_counts
         with Timer() as t:
@@ -92,3 +106,10 @@ if __name__ == '__main__':
         assert counts.sum() == total, "Wrong total after move_data_medium_grained"
         print "N", N
         print("Medium grained correlated: {} seconds".format(t.interval))
+        performance.append(t.interval)
+
+    plt.scatter(Ns2, performance)
+    plt.xlabel('N')
+    plt.ylabel('Time (seconds)')
+    plt.title('Running time versus N value for correlated values')
+    plt.savefig('performance_correlated.png')

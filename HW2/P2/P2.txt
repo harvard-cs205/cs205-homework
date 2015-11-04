@@ -1,0 +1,79 @@
+#############
+# PROBLEM 2 #
+#############
+
+Coarse-grained locking
+
+As we can see in the results, surprisingly the coarse-grained locking performs better than the medium and than the fine-grained locking. This is probably explained by the overhead associated with setting and releasing the locks.
+
+Serial uncorrelated: 0.27623796463 seconds
+
+Serial correlated: 0.423018932343 seconds
+
+
+---------------------------------------------------
+Medium locking
+
+The plot performance_uncorrelated.png shows the performance of the medium-locking for different values of N and uncorrelated data. As we can see N=1 seems to be the optimal solution.
+This is probably due to the fact that is very unlikely that the indexes that you need to lock are in the same lock when the data is uncorrelated.
+
+N 1
+Medium grained uncorrelated: 8.05446791649 seconds
+N 2
+Medium grained uncorrelated: 8.87576818466 seconds
+N 3
+Medium grained uncorrelated: 8.89380788803 seconds
+N 4
+Medium grained uncorrelated: 10.8584029675 seconds
+N 5
+Medium grained uncorrelated: 8.28174519539 seconds
+N 6
+Medium grained uncorrelated: 8.0556139946 seconds
+N 7
+Medium grained uncorrelated: 8.91500997543 seconds
+N 8
+Medium grained uncorrelated: 8.42655992508 seconds
+N 9
+Medium grained uncorrelated: 8.84853601456 seconds
+N 10
+Medium grained uncorrelated: 11.8017520905 seconds
+
+
+The plot performance_correlated.png shows the performance of the medium-locking for different values of N and correlated data. As we can see N=20 seems to be the optimal solution.
+This makes sense since the source and destination are no more than 10 elements away.
+
+Fine grained correlated: 6.50592899323 seconds
+N 5
+Medium grained correlated: 7.41270589828 seconds
+N 10
+Medium grained correlated: 6.99425411224 seconds
+N 18
+Medium grained correlated: 6.05894804001 seconds
+N 19
+Medium grained correlated: 5.79997801781 seconds
+N 20
+Medium grained correlated: 5.7554731369 seconds
+N 21
+Medium grained correlated: 6.07371807098 seconds
+N 22
+Medium grained correlated: 5.73027300835 seconds
+N 23
+Medium grained correlated: 6.03697395325 seconds
+N 24
+Medium grained correlated: 6.13299298286 seconds
+N 25
+Medium grained correlated: 7.33775019646 seconds
+N 100
+Medium grained correlated: 6.20506000519 seconds
+
+
+We can also notice that the process is more efficient for the correlated data than for the correlated. Again, this is coherent with what we could expect, since the data is correlated it is likely that the elements that you need to lock are in the same lock. And this would reduce the waiting time for other locks.
+
+---------------------------------------------------
+Fine-grained locking
+
+Fine grained uncorrelated: 5.78122496605 seconds
+
+Fine grained correlated: 6.51336216927 seconds
+
+---------------------------------------------------

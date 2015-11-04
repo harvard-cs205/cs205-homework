@@ -153,7 +153,7 @@ cpdef update(FLOAT[:, ::1] XY,
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
-        for i in prange(count, schedule='static',chunksize=1/4*count ,num_threads = 1): #range(count):
+        for i in prange(count, schedule='static',chunksize=1/4*count ,num_threads = 4): #range(count):
             for dim in range(2):
                 if (((XY[i, dim] < R) and (V[i, dim] < 0)) or
                     ((XY[i, dim] > 1.0 - R) and (V[i, dim] > 0))):
@@ -163,7 +163,7 @@ cpdef update(FLOAT[:, ::1] XY,
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
-        for i in prange(count, schedule='static',chunksize=1/4*count ,num_threads = 1):  #range(count):
+        for i in prange(count, schedule='static',chunksize=1/4*count ,num_threads = 4):  #range(count):
             sub_update(XY, V, R, i, count, Grid, grid_size, grid_spacing, locks)
 
         # update positions
@@ -171,7 +171,7 @@ cpdef update(FLOAT[:, ::1] XY,
         # SUBPROBLEM 1: parallelize this loop over 4 threads (with static
         #    scheduling).
         # SUBPROBLEM 2: update the grid values.
-        for i in prange(count, schedule='static',chunksize=1/4*count ,num_threads = 1): 
+        for i in prange(count, schedule='static',chunksize=1/4*count ,num_threads = 4): 
             
             
             #We set the grid in the i position to be -1 (the ball is not in that position anymore)
