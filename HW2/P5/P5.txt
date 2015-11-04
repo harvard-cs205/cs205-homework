@@ -13,6 +13,19 @@ Performance:
 
 Part3: Spatial decomposition
 Performance data:
+
+1 thread:
+
+420.02683811 simulation frames per second
+435.250297479 simulation frames per second
+441.946079602 simulation frames per second
+446.357670396 simulation frames per second
+439.835851259 simulation frames per second
+409.634288584 simulation frames per second
+417.044310765 simulation frames per second
+
+
+4 threads:
 1208.35093982 simulation frames per second
 1203.76645177 simulation frames per second
 1215.83484046 simulation frames per second
@@ -25,6 +38,18 @@ Performance data:
 Part3 and 4: Spatially Coherent Sorting/Locking
 Performance data:
 
+
+1 thread:
+446.728488859 simulation frames per second
+428.675501652 simulation frames per second
+456.507356893 simulation frames per second
+400.372661321 simulation frames per second
+395.116616761 simulation frames per second
+429.008735024 simulation frames per second
+439.264663785 simulation frames per second
+
+
+4 threads:
 1168.04615692 simulation frames per second
 1221.57830281 simulation frames per second
 1183.69475645 simulation frames per second
