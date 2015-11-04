@@ -21,7 +21,18 @@ With 4 threads
 
 discussion
 We see that my version where I do as many joins as there are iterations (driver.py)
-is doing better than my 'asynchrnized' code (extra.py) for extra credit.
+is doing better than my 'asynchrnized' code (extra.py) for extra credit. I
+also added another version of the extra credit, where I am using a list of
+lists of events (P4mat.py). This implementation handles the edge case where
+extra.py should not work (as described below). 
+It gives similar results as the synchronized version:
+With 1 threads
+9.89360785484 seconds for 10 filter passes.  
+With 2 threads
+5.13593292236 seconds for 10 filter passes.  
+With 4 threads
+5.15511703491 seconds for 10 filter passes.  
+
 Does it mean the hours I spent trying figuring out the events business was complete waste?
 Well, I don't know but let me develop on that.
 My first implementation was using a list of list of events, one event per thread and one list of thread per iterations.
