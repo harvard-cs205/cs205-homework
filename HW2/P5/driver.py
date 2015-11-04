@@ -113,17 +113,26 @@ if __name__ == '__main__':
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
 
-
+            #I recieved help from xchang4, regarding the logic of the operations below
+            #dynamically change the grid spacing
             point = (positions / grid_spacing).astype(int)
+
+
+
+            #create new array, ordered with each ball having the appropriate number associated with it
+            #according to z ordering, append index with appropriate values
             array = zip(range(num_balls), point)
             array.sort(order)
-            index = [i[0] for i in array]
-            positions = positions[index]
-            velocities = velocities[index]
+            index = []
+            for pt in array:
+                index.append(pt[0]) 
+
+
+            #update the position values
+            positions, velocities = positions[index], velocities[index]
             test_position = np.array(filter(lambda x: x[0] > 0 and x[1] < 1, positions))
-            test_result = len(test_position)
             update_positions = - np.ones((grid_size, grid_size), dtype = np.uint32)
-            update_positions[(test_position[:, 0] / grid_spacing).astype(int), (positions[:, 1] / grid_spacing).astype(int)] = np.array(range(test_result))
+            update_positions[(test_position[:, 0] / grid_spacing).astype(int), (positions[:, 1] / grid_spacing).astype(int)] = np.array(range(len(test_position)))
 
 
 
