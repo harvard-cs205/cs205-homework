@@ -46,7 +46,9 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
 
     with nogil:
         for i in prange(in_coords.shape[0], num_threads=4, schedule='static', chunksize=1):
+            # jump in chunks of 8 columns
             for j in range(0, in_coords.shape[1], 8):
+              # split c and z into real and imaginary components
               c_real = AVX.make_float8(in_coords[i, j+7].real,
                                        in_coords[i, j+6].real,
                                        in_coords[i, j+5].real,
@@ -70,18 +72,23 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
               fours = AVX.float_to_float8(4.0)
               ones = AVX.float_to_float8(1.0)
               for iter in range(max_iterations):
+                  # zr^2 + zi^2
                   z_magnitude_squared_avx = AVX.fmadd(z_real, z_real, AVX.mul(z_imag, z_imag))
                   mask = AVX.less_than(z_magnitude_squared_avx, fours)
+                  # if all magnitudes are greater than 4, exit the loop
                   if AVX.signs(mask) == 0:
                       break
                   iters = AVX.add(iters, AVX.bitwise_and(mask, ones))
+                  # zr' = zr^2 - zi^2
                   newz_real = AVX.fmsub(z_real, z_real, AVX.mul(z_imag, z_imag))
+                  # zi' = 2zrzi
                   newz_imag = AVX.fmadd(z_real, z_imag, AVX.mul(z_real, z_imag))
                   z_real = AVX.add(newz_real, c_real)
                   z_imag = AVX.add(newz_imag, c_imag)
               counts_to_output(iters, out_counts, i, j)
 
-                  
+# taken from instructor's piazza post, ensures threads don't clobber each other
+# and deals with ints instead of flaots
 cdef void counts_to_output(AVX.float8 counts,
                       np.uint32_t [:, :] out_counts,
                       int i, int j) nogil:
