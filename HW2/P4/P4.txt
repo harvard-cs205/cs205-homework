@@ -1,0 +1,20 @@
+Experiment Results: 
+
+4 threads
+1.47259497643 seconds for 10 filter passes.
+1.50553798676 seconds for 10 filter passes.
+1.48426318169 seconds for 10 filter passes.
+
+2 threads
+1.63110995293 seconds for 10 filter passes.
+1.6989338398 seconds for 10 filter passes.
+1.72469592094 seconds for 10 filter passes.
+
+1 thread 
+3.3609380722 seconds for 10 filter passes.
+3.37282991409 seconds for 10 filter passes.
+3.37703895569 seconds for 10 filter passes.
+
+Above we have the runtimes for each of the configurations (1, 2, and 4 threads) in 3 runs. We see that increasing from 1 to 2 threads almost achieves the optimal speedup of 2x, but further increasing from  2 to 4 threads does not have as large of an impact on the runtime (it does go down slightly). This might me because the overhead with 4 threads begins to outweigh the cost of parralelism, while the overhead with 2 threads is much less than the computation time. Note that the communication overhead will scale with the number of threads (we need more events to keep track of). 
+
+To coordinate threads, we needed to make sure that when thread t was processing iteration i, threads t-1, t, and t+1 had completed iteration i-1. For each thread/iteration pair, we create a threading.Event() object that will be set when the computation for that thread/iteration has completed. When we are processing thread t on iteration i, as long as the neighboring threads (t-1, t+1) are in bounds, we call wait() on the events corresponding to the current thread and the neighboring threads on iteration i-1 (previous iteration). This means that we wont continue execution on the current thread until each of these events has .set() called on them. We call .set() on the event corresponding to the current thread and the current iteration after we perform the filter and swap the tmpA, tmpB buffers. So, the mechanism of coordination between the threads was events, which corresponded to the computation of a thread/iteration. 
