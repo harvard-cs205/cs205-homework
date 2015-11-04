@@ -65,7 +65,6 @@ cpdef move_data_serial(np.int32_t[:] counts,
                     counts[dest[idx]] += 1
                     counts[src[idx]] -= 1
 
-
 cpdef move_data_fine_grained(np.int32_t[:] counts,
                              np.int32_t[:] src,
                              np.int32_t[:] dest,
