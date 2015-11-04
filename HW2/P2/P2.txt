@@ -1,15 +1,15 @@
 Serial uncorrelated: 0.275421142578 seconds
 Fine grained uncorrelated: 3.58328294754 seconds
-Medium grained correlated, N = 1: 4.63656806946 seconds
-Medium grained correlated, N = 2: 5.24040412903 seconds
-Medium grained correlated, N = 3: 5.85056400299 seconds
-Medium grained correlated, N = 4: 6.43449807167 seconds
-Medium grained correlated, N = 5: 7.3750910759 seconds
-Medium grained correlated, N = 6: 8.20255303383 seconds
-Medium grained correlated, N = 7: 9.15443515778 seconds
-Medium grained correlated, N = 8: 10.1533591747 seconds
-Medium grained correlated, N = 9: 11.0850629807 seconds
-Medium grained correlated, N = 10: 12.2166399956 seconds
+Medium grained uncorrelated, N = 1: 4.63656806946 seconds
+Medium grained uncorrelated, N = 2: 5.24040412903 seconds
+Medium grained uncorrelated, N = 3: 5.85056400299 seconds
+Medium grained uncorrelated, N = 4: 6.43449807167 seconds
+Medium grained uncorrelated, N = 5: 7.3750910759 seconds
+Medium grained uncorrelated, N = 6: 8.20255303383 seconds
+Medium grained uncorrelated, N = 7: 9.15443515778 seconds
+Medium grained uncorrelated, N = 8: 10.1533591747 seconds
+Medium grained uncorrelated, N = 9: 11.0850629807 seconds
+Medium grained uncorrelated, N = 10: 12.2166399956 seconds
 
 Serial correlated: 0.27863907814 seconds
 Fine grained correlated: 3.78258991241 seconds
@@ -24,6 +24,7 @@ Medium grained correlated, N = 8: 9.94677901268 seconds
 Medium grained correlated, N = 9: 11.0350589752 seconds
 Medium grained correlated, N = 10: 11.9213550091 seconds
 
-In general, the correlated case runs slightly faster than the uncorrelated case. This is due to utilization of cache lines in the correlated case where the source and destination are no more than 10 elements away.
-Serial vector update runs fastest followed by fine-grained locking and then medium-grained locking. In this case, the overhead of creating and destroying locks outweighs the parallel speedups.
-Finally, with the medium-grained locking scheme, it appears that the smaller the N the better the performance. This is consistent with the observation that fine-grained locking outperforms more coarse-grained locking.
+Serial vector update runs fastest followed by fine-grained locking and then medium-grained locking. In this case, the overhead of creating and destroying locks outweighs the parallel speedup.
+Fine-grained locking runs faster than medium-grained locking as it allows for more concurrency.
+With the medium-grained locking scheme, a smaller N is associated with better the performance. This is consistent with the observation that fine-grained locking outperforms coarse-grained locking.
+With coarse-grained locking, as N increases, correlated data transfer is generally faster than uncorrelated data transfer. Since the source and destination are close, concurrency is not affected as much when N increases.

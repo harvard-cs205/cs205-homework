@@ -45,7 +45,7 @@ if __name__ == '__main__':
         with Timer() as t:
             move_data_medium_grained(counts, src, dest, 100, N)
         assert counts.sum() == total, "Wrong total after move_data_medium_grained"
-        print("Medium grained correlated, N = {}: {} seconds".format(N, t.interval))
+        print("Medium grained uncorrelated, N = {}: {} seconds".format(N, t.interval))
 
     ########################################
     # Now use correlated data movement
