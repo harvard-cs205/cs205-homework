@@ -1,0 +1,13 @@
+1-way: 2.96352601051 seconds for 10 filter passes.
+2-way: 1.567704916 seconds for 10 filter passes.
+4-way: 0.804756164551 seconds for 10 filter passes.
+
+I decided to go for the extra credit approach of allowing asynchronous
+progress by mandating only that the requisite set of the threads
+(n-1), (n+1), and n had completed their progress on iteration i-1 before
+allowing thread n to advance to iteration i.  I did this with a 2D array of
+events (the Event primitive from the python threading library).  Thus I was
+able to use a relatively simple design where if thread n wanted to do
+iteration i, it would wait on the events that threads n, n-1, and n+1 had
+completed their respective iteration i-1s, and then it would set the event
+flag for its own event after doing the computation in filtering.median_3x3.
