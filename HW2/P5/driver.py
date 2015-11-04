@@ -21,8 +21,8 @@ if __name__ == '__main__':
     radius = 0.002
 
     # for test purposes
-    #num_balls = 500
-    #radius = 0.01
+    num_balls = 500
+    radius = 0.01
 
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
