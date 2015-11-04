@@ -57,7 +57,8 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                      int i, int count,
                      UINT[:, ::1] Grid,
                      int grid_size,
-                     float grid_spacing) nogil:
+                     float grid_spacing,
+                     omp_lock_t *locks) nogil:
     cdef:
         FLOAT *XY1, *XY2, *V1, *V2
         int dim, j
@@ -103,8 +104,20 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                         V2 = &(V[j, 0])
                         if overlapping(XY1, XY2, R):
                             # SUBPROBLEM 4: Add locking
+                            # Acquire the locks (lower id first)
+                            if i < j:
+                                acquire(&(locks[i]))
+                                acquire(&(locks[j]))
+                            else:
+                                acquire(&(locks[j]))
+                                acquire(&(locks[i]))
+                            
                             if not moving_apart(XY1, V1, XY2, V2):
                                 collide(XY1, V1, XY2, V2)
+                                
+                            # Release the locks
+                            release(&(locks[i]))
+                            release(&(locks[j]))
 
                             # give a slight impulse to help separate them
                             for dim in range(2):
@@ -123,9 +136,9 @@ cpdef update(FLOAT[:, ::1] XY,
         int i, j, dim
         FLOAT *XY1, *XY2, *V1, *V2
         int num_threads = 4
-        int chunksize = 10000/4
+        int chunksize = count/4
         # SUBPROBLEM 4: uncomment this code.
-        # omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
+        omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
 
     assert XY.shape[0] == V.shape[0]
     assert XY.shape[1] == V.shape[1] == 2
@@ -146,7 +159,7 @@ cpdef update(FLOAT[:, ::1] XY,
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
         for i in prange(count, schedule='static', chunksize=chunksize, num_threads=num_threads):
-            sub_update(XY, V, R, i, count, Grid, <int>grid_size, grid_spacing)
+            sub_update(XY, V, R, i, count, Grid, <int>grid_size, grid_spacing, locks)
 
         # update positions
         #
@@ -161,10 +174,6 @@ cpdef update(FLOAT[:, ::1] XY,
                 XY[i, dim] += V[i, dim] * t
             # After the position for this ball been updated, update the grid value with the new positions
             Grid[<int>(XY[i,0]/ grid_spacing), <int>(XY[i,1]/ grid_spacing)] = i
-            
-            #Grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
-            #Grid[<int>(XY[:, 0] / grid_spacing), <int>(XY[:, 1] / grid_spacing)] = np.arange(count)
-
 
 def preallocate_locks(num_locks):
     cdef omp_lock_t *locks = get_N_locks(num_locks)
