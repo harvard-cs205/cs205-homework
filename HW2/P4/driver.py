@@ -61,11 +61,9 @@ def py_median_3x3_threading(image, iterations, num_threads):
 
 def worker(in_coord, out_coord, iterations, threadid, thread_num, event_array):
     
-'''
-This function test ensures thread synchronization first evaluates to ensure all adjacent threads
-have finished the previous iteration then executes the operation on the 
-image.
-'''
+    '''This function test ensures thread synchronization first evaluates to ensure all adjacent threads
+    have finished the previous iteration then executes the operation on the 
+    image'''
 
     for i in range(iterations):
 
@@ -75,6 +73,8 @@ image.
         #pass if this is only the first iteration, no thread sync neccssary
         elif i == 0:
             pass
+        # i received help from twkillian, regarding the logic of setting these three conditions
+        # on each thread
         #if the thread is the first iteration only check the thread after, for previous iteration
         elif threadid == 0:
             event_array[threadid + 1,i - 1].wait()
