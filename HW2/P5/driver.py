@@ -38,8 +38,8 @@ def less_msb(x, y):
 
 
 if __name__ == '__main__':
-    num_balls = 10000  # 500
-    radius = 0.002  # 0.01
+    num_balls = 500  # 500
+    radius = 0.01  # 0.01
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -88,7 +88,7 @@ if __name__ == '__main__':
                    radius, grid_size, locks_ptr,
                    physics_step)
 
-            # Key and sort positions list
+            # Key and sort positions list for indexing
             keyed_list = [(i, (positions[i][0], positions[i][1])) for i in xrange(num_balls)]
             sorted_list = sorted(keyed_list, cmp=cmp_zorder, key=lambda x: (int(x[1][0] / grid_spacing), int(x[1][1] / grid_spacing)))
             index = np.array([n for (n, _) in sorted_list])
