@@ -14,3 +14,7 @@ Employing Morton spaceing, with the grid enabled, I achieve between 600 and 700 
 Part 4: 
 
 With the locks, the performance decrease to between 700 and 900 frames per second. This makes sense since locks are restricting the operation of threads.  
+
+Citation:
+
+I worked on this problem in office hours with TF Kevin Chen and collaborated conceptually with Patrick Day. 
