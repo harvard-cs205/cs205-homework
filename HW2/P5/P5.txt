@@ -1,0 +1,55 @@
+********** 4 Threads ******************
+S1: Parralelize 
+18.2522139105 simulation frames per second
+19.3933834239 simulation frames per second
+18.8878161251 simulation frames per second
+17.9723022076 simulation frames per second
+19.6155004536 simulation frames per second
+
+S2: Grid
+2430.98319184 simulation frames per second
+2415.82223826 simulation frames per second
+2242.47962988 simulation frames per second
+1795.9217584 simulation frames per second
+
+S3: Spatially Coherent Sorting 
+2253.61516328 simulation frames per second
+2344.41342616 simulation frames per second
+2493.19974808 simulation frames per second
+2494.85930363 simulation frames per second
+2337.31891511 simulation frames per second
+
+S4: Locking
+1461.28449134 simulation frames per second
+1036.39831974 simulation frames per second
+1456.90271998 simulation frames per second
+1568.98224911 simulation frames per second
+
+*********** 1 Thread **********************
+S1: Parralelize
+14.3967432904 simulation frames per second
+13.6578681724 simulation frames per second
+14.1783763319 simulation frames per second
+14.2160520607 simulation frames per second
+
+S2: Grid
+2014.11421752 simulation frames per second
+2028.43864103 simulation frames per second
+1973.33987254 simulation frames per second
+2020.40627347 simulation frames per second
+
+S3: Spatially Coherent Sorting 
+1995.96832229 simulation frames per second
+1996.23771435 simulation frames per second
+2016.27847725 simulation frames per second
+1933.87356713 simulation frames per second
+
+S4: Locking 
+947.056032627 simulation frames per second
+965.101989304 simulation frames per second
+742.864834612 simulation frames per second
+1022.38113478 simulation frames per second
+
+Each of these are the results of several runs of each configuration. From the experiments we see that increaseing the nubmber of threads to 4 does increase performance but not by the optimal 4x amount (closer to 1.1 - 2x improvement depending on case). This is probably due to communication overhead. Adding the grid was the greatest improvement, allowing us to simulate at a rate two orders of magnitude greater than previously. Adding spatially coherent sorting via the Morton ordering did not appear to have a large difference in runtime (it made it slightly faster with 4 threads and slightly slower with 3 threads). We do add work when computing the ordering and sorting, so if it does not have a large impact it is reasonable for this to make the simulation slower. As expected, adding locking decreaed the simulation rate. In both cases (1 and 4 threads) it did so by about a factor of 2. It is somewhat surprising to me that parallelisim did not have a greater performance benefit because it seems like the simulation is very localized. 
+
+For spatial sorting, I used the Morton ordering (or Z-order curve). This ordering is known to preserve locality of points from two dimensions down to one dimension (i.e. points close together in one-dimensional ordering will be close together in 2-dimensional originl space). Additionally, there was a seemingly efficient method to compute on the wikipedia page for the Z-order curve which used bitshifts, and required that the inputs be integers. Because we already mapped the space to a grid, we could use these integers along with this method to compute the ordering efficiently. 
