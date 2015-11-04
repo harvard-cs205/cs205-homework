@@ -1,0 +1,10 @@
+# Problem 4 writeup
+
+To control for cooperation between threads, I chose to use a matrix of events with dimensions of thread number x iterations, where all the events are initialized. As the iterations continue for a particular row n, the program checks to see if the necessary (i-1)th events are available (n-1, n, n+1 threads). This check is skipped for the first iteration. At the end of the script, the event is set to have occurred, and the block is removed, enabling other adjacent threads to run. In particular, this was designed to run asynchronously.
+
+3.48069214821 seconds for 10 filter passes with 1 threads.
+1.89054203033 seconds for 10 filter passes with 2 threads.
+1.75331401825 seconds for 10 filter passes with 3 threads.
+1.7370429039 seconds for 10 filter passes with 4 threads.
+
+As seen in figure P4.png, the speedup from adding a second thread is close to 2; however, successive threads 3 and 4 give very little additional speedup, despite adding multiple threads. I think my computer only has 4 threads (2 cores), but I tried adding extra "threads" to see what happens. There is an extra dip in performance upon the addition of the fifth thread, which levels out to the 4th thread level.
