@@ -8,6 +8,7 @@ import pyximport
 pyximport.install()
 
 import numpy as np
+import matplotlib.pyplot as plt
 from timer import Timer
 from parallel_vector import move_data_serial, move_data_fine_grained, move_data_medium_grained
 
@@ -36,16 +37,22 @@ if __name__ == '__main__':
     assert counts.sum() == total, "Wrong total after move_data_fine_grained"
     print("Fine grained uncorrelated: {} seconds".format(t.interval))
 
+
     ########################################
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################
-    N = 10
-    counts[:] = orig_counts
-    with Timer() as t:
-        move_data_medium_grained(counts, src, dest, 100, N)
-    assert counts.sum() == total, "Wrong total after move_data_medium_grained"
-    print("Medium grained uncorrelated: {} seconds".format(t.interval))
+    #we created a new array to put our performance result in
+    uncorrelated = []
+    N = [5,10,20,30,40,50,100]
+    for i in N:
+        counts[:] = orig_counts
+        with Timer() as t:
+            move_data_medium_grained(counts, src, dest, 100, i)
+        assert counts.sum() == total, "Wrong total after move_data_medium_grained"
+        print("Medium grained uncorrelated: {} seconds when N is equals to {}".format(t.interval,i))
+        uncorrelated.append(t.interval)
+
 
     ########################################
     # Now use correlated data movement
@@ -74,9 +81,21 @@ if __name__ == '__main__':
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################
-    N = 10
-    counts[:] = orig_counts
-    with Timer() as t:
-        move_data_medium_grained(counts, src, dest, 100, N)
-    assert counts.sum() == total, "Wrong total after move_data_medium_grained"
-    print("Medium grained correlated: {} seconds".format(t.interval))
+    correlated=[]
+    N = [5,10,20,30,40,50,100]
+    for i in N:
+        counts[:] = orig_counts
+        with Timer() as t:
+            move_data_medium_grained(counts, src, dest, 100, i)
+        assert counts.sum() == total, "Wrong total after move_data_medium_grained"
+        print("Medium grained correlated: {} seconds when N equals to {}".format(t.interval,i))
+        correlated.append(t.interval)
+
+
+
+    #we then plot our results
+    plt.plot(N, uncorrelated, label = 'Medium grained uncorrelated')
+    plt.plot(N, correlated, label = 'Medium grained correlated')
+    plt.title('Comparison Between Correlated and Uncorrelated Transfers')
+    plt.legend(loc='upper left')
+    plt.show()

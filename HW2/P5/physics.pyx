@@ -56,15 +56,18 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                      float R,
                      int i, int count,
                      UINT[:, ::1] Grid,
-                     float grid_spacing) nogil:
+                     float grid_spacing,
+                     omp_lock_t *locks) nogil:
     cdef:
         FLOAT *XY1, *XY2, *V1, *V2
-        int j, dim, x_grid1, y_grid1, ball_index
+        int j, dim, x_grid1, y_grid1, ball_index, curr_grid_x, curr_grid_y
         float eps = 1e-5
 
     # SUBPROBLEM 4: Add locking
+    acquire(&locks[i])
     XY1 = &(XY[i, 0])
     V1 = &(V[i, 0])
+    release(&locks[i])
     #############################################################
     # IMPORTANT: do not collide two balls twice.
     ############################################################
@@ -85,40 +88,43 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     for curr_grid_x in range(x_grid1 - 2, x_grid1 + 3):
 
         #we have to check if curr_grid_x is in range [0,1] before we move on
-         if (curr_grid_x > 0) and (curr_grid_x < grid_size):
-
+        if (curr_grid_x > 0) and (curr_grid_x < grid_size):
             #now we move y-axis to check
-                for curr_grid_y in range(y_grid1-2,y_grid1 + 3):
+            for curr_grid_y in range(y_grid1-2,y_grid1 + 3):
 
-                    #we also have to check if y values still in range
-                        if (curr_grid_y > 0) and (curr_grid_y < grid_size):
+                #we also have to check if y values still in range
+                    if (curr_grid_y > 0) and (curr_grid_y < grid_size):
 
-                            #after all conditions are satisfied
-                            #now we check if they have the same index as the original one
-                            #if they are overlapping, so they will have the different index, go into the loop
-                            #we have to check the grid index here
+                        #after all conditions are satisfied
+                        #now we check if they have the same index as the original one
+                        #if they are overlapping, so they will have the different index, go into the loop
+                        #we have to check the grid index here
 
-                            ball_index = Grid[curr_grid_x,curr_grid_y]
+                        ball_index = Grid[curr_grid_x,curr_grid_y]
 
-                            if(ball_index != -1 and ball_index != i):
+                        if(ball_index != -1 and ball_index != i):
 
-                                XY2 = &(XY[ball_index,0])
-                                V2 = &(V[ball_index,0])
+                            XY2 = &(XY[ball_index,0])
+                            V2 = &(V[ball_index,0])
 
-                                ################################
-                                #original code, ignore it :)
-                                ################################
-                                #for j in range(i + 1, count):
-                                #    XY2 = &(XY[j, 0])
-                                #    V2 = &(V[j, 0])
-                                #    if overlapping(XY1, XY2, R):
+                            ################################
+                            #original code, ignore it :)
+                            ################################
+                            #for j in range(i + 1, count):
+                            #    XY2 = &(XY[j, 0])
+                            #    V2 = &(V[j, 0])
+                            if overlapping(XY1, XY2, R):
 
                                 # SUBPROBLEM 4: Add locking
+                                acquire(&locks[ball_index])
                                 if not moving_apart(XY1, V1, XY2, V2):
                                     collide(XY1, V1, XY2, V2)
                                 # give a slight impulse to help separate them
                                 for dim in range(2):
                                     V2[dim] += eps * (XY2[dim] - XY1[dim])
+                                release(&locks[ball_index])
+
+
 
 cpdef update(FLOAT[:, ::1] XY,
              FLOAT[:, ::1] V,
@@ -132,7 +138,7 @@ cpdef update(FLOAT[:, ::1] XY,
         int i, j, dim,xgrid,ygrid,grid_size
         FLOAT *XY1, *XY2, *V1, *V2
         # SUBPROBLEM 4: uncomment this code.
-        # omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
+        omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
 
     assert XY.shape[0] == V.shape[0]
     assert XY.shape[1] == V.shape[1] == 2
@@ -155,7 +161,7 @@ cpdef update(FLOAT[:, ::1] XY,
     # scheduling.
     #for i in range(count):
     for i in prange(count,nogil=True, schedule='static', chunksize = count/4, num_threads = 4):
-        sub_update(XY, V, R, i, count, Grid, grid_spacing)
+        sub_update(XY, V, R, i, count, Grid, grid_spacing,locks)
 
     # update positions
     #

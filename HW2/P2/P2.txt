@@ -1,0 +1,54 @@
+Author: Xingchi Dai
+Class: CS205
+Homework 2
+Problem 2: Parallel Vector Updates
+
+Output N = 10
+
+Serial uncorrelated: 0.275285959244 seconds
+Fine grained uncorrelated: 4.32283806801 seconds
+Medium grained uncorrelated: 5.33071494102 seconds
+
+
+Serial correlated: 0.2825050354 seconds
+Fine grained correlated: 4.04863095284 seconds
+Medium grained correlated: 4.04532194138 seconds
+
+
+
+By looking at results, it is not surprising to see that parallel computing(prange) is actually slower than the serial's.
+As the parallel computing introduces more overhead in this case.
+
+If we change the number of N, the performance ourput is shown as follow.
+
+Serial uncorrelated: 0.272067070007 seconds
+Fine grained uncorrelated: 4.33275508881 seconds
+Medium grained uncorrelated: 5.29543185234 seconds when N is equals to 5
+Medium grained uncorrelated: 5.34436392784 seconds when N is equals to 10
+Medium grained uncorrelated: 5.48058509827 seconds when N is equals to 20
+Medium grained uncorrelated: 5.61853194237 seconds when N is equals to 30
+Medium grained uncorrelated: 5.75706219673 seconds when N is equals to 40
+Medium grained uncorrelated: 5.89275383949 seconds when N is equals to 50
+Medium grained uncorrelated: 6.57133293152 seconds when N is equals to 100
+
+****************************************************************************
+
+Serial correlated: 0.282373905182 seconds
+Fine grained correlated: 4.06423997879 seconds
+Medium grained correlated: 4.34502601624 seconds when N equals to 5
+Medium grained correlated: 4.04495596886 seconds when N equals to 10
+Medium grained correlated: 3.65899014473 seconds when N equals to 20
+Medium grained correlated: 3.67420911789 seconds when N equals to 30
+Medium grained correlated: 3.58107209206 seconds when N equals to 40
+Medium grained correlated: 3.63444781303 seconds when N equals to 50
+Medium grained correlated: 4.02862596512 seconds when N equals to 100
+
+It is not surprising to see the later one has higher performance, as in the memory, two exchange data entries are
+actually near each other.
+
+Since the source and destination are no more than 10 elements away, we can see when N = 5, the performance is actually
+worse than when N = 10.
+
+However, it doesn't mean a large N would result in a better performance.
+If the N is too large, other threads have to wait longer, in the case, the performance is worse. From the result and
+the graph, N = 40 would be a good choice.
