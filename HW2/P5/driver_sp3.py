@@ -18,8 +18,8 @@ def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
 if __name__ == '__main__':
-    num_balls = 500 
-    radius = 0.01
+    num_balls = 10000
+    radius = 0.002
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -59,7 +59,7 @@ if __name__ == '__main__':
     frame_count = 0
 
     # Number of threads for parallelism
-    thread_count = 1 
+    thread_count = 4
 
     # SUBPROBLEM 4: uncomment the code below.
     # preallocate locks for objects
@@ -102,5 +102,4 @@ if __name__ == '__main__':
             positions = positions[sort_indices]
             velocities = velocities[sort_indices] 
             grid[(positions[:, 0] / grid_spacing).astype(int),
-             (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
-
+                 (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)

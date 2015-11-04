@@ -1,4 +1,4 @@
-#cython: boundscheck=True, wraparound=False
+#cython: boundscheck=False, wraparound=False
 
 cimport numpy as np
 from libc.math cimport sqrt
@@ -68,6 +68,7 @@ cdef void sub_update(FLOAT[:, ::1] XY,
         float eps = 1e-5
 
     # SUBPROBLEM 4: Add locking
+    acquire(&(locks[i]))
     XY1 = &(XY[i, 0])
     V1 = &(V[i, 0])
 
@@ -93,24 +94,15 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                 if (grid_x1 + j < grid_x_dim) and (grid_y1 + k < grid_y_dim) and (grid_x1 + j > 0) and (grid_y1 + k > 0):
                     other_ball_grid_val = Grid[grid_x1 + j, grid_y1 + k]
 
-                    # If we have someone there...
-                    if (other_ball_grid_val != -1):
+                    # If we have someone there and their ball number is bigger than ours
+                    if (other_ball_grid_val != -1) and (other_ball_grid_val > i):
 
-                        # We apply the same logic as in P2
-                        if i == other_ball_grid_val:
-                            same_lock = 1
-                            first_lock = i
-                        elif i < other_ball_grid_val:
-                            first_lock = i
-                            second_lock = other_ball_grid_val
-                        else:
-                            first_lock = other_ball_grid_val
-                            second_lock = i
+                        # We apply the same logic as in P2 except now it is easier!
+                        # Because we only compare ball i to ball j if j > i, we automatically lock in the same order!
 
-                        # then treat the collision accordingly and lock as necessary
-                        acquire(&locks[first_lock])
-                        if not same_lock:
-                            acquire(&locks[second_lock])
+
+                        # Now pick up our new lock
+                        acquire(&(locks[other_ball_grid_val]))
 
                         XY2 = &(XY[other_ball_grid_val, 0])
                         V2 = &(V[other_ball_grid_val, 0])
@@ -124,11 +116,12 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                             for dim in range(2):
                                 V2[dim] += eps * (XY2[dim] - XY1[dim])
 
-                        # And now release the locks
-                        release(&locks[first_lock])
+                        # And now release the new locks
+                        release(&(locks[other_ball_grid_val]))
 
-                        if not same_lock:
-                            release(&locks[second_lock])
+
+    # And release the old lock
+    release(&(locks[i]))
 
 cpdef update(FLOAT[:, ::1] XY,
              FLOAT[:, ::1] V,

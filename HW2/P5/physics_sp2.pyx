@@ -91,8 +91,8 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                 if (grid_x1 + j < grid_x_dim) and (grid_y1 + k < grid_y_dim) and (grid_x1 + j > 0) and (grid_y1 + k > 0):
                     other_ball_grid_val = Grid[grid_x1 + j, grid_y1 + k]
 
-                    # If we have someone there...
-                    if (other_ball_grid_val != -1):
+                    # If we have someone there, and their ball number is bigger than ours (don't compare i to j and then j to i)
+                    if ((other_ball_grid_val != -1) and (other_ball_grid_val > i)):
 
                         # then treat it accordingly
                         XY2 = &(XY[other_ball_grid_val, 0])
