@@ -108,11 +108,12 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                   # if it is less than four, we want to add one to the iteratiorns 
                   # if it is greater than four, add 0 
                   iters = AVX.add(iters, AVX.bitwise_and(comp_mask, ones))
+                  # no negatives, so everything is greater than 4
                   if AVX.signs(comp_mask) == 0: 
                     break 
 
                   # update z 
-                  # z = (a + bi)(a + bi) = (a^2 - b^2) + 2(ab)i 
+                  # z = (a + bi)(a + bi) = (a^2 - b^2) + 2(ab)i + c
                   tmp_real_z = AVX.mul(real_z, real_z)
                   tmp_real_z = AVX.sub(tmp_real_z, AVX.mul(imag_z, imag_z))
                   tmp_real_z = AVX.add(tmp_real_z, real_c)
