@@ -36,6 +36,7 @@ cdef extern from "AVX.h" nogil:
     #     So, (val & 0.0) == 0.0
     #     and, (val & -1.0) == val
     float8 bitwise_and(float8, float8) 
+    float8 bitwise_andnot(float8 mask, float8 val) 
 
     # Helpers:
     #     This extracts the signs of each float into an 8-bit value.
