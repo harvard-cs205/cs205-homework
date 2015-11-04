@@ -81,22 +81,27 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
   ##########
   for r in range(repeat):
       for idx in prange(src.shape[0], nogil=True, num_threads=4, schedule=dynamic):
+          # same is a variable that detects whether the src and dest locks are the same lock
           same = 0
           src_index = src[idx]
           dest_index = dest[idx]
+          # enforce the order that we acquire the locks in
           if src_index < dest_index:
             acquire(&(locks[src_index]))
             acquire(&(locks[dest_index]))
           elif dest_index < src_index:
             acquire(&(locks[dest_index]))
             acquire(&(locks[src_index]))
+          # if the locks are the same, acquire the lock only once
           else:
             acquire(&(locks[src_index]))
             same = 1
           if counts[src_index] > 0:
               counts[dest_index] += 1
               counts[src_index] -= 1
+          # release one lock no matter what 
           release(&(locks[src_index]))
+          # release the other if they were not the same
           if not same:
             release(&(locks[dest_index]))
 
@@ -121,7 +126,9 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
   ##########
   for r in range(repeat):
       for idx in prange(src.shape[0], nogil=True, num_threads=4, schedule=dynamic):
+          # similar logic with "same" variable and enforcing order etc.
           same = 0
+          # index now has to be put in buckets of size N, the same is the same as fine-grained
           src_index = src[idx]/N
           dest_index = dest[idx]/N
           if src_index < dest_index:
