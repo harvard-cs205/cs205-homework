@@ -32,8 +32,8 @@ def cmp_zorder(a, b):
     return a[j] - b[j]
 
 if __name__ == '__main__':
-    num_balls = 10
-    radius = 0.05
+    num_balls = 10000
+    radius = 0.002
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 

@@ -4,3 +4,8 @@ For the first part with simply introducing threading here were my results:
 1 thread: 1074.656613 Million Complex FMAs in 6.38915014267 seconds, 168.200244008 million Complex FMAs / second
 
 The performance speedup is quite good, when going from 1 to 4 threads the FMAs is multiplied by 3.57
+
+Using AVX 8 way parallel instructions:
+4 Threads: 268.707623 Million Complex FMAs in 0.316922903061 seconds, 847.864324114 million Complex FMAs / second
+2 Threads: 268.707623 Million Complex FMAs in 0.281702041626 seconds, 953.871762693 million Complex FMAs / second
+1 Thread: 268.707623 Million Complex FMAs in 0.293735980988 seconds, 914.793012748 million Complex FMAs / second
