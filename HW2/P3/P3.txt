@@ -1,0 +1,20 @@
+With AVX: 
+
+1 Thread 
+1075.218402 Million Complex FMAs in 0.880264043808 seconds, 1221.4725906 million Complex FMAs / second
+
+2 Threads
+1075.218402 Million Complex FMAs in 0.448504209518 seconds, 2397.3429439 million Complex FMAs / second
+
+4 Threads
+1075.218402 Million Complex FMAs in 0.308728933334 seconds, 3482.72638521 million Complex FMAs / second
+
+Without AVX: 
+1 Thread 
+1074.656613 Million Complex FMAs in 5.51438689232 seconds, 194.882338506 million Complex FMAs / second
+
+2 Threads
+1074.656613 Million Complex FMAs in 2.63212680817 seconds, 408.28451337 million Complex FMAs / second
+
+4 Threads
+1074.656613 Million Complex FMAs in 1.50324511528 seconds, 714.891139227 million Complex FMAs / second
