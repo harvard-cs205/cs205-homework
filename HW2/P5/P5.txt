@@ -1,3 +1,91 @@
- P5/P5.txt: Your writeup comparing performance in each of the subproblems above, and an explanation of your choice for spatial sorting.
+Part 1:
 
- 
+1 thread:
+4 threads:
+
+Part 2:
+
+1 thread, no gridding:
+4 threads, no gridding:
+1 thread, gridding: ~890.23471 simulation frames per second
+4 threads, gridding: ~2007.10168 simulation frames per second
+
+Part 3:
+
+Choice: "Both the true Hilbert curve and its discrete approximations are useful because
+they give a mapping between 1D and 2D space that fairly well preserves locality...because
+of this locality property, the Hilbert curve is widely used in computer science"
+This is exactly what we want! Ideally our algorithm should sort such that things
+which are close in the sorted order are close in space as well.  This will lead
+to much better cache behavior in the long run: two colliding balls we are examining
+will hopefully be accessible from the same cache line.
+
+Averages:
+1 thread, no sorting: 857.078143717 simulation frames per second
+1 thread, sorting: 869.907498659 simulation frames per second
+4 threads, no sorting: 2025.78767109 simulation frames per second
+4 threads, sorting: 2529.48575321 simulation frames per second
+
+Part 4:
+
+With locking:
+
+1485.95074115 simulation frames per second
+2033.25400288 simulation frames per second
+1865.30627343 simulation frames per second
+1968.13479983 simulation frames per second
+1760.77131363 simulation frames per second
+2018.74741298 simulation frames per second
+1917.2591672 simulation frames per second
+1978.04944694 simulation frames per second
+2055.66627126 simulation frames per second
+2003.82671744 simulation frames per second
+2017.27674081 simulation frames per second
+1796.59639479 simulation frames per second
+1854.25902184 simulation frames per second
+1858.84506458 simulation frames per second
+1852.00085462 simulation frames per second
+1873.28015426 simulation frames per second
+2034.83517283 simulation frames per second
+2038.79159072 simulation frames per second
+2030.30134256 simulation frames per second
+1990.0459451 simulation frames per second
+2039.12684636 simulation frames per second
+2038.99564624 simulation frames per second
+2051.61506561 simulation frames per second
+2047.85508272 simulation frames per second
+1917.20439385 simulation frames per second
+1884.05895145 simulation frames per second
+
+AVERAGE: 1938.92516981
+
+Without locking:
+
+2246.90042356 simulation frames per second
+2258.83718821 simulation frames per second
+2306.48827693 simulation frames per second
+2140.72466665 simulation frames per second
+2226.66996992 simulation frames per second
+2230.56981592 simulation frames per second
+2098.75368044 simulation frames per second
+2255.16168376 simulation frames per second
+2206.24170825 simulation frames per second
+2265.03264314 simulation frames per second
+2290.9288805 simulation frames per second
+2187.24866772 simulation frames per second
+2262.71741507 simulation frames per second
+2226.84335712 simulation frames per second
+2098.66603764 simulation frames per second
+2139.10217034 simulation frames per second
+2187.49869258 simulation frames per second
+2206.41422895 simulation frames per second
+2366.87035966 simulation frames per second
+2204.29879409 simulation frames per second
+2329.88678009 simulation frames per second
+
+AVERAGE: 2225.51692574
+
+Locks slow things down as expected, but indeed help us avoid race conditions, such as
+when multiple balls collide.
+
+

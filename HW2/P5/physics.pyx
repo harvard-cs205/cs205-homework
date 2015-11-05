@@ -73,7 +73,6 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     ############################################################
     # SUBPROBLEM 2: use the grid values to reduce the number of other
     # objects to check for collisions.
-    #for j in range(i + 1, count):
     grid_x = <int> (XY[i, 0]/grid_spacing)
     grid_y = <int> (XY[i, 1]/grid_spacing)
     for xv in range(max(grid_x - 2, 0), min(grid_x + 3, grid_size)):
