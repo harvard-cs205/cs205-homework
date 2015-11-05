@@ -1,0 +1,34 @@
+Original code:
+2.2 simulation frames per second
+
+Multithreading:
+4 threads: ~ 3.8 simulation frames per second
+2 threads: ~ 2.8 simulation frames per second
+1 thread: ~ 2.2 simulation frames per second
+
+Adding threads allows parallel calculation for multiple balls and speeds up the execution.
+
+Spatial decomposition:
+4 threads: ~ 330 simulation frames per second
+2 threads: ~ 350 simulation frames per second
+1 thread: ~ 210 simulation frames per second
+
+Checking for collision only for balls close to each other dramatiaclly speeds up the program.
+A lot of unnecessary computation is avoided. I chose Morton ordering because it generates less processor 
+overhead compared to Hilbert ordering.
+
+With sorting:
+4 threads: ~ 380 simulation frames per second
+2 threads: ~ 430 simulation frames per second
+1 thread: ~ 230 simulation frames per second
+
+Sorting of balls by location results in balls that can potentially collide being stored close in memory.
+This slightly speeds up the execution regardless number of threads.
+
+With locks:
+4 threads: ~ 240 simulation frames per second
+2 threads: ~ 240 simulation frames per second
+1 threads: ~ 150 simulation frames per second
+
+Fine grain-locking adds a lot of overhead and significantly slows down the execution.
+

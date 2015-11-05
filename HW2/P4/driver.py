@@ -15,14 +15,22 @@ import filtering
 from timer import Timer
 import threading
 
+def worker(tmpA, tmpB, j, num_threads):
+    return filtering.median_3x3(tmpA, tmpB, j, num_threads)
+    
 def py_median_3x3(image, iterations=10, num_threads=1):
     ''' repeatedly filter with a 3x3 median '''
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
 
+    threads = []
     for i in range(iterations):
-        filtering.median_3x3(tmpA, tmpB, 0, 1)
-        # swap direction of filtering
+        for j in range(num_threads):
+            t = threading.Thread(target=worker, args=(tmpA, tmpB, j, num_threads))
+            threads.append(t)
+            t.start()
+        for thread in threads:
+            thread.join()
         tmpA, tmpB = tmpB, tmpA
 
     return tmpA
@@ -57,7 +65,7 @@ if __name__ == '__main__':
     assert np.all(from_cython == from_numpy)
 
     with Timer() as t:
-        new_image = py_median_3x3(input_image, 10, 8)
+        new_image = py_median_3x3(input_image, 10, 4)
 
     pylab.figure()
     pylab.imshow(new_image[1200:1800, 3000:3500])

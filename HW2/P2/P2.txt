@@ -1,0 +1,7 @@
+To implement the move_data_fine_grained function each count index was locked with an individual lock before comparison/increment/decrement. Afterwards the index was unlocked again. To prevent deadlocking the index that has the smaller value was always locked and unlocked first.
+
+The function move_data_medium_grained was implemented similarly, with the exception that every nth counr value shared a lock.
+
+The move_data_serial function was always executed fastest (~ 0.75 s) independent of whether the data movement was correlated. The move_data_fine_grained function ran significantly slower (~ 16 s). This can be attributed to the overhead created by lock acquisition and release. The performance did not depend on data movement correlation, since each value of count had its own lock. 
+
+The move_data_medium_grained function executed slowest. The runtime dependened on the correlation of data movement and number of elements that share a lock. Generally, the performeance is better for a correlated data set. The runtime is ~ 20 s and starts to increase for N > 20. This is de to the fact that while N < 20 increasing the number of locks (increasing N) creates more overhead, but at the same time reduces the probability of collisions since source and destination are max. 10 elements away. For N > 20 the number of collisions is no longer significantly reduced but the overhead due more locks keeps growing. Therefore we see increasing execution time for N > 20. Setting N = 20 is a good choice fo correlated data movements.
