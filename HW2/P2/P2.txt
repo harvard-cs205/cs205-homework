@@ -1,0 +1,14 @@
+The times are all much slower than the serial implementation. I ran
+the code on the uncorrelated/correlated set for N=1(fine-grained), 
+5, 10, 20, 50, 100. As expected, the less locks there are the worse 
+performance. I took the times of just acquiring/releasing the locks 
+and it was well over the time for the serial implementation 
+(see P2_graphs). If you subtract the time for the locks from the total time
+, there's still about a second for the calculation/splitting and joining of
+threads (serial ran in about .3 seconds). 
+
+The time for N=20 on the correlated array had the best performance, even 
+beating out the fine-grained. If src and dest don't differ by 10, then 
+if there are two src/dest combinations with an overlap (i.e. a lock is 
+required) the maximum distance among the 3 indices is 20.
+

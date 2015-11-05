@@ -1,0 +1,7 @@
+Changing the update loops to pranges from 1 thread -> 4 threads roughly doubled the fps (~10 fps -> ~23 fps).
+The update function has 3 loops: 2 of them performed better on the single thread. This might be because it's a straightforward calculation that didn't warrant the overhead of creating new threads and distributing the objects?
+The other loop gives the roughly double speedup that we saw - it's more work than the other 2 loops, but it's not distributed equally. It has an inner loop from j=i+1 to count, so the last thread has less iterations to loop through than the first.
+
+Adding the Grid component improved fps dramatically - ~1250 fps for the single thread and 2700 fps for 4 threads.
+Adding the ordering of the positions gave an additional 150 fps to the single thread and 500 fps for 4 threads.
+Adding the locking before accessing any positions/velocities reduced the 4 thread fps to 2200, so about a 1000 fps decrease

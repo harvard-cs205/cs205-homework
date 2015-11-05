@@ -1,0 +1,24 @@
+Prange rows:
+
+threads = 1: 1074.656613 Million Complex FMAs in 5.59425115585 seconds, 192.10017267 million Complex FMAs / second
+threads = 2: 1074.656613 Million Complex FMAs in 2.80311083794 seconds, 383.379992848 million Complex FMAs / second
+threads = 4: 1074.656613 Million Complex FMAs in 1.43997621536 seconds, 746.301641329 million Complex FMAs / second
+
+Prange rows + AVX:
+
+threads = 1: 1074.656613 Million Complex FMAs in 0.749855995178 seconds, 1433.15065814 million Complex FMAs / second
+threads = 2: 1074.656613 Million Complex FMAs in 0.383849859238 seconds, 2799.6795808 million Complex FMAs / second
+threads = 4: 1074.656613 Million Complex FMAs in 0.200419902802 seconds, 5362.02541753 million Complex FMAs / second
+
+We see as increasing threads in the non-AVX case, the speedup is about as expected. 
+Going from no AVX -> AVX was pretty close to 8x speedup but performance decreased as
+you increased the threads in terms of FMAs/second. Attached plot showing the values 
+vs. limit. You won't get exactly an 8x speedup because the work isn't evenly distributed.
+For every 8 indices you'll loop through the max iteration over them. In the worst case 
+you could have a 8-tuple of (0,0,0,0,0,0,0,1023) in which case for all 8 of them you'd 
+have to loop through 1024 times - the same as if you did it serially. 
+
+P3_noAVX - using the 1 thread performance as a benchmark compares threads 2,4 
+performance vs. thread 1 FMAs/second * N
+
+P3_AVX - compares no AVX performance * 8 vs. AVX performance for each thread
