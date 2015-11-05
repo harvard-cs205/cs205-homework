@@ -1,0 +1,49 @@
+Here is some outputs of my code:
+
+Serial uncorrelated: 0.352463960648 seconds
+Fine grained uncorrelated: 4.6327059269 seconds
+Medium grained uncorrelated: 4.15916991234 seconds and N=1
+Medium grained uncorrelated: 4.48187017441 seconds and N=2
+Medium grained uncorrelated: 5.09798693657 seconds and N=3
+Medium grained uncorrelated: 5.82903599739 seconds and N=4
+Medium grained uncorrelated: 6.06271982193 seconds and N=5
+Medium grained uncorrelated: 6.01073908806 seconds and N=6
+Medium grained uncorrelated: 6.43323588371 seconds and N=7
+Medium grained uncorrelated: 6.61445498466 seconds and N=8
+Medium grained uncorrelated: 7.61283898354 seconds and N=9
+Medium grained uncorrelated: 7.15025997162 seconds and N=10
+Medium grained uncorrelated: 7.59411621094 seconds and N=11
+Medium grained uncorrelated: 7.57095909119 seconds and N=12
+Medium grained uncorrelated: 7.89380598068 seconds and N=13
+Medium grained uncorrelated: 7.94127202034 seconds and N=14
+Medium grained uncorrelated: 8.47728490829 seconds and N=15
+Medium grained uncorrelated: 8.19571590424 seconds and N=16
+Medium grained uncorrelated: 8.69045901299 seconds and N=17
+Medium grained uncorrelated: 8.43442797661 seconds and N=18
+Medium grained uncorrelated: 8.98285198212 seconds and N=19
+
+Serial correlated: 0.412389993668 seconds
+Fine grained correlated: 3.32598686218 seconds
+Medium grained correlated: 3.74103188515 seconds and N=1
+Medium grained correlated: 3.83362412453 seconds and N=2
+Medium grained correlated: 3.87920999527 seconds and N=3
+Medium grained correlated: 4.09096097946 seconds and N=4
+Medium grained correlated: 4.04377603531 seconds and N=5
+Medium grained correlated: 3.97220802307 seconds and N=6
+Medium grained correlated: 4.09944987297 seconds and N=7
+Medium grained correlated: 4.12973713875 seconds and N=8
+Medium grained correlated: 4.12109899521 seconds and N=9
+Medium grained correlated: 4.27080917358 seconds and N=10
+Medium grained correlated: 4.54701399803 seconds and N=11
+Medium grained correlated: 4.52391505241 seconds and N=12
+Medium grained correlated: 4.46345806122 seconds and N=13
+Medium grained correlated: 4.46317505836 seconds and N=14
+Medium grained correlated: 4.66961503029 seconds and N=15
+Medium grained correlated: 4.73690915108 seconds and N=16
+Medium grained correlated: 4.49763894081 seconds and N=17
+Medium grained correlated: 4.60891699791 seconds and N=18
+Medium grained correlated: 4.81896781921 seconds and N=19
+
+From the output above, no matter correlated cases and uncorrelated cases, serial version is always the fastest because the overhead of initializing threads are more expensive. 
+
+I think there is no best N for medium grained because the fastest solution is N=1, which means we should assign locks for every element. Theoretically, it is the same as fine grained locks. Also, serial version is faster than parallel version. Therefore, there is no good N.
