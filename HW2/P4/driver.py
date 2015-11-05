@@ -90,8 +90,8 @@ if __name__ == '__main__':
             new_image = py_median_3x3(input_image, 10, n_threads)
         print("{} seconds for 10 filter passes with {} threads.".format(t.interval, n_threads))
 
-    # pylab.figure()
-    # pylab.imshow(new_image[1200:1800, 3000:3500])
-    # pylab.title('after - zoom')
+    pylab.figure()
+    pylab.imshow(new_image[1200:1800, 3000:3500])
+    pylab.title('after - zoom')
 
-    # pylab.show()
+    pylab.show()

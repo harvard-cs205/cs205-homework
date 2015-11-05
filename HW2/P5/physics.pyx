@@ -154,7 +154,7 @@ cpdef update(FLOAT[:, ::1] XY,
                 gy = <unsigned int> (XY[i,1] / grid_spacing)
                 Grid[gx, gy] = -1
 
-            #  update position
+            #  update velocity
             for dim in range(2):
                 XY[i, dim] += V[i, dim] * t
 

@@ -16,7 +16,6 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                  int max_iterations=511):
     cdef:
        int i, j, iter
-       # np.complex64_t c, z
        AVX.float8 counts, c_real, c_imaginary, z_real, z_real_temp, z_imaginary, mask
 
        # To declare AVX.float8 variables, use:
