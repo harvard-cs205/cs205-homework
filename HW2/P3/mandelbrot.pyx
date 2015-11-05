@@ -47,15 +47,13 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
         val0 = threadid()
         for i in prange(in_coords.shape[0], schedule='static', chunksize = 1):
             for j in range(in_coords.shape[1]/8):
-                #if (i == 0) & (j == 0):
-                    #with gil:
-                        #print re[i,0],im[i,0]
                 cRe = AVX.make_float8(re[i, 8*j],re[i, 8*j+1],re[i, 8*j+2],re[i, 8*j+3],re[i, 8*j+4],re[i, 8*j+5],re[i, 8*j+6],re[i, 8*j+7])
                 cIm = AVX.make_float8(im[i, 8*j],im[i, 8*j+1],im[i, 8*j+2],im[i, 8*j+3],im[i, 8*j+4],im[i, 8*j+5],im[i, 8*j+6],im[i, 8*j+7])
                 re2 = AVX.make_float8(0,0,0,0,0,0,0,0)
                 im2 = AVX.make_float8(0,0,0,0,0,0,0,0)
                 count8 = AVX.make_float8(0,0,0,0,0,0,0,0)
                 for iter in range(max_iterations):
+                    # AVX computations
                     reTemp = AVX.mul(re2,re2)
                     imTemp = AVX.mul(im2,im2)
                     mTemp = AVX.mul(re2,im2)
@@ -71,30 +69,18 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                     re2 = AVX.add(re2,cRe)
                     im2 = AVX.add(mTemp,mTemp)
                     im2 = AVX.add(im2,cIm)
-                    #if (i == 0) & (j == 0) & (iter < 52):
-                        #AVX.to_mem(mag, &(countTemp[val0][0]))
-                        #with gil:
-                            #print countTemp[val0][0]#countTemp[val0][1],countTemp[val0][2],countTemp[val0][3],countTemp[val0][4],countTemp[val0][5],countTemp[val0][6],countTemp[val0][7]
-                        #AVX.to_mem(count8, &(countTemp[val0][0]))
-                        #with gil:
-                            #print countTemp[val0][0],countTemp[val0][1],countTemp[val0][2],countTemp[val0][3],countTemp[val0][4],countTemp[val0][5],countTemp[val0][6],countTemp[val0][7]
+              
                 AVX.to_mem(count8, &(countTemp[val0][0])) 
                 for indFlag in range(0,8):
                     out_counts[i,8*j+indFlag] = <int> countTemp[val0][indFlag]
-                        
+    # original version for comparing performance                 
     """
     print "num threads: ", num_threads
     for i in prange(in_coords.shape[0], nogil=True, schedule='static', chunksize = 1, num_threads=num_threads):
         for j in range(in_coords.shape[1]):
-            #if (i == 0) & (j == 0):
-                #with gil:
-                    #print in_coords[i,j]
             c = in_coords[i, j]
             z = 0
             for iter in range(max_iterations):
-                #if (i == 0) & (j == 0):
-                    #with gil:
-                        #print magnitude_squared(z)
                 if magnitude_squared(z) > 4:
                     break
                 z = z * z + c
