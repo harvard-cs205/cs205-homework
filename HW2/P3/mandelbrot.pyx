@@ -36,15 +36,8 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
         ones = AVX.float_to_float8(1.0)
         fours = AVX.float_to_float8(4.0)
 
-        for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=4):
+        for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=1):
             for j in range(0, in_coords.shape[1], 8):
-                # c = in_coords[i, j]
-                # z = 0
-                # for iter in range(max_iterations):
-                #     if magnitude_squared(z) > 4:
-                #         break
-                #     z = z * z + c
-                # out_counts[i, j] = iter
 
                 counts = AVX.float_to_float8(0.0)
 
@@ -93,12 +86,10 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                         c_real,
                         AVX.sub(AVX.mul(z_real, z_real), AVX.mul(z_imaginary, z_imaginary))
                     )
-
                     z_imaginary = AVX.add(
                         c_imaginary,
                         AVX.add(AVX.mul(z_real, z_imaginary), AVX.mul(z_real, z_imaginary))
                     )
-
                     z_real = z_real_temp
 
                 AVX.to_mem(counts, &(out_counts[i, j]))
