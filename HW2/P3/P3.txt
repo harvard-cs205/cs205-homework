@@ -1,0 +1,39 @@
+##########################
+RESULT
+##########################
+
+
+Without instruction-level Parallelism (Shown in without.png):
+
+# of Threads = 1:
+
+1074.656613 Million Complex FMAs in 5.78778481483 seconds, 185.676670329 million Complex FMAs / second
+
+# of Threads = 2:
+
+1074.656613 Million Complex FMAs in 2.8579518795 seconds, 376.023340599 million Complex FMAs / second
+
+
+# of Threads = 4: 
+
+1074.656613 Million Complex FMAs in 1.45252180099 seconds, 739.855754498 million Complex FMAs / second
+
+
+With instruction-level Parallelism (Shown in with.png):
+
+# of Threads = 1:
+
+1074.94829 Million Complex FMAs in 0.840198993683 seconds, 1279.39725956 million Complex FMAs / second
+
+# of Threads = 2:
+
+1074.94829 Million Complex FMAs in 0.391956806183 seconds, 2742.51721885 million Complex FMAs / second
+
+# of Threads = 4: 
+
+1074.94829 Million Complex FMAs in 0.201856851578 seconds, 5325.29999154 million Complex FMAs / second
+
+##########################
+ANALYSIS
+##########################
+We see that for both without instruction-level and with instruction-level, as number of threads doubles, the performance gets almost twice as fast. Also with the 8-way instruction-level paralleism, the performance is about 7 times as fast. It is not 8 times as fast as we have expected, because when doing the 8-way instruction-level, the work is not distributed evenly. 

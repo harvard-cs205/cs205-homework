@@ -1,3 +1,10 @@
+###########################################################################
+#Jaemin Cheun
+#CS205, Fall 2015 Computing Foundations for Computer Science
+#Nov 4, 2015
+#mandelbrot.pyx
+###########################################################################
+
 import numpy as np
 cimport numpy as np
 cimport cython
@@ -13,8 +20,7 @@ cdef np.float64_t magnitude_squared(np.complex64_t z) nogil:
 @cython.wraparound(False)
 cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                  np.uint32_t [:, :] out_counts,
-                 int max_iterations=511,
-                 ):
+                 int max_iterations=511):
     cdef:
        int i, j, iter
        np.complex64_t c, z
@@ -36,26 +42,26 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
 
     # We first seperate the real and imaginary parts of the in_coords
     in_coords_r = np.real(in_coords)
-    in_coords_i = np.imag(in_coords)
+    in_coords_i = np.imag(in_coords) 
 
     with nogil:
         for i in prange(in_coords.shape[0], schedule = 'static', chunksize = 1, num_threads = 4):
           for j in range(in_coords.shape[1] / 8):
-            c_r= AVX.make_float8(in_coords_r[i,j*8+0],
-              in_coords_r[i,j*8+1],
-              in_coords_r[i,j*8+2],
-              in_coords_r[i,j*8+3],
-              in_coords_r[i,j*8+4],
-              in_coords_r[i,j*8+5],
+            c_r= AVX.make_float8(in_coords_r[i,j*8+7],
               in_coords_r[i,j*8+6],
-              in_coords_r[i,j*8+7]) 
-            c_i= AVX.make_float8(in_coords_i[i,j*8+0],
-              in_coords_i[i,j*8+1],
-              in_coords_i[i,j*8+2],
-              in_coords_i[i,j*8+3],
-              in_coords_i[i,j*8+4],
-              in_coords_i[i,j*8+5],
+              in_coords_r[i,j*8+5],
+              in_coords_r[i,j*8+4],
+              in_coords_r[i,j*8+3],
+              in_coords_r[i,j*8+2],
+              in_coords_r[i,j*8+1],
+              in_coords_r[i,j*8+0]) 
+            c_i= AVX.make_float8(in_coords_i[i,j*8+7],
               in_coords_i[i,j*8+6],
+              in_coords_i[i,j*8+5],
+              in_coords_i[i,j*8+4],
+              in_coords_i[i,j*8+3],
+              in_coords_i[i,j*8+2],
+              in_coords_i[i,j*8+1],
               in_coords_i[i,j*8+7])   
 
             #initialize z and counter
@@ -68,8 +74,8 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
               # No need to stop computations for values > 4.0
               mask = AVX.less_than(AVX.add(AVX.mul(z_r,z_r),AVX.mul(z_i,z_i)),AVX.float_to_float8(4.0))
 
-              # We stop when the values are all false (255)
-              if AVX.signs(mask) == 255:
+              # We stop when the values are all false (255), got help from the piazza post
+              if AVX.signs(mask) == 0:
                 break
               # We update the real and imaginary values of z
               z_temp_r = z_r
@@ -83,6 +89,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
 
             counts_to_output(counts, out_counts, i, j)
 
+# Followed the piazza post for this
 cdef void counts_to_output(AVX.float8 counts, np.uint32_t[:,:] out_counts, int i, int j) nogil:
   cdef:
     float temp[8]
@@ -90,11 +97,6 @@ cdef void counts_to_output(AVX.float8 counts, np.uint32_t[:,:] out_counts, int i
   AVX.to_mem(counts, &(temp[0]))
   for idx in range(8):
     out_counts[i, j*8 + idx] = <np.uint32_t> temp[idx]
-
-
-           
-
-
 
 # An example using AVX instructions
 cpdef example_sqrt_8(np.float32_t[:] values):

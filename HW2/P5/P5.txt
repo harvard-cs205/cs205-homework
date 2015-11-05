@@ -1,0 +1,119 @@
+###########################################################################
+#Jaemin Cheun
+#CS205, Fall 2015 Computing Foundations for Computer Science
+#Nov 4, 2015
+#P5.txt
+###########################################################################
+
+
+###########################################################################
+Part 1: Multithreading
+###########################################################################
+
+Compare performance with 4 and with 1 thread, and discuss the reasons for any performance difference
+
+Serial performance:
+
+9.60687503722 simulation frames per second
+9.26072777774 simulation frames per second
+10.7326100307 simulation frames per second
+10.7865704844 simulation frames per second
+
+Multithreading with 4 threads performance:
+
+21.2350469324 simulation frames per second
+21.6581930094 simulation frames per second
+21.6901134589 simulation frames per second
+22.4109770563 simulation frames per second
+
+From the result above, the serial performance is around 9 to 10 simulation frames per second, while with 4 threads it is around 21 simulation frames per second. Therefore, the performance has sped up more than twice, and this is because the work is divided among 4 threads.
+
+###########################################################################
+Part 2: Spatial Decomposition
+###########################################################################
+
+Compare this version to the non-gridded versino for both 4 and 1 threads, and discuss the reasons for performance differences between all four versions
+
+Gridded with serial:
+
+1347.90918894 simulation frames per second
+1516.34663888 simulation frames per second
+1737.28036335 simulation frames per second
+1883.05197896 simulation frames per second
+
+Non-Gridded Serial performance:
+
+9.60687503722 simulation frames per second
+9.26072777774 simulation frames per second
+10.7326100307 simulation frames per second
+10.7865704844 simulation frames per second
+
+Gridded with 4 threads:
+
+4331.46712565 simulation frames per second
+3502.09485744 simulation frames per second
+3673.36901707 simulation frames per second
+3721.12566095 simulation frames per second
+
+Non-Gridded with 4 threads:
+
+21.2350469324 simulation frames per second
+21.6581930094 simulation frames per second
+21.6901134589 simulation frames per second
+22.4109770563 simulation frames per second
+
+By using the grid, we convert the alogorithm from an O(N^2) to a O(N) algorithm. As expected, the gridded vs non-gridded for both serial and multithreading has sped up rapidly, because rather than checking individual balls, we are now subdividing the simulation space into a regular grid, saving computation.
+
+###########################################################################
+Part 3: Spatially Coherent Sorting
+###########################################################################
+
+Sorting, serial
+1866.67668854 simulation frames per second
+1976.83465444 simulation frames per second
+1961.23263525 simulation frames per second
+1688.85023417 simulation frames per second
+
+No Sortingm serial:
+
+1347.90918894 simulation frames per second
+1516.34663888 simulation frames per second
+1737.28036335 simulation frames per second
+1883.05197896 simulation frames per second
+
+Sorting, 4threads
+4055.17569278 simulation frames per second
+4539.71024317 simulation frames per second
+4561.68350417 simulation frames per second
+4379.12716143 simulation frames per second
+
+No Sorting with 4 threads:
+
+4331.46712565 simulation frames per second
+3502.09485744 simulation frames per second
+3673.36901707 simulation frames per second
+3721.12566095 simulation frames per second
+
+I have used the Morton ordering for this question. The sorting speeds up the process by a little, because by sorting, it makes sure balls that are near in the simulation space are also near in memory, and thus improving performance.
+
+###########################################################################
+Part 4: Locking
+###########################################################################
+
+
+Locking 4threads:
+
+2957.35354111 simulation frames per second
+2856.50669694 simulation frames per second
+2558.06469091 simulation frames per second
+2917.23828788 simulation frames per second
+2831.39139765 simulation frames per second
+2834.91668682 simulation frames per second
+
+No- Locking 4threads
+4055.17569278 simulation frames per second
+4539.71024317 simulation frames per second
+4561.68350417 simulation frames per second
+4379.12716143 simulation frames per second
+
+Different from other parts, we actually see that the fps has decreased, and this is because by adding locking, this introduces additional scheduling overhead.

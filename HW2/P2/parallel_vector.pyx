@@ -1,3 +1,10 @@
+###########################################################################
+#Jaemin Cheun
+#CS205, Fall 2015 Computing Foundations for Computer Science
+#Nov 4, 2015
+#parallel_vector.pyx
+###########################################################################
+
 # turn off bounds checking & wraparound for arrays
 #cython: boundscheck=False, wraparound=False
 
@@ -127,31 +134,33 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
    with nogil:
        for r in range(repeat):
           for idx in prange(src.shape[0], num_threads = 4):
-           #We find the idx of the locks, which is for every N adjacent elements of the coutns
+            #We find the indexx of locks, which is for every N adjacent elements of the counts
             src_idx = src[idx]/N
             dest_idx = dest[idx]/N
 
-           #Now we do what we have done in fine grained
-          if src_idx < dest_idx:
-            acquire(&locks[src_idx])
-            acquire(&locks[dest_idx])
-          elif src_idx > dest_idx:
-            acquire(&locks[dest_idx])
-            acquire(&locks[src_idx])
-          # This is when they are the same, so we only take one lock, to avoid double-locking
-          else:
-            acquire(&locks[src_idx])
-          if counts[src[idx]] > 0:
-            counts[dest[idx]] += 1
-            counts[src[idx]] -= 1
-          # We then release the locks in the same order
-          if src_idx < dest_idx:
-            release(&locks[src_idx])
-            release(&locks[dest_idx])
-          elif src_idx > dest_idx:
-            release(&locks[dest_idx])
-            release(&locks[src_idx])
-          else:
-            release(&locks[src_idx])
+            #Now we do what we have done in fine grained
+            if src_idx < dest_idx:
+              acquire(&locks[src_idx])
+              acquire(&locks[dest_idx])
+            elif src_idx > dest_idx:
+              acquire(&locks[dest_idx])
+              acquire(&locks[src_idx])
+            # This is when they are the same, so we only take one lock, to avoid double-locking
+            else:
+              acquire(&locks[src_idx])
+
+            if counts[src[idx]] > 0:
+              counts[dest[idx]] += 1
+              counts[src[idx]] -= 1
+
+            # We then release the locks in the same order
+            if src_idx < dest_idx:
+              release(&locks[src_idx])
+              release(&locks[dest_idx])
+            elif src_idx > dest_idx:
+              release(&locks[dest_idx])
+              release(&locks[src_idx])
+            else:
+              release(&locks[src_idx])
 
    free_N_locks(num_locks, locks)

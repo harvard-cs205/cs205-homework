@@ -1,0 +1,36 @@
+###########################################################################
+#Jaemin Cheun
+#CS205, Fall 2015 Computing Foundations for Computer Science
+#Nov 4, 2015
+#P2.txt
+###########################################################################
+
+###########################################################################
+Uncorrelated-transfer
+###########################################################################
+
+Serial uncorrelated: 0.282157897949 seconds
+Fine grained uncorrelated: 4.84894514084 seconds
+Medium grained uncorrelated for N = 1: 5.86156606674 seconds
+Medium grained uncorrelated for N = 2: 5.79189515114 seconds
+Medium grained uncorrelated for N = 5: 5.90538096428 seconds
+Medium grained uncorrelated for N = 10: 6.08388209343 seconds
+Medium grained uncorrelated for N = 25: 6.66369700432 seconds
+Medium grained uncorrelated for N = 50: 7.63068914413 seconds
+Medium grained uncorrelated for N = 100: 9.72434997559 seconds
+
+###########################################################################
+Correlated-transfer
+###########################################################################
+
+Serial correlated: 0.316359996796 seconds
+Fine grained correlated: 4.55330204964 seconds
+Medium grained correlated for N = 1: 5.25553297997 seconds
+Medium grained correlated for N = 2: 5.19568300247 seconds
+Medium grained correlated for N = 5: 4.99938511848 seconds
+Medium grained correlated for N = 10: 4.61326217651 seconds
+Medium grained correlated for N = 25: 4.13356089592 seconds
+Medium grained correlated for N = 50: 4.26863288879 seconds
+Medium grained correlated for N = 100: 4.63171720505 seconds
+
+We see that the serial is the fastest, and the fine grained, and the medium grained. This is because even though both fine grained and medium grained allow for higher concurrency, since the overhead of acquiring and releasing the locks are quite heavy, they are not efficient for small number of threads that we are using. Also, we see that the fine grained is faster than the medium grained for uncorrelated transfer, while for certain N medium grained is faster than the fine grained for correlated transfer. This is not suprising, because the correlated data has closer distance between the source and destination. Also, looking at the plot of time vs N for medium grained locking (medium_grained.png), we see that for the correlated transfers, the fastest is around N = 40, while for uncorrelated, it gets slower as N goes up, so N should be 1.
