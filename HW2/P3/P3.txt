@@ -7,12 +7,26 @@ Prange() with 2 threads:
 Prange() with 4 threads
 1074.677197 Million Complex FMAs in 3.70518898964 seconds, 290.046526643 million Complex FMAs / second
 
+Multi-threading using prange() nearly doubles performance between 1 thread and 2 threads.  The performance is not quite double due to overhead associated with multithreading.  Performance does not increase much from 2 to 4 threads (and in fact, in repeated simulations, sometimes 4 threads is slower) because my Virtual Machine only uses two CPUs, so it can't benefit from 4 threads.  
 
 
-Multi-threading, Inst-level parallelism 4 threads
+Prange() with 1 thread and Instruction-level parallelism
+1082.029344 Million Complex FMAs in 0.731175899506 seconds, 1479.84820716 million Complex FMAs / second
+
+Prange() with 2 threads and Instruction-level parallelism
+1082.029344 Million Complex FMAs in 0.404689073563 seconds, 2673.73006757 million Complex FMAs / second
+
+Prange() with 4 threads and Instruction-level parallelism
 1082.029344 Million Complex FMAs in 0.431492805481 seconds, 2507.64168082 million Complex FMAs / second
 
+Adding instruction-level parallelism increases performance by more than 8 times.  I expected performance to be nearly 8 times as fast because 8 times as many computations occur simultaneously, but I was surprised to see that it was a bit more than 8 times as fast.  I suspect that this is due to the fact that the Instruction-level parallelism implementation uses simple C-level mathematical operations, while the previous implementation uses numpy complex number operations, which may be slower.  
 
+Again, with Instruction-level parallelism there is a great performance increase from multithreading with 2 threads over 1 due to parallel computation, but no advantage from 4 threads because there aren't 4 CPUs to take advantage of them.  
+
+Strangely, the total number of FMAs is a bit off for my instruction-level parallelism implementation.  The image outputs are nearly indistinguishable, but there are some very minor structural differences in the blue (low iteration count) sections of the plot.  I haven't had time to dig deep enough to really determine what the cause of this discrepancy is, but I have a couple of hypotheses:
+1. Switching from Greater than 4 to Less than 4 to determine when to stop, I may be allowing points whose magnitude is equal to 4 iterate one more time.  
+2. Rounding differences between the np.complex operation and cython operations may cause differences.  
+With a bit more time, it would be interesting to get to the bottom of this, but I need to finish the assignment.  
 
 
 Acknowledgments: I received help on this problem from Kendrick Lo and Chuck Liu.  I also worked with Neil Chainani.  

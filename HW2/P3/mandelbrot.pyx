@@ -47,6 +47,8 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     assert in_coords.shape[0] == out_counts.shape[0], "Input and output arrays must be the same size"
     assert in_coords.shape[1] == out_counts.shape[1],  "Input and output arrays must be the same size"
 
+    """
+    # Part 1:
     # With Multithreading, but without instruction-level parallelism
     with nogil:
         for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=4):
@@ -59,6 +61,10 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                     z = z * z + c
                 out_counts[i, j] = iter
     """
+
+    # Part 2:
+    # With Multithreading and Instruction-Level Parallelism
+
     # Separate out the real and imaginary components of in_coords:
     inco_real = np.real(in_coords)
     inco_imag = np.imag(in_coords)
@@ -69,7 +75,6 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     avx2 = AVX.float_to_float8(2)
     avx4 = AVX.float_to_float8(4)
     
-    # With Instruction-level parallelism
     with nogil:
         for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=4): 
             # Break each row into blocks of 8
@@ -126,7 +131,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
 
                     # Add mask to the iteration counts to keep a count of iterations for each element.
                     itercounts = AVX.add(itercounts, mask)
-                    
+
                     # Update zreal and zimag, based on:
                     #    c = a + bj, z = e + fj
                     #    z*z = (e*e) + (2*e*f)*j + (f*f)*(j*j)
@@ -138,7 +143,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                     #    for zreal can still be used to update zimag, and update both components.  
                     zreal_inter = AVX.add(creal, AVX.sub(AVX.mul(zreal,zreal),AVX.mul(zimag,zimag)))
                     zimag = AVX.add(cimag, AVX.mul(avx2,AVX.mul(zreal,zimag)))
-                    zreal = zreal_inter"""
+                    zreal = zreal_inter
                        
 # An example using AVX instructions
 cpdef example_sqrt_8(np.float32_t[:] values):
