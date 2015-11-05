@@ -20,10 +20,44 @@ def py_median_3x3(image, iterations=10, num_threads=1):
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
 
-    for i in range(iterations):
-        filtering.median_3x3(tmpA, tmpB, 0, 1)
-        # swap direction of filtering
-        tmpA, tmpB = tmpB, tmpA
+    #we will create an event for each iteration in each thread
+    #for each iteration, we will launch a thread
+    #   we will pass that thread the two images, as well as the list of events
+    events = [[threading.Event() for i in range(iterations)] for j in range(num_threads)]    
+
+    #to compute iteration i for thread n, threads n, n-1, and n+1 must have completed 
+    #   iteration i-1    
+    def run_thread(thread):
+        for i in range(iterations):
+            #wait for thread n on iteration i-1
+            events[thread][i-1].wait()
+
+            #wait for thread n-1 on i-1
+            if thread > 0:
+                events[thread-1][i-1].wait()
+
+            #wait for thread n_1 on i-1
+            if thread < (num_threads-1):
+                events[thread+1][i-1].wait()
+
+            #filter
+            filtering.median_3x3(tmpA, tmpB, thread, num_threads)
+
+            #swap
+            tmpA, tmpB = tmpB, tmpA
+
+            #unpause our current thread
+            events[thread][i].set()
+
+    
+    threads = [threading.Thread(target=run_thread, args=(i)) for i in range(num_threads)]
+    
+    for i in threads:
+        i.start()
+
+    for i in threads:
+        i.join()
+
 
     return tmpA
 

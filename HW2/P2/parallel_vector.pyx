@@ -15,7 +15,6 @@ from libc.stdlib cimport malloc, free
 import numpy as np
 cimport numpy as np
 
-
 # lock helper functions
 cdef void acquire(omp_lock_t *l) nogil:
     omp_set_lock(l)
@@ -73,6 +72,7 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
    cdef:
        int idx, r
        omp_lock_t *locks = get_N_locks(counts.shape[0])
+       int src_index_value, dest_index_value, order
 
    ##########
    # Your code here
@@ -80,11 +80,44 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
    # data movement.  Be sure to avoid deadlock, and double-locking.
    ##########
    with nogil:
-       for r in range(repeat):
+       for r in prange(repeat, num_threads=4):
            for idx in range(src.shape[0]):
+               src_index_value = src[idx]
+               dest_index_value = dest[idx]
+
+               #to determine the order, we will subtract the values at the two indices
+               #if positive, then we know src_index_value is larger
+               #if 0, we know they have the same value
+               order = src_index_value - dest_index_value
+
+               #we need to lock both counts[dest_index_value] and counts[src_index_value]
+               
+               #to avoid double locking, we will check when they have the same value, and 
+               #only acquire one lock
+               if order == 0:
+                   acquire(&locks[src_index_value])
+               elif order < 0:
+                   acquire(&locks[src_index_value])
+                   acquire(&locks[dest_index_value])
+               else:
+                   acquire(&locks[dest_index_value])
+                   acquire(&locks[src_index_value])                   
+
                if counts[src[idx]] > 0:
                    counts[dest[idx]] += 1
                    counts[src[idx]] -= 1
+
+               #to avoid deadlocking, we will acquire and release the threads in 
+               #opposite order
+               if order == 0:
+                   release(&locks[src_index_value])
+               elif order < 0:
+                   release(&locks[dest_index_value])
+                   release(&locks[src_index_value])
+               else:
+                   release(&locks[src_index_value])
+                   release(&locks[dest_index_value])
+                   
 
    free_N_locks(counts.shape[0], locks)
 
@@ -98,6 +131,7 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
        int idx, r
        int num_locks = (counts.shape[0] + N - 1) / N  # ensure enough locks
        omp_lock_t *locks = get_N_locks(num_locks)
+       int src_index_value, dest_index_value, order
 
    ##########
    # Your code here
@@ -106,10 +140,42 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
    # double-locking.
    ##########
    with nogil:
-       for r in range(repeat):
+       for r in prange(repeat, num_threads=4):
            for idx in range(src.shape[0]):
+               src_index_value = src[idx] / N
+               dest_index_value = dest[idx] / N
+
+               #to determine the order, we will subtract the values at the two indices
+               #if positive, then we know src_index_value is larger
+               #if 0, we know they have the same value
+               order = src_index_value - dest_index_value
+
+               #we need to lock both counts[dest_index_value] and counts[src_index_value]
+               
+               #to avoid double locking, we will check when they have the same value, and 
+               #only acquire one lock
+               if order == 0:
+                   acquire(&locks[src_index_value])
+               elif order < 0:
+                   acquire(&locks[src_index_value])
+                   acquire(&locks[dest_index_value])
+               else:
+                   acquire(&locks[dest_index_value])
+                   acquire(&locks[src_index_value])                   
+
                if counts[src[idx]] > 0:
                    counts[dest[idx]] += 1
                    counts[src[idx]] -= 1
+
+               #to avoid deadlocking, we will acquire and release the threads in 
+               #opposite order
+               if order == 0:
+                   release(&locks[src_index_value])
+               elif order < 0:
+                   release(&locks[dest_index_value])
+                   release(&locks[src_index_value])
+               else:
+                   release(&locks[src_index_value])
+                   release(&locks[dest_index_value])
 
    free_N_locks(num_locks, locks)

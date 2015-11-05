@@ -27,8 +27,8 @@ cdef extern from "AVX.h" nogil:
     #     When comparing to vectors of float, the result is either 0.0 or -1.0,
     #     in each of the 8 locations.  Note that -1.0 is all 1s in its
     #     repesentation.  This can be useful with bitwise_and(), below.
-    float8 less_than(float8 a, float8 b)     # (a < b) -> 0.0 or -1.0
-    float8 greater_than(float8 a, float8 b)  # (a > b) -> 0.0 or -1.0
+    float8 less_than(float8 a, float8 b)     # (a < b) ->  -1.0 or 0.0 {this is backwards in the original...}
+    float8 greater_than(float8 a, float8 b)  # (a > b) -> -1.0 or 0.0 
 
     # Bitwise AND:
     #     Note that 0.0 = all zeros,

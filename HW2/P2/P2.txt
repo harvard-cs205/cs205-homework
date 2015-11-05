@@ -1,0 +1,72 @@
+Across all trials, the serial algorithms performed best. We would expect the parallel algorithms to perform better if the benefit of parallelism is greater than the overhead cost of parallelism; because we are only using a small number (4) threads, it looks like we aren't getting enough benefit of parallelism to offset the overhead of transferring and allocating data between threads (the overhead of locks).
+
+For uncorrelated data, the fine grained locks performed better than the medium grained locks. However, for correlated data, the medium grain locks slightly outperformed the fine grained locks.
+
+In the uncorrelated case, the medium grained lock performed best with smaller numbers of locks, and the computation time increased as we added more locks. In the correlated case, the performance seemed to peak at a medium number of locks (50). Performance increased as the number of locks increased in the correlated case, but only slightly. 
+
+We should choose a number of locks between 10 and 20 to work well on all data; if we know our data is correlated, we can increase the number of locks, and if we know our data is uncorrelated, we should tend towards fewer locks.
+
+------------------------------------------------------------
+Supporting Data:
+------------------------------------------------------------
+
+Serial uncorrelated: 0.27280497551 seconds
+Serial uncorrelated: 0.300185918808 seconds
+Serial uncorrelated: 0.290886163712 seconds
+Serial uncorrelated: 0.30387711525 seconds
+Serial uncorrelated: 0.332878828049 seconds
+Average 0.300126600266 seconds
+
+
+Fine grained uncorrelated: 6.25135612488 seconds
+Fine grained uncorrelated: 5.57039093971 seconds
+Fine grained uncorrelated: 5.6118118763 seconds
+Fine grained uncorrelated: 5.74651813507 seconds
+Fine grained uncorrelated: 5.6405620575 seconds
+Average 5.76412782669 seconds
+
+
+Medium grained uncorrelated: 6.77243900299 seconds
+Medium grained uncorrelated: 6.83095598221 seconds
+Medium grained uncorrelated: 6.60002708435 seconds
+Medium grained uncorrelated: 6.54380106926 seconds
+Medium grained uncorrelated: 6.61533308029 seconds
+Average 6.67251124382 seconds
+
+Medium grained uncorrelated with 1 locks: 6.21116304398 seconds
+Medium grained uncorrelated with 5 locks: 8.80532503128 seconds
+Medium grained uncorrelated with 10 locks: 8.0706679821 seconds
+Medium grained uncorrelated with 20 locks: 8.30963015556 seconds
+Medium grained uncorrelated with 50 locks: 8.39335584641 seconds
+Medium grained uncorrelated with 100 locks: 11.3088231087 seconds
+
+
+Serial correlated: 0.379273891449 seconds
+Serial correlated: 0.295469045639 seconds
+Serial correlated: 0.306652069092 seconds
+Serial correlated: 0.289671897888 seconds
+Serial correlated: 0.298756837845 seconds
+Average 0.313964748383 seconds
+
+
+Fine grained correlated: 5.63955903053 seconds
+Fine grained correlated: 5.71392917633 seconds
+Fine grained correlated: 5.73863601685 seconds
+Fine grained correlated: 5.71527504921 seconds
+Fine grained correlated: 5.66401600838 seconds
+Average 5.69428305626 seconds
+
+
+Medium grained correlated: 5.85852003098 seconds
+Medium grained correlated: 5.63161611557 seconds
+Medium grained correlated: 5.34706401825 seconds
+Medium grained correlated: 5.29835009575 seconds
+Medium grained correlated: 5.27781796455 seconds
+Average 5.48267364502 seconds
+
+Medium grained correlated with 1 locks: 5.983700037 seconds
+Medium grained correlated with 5 locks: 5.75266289711 seconds
+Medium grained correlated with 10 locks: 5.62231016159 seconds
+Medium grained correlated with 20 locks: 4.90165805817 seconds
+Medium grained correlated with 50 locks: 4.47169399261 seconds
+Medium grained correlated with 100 locks: 4.79022717476 seconds

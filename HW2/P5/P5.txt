@@ -1,0 +1,29 @@
+Multithreading
+1 thread Average: 13.3 simulation frames per second
+4 thread Average: 15.3 simulation frames per second
+
+At this point, there is a slight difference between the threads, with higher performance from the 4 thread example. Addind multithreading makes the simulation visibly faster. However, because of the communication overhead, we don't see anywhere close to a 4x increase in speed.
+
+Spatial Decomposition
+1 thread Average: 2162.3 simulation frames per second
+4 thread Average: 2292.8 simulation frames per second
+
+Here, the 4 thread is still faster than the 1 thread, but the increase in speed is mainly from the spatial decomposition, which was an over 100x speedup. 
+
+
+Spatially Coherent Sorting
+1 thread Average: 2485.8 simulation frames per second
+4 thread Average: 2780.7 simulation frames per second
+
+Spacially coherent sorting is a slight increase over spatial decomposition, with the differences remaining steady between the 1 and 4 thread cases. This is the peak performance observed in the simulation
+
+Locking
+1 thread Average: 1294.6 simulation frames per second
+4 thread Average: 1664.5 simulation frames per second
+
+Locking decreases the performance, which we would expect due to the added overhead. It had a fairly large impact (a reduction of 50% in one case), which was larger than the gain from multithreading.
+
+
+I used the Z-order curve (from https://en.wikipedia.org/wiki/Z-order_curve) to implement spatially coherent sorting. The Z-order curve works by translating points that are physically or spatially similar to one another such that they are still spatially similar to each other. The Z-order curve goes from a single integer to a (x,y) tuple such that similar input integers are likely to be mapped to spatially similar points in the output. This helps to place integers with similar locations for computation (when we sort), increasing memory efficiency by increasing data locality for each computation. 
+
+
