@@ -21,7 +21,7 @@ if __name__ == '__main__':
     dest = np.random.randint(1000, size=1000000).astype(np.int32)
 
     total = orig_counts.sum()
-    """
+    
     # serial move
     counts = orig_counts.copy()
     with Timer() as t:
@@ -81,6 +81,9 @@ if __name__ == '__main__':
         move_data_medium_grained(counts, src, dest, 100, N)
     assert counts.sum() == total, "Wrong total after move_data_medium_grained"
     print("Medium grained correlated: {} seconds".format(t.interval))
+    
+
+    # I use the following code to generate the plot from my experimentation:
     """
     uncor_times = []
     cor_times = []
@@ -134,3 +137,4 @@ if __name__ == '__main__':
     plt.title("Comparison of Medium-grained Runtimes with varying N")
     plt.legend(loc='best')
     plt.show() 
+    """
