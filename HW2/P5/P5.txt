@@ -41,7 +41,7 @@ the explanation of Hilbert ordering, perhaps it would have been just marginally
 more performant to choose that over Morton, especially with a smaller grid.
 
 
-SUBPROBLEM 3, Locking
+SUBPROBLEM 4, Locking
 
 1 thread:
 1231.03434810 simulation frames per second
