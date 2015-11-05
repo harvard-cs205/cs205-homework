@@ -1,0 +1,753 @@
+describe exp w/ three scales of locking
+-experiment: range of values for N in medium-grained, src and dest 10 spots away
+
+-characterize performance
+
+-include suggestion for N in medium grained (uncorrelated and correlated)
+and justification
+
+
+ANSWER
+
+PERFORMANCE
+TODO: add graph of performance
+
+
+samples of data:
+
+Run1:
+Serial uncorrelated: 0.63267493248 seconds
+Fine grained uncorrelated: 5.86188697815 seconds
+Medium grained uncorrelated: 12.078881979 seconds
+Serial correlated: 0.666460037231 seconds
+Fine grained correlated: 5.14231395721 seconds
+Medium grained correlated: 8.34719395638 seconds
+
+Run2:
+Serial uncorrelated: 0.572909116745 seconds
+Fine grained uncorrelated: 5.40919995308 seconds
+Medium grained uncorrelated: 11.2922091484 seconds
+Serial correlated: 0.554610967636 seconds
+Fine grained correlated: 4.9838578701 seconds
+Medium grained correlated: 7.9275188446 seconds
+
+Run3:
+Serial uncorrelated: 0.594835042953 seconds
+Fine grained uncorrelated: 5.40071797371 seconds
+Medium grained uncorrelated: 10.8798799515 seconds
+Serial correlated: 0.536921977997 seconds
+Fine grained correlated: 4.59749984741 seconds
+Medium grained correlated: 7.8267929554 seconds
+
+
+in medium-grained, correlated showed better performance:
+    -in correlated the src and dest are guaranteed the same lock group
+    if N >= 21
+    -in uncorrelated there is higher chance of src and dest
+    being in different lock group
+
+
+in fine-grained, correlated performance was pretty much the same:
+    -it may be slightly faster because data was closer (maybe search
+    is faster when data closer together)
+    -but for bother correlated and uncorrelated locking rules stayed the
+    same
+
+overall performance speed = serial < fine < medium:
+    -seems like the more attempts to acquire same lock, the slower it
+    is because one thread is held up waiting for another
+    -locking and releasing also has some overhead
+
+
+
+CHOOSING N IN MEDIUM-GRAINED
+so by the ideas i came up with
+less lock waiting -> faster
+less num of locks -> faster b/c less overhead
+
+therefore we want least amount of locks without having so few that a
+thread has to wait for lock to be released in other thread to continue
+
+for uncorrelated:
+src and dest can be anywhere so may be in different locks or same lock
+no matter which N you choose, but if you have a smaller N it's less
+likely to be in same lock.
+
+for correlated:
+when N >= 21 src and dest in same lock since correlation is src +-10
+this would guarantee one lock needed per thread.
+
+when N=21,
+sample data:
+
+Run1
+Serial uncorrelated: 0.495096921921 seconds
+Fine grained uncorrelated: 5.19752812386 seconds
+Medium grained uncorrelated: 12.1397929192 seconds
+Serial correlated: 0.54518198967 seconds
+Fine grained correlated: 4.46990704536 seconds
+Medium grained correlated: 6.71138596535 seconds
+
+Run2:
+Serial uncorrelated: 0.578189134598 seconds
+Fine grained uncorrelated: 5.30256295204 seconds
+Medium grained uncorrelated: 12.3318359852 seconds
+Serial correlated: 0.533940076828 seconds
+Fine grained correlated: 4.51758003235 seconds
+Medium grained correlated: 6.81825995445 seconds
+
+Run3:
+Serial uncorrelated: 0.557399988174 seconds
+Fine grained uncorrelated: 5.31959199905 seconds
+Medium grained uncorrelated: 12.1915040016 seconds
+Serial correlated: 0.545933008194 seconds
+Fine grained correlated: 4.87272000313 seconds
+Medium grained correlated: 6.8557510376 seconds
+
+Correlated is faster now
+
+
+N = 50
+Serial uncorrelated: 0.571470975876 seconds
+Fine grained uncorrelated: 5.31827616692 seconds
+Medium grained uncorrelated: 14.4297509193 seconds
+Serial correlated: 0.525933980942 seconds
+Fine grained correlated: 4.53586888313 seconds
+Medium grained correlated: 6.96555113792 seconds
+
+N= 1
+Run1:
+Serial uncorrelated: 0.574059963226 seconds
+Fine grained uncorrelated: 5.42960786819 seconds
+Medium grained uncorrelated: 6.93480587006 seconds
+Serial correlated: 0.529704093933 seconds
+Fine grained correlated: 4.58297514915 seconds
+Medium grained correlated: 6.26398801804 seconds
+
+Run2:
+Serial uncorrelated: 0.614562034607 seconds
+Fine grained uncorrelated: 5.33335804939 seconds
+Medium grained uncorrelated: 7.38300895691 seconds
+Serial correlated: 0.570374011993 seconds
+Fine grained correlated: 4.47280812263 seconds
+Medium grained correlated: 6.1543340683 seconds
+
+
+N=10000
+Serial uncorrelated: 0.564152002335 seconds
+Fine grained uncorrelated: 5.59270501137 seconds
+Medium grained uncorrelated: 16.5022370815 seconds
+Serial correlated: 0.547715902328 seconds
+Fine grained correlated: 4.69270205498 seconds
+Medium grained correlated: 16.2946801186 seconds
+
+N=5
+Serial uncorrelated: 0.578032016754 seconds
+Fine grained uncorrelated: 5.25576591492 seconds
+Medium grained uncorrelated: 9.04551911354 seconds
+Serial correlated: 0.527982950211 seconds
+Fine grained correlated: 4.57901382446 seconds
+Medium grained correlated: 7.80710911751 seconds
+
+N=10
+Serial uncorrelated: 0.593980073929 seconds
+Fine grained uncorrelated: 5.33857297897 seconds
+Medium grained uncorrelated: 11.0466620922 seconds
+Serial correlated: 0.558753967285 seconds
+Fine grained correlated: 4.46717882156 seconds
+Medium grained correlated: 7.511521101 seconds
+
+
+The best performance overall is N=1
+
+
+
+
+
+
+Medium grained uncorrelated: 13.0592668056 seconds
+Medium grained correlated: 6.16909098625 seconds_1
+Medium grained correlated: 7.3214700222 seconds_3
+Medium grained correlated: 7.62801003456 seconds_5
+Medium grained correlated: 7.87723898888 seconds_7
+Medium grained correlated: 7.53887796402 seconds_9
+Medium grained correlated: 7.27347493172 seconds_11
+Medium grained correlated: 7.03590202332 seconds_13
+Medium grained correlated: 6.84868788719 seconds_15
+Medium grained correlated: 6.88710594177 seconds_17
+Medium grained correlated: 6.84723114967 seconds_19
+Medium grained correlated: 6.67931199074 seconds_21
+Medium grained correlated: 6.7645380497 seconds_23
+
+
+Medium grained uncorrelated: 12.8339300156 seconds
+Medium grained correlated: 5.98209786415 seconds_1
+Medium grained correlated: 6.95066308975 seconds_2
+Medium grained correlated: 7.25230908394 seconds_3
+Medium grained correlated: 7.53110289574 seconds_4
+Medium grained correlated: 7.60968208313 seconds_5
+Medium grained correlated: 7.89593505859 seconds_6
+Medium grained correlated: 7.69991517067 seconds_7
+Medium grained correlated: 7.88063788414 seconds_8
+Medium grained correlated: 7.6313149929 seconds_9
+Medium grained correlated: 7.49111890793 seconds_10
+Medium grained correlated: 7.20187997818 seconds_11
+Medium grained correlated: 7.14912891388 seconds_12
+Medium grained correlated: 7.06836414337 seconds_13
+Medium grained correlated: 6.95783019066 seconds_14
+Medium grained correlated: 6.97893619537 seconds_15
+Medium grained correlated: 6.91350007057 seconds_16
+Medium grained correlated: 6.5449078083 seconds_17
+Medium grained correlated: 6.78391098976 seconds_18
+Medium grained correlated: 6.65079498291 seconds_19
+Medium grained correlated: 6.67909598351 seconds_20
+Medium grained correlated: 6.66133904457 seconds_21
+Medium grained correlated: 6.76141095161 seconds_22
+Medium grained correlated: 6.60678982735 seconds_23
+Medium grained correlated: 6.81236720085 seconds_24
+Medium grained correlated: 6.66691088676 seconds_25
+Medium grained correlated: 6.63086891174 seconds_26
+Medium grained correlated: 6.86263298988 seconds_27
+Medium grained correlated: 6.52208399773 seconds_28
+Medium grained correlated: 6.59152007103 seconds_29
+Medium grained correlated: 6.66714000702 seconds_30
+Medium grained correlated: 6.65268301964 seconds_31
+Medium grained correlated: 6.7346060276 seconds_32
+Medium grained correlated: 6.56151008606 seconds_33
+Medium grained correlated: 6.78552603722 seconds_34
+Medium grained correlated: 6.63560199738 seconds_35
+Medium grained correlated: 6.76610803604 seconds_36
+Medium grained correlated: 6.71033096313 seconds_37
+Medium grained correlated: 6.93494701385 seconds_38
+Medium grained correlated: 6.67947506905 seconds_39
+Medium grained correlated: 6.81738495827 seconds_40
+Medium grained correlated: 6.77902889252 seconds_41
+Medium grained correlated: 7.09779000282 seconds_42
+Medium grained correlated: 10.2962629795 seconds_43
+Medium grained correlated: 7.31396198273 seconds_44
+Medium grained correlated: 7.13097906113 seconds_45
+Medium grained correlated: 6.99548792839 seconds_46
+Medium grained correlated: 7.03861808777 seconds_47
+Medium grained correlated: 7.152146101 seconds_48
+Medium grained correlated: 7.10551905632 seconds_49
+
+
+
+Medium grained uncorrelated: 12.6015410423 seconds
+Medium grained correlated: 6.11002993584 seconds_1
+Medium grained correlated: 7.32908701897 seconds_11
+Medium grained correlated: 6.71409201622 seconds_21
+Medium grained correlated: 6.80351090431 seconds_31
+Medium grained correlated: 6.54496598244 seconds_41
+Medium grained correlated: 6.89922118187 seconds_51
+Medium grained correlated: 6.71039819717 seconds_61
+Medium grained correlated: 6.3116838932 seconds_71
+Medium grained correlated: 6.75296807289 seconds_81
+Medium grained correlated: 6.72725510597 seconds_91
+Medium grained correlated: 7.22480607033 seconds_101
+Medium grained correlated: 7.41696310043 seconds_111
+Medium grained correlated: 6.560079813 seconds_121
+Medium grained correlated: 8.16842103004 seconds_131
+Medium grained correlated: 6.96734404564 seconds_141
+Medium grained correlated: 8.19438505173 seconds_151
+Medium grained correlated: 8.31331300735 seconds_161
+Medium grained correlated: 8.37575387955 seconds_171
+Medium grained correlated: 8.35150694847 seconds_181
+Medium grained correlated: 8.46303701401 seconds_191
+Medium grained correlated: 8.51994419098 seconds_201
+Medium grained correlated: 8.61496901512 seconds_211
+Medium grained correlated: 8.52122497559 seconds_221
+Medium grained correlated: 8.74684619904 seconds_231
+Medium grained correlated: 8.63479185104 seconds_241
+Medium grained correlated: 8.74320793152 seconds_251
+Medium grained correlated: 8.78062105179 seconds_261
+Medium grained correlated: 9.202709198 seconds_271
+Medium grained correlated: 9.06196498871 seconds_281
+Medium grained correlated: 8.8605389595 seconds_291
+Medium grained correlated: 9.26243495941 seconds_301
+Medium grained correlated: 9.08533191681 seconds_311
+Medium grained correlated: 9.29194998741 seconds_321
+Medium grained correlated: 9.36963820457 seconds_331
+Medium grained correlated: 9.35579395294 seconds_341
+Medium grained correlated: 9.4577460289 seconds_351
+Medium grained correlated: 9.44469881058 seconds_361
+Medium grained correlated: 9.58693504333 seconds_371
+Medium grained correlated: 9.68048000336 seconds_381
+Medium grained correlated: 9.59245586395 seconds_391
+Medium grained correlated: 9.6797978878 seconds_401
+Medium grained correlated: 10.0390341282 seconds_411
+Medium grained correlated: 10.0261249542 seconds_421
+Medium grained correlated: 10.187484026 seconds_431
+Medium grained correlated: 10.3800570965 seconds_441
+Medium grained correlated: 10.2409300804 seconds_451
+Medium grained correlated: 10.389824152 seconds_461
+Medium grained correlated: 10.7476210594 seconds_471
+Medium grained correlated: 10.6660428047 seconds_481
+Medium grained correlated: 10.783105135 seconds_491
+Medium grained correlated: 11.0669100285 seconds_501
+Medium grained correlated: 10.8545670509 seconds_511
+Medium grained correlated: 10.8785331249 seconds_521
+Medium grained correlated: 11.097055912 seconds_531
+Medium grained correlated: 10.9500229359 seconds_541
+Medium grained correlated: 11.0182700157 seconds_551
+Medium grained correlated: 11.2403810024 seconds_561
+Medium grained correlated: 11.4299790859 seconds_571
+Medium grained correlated: 11.4122328758 seconds_581
+Medium grained correlated: 11.4687969685 seconds_591
+Medium grained correlated: 11.3655281067 seconds_601
+Medium grained correlated: 11.5433290005 seconds_611
+Medium grained correlated: 11.6856861115 seconds_621
+Medium grained correlated: 11.7034771442 seconds_631
+Medium grained correlated: 11.8007588387 seconds_641
+Medium grained correlated: 12.1256260872 seconds_651
+Medium grained correlated: 11.95002985 seconds_661
+Medium grained correlated: 12.0195531845 seconds_671
+Medium grained correlated: 12.4086489677 seconds_681
+Medium grained correlated: 12.370568037 seconds_691
+Medium grained correlated: 12.267070055 seconds_701
+Medium grained correlated: 12.6794080734 seconds_711
+Medium grained correlated: 12.69231987 seconds_721
+Medium grained correlated: 12.441729784 seconds_731
+Medium grained correlated: 13.1076929569 seconds_741
+Medium grained correlated: 12.9208948612 seconds_751
+Medium grained correlated: 13.1220440865 seconds_761
+Medium grained correlated: 13.2596859932 seconds_771
+Medium grained correlated: 13.4049050808 seconds_781
+Medium grained correlated: 13.6104619503 seconds_791
+Medium grained correlated: 13.8227829933 seconds_801
+Medium grained correlated: 13.5743288994 seconds_811
+Medium grained correlated: 13.5006999969 seconds_821
+Medium grained correlated: 14.0751791 seconds_831
+Medium grained correlated: 13.8066339493 seconds_841
+Medium grained correlated: 13.8978040218 seconds_851
+Medium grained correlated: 14.379016161 seconds_861
+Medium grained correlated: 14.1208970547 seconds_871
+Medium grained correlated: 14.3140048981 seconds_881
+Medium grained correlated: 14.5812580585 seconds_891
+Medium grained correlated: 14.8401939869 seconds_901
+Medium grained correlated: 14.7857069969 seconds_911
+Medium grained correlated: 15.3143138885 seconds_921
+Medium grained correlated: 14.7759459019 seconds_931
+Medium grained correlated: 14.895660162 seconds_941
+Medium grained correlated: 15.4044749737 seconds_951
+Medium grained correlated: 15.3885819912 seconds_961
+Medium grained correlated: 15.7353827953 seconds_971
+Medium grained correlated: 15.9433047771 seconds_981
+Medium grained correlated: 15.711149931 seconds_991
+Medium grained correlated: 15.7690238953 seconds_1001
+Medium grained correlated: 16.3470489979 seconds_1011
+Medium grained correlated: 15.7054200172 seconds_1021
+Medium grained correlated: 15.7267661095 seconds_1031
+Medium grained correlated: 15.9195730686 seconds_1041
+Medium grained correlated: 15.4675900936 seconds_1051
+Medium grained correlated: 15.9213979244 seconds_1061
+Medium grained correlated: 15.9160580635 seconds_1071
+Medium grained correlated: 15.7015070915 seconds_1081
+Medium grained correlated: 15.7160480022 seconds_1091
+Medium grained correlated: 15.9381508827 seconds_1101
+Medium grained correlated: 15.6365439892 seconds_1111
+Medium grained correlated: 15.8088450432 seconds_1121
+Medium grained correlated: 15.9519600868 seconds_1131
+Medium grained correlated: 15.9491798878 seconds_1141
+Medium grained correlated: 15.7049639225 seconds_1151
+Medium grained correlated: 16.017524004 seconds_1161
+Medium grained correlated: 15.4062609673 seconds_1171
+Medium grained correlated: 15.8567228317 seconds_1181
+Medium grained correlated: 16.0426559448 seconds_1191
+Medium grained correlated: 15.4506208897 seconds_1201
+Medium grained correlated: 15.3599209785 seconds_1211
+Medium grained correlated: 15.8315770626 seconds_1221
+Medium grained correlated: 15.5759079456 seconds_1231
+Medium grained correlated: 15.6021239758 seconds_1241
+Medium grained correlated: 15.8183569908 seconds_1251
+Medium grained correlated: 15.574534893 seconds_1261
+Medium grained correlated: 15.3074290752 seconds_1271
+Medium grained correlated: 15.8016550541 seconds_1281
+Medium grained correlated: 15.9122109413 seconds_1291
+Medium grained correlated: 15.7073788643 seconds_1301
+Medium grained correlated: 16.1944200993 seconds_1311
+Medium grained correlated: 15.7126271725 seconds_1321
+Medium grained correlated: 15.5149240494 seconds_1331
+Medium grained correlated: 15.5692720413 seconds_1341
+Medium grained correlated: 15.489043951 seconds_1351
+Medium grained correlated: 15.4652080536 seconds_1361
+Medium grained correlated: 15.8008339405 seconds_1371
+Medium grained correlated: 15.6136310101 seconds_1381
+Medium grained correlated: 15.5585989952 seconds_1391
+Medium grained correlated: 15.6946940422 seconds_1401
+Medium grained correlated: 15.6561009884 seconds_1411
+Medium grained correlated: 15.69018507 seconds_1421
+Medium grained correlated: 16.3148519993 seconds_1431
+Medium grained correlated: 15.5136380196 seconds_1441
+Medium grained correlated: 15.8310360909 seconds_1451
+Medium grained correlated: 15.9801352024 seconds_1461
+Medium grained correlated: 15.6332218647 seconds_1471
+Medium grained correlated: 15.8863039017 seconds_1481
+Medium grained correlated: 15.6519370079 seconds_1491
+Medium grained correlated: 15.8936889172 seconds_1501
+Medium grained correlated: 15.6625769138 seconds_1511
+Medium grained correlated: 16.0710070133 seconds_1521
+Medium grained correlated: 15.3892719746 seconds_1531
+Medium grained correlated: 15.6312220097 seconds_1541
+Medium grained correlated: 16.1133379936 seconds_1551
+Medium grained correlated: 15.6094088554 seconds_1561
+Medium grained correlated: 15.8803730011 seconds_1571
+Medium grained correlated: 15.9119639397 seconds_1581
+Medium grained correlated: 15.5319669247 seconds_1591
+Medium grained correlated: 15.6334719658 seconds_1601
+Medium grained correlated: 15.6881318092 seconds_1611
+Medium grained correlated: 15.9048640728 seconds_1621
+Medium grained correlated: 15.7479889393 seconds_1631
+Medium grained correlated: 15.7863810062 seconds_1641
+Medium grained correlated: 15.6422970295 seconds_1651
+Medium grained correlated: 15.618129015 seconds_1661
+Medium grained correlated: 16.0411839485 seconds_1671
+Medium grained correlated: 15.8697059155 seconds_1681
+Medium grained correlated: 15.534607172 seconds_1691
+Medium grained correlated: 15.9135191441 seconds_1701
+Medium grained correlated: 15.7583749294 seconds_1711
+Medium grained correlated: 15.663269043 seconds_1721
+Medium grained correlated: 16.177421093 seconds_1731
+Medium grained correlated: 15.5990161896 seconds_1741
+Medium grained correlated: 15.6825721264 seconds_1751
+Medium grained correlated: 15.7350130081 seconds_1761
+Medium grained correlated: 15.5601329803 seconds_1771
+Medium grained correlated: 15.6785569191 seconds_1781
+Medium grained correlated: 16.0458180904 seconds_1791
+Medium grained correlated: 15.7232921124 seconds_1801
+Medium grained correlated: 15.9990849495 seconds_1811
+Medium grained correlated: 16.1491410732 seconds_1821
+Medium grained correlated: 15.8963980675 seconds_1831
+Medium grained correlated: 15.8685569763 seconds_1841
+Medium grained correlated: 16.0471727848 seconds_1851
+Medium grained correlated: 15.7154490948 seconds_1861
+Medium grained correlated: 15.8272340298 seconds_1871
+Medium grained correlated: 15.8339340687 seconds_1881
+Medium grained correlated: 15.9160990715 seconds_1891
+Medium grained correlated: 15.8597929478 seconds_1901
+Medium grained correlated: 15.9262030125 seconds_1911
+Medium grained correlated: 15.357790947 seconds_1921
+Medium grained correlated: 15.6817939281 seconds_1931
+Medium grained correlated: 15.5318791866 seconds_1941
+Medium grained correlated: 15.5413548946 seconds_1951
+Medium grained correlated: 15.4254300594 seconds_1961
+Medium grained correlated: 15.643351078 seconds_1971
+Medium grained correlated: 15.5448009968 seconds_1981
+Medium grained correlated: 15.4163489342 seconds_1991
+Medium grained correlated: 16.185447216 seconds_2001
+Medium grained correlated: 15.4744939804 seconds_2011
+Medium grained correlated: 15.7183220387 seconds_2021
+Medium grained correlated: 15.6571750641 seconds_2031
+Medium grained correlated: 15.6445069313 seconds_2041
+Medium grained correlated: 15.7374579906 seconds_2051
+Medium grained correlated: 15.9354279041 seconds_2061
+Medium grained correlated: 15.4463629723 seconds_2071
+Medium grained correlated: 15.4141149521 seconds_2081
+Medium grained correlated: 16.1355068684 seconds_2091
+Medium grained correlated: 15.6741480827 seconds_2101
+Medium grained correlated: 15.687035799 seconds_2111
+Medium grained correlated: 15.680049181 seconds_2121
+Medium grained correlated: 15.8539149761 seconds_2131
+Medium grained correlated: 15.9694468975 seconds_2141
+Medium grained correlated: 15.5720891953 seconds_2151
+Medium grained correlated: 15.7445850372 seconds_2161
+Medium grained correlated: 15.6975619793 seconds_2171
+Medium grained correlated: 16.1466431618 seconds_2181
+Medium grained correlated: 15.5925850868 seconds_2191
+Medium grained correlated: 15.7167410851 seconds_2201
+Medium grained correlated: 15.9396150112 seconds_2211
+Medium grained correlated: 15.7105731964 seconds_2221
+Medium grained correlated: 16.0275061131 seconds_2231
+Medium grained correlated: 16.1124038696 seconds_2241
+Medium grained correlated: 15.433232069 seconds_2251
+Medium grained correlated: 15.5911650658 seconds_2261
+Medium grained correlated: 15.5663990974 seconds_2271
+Medium grained correlated: 15.7485990524 seconds_2281
+Medium grained correlated: 15.4341158867 seconds_2291
+Medium grained correlated: 15.7082118988 seconds_2301
+Medium grained correlated: 15.5393428802 seconds_2311
+Medium grained correlated: 15.5397040844 seconds_2321
+Medium grained correlated: 15.9154551029 seconds_2331
+Medium grained correlated: 15.6015582085 seconds_2341
+Medium grained correlated: 15.6227240562 seconds_2351
+Medium grained correlated: 16.0390648842 seconds_2361
+Medium grained correlated: 15.7478659153 seconds_2371
+Medium grained correlated: 15.9151380062 seconds_2381
+Medium grained correlated: 16.0112349987 seconds_2391
+Medium grained correlated: 15.6966569424 seconds_2401
+Medium grained correlated: 15.6612319946 seconds_2411
+Medium grained correlated: 16.2415130138 seconds_2421
+Medium grained correlated: 15.836026907 seconds_2431
+Medium grained correlated: 15.8670330048 seconds_2441
+Medium grained correlated: 16.1132860184 seconds_2451
+Medium grained correlated: 15.888600111 seconds_2461
+Medium grained correlated: 15.7455501556 seconds_2471
+Medium grained correlated: 16.038944006 seconds_2481
+Medium grained correlated: 15.6695320606 seconds_2491
+Medium grained correlated: 15.5242431164 seconds_2501
+Medium grained correlated: 16.0573170185 seconds_2511
+Medium grained correlated: 15.8740429878 seconds_2521
+Medium grained correlated: 15.4625990391 seconds_2531
+Medium grained correlated: 16.0857858658 seconds_2541
+Medium grained correlated: 15.5924801826 seconds_2551
+Medium grained correlated: 15.6308238506 seconds_2561
+Medium grained correlated: 15.8916649818 seconds_2571
+Medium grained correlated: 15.5669291019 seconds_2581
+Medium grained correlated: 15.7084600925 seconds_2591
+Medium grained correlated: 15.7291018963 seconds_2601
+Medium grained correlated: 15.7755510807 seconds_2611
+Medium grained correlated: 15.6579458714 seconds_2621
+Medium grained correlated: 15.8526790142 seconds_2631
+Medium grained correlated: 15.1611721516 seconds_2641
+Medium grained correlated: 15.7832658291 seconds_2651
+Medium grained correlated: 15.5268769264 seconds_2661
+Medium grained correlated: 15.2651100159 seconds_2671
+Medium grained correlated: 15.7279911041 seconds_2681
+Medium grained correlated: 15.8133001328 seconds_2691
+Medium grained correlated: 15.4871799946 seconds_2701
+Medium grained correlated: 15.5644369125 seconds_2711
+Medium grained correlated: 15.9048941135 seconds_2721
+Medium grained correlated: 15.5696780682 seconds_2731
+Medium grained correlated: 15.5425682068 seconds_2741
+Medium grained correlated: 15.846118927 seconds_2751
+Medium grained correlated: 15.8573031425 seconds_2761
+Medium grained correlated: 15.7040979862 seconds_2771
+Medium grained correlated: 15.9092440605 seconds_2781
+Medium grained correlated: 15.5185139179 seconds_2791
+Medium grained correlated: 15.5774109364 seconds_2801
+Medium grained correlated: 15.7631549835 seconds_2811
+Medium grained correlated: 15.5772368908 seconds_2821
+Medium grained correlated: 15.6142218113 seconds_2831
+Medium grained correlated: 16.0019772053 seconds_2841
+Medium grained correlated: 15.5146539211 seconds_2851
+Medium grained correlated: 15.4198670387 seconds_2861
+Medium grained correlated: 15.7526159286 seconds_2871
+Medium grained correlated: 15.5191800594 seconds_2881
+Medium grained correlated: 15.6250400543 seconds_2891
+Medium grained correlated: 16.4383409023 seconds_2901
+Medium grained correlated: 15.6065630913 seconds_2911
+Medium grained correlated: 15.8886551857 seconds_2921
+Medium grained correlated: 15.9455740452 seconds_2931
+Medium grained correlated: 15.4383661747 seconds_2941
+Medium grained correlated: 15.8122460842 seconds_2951
+Medium grained correlated: 16.0286009312 seconds_2961
+Medium grained correlated: 15.6156919003 seconds_2971
+Medium grained correlated: 15.5474920273 seconds_2981
+Medium grained correlated: 16.0981259346 seconds_2991
+Medium grained correlated: 15.6473929882 seconds_3001
+Medium grained correlated: 15.5320839882 seconds_3011
+Medium grained correlated: 16.1501510143 seconds_3021
+Medium grained correlated: 15.8787231445 seconds_3031
+Medium grained correlated: 15.7019250393 seconds_3041
+Medium grained correlated: 15.8176960945 seconds_3051
+Medium grained correlated: 15.7331650257 seconds_3061
+Medium grained correlated: 15.8659830093 seconds_3071
+Medium grained correlated: 15.9863538742 seconds_3081
+Medium grained correlated: 15.7147619724 seconds_3091
+Medium grained correlated: 15.8027360439 seconds_3101
+Medium grained correlated: 15.7623999119 seconds_3111
+Medium grained correlated: 15.5468220711 seconds_3121
+Medium grained correlated: 15.5756120682 seconds_3131
+Medium grained correlated: 16.0565021038 seconds_3141
+Medium grained correlated: 15.6299319267 seconds_3151
+Medium grained correlated: 15.7957868576 seconds_3161
+Medium grained correlated: 15.9061532021 seconds_3171
+Medium grained correlated: 15.3986599445 seconds_3181
+Medium grained correlated: 15.5264439583 seconds_3191
+Medium grained correlated: 15.8053190708 seconds_3201
+Medium grained correlated: 15.7730720043 seconds_3211
+Medium grained correlated: 15.7640678883 seconds_3221
+Medium grained correlated: 16.2412538528 seconds_3231
+Medium grained correlated: 15.5656681061 seconds_3241
+Medium grained correlated: 16.0344810486 seconds_3251
+Medium grained correlated: 15.9720900059 seconds_3261
+Medium grained correlated: 15.5802690983 seconds_3271
+Medium grained correlated: 15.8282029629 seconds_3281
+Medium grained correlated: 15.8217558861 seconds_3291
+Medium grained correlated: 15.5712459087 seconds_3301
+Medium grained correlated: 15.68759799 seconds_3311
+Medium grained correlated: 16.1092460155 seconds_3321
+Medium grained correlated: 15.4172170162 seconds_3331
+Medium grained correlated: 15.5691809654 seconds_3341
+Medium grained correlated: 15.6336910725 seconds_3351
+Medium grained correlated: 15.8119609356 seconds_3361
+Medium grained correlated: 15.5129780769 seconds_3371
+Medium grained correlated: 15.7156260014 seconds_3381
+Medium grained correlated: 15.5062220097 seconds_3391
+Medium grained correlated: 15.4289369583 seconds_3401
+Medium grained correlated: 15.9851241112 seconds_3411
+Medium grained correlated: 15.8696742058 seconds_3421
+Medium grained correlated: 15.7939200401 seconds_3431
+Medium grained correlated: 15.9122879505 seconds_3441
+Medium grained correlated: 15.3013498783 seconds_3451
+Medium grained correlated: 15.8154699802 seconds_3461
+Medium grained correlated: 15.6367599964 seconds_3471
+Medium grained correlated: 15.5859918594 seconds_3481
+Medium grained correlated: 15.9271991253 seconds_3491
+Medium grained correlated: 16.1185770035 seconds_3501
+Medium grained correlated: 15.5940289497 seconds_3511
+Medium grained correlated: 15.6051981449 seconds_3521
+Medium grained correlated: 16.0531101227 seconds_3531
+Medium grained correlated: 15.6894650459 seconds_3541
+Medium grained correlated: 15.5760920048 seconds_3551
+Medium grained correlated: 16.0060529709 seconds_3561
+Medium grained correlated: 15.6911590099 seconds_3571
+Medium grained correlated: 15.3382098675 seconds_3581
+Medium grained correlated: 15.7062001228 seconds_3591
+Medium grained correlated: 15.9482011795 seconds_3601
+Medium grained correlated: 15.8794219494 seconds_3611
+Medium grained correlated: 16.0937559605 seconds_3621
+Medium grained correlated: 15.7266290188 seconds_3631
+Medium grained correlated: 15.567702055 seconds_3641
+Medium grained correlated: 15.6080830097 seconds_3651
+Medium grained correlated: 15.3427991867 seconds_3661
+Medium grained correlated: 15.6999680996 seconds_3671
+Medium grained correlated: 15.70972085 seconds_3681
+Medium grained correlated: 15.5637409687 seconds_3691
+Medium grained correlated: 15.81108284 seconds_3701
+Medium grained correlated: 15.883234024 seconds_3711
+Medium grained correlated: 15.6015229225 seconds_3721
+Medium grained correlated: 15.6942520142 seconds_3731
+Medium grained correlated: 15.9862859249 seconds_3741
+Medium grained correlated: 15.6460049152 seconds_3751
+Medium grained correlated: 15.6499109268 seconds_3761
+Medium grained correlated: 15.7185211182 seconds_3771
+Medium grained correlated: 15.5256040096 seconds_3781
+Medium grained correlated: 15.6790370941 seconds_3791
+Medium grained correlated: 15.7889959812 seconds_3801
+Medium grained correlated: 15.5028979778 seconds_3811
+Medium grained correlated: 15.3550958633 seconds_3821
+Medium grained correlated: 15.7664580345 seconds_3831
+Medium grained correlated: 15.6170649529 seconds_3841
+Medium grained correlated: 15.8898139 seconds_3851
+Medium grained correlated: 16.0811500549 seconds_3861
+Medium grained correlated: 15.9164731503 seconds_3871
+Medium grained correlated: 15.5109341145 seconds_3881
+Medium grained correlated: 16.4024538994 seconds_3891
+Medium grained correlated: 15.5620970726 seconds_3901
+Medium grained correlated: 15.4588670731 seconds_3911
+Medium grained correlated: 15.8164360523 seconds_3921
+Medium grained correlated: 15.5957510471 seconds_3931
+Medium grained correlated: 15.5050771236 seconds_3941
+Medium grained correlated: 15.8654859066 seconds_3951
+Medium grained correlated: 15.4441020489 seconds_3961
+Medium grained correlated: 15.7824428082 seconds_3971
+Medium grained correlated: 15.7382090092 seconds_3981
+Medium grained correlated: 15.5040998459 seconds_3991
+Medium grained correlated: 15.5876960754 seconds_4001
+Medium grained correlated: 15.9511950016 seconds_4011
+Medium grained correlated: 15.6196269989 seconds_4021
+Medium grained correlated: 15.8460011482 seconds_4031
+Medium grained correlated: 16.2153711319 seconds_4041
+Medium grained correlated: 15.746489048 seconds_4051
+Medium grained correlated: 15.6971879005 seconds_4061
+Medium grained correlated: 15.7912380695 seconds_4071
+Medium grained correlated: 15.820841074 seconds_4081
+Medium grained correlated: 15.5435960293 seconds_4091
+Medium grained correlated: 15.8462188244 seconds_4101
+Medium grained correlated: 15.7690429688 seconds_4111
+Medium grained correlated: 15.5613100529 seconds_4121
+Medium grained correlated: 15.7401180267 seconds_4131
+Medium grained correlated: 15.7237548828 seconds_4141
+Medium grained correlated: 15.5286290646 seconds_4151
+Medium grained correlated: 15.6913039684 seconds_4161
+Medium grained correlated: 15.4376950264 seconds_4171
+Medium grained correlated: 15.8041620255 seconds_4181
+Medium grained correlated: 15.7566070557 seconds_4191
+Medium grained correlated: 15.4264960289 seconds_4201
+Medium grained correlated: 15.5736980438 seconds_4211
+Medium grained correlated: 15.9641160965 seconds_4221
+Medium grained correlated: 15.7102351189 seconds_4231
+Medium grained correlated: 15.6489760876 seconds_4241
+Medium grained correlated: 16.0312511921 seconds_4251
+Medium grained correlated: 15.7553648949 seconds_4261
+Medium grained correlated: 15.5435910225 seconds_4271
+Medium grained correlated: 15.6766960621 seconds_4281
+Medium grained correlated: 15.45637393 seconds_4291
+Medium grained correlated: 15.7156329155 seconds_4301
+Medium grained correlated: 15.7540359497 seconds_4311
+Medium grained correlated: 15.4779160023 seconds_4321
+Medium grained correlated: 15.7376739979 seconds_4331
+Medium grained correlated: 15.9166178703 seconds_4341
+Medium grained correlated: 15.2981247902 seconds_4351
+Medium grained correlated: 15.9073209763 seconds_4361
+Medium grained correlated: 15.8158378601 seconds_4371
+Medium grained correlated: 15.6159448624 seconds_4381
+Medium grained correlated: 15.6589670181 seconds_4391
+Medium grained correlated: 15.9316821098 seconds_4401
+Medium grained correlated: 15.8035230637 seconds_4411
+Medium grained correlated: 15.7984070778 seconds_4421
+Medium grained correlated: 16.084056139 seconds_4431
+Medium grained correlated: 15.6982829571 seconds_4441
+Medium grained correlated: 15.6761538982 seconds_4451
+Medium grained correlated: 15.6576249599 seconds_4461
+Medium grained correlated: 15.7347960472 seconds_4471
+Medium grained correlated: 15.5831720829 seconds_4481
+Medium grained correlated: 15.6842060089 seconds_4491
+Medium grained correlated: 15.6997129917 seconds_4501
+Medium grained correlated: 15.6498019695 seconds_4511
+Medium grained correlated: 15.9556810856 seconds_4521
+Medium grained correlated: 15.5969440937 seconds_4531
+Medium grained correlated: 16.051735878 seconds_4541
+Medium grained correlated: 16.0106470585 seconds_4551
+Medium grained correlated: 15.5103359222 seconds_4561
+Medium grained correlated: 15.7447938919 seconds_4571
+Medium grained correlated: 15.774012804 seconds_4581
+Medium grained correlated: 15.7144598961 seconds_4591
+Medium grained correlated: 15.5554940701 seconds_4601
+Medium grained correlated: 16.1453511715 seconds_4611
+Medium grained correlated: 15.5148210526 seconds_4621
+Medium grained correlated: 15.7800290585 seconds_4631
+Medium grained correlated: 15.8772261143 seconds_4641
+Medium grained correlated: 15.6114110947 seconds_4651
+Medium grained correlated: 15.7266390324 seconds_4661
+Medium grained correlated: 15.9777870178 seconds_4671
+Medium grained correlated: 15.5572419167 seconds_4681
+Medium grained correlated: 15.7355420589 seconds_4691
+Medium grained correlated: 15.7171621323 seconds_4701
+Medium grained correlated: 15.5093660355 seconds_4711
+Medium grained correlated: 15.8520359993 seconds_4721
+Medium grained correlated: 15.8341789246 seconds_4731
+Medium grained correlated: 15.7009379864 seconds_4741
+Medium grained correlated: 15.9139630795 seconds_4751
+Medium grained correlated: 15.9046719074 seconds_4761
+Medium grained correlated: 15.3714869022 seconds_4771
+Medium grained correlated: 15.9174461365 seconds_4781
+Medium grained correlated: 15.6808738708 seconds_4791
+Medium grained correlated: 15.7837400436 seconds_4801
+Medium grained correlated: 15.8261349201 seconds_4811
+Medium grained correlated: 15.9240708351 seconds_4821
+Medium grained correlated: 15.7569551468 seconds_4831
+Medium grained correlated: 15.660337925 seconds_4841
+Medium grained correlated: 15.7365460396 seconds_4851
+Medium grained correlated: 15.2240900993 seconds_4861
+Medium grained correlated: 15.939620018 seconds_4871
+Medium grained correlated: 15.8381328583 seconds_4881
+Medium grained correlated: 15.1955828667 seconds_4891
+Medium grained correlated: 15.7787680626 seconds_4901
+Medium grained correlated: 15.8123960495 seconds_4911
+Medium grained correlated: 15.4219419956 seconds_4921
+Medium grained correlated: 15.8577620983 seconds_4931
+Medium grained correlated: 15.8419649601 seconds_4941
+Medium grained correlated: 15.6758098602 seconds_4951
+Medium grained correlated: 15.5965030193 seconds_4961
+Medium grained correlated: 15.9805960655 seconds_4971
+Medium grained correlated: 15.6571660042 seconds_4981
+Medium grained correlated: 15.6764118671 seconds_4991
+Medium grained correlated: 15.6230711937 seconds_5001
+Medium grained correlated: 15.2922611237 seconds_5011
+Medium grained correlated: 15.8416488171 seconds_5021
+Medium grained correlated: 45321.1148019 seconds_5031
+Medium grained correlated: 15.3511657715 seconds_5041
+
+
+
+
+
+
+
+
+
+
+
+
