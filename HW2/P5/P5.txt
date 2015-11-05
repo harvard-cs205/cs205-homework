@@ -22,4 +22,9 @@ Average simulation frames per second  N
 338.76                                4
 325.80                                8
 
-4)
+4) Locking seems to marginally improve the serial implementation, although due to high variability of performance timings its hard to draw a concrete conclusion. It seems to have slowed down N = 4 and not had much of an effect on N = 8. This is with both gridding and sorting enabled.
+
+Average simulation frames per second  N
+254.32                                1
+301.95                                4
+348.72                                8

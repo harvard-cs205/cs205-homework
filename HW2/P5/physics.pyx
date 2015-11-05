@@ -1,4 +1,4 @@
-#cython: boundscheck=True, wraparound=False
+#cython: boundscheck=False, wraparound=False
 
 cimport numpy as np
 from libc.math cimport sqrt
@@ -84,7 +84,8 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                      float R,
                      int i, int count,
                      UINT[:, ::1] Grid,
-                     float grid_spacing) nogil:
+                     float grid_spacing,
+                     omp_lock_t *locks) nogil:
     cdef:
         FLOAT *XY1, *XY2, *V1, *V2
         int j, dim, grid_x, grid_y, grid_x_left, grid_y_down, grid_x_right, grid_y_top, grid_x_min, grid_x_max, \
@@ -140,25 +141,16 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                 V2 = &(V[j, 0])
                 if overlapping(XY1, XY2, R):
                     # SUBPROBLEM 4: Add locking
+                    acquire( &locks[i] )
+                    acquire( &locks[j] )
                     if not moving_apart(XY1, V1, XY2, V2):
                         collide(XY1, V1, XY2, V2)
 
                     # give a slight impulse to help separate them
                     for dim in range(2):
                         V2[dim] += eps * (XY2[dim] - XY1[dim])
-
-    
-    #for j in range(i + 1, count):
-    #    XY2 = &(XY[j, 0])
-    #    V2 = &(V[j, 0])
-    #    if overlapping(XY1, XY2, R):
-    #        # SUBPROBLEM 4: Add locking
-    #        if not moving_apart(XY1, V1, XY2, V2):
-    #            collide(XY1, V1, XY2, V2)
-
-            # give a slight impulse to help separate them
-    #        for dim in range(2):
-    #            V2[dim] += eps * (XY2[dim] - XY1[dim])
+                    release( &locks[i] )
+                    release( &locks[j] )
 
 cpdef update(FLOAT[:, ::1] XY,
              FLOAT[:, ::1] V,
@@ -172,12 +164,12 @@ cpdef update(FLOAT[:, ::1] XY,
         int i, j, dim
         FLOAT *XY1, *XY2, *V1, *V2
         # SUBPROBLEM 4: uncomment this code.
-        # omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
+        omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
 
     assert XY.shape[0] == V.shape[0]
     assert XY.shape[1] == V.shape[1] == 2
 
-    with nogil:#, parallel(num_threads=1):
+    with nogil:
         # bounce off of walls
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
@@ -192,8 +184,8 @@ cpdef update(FLOAT[:, ::1] XY,
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
-        for i in prange(count, num_threads=8, schedule='static', chunksize=count/4):
-            sub_update(XY, V, R, i, count, Grid, grid_spacing)
+        for i in prange(count, num_threads=4, schedule='static', chunksize=count/4):
+            sub_update(XY, V, R, i, count, Grid, grid_spacing, locks)
 
         # update positions
         #
