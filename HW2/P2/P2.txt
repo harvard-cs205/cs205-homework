@@ -1,0 +1,60 @@
+# Solutions for HW2 - P2
+
+Uncorrelated data storage - 
+
+In this case, the serial implementation had the best performance. The serialization involved with reading from memory meant that the multi-thread approach couldnt be exploited for a problem of this size. 
+Interestingly, the medium grained approach had the worst performance irrespective of the coarseness of the lock. And as can be seen from the data below and the associated plot, on average the coarser the locks, the worse the performance. There are however, local peaks at size 15 and size 50 that I can't explain.
+
+The best choice of N here would be 5 based on the empirical results below. But its unclear if that is the best approach in the case of uncorrelated data storage as both serial and fine grained perform much better.
+
+Serial: 0.290615797043 seconds
+Fine grained: 7.46561002731 seconds
+Medium grained:
+N	Uncorrelated (s)
+1	9.285660982
+3	9.371086121
+5	9.561619997
+7	12.37617207
+9	13.44145298
+10	16.92082596
+12	17.18421197
+15	20.59315395
+18	18.44756603
+20	16.91174984
+25	14.88678503
+30	14.36854291
+40	15.62606406
+50	22.66136003
+75	17.71805
+100	16.50091791
+150	23.50406599
+200	29.01399612
+
+Correlated data storage - 
+
+Once again, the serial implementation had the best performance. And the medium grained approach the worst performance. However, in this case, due to the correlated nature of the data storage, we get reasonably consistent performance across a wide range of coarseness of the locks as can be seen in the data below and the associated plot. 
+
+A good choice of N here would be 25 based on the empirical data below. We can make a stronger case here as the results are less noisy. Having said that, the fact that serial and fine grained still out-performed the medium grained approach makes one question this choice for the this problem. 
+
+Serial: 0.371638059616 seconds
+Fine grained: 7.47772812843 seconds
+Medium grained:
+N	Correlated (s)
+1	9.81530714
+3	10.18554211
+5	9.73053813
+7	9.371086836
+9	9.284436941
+10	10.703228
+12	9.696387053
+15	9.113818169
+18	8.782656908
+20	8.287797928
+25	6.963338137
+30	7.771742105
+40	8.066948175
+50	8.812878132
+75	7.270773888
+100	7.781343937
+150	8.560142994
+200	9.326071978
