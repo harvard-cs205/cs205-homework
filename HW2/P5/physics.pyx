@@ -59,7 +59,8 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                      float grid_spacing) nogil:
     cdef:
         FLOAT *XY1, *XY2, *V1, *V2
-        int j, dim
+        int j, dim, grid_x, grid_y, grid_x_left, grid_y_down, grid_x_right, grid_y_top, grid_x_min, grid_x_max, \
+            grid_y_min, grid_y_max, xi, yj
         float eps = 1e-5
 
     # SUBPROBLEM 4: Add locking
@@ -70,17 +71,66 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     ############################################################
     # SUBPROBLEM 2: use the grid values to reduce the number of other
     # objects to check for collisions.
-    for j in range(i + 1, count):
-        XY2 = &(XY[j, 0])
-        V2 = &(V[j, 0])
-        if overlapping(XY1, XY2, R):
-            # SUBPROBLEM 4: Add locking
-            if not moving_apart(XY1, V1, XY2, V2):
-                collide(XY1, V1, XY2, V2)
+    # Get grid location for ball i
+    grid_x = int((XY1[0] / grid_spacing))
+    grid_y = int((XY1[1] / grid_spacing))
+    # Get grid boundaries 
+    grid_x_left = 0
+    grid_y_down = 0
+    grid_x_right = int((1.0 / grid_spacing) + 1)
+    grid_x_right -= 1
+    grid_y_top = int((1.0 / grid_spacing) + 1)
+    grid_y_top -= 1
+    
+    # Get grid search area bounds --> 5 by 5 grid square centred on ball i's location subject to boundary
+    if grid_x - 2 < grid_x_left:
+        grid_x_min = grid_x_left
+    else:
+        grid_x_min = grid_x - 2
+    
+    if grid_x + 2 > grid_x_right:
+        grid_x_max = grid_x_right
+    else:
+        grid_x_max = grid_x + 2
+    
+    if grid_y - 2 < grid_y_down:
+        grid_y_min = grid_y_down
+    else:
+        grid_y_min = grid_y - 2
+    
+    if grid_y + 2 > grid_y_top:
+        grid_y_max = grid_y_top
+    else:
+        grid_y_max = grid_y + 2
+        
+    # Get balls in search area
+    for xi in range(grid_x_min, grid_x_max + 1):
+        for yj in range(grid_y_min, grid_y_max + 1):
+            j = Grid[xi, yj]
+            if j > i:
+                XY2 = &(XY[j, 0])
+                V2 = &(V[j, 0])
+                if overlapping(XY1, XY2, R):
+                    # SUBPROBLEM 4: Add locking
+                    if not moving_apart(XY1, V1, XY2, V2):
+                        collide(XY1, V1, XY2, V2)
+
+                    # give a slight impulse to help separate them
+                    for dim in range(2):
+                        V2[dim] += eps * (XY2[dim] - XY1[dim])
+
+    
+    #for j in range(i + 1, count):
+    #    XY2 = &(XY[j, 0])
+    #    V2 = &(V[j, 0])
+    #    if overlapping(XY1, XY2, R):
+    #        # SUBPROBLEM 4: Add locking
+    #        if not moving_apart(XY1, V1, XY2, V2):
+    #            collide(XY1, V1, XY2, V2)
 
             # give a slight impulse to help separate them
-            for dim in range(2):
-                V2[dim] += eps * (XY2[dim] - XY1[dim])
+    #        for dim in range(2):
+    #            V2[dim] += eps * (XY2[dim] - XY1[dim])
 
 cpdef update(FLOAT[:, ::1] XY,
              FLOAT[:, ::1] V,
@@ -114,7 +164,7 @@ cpdef update(FLOAT[:, ::1] XY,
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
-        for i in prange(count, num_threads=1, schedule='static', chunksize=count/4):
+        for i in prange(count, num_threads=8, schedule='static', chunksize=count/4):
             sub_update(XY, V, R, i, count, Grid, grid_spacing)
 
         # update positions
@@ -125,7 +175,8 @@ cpdef update(FLOAT[:, ::1] XY,
         for i in range(count): # prange slows down the code here
             for dim in range(2):
                 XY[i, dim] += V[i, dim] * t
-
+            Grid[int((XY[i, 0] / grid_spacing)), int((XY[i, 1] / grid_spacing))] = i
+                
 
 def preallocate_locks(num_locks):
     cdef omp_lock_t *locks = get_N_locks(num_locks)
