@@ -1,0 +1,14 @@
+# solutions for HW2 - P4
+
+# Approach
+The approach taken was to initialize a number of threads and assign each of the N threads the nth row in the image and set an offset equal to the number of threads. This ensured that each thread could in parallel apply the filtering on its own assigned rows. 
+Post that, we use a join() command on each thread to wait for each of the threads to be done before proceeding to the next iteration. This ensures that all the dependent computations are always done for the entire image before moving onto the next iteration. 
+This approach produced reasonable speedups in performance as described below in detail. To summarize, a 2x speedup was noticed on using 2 threads in parallel. Using 3 or 4 or more threads only produced marginal speedups beyond this initial speedup. The tests were done for 50 iterations.
+
+# Naive threading results for 50 iterations after averaging over a number of runs
+N     Time (s)
+1      18.23
+2      10.5
+3      9.65
+4      9.28
+

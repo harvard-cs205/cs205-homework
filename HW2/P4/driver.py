@@ -21,7 +21,16 @@ def py_median_3x3(image, iterations=10, num_threads=1):
     tmpB = np.empty_like(tmpA)
 
     for i in range(iterations):
-        filtering.median_3x3(tmpA, tmpB, 0, 1)
+        threads = []
+        for t in range(num_threads): # to loop over N threads and their initialization
+            thread = threading.Thread(target=filtering.median_3x3, args=(tmpA, tmpB, t, num_threads))
+            threads.append(thread)
+            threads[t].start()
+            
+        # make sure all threads are done before moving onto the next iteration
+        for j in range(num_threads):
+            threads[j].join()
+        
         # swap direction of filtering
         tmpA, tmpB = tmpB, tmpA
 
@@ -52,12 +61,13 @@ if __name__ == '__main__':
     pylab.title('before - zoom')
 
     # verify correctness
-    from_cython = py_median_3x3(input_image, 2, 5)
-    from_numpy = numpy_median(input_image, 2)
+    iterations = 20
+    from_cython = py_median_3x3(input_image, iterations, 4)
+    from_numpy = numpy_median(input_image, iterations)
     assert np.all(from_cython == from_numpy)
 
     with Timer() as t:
-        new_image = py_median_3x3(input_image, 10, 8)
+        new_image = py_median_3x3(input_image, 50, 4)
 
     pylab.figure()
     pylab.imshow(new_image[1200:1800, 3000:3500])
