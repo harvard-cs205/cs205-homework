@@ -81,14 +81,14 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
    ##########
     for r in range(repeat):
         for idx in prange(src.shape[0],nogil=True,num_threads = 4,schedule=dynamic):
-            if dest[idx] < src[idx]:
+            if dest[idx] < src[idx]: # lock each element individually, sort to prevent deadlock
                 omp_set_lock(&(locks[dest[idx]]))
                 omp_set_lock(&(locks[src[idx]]))
             elif dest[idx] > src[idx]:
                 omp_set_lock(&(locks[src[idx]]))
                 omp_set_lock(&(locks[dest[idx]]))
             else:
-                omp_set_lock(&(locks[src[idx]]))
+                omp_set_lock(&(locks[src[idx]])) # prevent double locking here
                            
             if counts[src[idx]] > 0:
                 counts[dest[idx]] += 1
@@ -123,7 +123,7 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
    ##########
     for r in range(repeat):
         for idx in prange(src.shape[0],nogil=True,num_threads = 4,schedule=dynamic):
-            if dest[idx]/N < src[idx]/N:
+            if dest[idx]/N < src[idx]/N: # lock by contiguous blocks of size N
                 omp_set_lock(&(locks[dest[idx]/N]))
                 omp_set_lock(&(locks[src[idx]/N]))
             elif dest[idx]/N > src[idx]/N:
