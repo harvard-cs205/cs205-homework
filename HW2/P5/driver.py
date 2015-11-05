@@ -16,6 +16,7 @@ from physics import update, preallocate_locks
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
+#filtering function (from hilbert z ordering wikipedia)
 def cmp_zorder(a, b, dim=2):
         j = 0
         k = 0

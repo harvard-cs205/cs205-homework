@@ -1,13 +1,13 @@
 
 P2. 
 
-Here I experimented with three scales of locking. It is clear that the number of locks affects the time it takes. For fine grained, we lock at every index whereas medium grained allows us to lock a set of N locks at a time. We also are able to compare correlated and uncorrelated locking. From the plot i have included, we see that correlated movement decreases the time necessary to complete the task. Please see below for more on my experiments regarding number of locks to use in medium grained locking. 
+Here I experimented with three scales of locking. It is clear that the number of locks affects the time it takes. For fine grained, we lock at every index whereas medium grained allows us to lock a set of N locks at a time. We also are able to compare correlated and uncorrelated locking. From the plot I have included, we see that correlated movement decreases the time necessary to complete the task. Please see below for more on my experiments regarding number of locks to use in medium grained locking. 
 
 For the initial code set-up where N = 10:
 
 Serial uncorrelated: 0.247 seconds
 Fine grained uncorrelated: 4.692 seconds
-Medium grained uncorrelated: 5.902seconds
+Medium grained uncorrelated: 5.902 seconds
 
 Serial correlated: 0.278 seconds
 Fine grained correlated: 4.321 seconds

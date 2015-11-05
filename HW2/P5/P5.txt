@@ -11,7 +11,7 @@ There does appear to be a difference in performance when we compare 1 threads (s
 
 Note: chunk size set to (1/4)*count
 
-This performance difference makes sense. Here we are able to distribute the work across multiple processes instead of serially in a single process (which is a lot to handle when number of balls is large). Thus, more work (i.e., simulation frames per second) can be done. Note the increase in performance is only roughly 2x better here, though we have increased the number of threads by a factor of 4. 
+This performance difference makes sense. Here we are able to distribute the work across multiple threads instead of serially (which is a lot to handle when number of balls is large). Thus, more work (i.e., simulation frames per second) can be done. Note the increase in performance is only roughly 2x better here, though we have increased the number of threads by a factor of 4. 
 
 ################
 # Subproblem 2 # 
@@ -22,7 +22,7 @@ When we introduce the grid, we see that performance increases.
 1 Thread: ~700 simulation frames per second
 4 Threads: ~1800 simulation frames per second
 
-As we can see, there is a significant speed up relative to the speeds listed above in Subproblem 1. Specifically, we have reduced this from a O(N^2) algorithm to an O(N) algorithm.
+As we can see, there is a significant speed up relative to the speeds listed above in Subproblem 1. We see a factor of about 60 difference between the 1 to 1 thread and 4 to 4 thread performance comparisons in this subproblem to the last. Specifically, we have reduced this from a O(N^2) algorithm to an O(N) algorithm, which has sped up performance.
 
 ################
 # Subproblem 3 # 
