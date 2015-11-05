@@ -1,15 +1,20 @@
 Part 1:
 
-1 thread:
-4 threads:
+1 thread: 6.4436254365 simulation frames per second
+4 threads: 9.73795787025 simulation frames per second
+This is exactly what we expect: multithreading over large
+update loops with data separation gives a nice performance gain.
 
 Part 2:
 
 (for these two numbers, same as above)
-1 thread, no gridding:
-4 threads, no gridding:
+1 thread, no gridding: 6.4436254365 simulation frames per second
+4 threads, no gridding: 9.73795787025 simulation frames per second
 1 thread, gridding: ~890.23471 simulation frames per second
 4 threads, gridding: ~2007.10168 simulation frames per second
+
+*MASSIVE* performance increase! This is what we expect though
+in going from an O(N^2) to an O(N) algorithm with N very large.
 
 Part 3:
 
@@ -23,9 +28,12 @@ will hopefully be accessible from the same cache line.
 
 Averages:
 1 thread, no sorting: 857.078143717 simulation frames per second
-1 thread, sorting: 869.907498659 simulation frames per second
+1 thread, sorting: 869.907498659 simulation frames per second (close to the same performance,
+consistent small advantage...these results were quite inconsistent, ran it on a different machine
+and got much better numbers!)
 4 threads, no sorting: 2025.78767109 simulation frames per second
-4 threads, sorting: 2529.48575321 simulation frames per second
+4 threads, sorting: 2529.48575321 simulation frames per second (very consistent 25%+ speedup!, but
+same difference across machines as above)
 
 Part 4:
 
