@@ -1,0 +1,6 @@
+On my VM supported by a Windows 8.1 ultrabook with hardware:
+Intel(R) Core(TM) i7-3537U CPU @ 2.00GHz on AMD Accelerated Parallel Processing
+my fastest configuration is:
+configuration ('blocked', 32, 8): 0.00699804 seconds
+
+Blocked was consistently at least an order of magnitude faster than coalesced because blocked reads take advantage of prefetching used by OpenCL. Since my machine only has 4 cores, too many work groups or workers would caused context-switching overhead and be unable to run in parallel, thus worsening the time.
