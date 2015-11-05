@@ -11,6 +11,34 @@ from cython.parallel import prange, parallel
 ctypedef np.float32_t FLOAT
 ctypedef np.uint32_t UINT
 
+# Hilbert ordering
+# convert (x,y) to d
+cpdef int xy2d(int n, int x, int y) nogil:
+    cdef:
+        int rx, ry, s, d=0 
+    s = n/2
+    while s > 0:
+        rx = (x & s) > 0
+        ry = (y & s) > 0
+        d += s * s * ((3 * rx) ^ ry)
+        rot(s, &x, &y, rx, ry)
+        s /= 2
+    return d
+
+# rotate/flip a quadrant appropriately
+cdef void rot(int n, int *x, int *y, int rx, int ry) nogil:
+    cdef:
+        int t
+    if ry == 0:
+        if rx == 1:
+            x[0] = n-1 - x[0]
+            y[0] = n-1 - y[0]
+
+    #Swap x and y
+    t = x[0]
+    x[0] = y[0]
+    y[0] = t
+
 cdef inline int overlapping(FLOAT *x1,
                             FLOAT *x2,
                             float R) nogil:

@@ -14,4 +14,12 @@ Average simulation frames per second  N
 295.32                                4
 341.05                                8
 
-3)
+3) The Hilbert ordering model was chosen for sorting the positions due to its attractive property of maintianing locality when transforming from 2D to 1D. Its relatively simple computation also helped.
+Sorting marginally improves performance for N = 1 and 4 but not so for N = 8, with the grid enabled.
+
+Average simulation frames per second  N
+210.18                                1
+338.76                                4
+325.80                                8
+
+4)
