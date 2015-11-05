@@ -102,11 +102,13 @@ cpdef update(FLOAT[:, ::1] XY,
              float t):
     cdef:
         int count = XY.shape[0]
+        int chunk = count/4
         int i, j, dim
         FLOAT *XY1, *XY2, *V1, *V2
         # SUBPROBLEM 4: uncomment this code.
         omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
         int grid_x, grid_y, new_x, new_y
+
     assert XY.shape[0] == V.shape[0]
     assert XY.shape[1] == V.shape[1] == 2
 
@@ -116,7 +118,7 @@ cpdef update(FLOAT[:, ::1] XY,
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
 
-        for i in prange(count, num_threads=4, schedule="static", chunksize=125):
+        for i in prange(count, num_threads=4, schedule="static", chunksize=chunk):
             for dim in range(2):
                 if (((XY[i, dim] < R) and (V[i, dim] < 0)) or
                     ((XY[i, dim] > 1.0 - R) and (V[i, dim] > 0))):
@@ -127,7 +129,7 @@ cpdef update(FLOAT[:, ::1] XY,
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
 
-        for i in prange(count, num_threads=4, schedule="static", chunksize=125):
+        for i in prange(count, num_threads=4, schedule="static", chunksize=chunk):
             sub_update(XY, V, R, i, count, Grid, grid_spacing, locks)
         
         # update positions
@@ -136,7 +138,7 @@ cpdef update(FLOAT[:, ::1] XY,
         #    scheduling).
         # SUBPROBLEM 2: update the grid values.
 
-        for i in prange(count, num_threads=4, schedule="static", chunksize=125):
+        for i in prange(count, num_threads=4, schedule="static", chunksize=chunk):
             grid_x = int(XY[i,0] / grid_spacing)
             grid_y = int(XY[i,1] / grid_spacing)
             Grid[grid_x, grid_y] = -1
