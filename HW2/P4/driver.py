@@ -20,7 +20,6 @@ def py_median_3x3(image, iterations=10, num_threads=1):
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
 
-
     # we will have one event for each thread, each iteration
     event_list = [[threading.Event() for _ in range(iterations)] for _ in range(num_threads)]
 
@@ -88,7 +87,7 @@ if __name__ == '__main__':
     assert np.all(from_cython == from_numpy)
 
     with Timer() as t:
-        new_image = py_median_3x3(input_image, 10, 8)
+        new_image = py_median_3x3(input_image, 10, 2)
 
     pylab.figure()
     pylab.imshow(new_image[1200:1800, 3000:3500])

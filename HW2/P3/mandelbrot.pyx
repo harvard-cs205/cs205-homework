@@ -73,7 +73,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
 
     with nogil:
         ones = AVX.float_to_float8(1.0)
-        for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=1):
+        for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=4):
             for j in xrange(in_coords.shape[1] / 8):
 
               flter = AVX.float_to_float8(1.0)
@@ -98,6 +98,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
 
               for dummy in range(max_iterations): 
                 # square and add c  
+
                 temp = AVX.add(square_number_real(z_real, z_imag), C_real)
                 z_imag = AVX.add(square_number_imag(z_real, z_imag), C_imag)
                 z_real = temp 
@@ -105,23 +106,14 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                 magnitude = AVX.fmadd(z_real, z_real, AVX.mul(z_imag, z_imag))
                 mask = AVX.less_than(magnitude, AVX.float_to_float8(4.0))
 
+                if AVX.signs(mask) == 0: 
+                  break 
+
                 flter = AVX.bitwise_and(flter, mask)
                 iteration = AVX.add(iteration,AVX.bitwise_and(ones, flter))
                 
               write_output(out_counts, iteration, i, j)
               
-              test = AVX.make_float8(
-                1., 2., 3., 4., 5., 6., 7., 8.
-                )
-              mask = AVX.less_than(test, AVX.float_to_float8(4.0))
-              ones = AVX.float_to_float8(1.0)
-
-              print_complex_AVX(mask, AVX.bitwise_and(mask, test))
-              print_complex_AVX(test, AVX.add(AVX.bitwise_and(ones,mask), test))
-              #`print_complex_AVX(C_real == C_imag, C_real)
-              print_complex_AVX(test, AVX.bitwise_and(AVX.float_to_float8(3.0), AVX.float_to_float8(3.0)))
-
-
 # An example using AVX instructions
 cpdef example_sqrt_8(np.float32_t[:] values):
     cdef:
