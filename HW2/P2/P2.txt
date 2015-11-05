@@ -21,3 +21,5 @@ For the correlated data, spacing the locks more widely generally slows the compu
 The correlated data almost always runs faster than the uncorrelated data because the correlated data will have fewer threads waiting for each other.  
 
 The correlated and uncorrelated runtimes converge for N=1000 (serial).  This makes sense, because this removes the advantage of correlation (with only one thread, correlating the data no longer benefits the computation by reducing threads waiting for each other).  
+
+Acknowledgements: I received a lot of help from Kendrick Lo on this problem.  
