@@ -19,7 +19,7 @@ def randcolor():
 
 if __name__ == '__main__':
     #num_balls = 10000
-    #radius = 0.002f
+    #radius = 0.002
     num_balls = 500
     radius = 0.01
     positions = np.random.uniform(0 + radius, 1 - radius,
@@ -79,6 +79,7 @@ if __name__ == '__main__':
 
         grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
         
+        # make sure elements in bounds in the grid
         positionsTest = np.copy((positions/grid_spacing).astype(int))
         positionsTest[positionsTest < 0] = 0
         positionsTest[positionsTest > grid_size - 1] = grid_size - 1
@@ -97,7 +98,7 @@ if __name__ == '__main__':
                 plt.show()
                 plt.title('Locking, Sorted, 4 Threads')
                 plt.xlabel('Frames/second')
-                plt.savefig('4_thread_locking_sorted.png')
+                plt.savefig('4_thread_locking_sorted.png') # save results
                 break
             frame_count = 0
             total_time = 0
@@ -112,9 +113,9 @@ if __name__ == '__main__':
             positionsX2 = map(lambda x: int('0'+x[0]+'0'+x[1]+'0'+x[2]+'0'+x[3]+'0'+x[4]+'0'+x[5]+'0'+x[6]+'0'+x[7]),positionsX)
             zOrder = [int(str(sum(x)),2) for x in zip(positionsY2,positionsX2)]
             newOrder = np.argsort(zOrder)
-            positions = np.copy(positions[newOrder])
+            positions = np.copy(positions[newOrder]) # update position and velocity ordering according to Morton ordering
             velocities = np.copy(velocities[newOrder])
-    
+            
             grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
             positionsTest = np.copy((positions/grid_spacing).astype(int))
             positionsTest[positionsTest < 0] = 0

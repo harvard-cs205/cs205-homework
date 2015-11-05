@@ -35,7 +35,8 @@ updates between threads is minimized (location is correlated with thread ID).
 
 Results:
 
-The following frames/second are the (min, median, max) over 100 animations
+The following frames/second are the (min, median, max) over 100 animations.
+See plots for the distribution of the samples.
 
 Multithreading/No Spatial
 
