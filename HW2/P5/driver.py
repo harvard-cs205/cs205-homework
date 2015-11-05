@@ -16,6 +16,7 @@ from physics import update, preallocate_locks
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
+# Reference: https://en.wikipedia.org/wiki/Hilbert_curve
 def getHilbert(N, x, y):
     factor = 10000000 # Scale everything by factor so we can work with integers
     x = int( x * factor )
@@ -47,7 +48,7 @@ if __name__ == '__main__':
     radius = 0.002
 
     # Testing parameters
-    # num_balls = 500
+    # num_balls= 500
     # radius = 0.01
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
@@ -112,7 +113,6 @@ if __name__ == '__main__':
             # velocities with their object positions!
 
             # Get Hilbert mapping
-            # Reference: https://en.wikipedia.org/wiki/Hilbert_curve
             hM = [getHilbert(grid_size, positions[p, 1], positions[p, 0]) for p in xrange(len(positions))]
             order = np.argsort(hM)
             positions = positions[order, :]
@@ -120,6 +120,7 @@ if __name__ == '__main__':
             grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
             grid[(positions[:, 0] / grid_spacing).astype(int),
                  (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
+
 
 
 
