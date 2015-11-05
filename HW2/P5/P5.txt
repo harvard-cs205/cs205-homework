@@ -1,0 +1,27 @@
+Problem 5
+
+
+Part 1: Multithreading
+In SingleThread.png and FourThreads.png I display histograms of the speeds of the serial and parallelized versions for 60 iterations.  The serial implementation has an average speed of about 4 frames per second, while the parallelized version has an average speed of about 6 frames per second.  The threaded version is faster because it performs calculations simultaneously, but is much less than 4X as fast because this also adds communication costs.  
+
+Part 2: Spatial Decomposition
+In FourThreadsPart2.png and SingleThreadPart2.png I display histograms of the speeds of the parallelized and serial versions for 600 iterations.  I had to run more iterations to get enough speed measurements to make a histogram because the algorithm runs so much more quickly that it wasn't getting past the "if total_time > anim_step:" step.  The threaded version has an average speed of about 350 frames per second, and the serial version has an average speed of about 750 frames per second.  
+
+Constraining the balls to check for collisions to the 5X5 grid significantly reduces the number of computations that have to be made for each update, resulting in large speed increases.  This is because the algorithm makes many fewer comparisons and lookups by only considering the balls that are close ot it, rather than comparing every possible pair of balls.  
+
+Oddly, for this problem, my serial implementation was twice as fast as my parallel version.  I'm not sure why this would be, because I did see a speedup for Multithreading in Part 1.  I suspect that this may be particular to the Virtual Machine.  
+
+Part 3: Spatially Coherent Sorting
+In FourThreadsPart3.png and SingleThreadPart3.png I display histograms of the speeds of the parallelized and serial versions.  This time, instead of setting an iteration count, I ran the algorithm until I had 30 speed measurements.  The Serial version has an average speed of about 1400 frames per second, and the 4-threaded version has an average speed of about 660 frames per second.  
+
+Once again, the serial version is much faster, and the gap is widening.  Again, I'm not sure why the threaded version would be slower, and I would expect it to be faster.  Spatially sorting the balls improves the speed for both implementations because the sorting makes nearby balls to be much closer in the list, so less list entries need to be looked over when accessing them for comparisons.  
+
+Part 4: Locking
+
+4 Threads: 640 fps
+Single Thread: 1250 fps.
+
+Adding locking slows the code down a very small amount, but it makes the simulation more accurate because it prevents simultaneous updates to the balls.  
+
+
+Acknowledgements: I received significant help from Taylor Killian and Chuck Liu.  I also collaborated with Neil Chainani and Isadora Nun.  
