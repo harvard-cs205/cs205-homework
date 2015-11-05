@@ -1,0 +1,83 @@
+==============
+Multithreading
+==============
+Sample simulation frames per second with 1 thread:
+10.838947091 simulation frames per second
+10.0332119739 simulation frames per second
+10.0480180918 simulation frames per second
+9.95283542706 simulation frames per second
+8.52478288175 simulation frames per second
+
+Sample simulation frames per second with 4 threads:
+15.9815885935 simulation frames per second
+16.5032618532 simulation frames per second
+13.8779005324 simulation frames per second
+16.9721238705 simulation frames per second
+17.8785336743 simulation frames per second
+
+As shown above, the number of simulation frames per second is higher with 4 threads relative to 1 thread.
+However, the speedup is around 1.6x.
+
+=================================================================
+Spatial Decomposition with a Grid (Collision in 3 Adjacent Grids)
+=================================================================
+Sample simulation frames per second with 1 thread:
+263.170364421 simulation frames per second
+258.759107426 simulation frames per second
+255.524323007 simulation frames per second
+230.91725239 simulation frames per second
+260.40794702 simulation frames per second
+
+Sample simulation frames per second with 4 threads:
+475.39494994 simulation frames per second
+510.438802761 simulation frames per second
+512.462222464 simulation frames per second
+539.680126954 simulation frames per second
+523.685073107 simulation frames per second
+
+With spatial decomposition, the numer of simulation frames per second is higher with 4 threads relative to 1 thread.
+However, the speedup is around 2x.
+Relative to the O(N2) algorithm, the spatial decomposition algorithm is O(N) and much faster by a factor of around 25.
+
+===============================================
+Spatially Coherent Sorting with Morton ordering
+===============================================
+Sample simulation frames per second with 1 thread:
+391.01479617 simulation frames per second
+405.860175144 simulation frames per second
+400.181662055 simulation frames per second
+402.913811677 simulation frames per second
+416.178264136 simulation frames per second
+
+Sample simulation frames per second with 4 threads:
+732.670472411 simulation frames per second
+728.005887499 simulation frames per second
+747.674426896 simulation frames per second
+766.109831747 simulation frames per second
+746.041322784 simulation frames per second
+
+I implemented the spatially coherent sorting using Morton ordering (source: wikipedia). Relative to the baseline griddings implemention, the spatially coherent sorting algorithm has a speedup of about 1.5x.
+The number of simulation frames per second with 4 threads is around 1.9 times the number of simulation frames per second with 1 thread.
+
+=======
+Locking
+=======
+Sample simulation frames per second with 4 threads and gridding:
+212.919640591 simulation frames per second
+204.64886162 simulation frames per second
+211.170959804 simulation frames per second
+209.813550102 simulation frames per second
+206.79423148 simulation frames per second
+
+Sample simulation frames per second with 4 threads and sorting:
+301.00630884 simulation frames per second
+296.530407364 simulation frames per second
+288.367411482 simulation frames per second
+303.078546138 simulation frames per second
+306.813214875 simulation frames per second
+
+With fine-grained locking, we see significant overhead in the creation, acquisiton and release of locks for each ball, as the number of simulation frames per second is lower with gridding and with sorting.
+
+
+
+

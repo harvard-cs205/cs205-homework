@@ -16,9 +16,23 @@ from physics import update, preallocate_locks
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
+# Morton ordering code 
+# Source: https://en.wikipedia.org/wiki/Z-order_curve
+def morton_order(a, b):
+    j = k = x = 0
+    for k in range(2):
+        y = a[k] ^ b[k]
+        if x < y and x < (x ^ y):
+            j = k
+            x = y
+    return a[j] - b[j]
+
 if __name__ == '__main__':
     num_balls = 10000
     radius = 0.002
+    # testing only
+    # num_balls = 500
+    # radius = 0.01
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -64,7 +78,7 @@ if __name__ == '__main__':
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
-                   radius, grid_size, locks_ptr,
+                   radius, grid_spacing, locks_ptr,
                    physics_step)
 
         # udpate our estimate of how fast the simulator runs
@@ -80,3 +94,8 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+            # Morton ordering
+            idx = (positions/grid_spacing).astype(int)
+            order = sorted(range(len(idx)), cmp=lambda a, b: morton_order(idx[a], idx[b]))
+            positions = positions[order]
+            velocities = velocities[order]
