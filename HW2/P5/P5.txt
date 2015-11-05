@@ -1,0 +1,10 @@
+# solutions for HW2 - P5
+
+1) Adding prange to all three areas indicated in the skeleton code actually slowed down the code. Adding prange to only the subupdate part of the code, gave a marginal speedup for four threads and a more substantial speedup for 8 threads. 
+
+Average simulation frames per second  N
+5.13                                  1
+5.68                                  4
+8.45                                  8
+
+2) 
