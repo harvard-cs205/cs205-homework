@@ -104,6 +104,7 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+
             # Use Morton Ordering
             positionsY = map(lambda x: (expUse-len(bin(x)[2:]))*'0' + bin(x)[2:],(positions[:,0]/grid_spacing).astype(int))
             positionsX = map(lambda x: (expUse-len(bin(x)[2:]))*'0' + bin(x)[2:],(positions[:,1]/grid_spacing).astype(int))

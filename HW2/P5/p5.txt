@@ -2,9 +2,40 @@
 
 Discussion:
 
+With no spatial decomposition, running 4 threads results in a speedup 
+of about a factor of 2 when compared to 1 thread. This is not surprising
+becasue there are other factors involved with prange that may result in
+suboptimal performance gains like communication between the CPU and the 
+4 threads. 
 
+With spatial decomposition, the median frames/second increases by about 
+a factor of 4 with 1 thread and a factor of 3 with 4 threads. With 500
+objects, the number of cells checked per object reduced from 500 to 49 
+at most (3 cells on left/right and 3 cells on the top/bottom). This is 
+an overestimate to make sure no collisions were left out. The speedup
+is not exactly 10 because there are other factors like referencing elements
+in the Grid matrix that add complexity.
+
+The speedups are seen in both cases because it is faster to access 
+objects in the position Nx2 array when the objects under consideration are 
+close together in the array/memory. With Morton sorting, frames/second increases 
+a lot more for 4 threads than for 1 thread. This is because in the 1 thread 
+case the 1 thread has more instances of position and velocity elements for 
+colliding objects being further away in memory while in the 4 thread case those far 
+away instances are split between 4 threads running in parallel. I chose 
+Morton ordering because it lends itself naturally to the rectangular 
+geometry of the problem and does a decent job or making sure distance in 
+space correlates to distance in memory. 
+
+With locks, the median frames/second decreases, though not by much. This is 
+because the locks have to be called and there are delays when objects are about 
+to be updated in different threads to prevent simultaneous updates. Since
+the objects are sorted spatially by Morton sorting, the simultaneous object 
+updates between threads is minimized (location is correlated with thread ID).
 
 Results:
+
+The following frames/second are the (min, median, max) over 100 animations
 
 Multithreading/No Spatial
 
@@ -13,7 +44,7 @@ Multithreading/No Spatial
 4
 13.7780624731 3923.2935461 4124.95689852
 
-Spatial
+Spatial Decomposition
 
 1
 3147.18919498 7793.84840447 8636.4871771
@@ -21,7 +52,7 @@ Spatial
 14.7847622942 12053.329506 16455.7738886
 
 
-Sorted
+Morton Sorted
 
 1
 7152.20434082 8579.57373796 8829.04254256

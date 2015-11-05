@@ -75,16 +75,12 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     grid_size = <int>((1.0 / grid_spacing) + 1)
     yind = <int>(XY[index,0]/grid_spacing)
     xind = <int>(XY[index,1]/grid_spacing)
-    #print i, Grid[yind,xind]
-    #assert Grid[yind,xind] == i, "wrong vals"
-    
+  
     upLim = min([yind,3])
     downLim = min([grid_size-1-yind,3])
     rightLim = min([grid_size-1-xind,3])
     leftLim = min([xind,3])
-    #with gil:
-        #print Grid[yind,xind],i,yind,xind,upLim,downLim,rightLim,leftLim
-
+    
     deltax = rightLim + leftLim
     deltay = downLim + upLim 
 
@@ -94,8 +90,7 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     for ii in xrange(0,deltay+1):
         for jj in xrange(0,deltax+1):
             if (Grid[starty+ii,startx+jj] > index) & (Grid[starty+ii,startx+jj] < count):
-                #with gil:
-                    #print Grid[starty+ii,startx+jj], index
+              
                 XY2 = &(XY[Grid[starty+ii,startx+jj], 0])
                 V2 = &(V[Grid[starty+ii,startx+jj], 0])
                 if overlapping(XY1, XY2, R):
@@ -159,7 +154,7 @@ cpdef update(FLOAT[:, ::1] XY,
     assert XY.shape[0] == V.shape[0]
     assert XY.shape[1] == V.shape[1] == 2
     nThreads = 4
-    #print nThreads
+
 
     with nogil:
         # bounce off of walls
@@ -192,7 +187,7 @@ cpdef update(FLOAT[:, ::1] XY,
             for dim in range(2):    
                 XY[i, dim] += V[i, dim] * t
             release(&(locks[i]))
-        #free_N_locks(count, locks_ptr)
+       
 
 
 def preallocate_locks(num_locks):
