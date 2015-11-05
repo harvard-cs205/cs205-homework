@@ -6,9 +6,10 @@ import set_compiler
 set_compiler.install()
 
 import pyximport
-pyximport.install()
+pyximport.install(reload_support=True)
 
 import mandelbrot
+reload(mandelbrot)
 from timer import Timer
 
 import pylab as plt
@@ -22,7 +23,7 @@ def make_coords(center=(-0.575 - 0.575j),
 
     x = np.linspace(start=(-width / 2), stop=(width / 2), num=count)
     xx = center + (x + 1j * x[:, np.newaxis]).astype(np.complex64)
-    return xx, np.zeros_like(xx, dtype=np.uint32)
+    return xx, np.zeros_like(xx, dtype=np.float32)
 
 
 if __name__ == '__main__':
