@@ -1,1 +1,20 @@
+Number of threads = 1
+12.8246049881 seconds for 10 filter passes.
+
+Number of threads = 2
+7.46538496017 seconds for 10 filter passes.
+
+Number of threads = 4
+7.65428709984 seconds for 10 filter passes.
+
+
+Using two threads allows me to perform some operations in parallel and reduce the time of my operation by almost half.  The reduction is not quite half because there are communication costs and the threads have to wait for each other.  
+
+Consistent with my results in other parts of the Problem set, I see a performance enhancement from using 2 threads, but not 4, because the Virtual Machine only has 2 CPUs.  
+
+My thread cooperation strategy is to create an array of events, with one for each iteration of each thread.  Each column of the array contains the event for each iteration of one thread.  The worker() function that each thread is passed to sets the event corresponding to each particular iteration/thread combo, and when the event is set, any thread that is waiting for that event proceeds.  Each thread is instructed to wait for the events corresponding to thread/iterations that it depends on before it can proceed to the next iteration.  
+The essence of this strategy is that the threads form evenly spaced horizontal stripes of pixels across the array, so for a 3X3 median, each row only needs the rows immediately above and below it to be up-to-date to move forward.  This takes advantage of the way N threads are defined to process every N rows of the image.  
+
+In principle, this allows the threads to filter asynchronously, because as long as one thread has the two threads that it needs to be done to proceed, it can continue, even though other threads that don't affect that line may still be lagging behind.  
+
 Acknowledgments: Avery Faller explained a lot of the logic of events and threads to me for this problem.  

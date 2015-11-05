@@ -71,7 +71,7 @@ def worker(tmpA, tmpB, events, iterations, thread_id, num_threads):
         # Swap before the next iteration
         tmpA, tmpB = tmpB, tmpA
     
-def py_median_3x3(image, iterations=10, num_threads=1):
+def py_median_3x3(image, iterations=10, num_threads=4):
     ''' repeatedly filter with a 3x3 median '''
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
@@ -129,8 +129,9 @@ if __name__ == '__main__':
     from_numpy = numpy_median(input_image, 2)
     assert np.all(from_cython == from_numpy)
 
+    # Test the times here:
     with Timer() as t:
-        new_image = py_median_3x3(input_image, 10, 8)
+        new_image = py_median_3x3(input_image, 10, 4)
 
     pylab.figure()
     pylab.imshow(new_image[1200:1800, 3000:3500])
