@@ -16,6 +16,8 @@ def make_ext(modname, pyxfilename):
                                          '-std=gnu99',
                                          '-Ofast',
                                          '-march=native',
+                                         '-msse3',
+                                         '-mavx',
                                          '-fopenmp',
                                          '-I{}'.format(np.get_include()),
                                          '-I.'],

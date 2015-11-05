@@ -14,18 +14,53 @@ import pylab
 import filtering
 from timer import Timer
 import threading
+from Queue import Queue
 
 def py_median_3x3(image, iterations=10, num_threads=1):
     ''' repeatedly filter with a 3x3 median '''
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
-
+    Threads = []
+    Events = [] #np.empty([num_threads,iterations])
+    
+    # Create 2D array of events, each event corresponds to a single (thread, iteration) pair
     for i in range(iterations):
-        filtering.median_3x3(tmpA, tmpB, 0, 1)
+        for n in range(num_threads):
+            Events += [threading.Event()]
+    Events = np.array(Events).reshape((num_threads,iterations))
+    
+    # Create separate threads and set them loose on the image!
+    for n in range(num_threads):
+        thread = threading.Thread(target=parallizeImage, args=(n, num_threads, tmpA, tmpB, Events, iterations))
+        thread.start()
+        Threads += [thread]
+    # Kill 
+    for t in Threads:
+        t.join()
+        
+    #Return filtered image
+    return tmpA
+    
+def parallizeImage(threadNum, num_threads, tmpA, tmpB, Events, iterations=10):
+'''Helper function used to coordinate threads from iteration to iteration'''
+    for i in range(iterations):
+        #Check events, create checks for conditions. i==0, n==num_threads, etc...
+        if num_threads >1:
+            if i == 0:
+                pass
+            elif threadNum == 0:
+                Events[threadNum+1,i-1].wait()
+            elif threadNum == num_threads-1:
+                Events[threadNum-1, i-1].wait()
+            else:
+                Events[threadNum-1,i-1].wait()
+                Events[threadNum+1,i-1].wait()
+            
+        filtering.median_3x3(tmpA, tmpB, threadNum, num_threads)
+        #Change event flag
+        Events[threadNum,i].set()
         # swap direction of filtering
         tmpA, tmpB = tmpB, tmpA
-
-    return tmpA
 
 def numpy_median(image, iterations=10):
     ''' filter using numpy '''
