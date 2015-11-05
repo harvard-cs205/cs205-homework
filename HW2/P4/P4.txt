@@ -1,0 +1,8 @@
+# I have discussed this problem with Peilin Duan and Jeewon Hwang
+
+Number of Thread = 1 :  0.0372970104218 seconds for 10 filter passes
+Number of Thread = 2 ： 0.036984205246 seconds for 10 filter passes
+Number of Thread = 4 ： 0.033185005188 seconds for 10 filter passes
+
+In this question, I think I have successfully implement the extra-credit part.
+I use an 1-D array of length = num_iteration * num_thread to hold events. The thread could start calculation asynchronously. For all iteration i, except i = 0, the thread n could start working as long as the threads working on n-1 and n+1 in iteration i-1 are done.
