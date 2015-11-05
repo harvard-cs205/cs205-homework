@@ -1,5 +1,4 @@
 #cython: boundscheck=False, wraparound=False
-
 cimport numpy as np
 from libc.math cimport sqrt
 from libc.stdint cimport uintptr_t

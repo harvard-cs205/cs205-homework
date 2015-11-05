@@ -105,10 +105,9 @@ if __name__ == '__main__':
             # velocities with their object positions!
 
             # Map every point to its corresponding d in the hilbert ordering.
-            x = map(lambda b: xy2d(grid_size, int(b[0]), int(b[1])), positions)
-
+            hilbs = [xy2d(grid_size, int(b[0]), int(b[1])) for b in positions]
             # Sort based on this ordering.
-            res = np.argsort(x)
+            res = np.argsort(hilbs)
 
             # Reorder the positions and velocities lists (praise numpy indexing syntax).
             positions = positions[res]
