@@ -32,12 +32,13 @@ Subproblem 4:
 =============
 There is another change that needs to happen for the locking to avoid deadlocks: the grid needs to be reset with -1s
 after each iteration, otherwise there is a potential for a ball to be in multiple different grid cells (e.g. if no
-other ball was to occupy the old space.)
-That breaks the nice assumption needed to avoid deadlocks in my solution. In previous sub-problems this was less of an
-issue since it was not necessary to ensure correctness of the collisions as we do here. This contributes to the
-slow-down observed.
-The addition of more threads here improved performance, but due to the coarse locking strategy, perhaps less benefit
-was derived from the multi-threading.
+other ball was to occupy the old space.) This update can be done in parallel.
+However, this also breaks the nice assumption needed to avoid deadlocks in my solution. In the previous sub-problems
+this was less of an issue since it was not necessary to ensure correctness of the collisions as we do here. This
+likely contributes to the slow-down observed.
+The other source of the slowdown is the overhead and contention from using locks. However, given the low number of
+threads compared to the size of the grid as well as the sorting strategy in subproblem 3, I suspect most of the
+slowdown is from the overhead of using locks rather than contention for the locks.
 
-N = 1: 477 FPS
-N = 4: 551 FPS
+N = 1: 545 FPS
+N = 4: 821 FPS

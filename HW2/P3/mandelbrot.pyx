@@ -3,8 +3,8 @@ cimport numpy as np
 cimport cython
 import numpy
 cimport AVX
-from cython.parallel import prange
-
+from cython.parallel import parallel, prange
+from libc.stdlib cimport abort, malloc, free
 
 cdef np.float64_t magnitude_squared(np.complex64_t z) nogil:
     return z.real * z.real + z.imag * z.imag
@@ -22,7 +22,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
        np.float32_t [:, :] img = np.imag(in_coords)
        np.float32_t [:, :] real = np.real(in_coords)
        AVX.float8 avx_imag, avx_real
-       float out_vals[8]
+       float * out_vals
 
        # To declare AVX.float8 variables, use:
        # cdef:
@@ -50,9 +50,12 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     #             out_counts[i, j] = iter
 
     # Reference: http://nullprogram.com/blog/2015/07/10/
-
-    with nogil:
-        for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=1):
+    # Reference: http://docs.cython.org/src/userguide/parallelism.html
+    with nogil, parallel(num_threads=1):
+        out_vals = <float *> malloc( sizeof(float) * 8) # Fix for Piazza issue @382
+        if out_vals == NULL:
+            abort()
+        for i in prange(in_coords.shape[0], schedule='static', chunksize=1):
             for j in range(0, in_coords.shape[1], 8):
                 avx_imag = AVX.make_float8(img[i, j+7], img[i, j+6], img[i,j+5], img[i,j+4], img[i,j+3], img[i,j+2], img[i,j+1],
                                            img[i,j+0])
@@ -92,3 +95,4 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                 for k in range(8):
                     out_counts[i, j + k] = <int> out_vals[k]
 
+        free(out_vals)

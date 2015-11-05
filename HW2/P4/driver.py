@@ -65,6 +65,9 @@ def py_median_3x3(image, iterations=10, num_threads=1):
 
         tmpA, tmpB = tmpB, tmpA
 
+    for t in threads:
+        t.join()
+
     return tmpA
 
 def numpy_median(image, iterations=10):

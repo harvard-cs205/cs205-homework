@@ -135,7 +135,7 @@ cpdef update(FLOAT[:, ::1] XY,
     cdef:
         int count = XY.shape[0]
         int chnk = count / 4
-        int nt = 4
+        int nt = 1
         int i, j, k, dim
         FLOAT *XY1, *XY2, *V1, *V2
         # SUBPROBLEM 4: uncomment this code.
@@ -169,7 +169,7 @@ cpdef update(FLOAT[:, ::1] XY,
         # SUBPROBLEM 2: update the grid values.
 
         # Need to reset the grid values to -1 so there are no duplicates (which can cause deadlocks)
-        for j in range(Grid.shape[0]):
+        for j in prange(Grid.shape[0], schedule='static', num_threads=nt):
                 for k in range(Grid.shape[1]):
                     Grid[j, k] = -1
 
