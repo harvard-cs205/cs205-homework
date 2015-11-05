@@ -1,0 +1,11 @@
+### Without Instruction-Level Parallelism ###
+1 Thread - 1074.656613 Million Complex FMAs in 5.46469020844 seconds, 196.654626705 million Complex FMAs / second
+2 Threads - 1074.656613 Million Complex FMAs in 2.70176482201 seconds, 397.760976176 million Complex FMAs / second
+4 Threads - 1074.656613 Million Complex FMAs in 1.31922006607 seconds, 814.615120433 million Complex FMAs / second
+
+### With Instruction-Level Parallelism ###
+1 Thread - 1090.94829 Million Complex FMAs in 0.742789983749 seconds, 1468.71701809 million Complex FMAs / second
+2 Threads - 1090.94829 Million Complex FMAs in 0.401371002197 seconds, 2718.054578 million Complex FMAs / second
+4 Threads - 1090.94829 Million Complex FMAs in 0.219716072083 seconds, 4965.26394114 million Complex FMAs / second
+
+With Instruction-Level Parallelism is around 6x faster than without instruction-level parallelism!

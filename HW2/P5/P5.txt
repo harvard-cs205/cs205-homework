@@ -1,0 +1,47 @@
+######################
+### SUB-PROBLEM #1 ###
+######################
+
+Serial - 4.73236436339 simulation frames per second
+
+Multithreaded:
+1 thread - 4.72723871051 simulation frames per second
+2 threads - 7.3402063299 simulation frames per second
+4 threads - 10.2033565978 simulation frames per second
+
+1 Threaded Multithreaded is around the same speed as the serial version.  Double the number of threads to 2 doesn't quite double the number of simulation frames per second.  Doubling the number of threads again to 4 gives us an even smaller gain, less than 50%.
+
+
+
+######################
+### SUB-PROBLEM #2 ###
+######################
+
+Collision Detection Improvements:
+1 thread - 617.051392703 simulation frames per second
+4 threads - 1368.85932401 simulation frames per second
+
+Before, the algorithm checked every id after the ith ball to see if the two balls collided.  Now we only need to check a 5x5 square centered on the ball in the grid to ensure that there are no balls within 2-squares of the current ball, because that is the most that a ball could be away and still collide with the ball we are examining in one time interval.  This gives us more than a 130x increase in speed!  Quadrupaling the number of threads from 1 to 4, more than doubles our speed as multiple balls can be running through the collision and boundary checks at once.
+
+
+
+######################
+### SUB-PROBLEM #3 ###
+######################
+
+Spatially Coherent Sorting:
+1 thread - 626.942345472 simulation frames per second
+4 threads - 1790.26990112 simulation frames per second
+
+With the grid enabled, 1 thread is slightly faster than 1 thread without the grid enabled.  4 threads is noticably faster.  However, I noticed that for both 1 and 4 threads the fps is much more variable with the grid enabled than without.  I wonder if this is due to the fact the re-ordering itself may take some time, and if the order is already pretty good, reordering might not improve the speed that much for some iterations if the balls haven't moved that much, but the re-ordering takes some time, no matter what.
+
+
+
+######################
+### SUB-PROBLEM #4 ###
+######################
+
+1 thread - 634.569728979 simulation frames per second
+4 threads - 1764.59972333 simulation frames per second
+
+There are no significant changes in fps.  The chance that two threads would need the same lock at the same time is very rare as there are thousands of balls, only 4 threads, with 2 balls being compared at a time.
