@@ -15,16 +15,40 @@ import filtering
 from timer import Timer
 import threading
 
-def py_median_3x3(image, iterations=10, num_threads=1):
+def compute(threadID, num_threads, tmpA, tmpB, events, iterations = 10):
+    for i in range(iterations):
+        if i > 0:
+            # wait for prev iteration of nearby threads; check boundaries
+            if threadID > 0:
+                events[threadID - 1][i-1].wait()
+            if threadID < num_threads - 1:
+                events[threadID + 1][i-1].wait()
+
+        # compute
+        filtering.median_3x3(tmpA, tmpB, threadID, num_threads)
+        events[threadID][i].set()
+        tmpA, tmpB = tmpB, tmpA
+
+def py_median_3x3(image, iterations=10, num_threads=4):
     ''' repeatedly filter with a 3x3 median '''
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
 
-    for i in range(iterations):
-        filtering.median_3x3(tmpA, tmpB, 0, 1)
-        # swap direction of filtering
-        tmpA, tmpB = tmpB, tmpA
+    # make an event for a thread reaching a certain iteration
+    events = []
+    for i in range(num_threads):
+        events.append([threading.Event() for _ in range(iterations)])
+    
+    # make threads compute
+    threads = []
+    for thread in range(num_threads):
+        x = threading.Thread(target=compute,args=(thread,num_threads,tmpA,tmpB,events,iterations))
+        x.start()
+        threads.append(x)
 
+    # end threads
+    for y in threads:
+        y.join()
     return tmpA
 
 def numpy_median(image, iterations=10):
@@ -41,6 +65,9 @@ def numpy_median(image, iterations=10):
 
 if __name__ == '__main__':
     input_image = np.load('image.npz')['image'].astype(np.float32)
+
+    # scale down for my VM
+    input_image = input_image[::2, ::2].copy()
 
     pylab.gray()
 

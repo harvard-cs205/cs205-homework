@@ -81,7 +81,7 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
     ##########
     #with nogil:
     for r in range(repeat):
-        for idx in prange(src.shape[0], nogil=True, num_threads=4, schedule=dynamic):
+        for idx in prange(src.shape[0], nogil=True, num_threads=4):
             # if same count, only need one lock
             if src[idx] == dest[idx]:
                 acquire(&locks[src[idx]])

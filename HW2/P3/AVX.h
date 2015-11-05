@@ -24,6 +24,7 @@ typedef __m256 float8;
 #define fmsub(a, b, c)        _mm256_fmsub_ps((a), (b), (c))  // a * b - c
 #define sqrt(val)             _mm256_sqrt_ps(val)
 #define mul(a, b)             _mm256_mul_ps((a), (b))
+#define sub(a, b)             _mm256_sub_ps((a), (b))
 #define add(a, b)             _mm256_add_ps((a), (b))
 #define div(a, b)             _mm256_div_ps((a), (b))
 //Bitwise
