@@ -76,7 +76,7 @@ Sample simulation frames per second with 4 threads and sorting:
 303.078546138 simulation frames per second
 306.813214875 simulation frames per second
 
-With fine-grained locking, we see significant overhead in the creation, acquisiton and release of locks for each ball, as the number of simulation frames per second is lower with gridding and with sorting.
+With fine-grained locking, we see significant overhead in the creation, acquisiton and release of locks, as the number of simulation frames per second is lower for both with gridding and with sorting relative to the cases without locks.
 
 
 
