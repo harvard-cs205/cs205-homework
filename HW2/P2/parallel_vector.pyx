@@ -88,11 +88,11 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
 
 			# put locks in correct order
 			if src[idx] < dest[idx]:
-				acquire(&(locks[src[idx]]))
-				acquire(&(locks[dest[idx]]))
+				acquire(&locks[src[idx]])
+				acquire(&locks[dest[idx]])
 			else:
-				acquire(&(locks[dest[idx]]))
-				acquire(&(locks[src[idx]]))
+				acquire(&locks[dest[idx]])
+				acquire(&locks[src[idx]])
 
 			# move data
 			if counts[src[idx]] > 0:
@@ -100,8 +100,8 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
 				counts[src[idx]] -= 1
 
 			# release locks, order doesn't matter
-			release(&(locks[dest[idx]]))
-			release(&(locks[dest[idx]]))
+			release(&locks[dest[idx]])
+			release(&locks[src[idx]])
 
 	free_N_locks(counts.shape[0], locks)
 
@@ -112,7 +112,7 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
                                int repeat,
                                int N):
 	cdef:
-		int idx, r, elts1, elts2
+		int idx, r, elt1, elt2
 		int num_locks = (counts.shape[0] + N - 1) / N  # ensure enough locks
 		omp_lock_t *locks = get_N_locks(num_locks)
 

@@ -1,0 +1,24 @@
+1 thread:
+5.03369617462 seconds for 10 filter passes.
+
+2 threads:
+3.96391105652 seconds for 10 filter passes.
+
+4 threads:
+3.41395807266 seconds for 10 filter passes.
+
+This type of image filtering is highly parallelizable - each row of pixels
+only depends on the upper and lower rows' prevous iteration to be finished,
+so if we start filtering from both directions, the filtering of each row
+does not have to be done in order of where it is in the image.
+
+I chose to implement a pretty simple and straightforward method to control
+cooperation - I defined an events array that kept track of each thread's
+"ready-ness" to be calculated, so that each thread could check on the state
+of its dependent threads' previous iterations. Only then could it proceed to
+filter correctly.
+
+In the timed results, we see that there is a much larger jump in performance
+going from 1 to 2 threads than going from 2 to 4 threads. I think this might
+be due to software limitations (running VM on Windows box, not sure how the
+logical cores really carry over).

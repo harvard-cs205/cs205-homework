@@ -41,8 +41,7 @@ if __name__ == '__main__':
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################
-    MAX_LOCKS = 20
-    Nlocks = range(1, MAX_LOCKS + 1)
+    Nlocks = [1, 5, 10, 15, 30, 50]
     uncorr_times = []
     for N in Nlocks:
         counts[:] = orig_counts
@@ -79,7 +78,7 @@ if __name__ == '__main__':
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################
-    Nlocks = range(1, MAX_LOCKS + 1)
+    Nlocks = [1, 5, 10, 15, 30, 50]
     corr_times = []
     for N in Nlocks:
         counts[:] = orig_counts
@@ -89,4 +88,11 @@ if __name__ == '__main__':
         print("Medium grained correlated for {} locks: {} seconds".format(N, t.interval))
         corr_times.append(t.interval)
 
-# TODO plot
+    # Plot
+    plt.plot(Nlocks, uncorr_times, label='Uncorrelated medium-grained locking')
+    plt.plot(Nlocks, corr_times, label='Correlated medium-grained locking')
+    plt.xlabel('Number of locks')
+    plt.ylabel('Time')
+    plt.title('Medium-grained locking runtimes, correlated vs uncorrelated data')
+    plt.legend()
+    plt.show()
