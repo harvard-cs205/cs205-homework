@@ -5,6 +5,7 @@ Part 1:
 
 Part 2:
 
+(for these two numbers, same as above)
 1 thread, no gridding:
 4 threads, no gridding:
 1 thread, gridding: ~890.23471 simulation frames per second
