@@ -1,0 +1,59 @@
+Uncorrelated:
+
+	N = 1:
+		Serial uncorrelated: 0.239325046539 seconds
+		Fine grained uncorrelated: 3.35308694839 seconds
+		Medium grained uncorrelated: 8.41857385635 seconds
+
+	N = 5:
+		Serial uncorrelated: 0.243359088898 seconds
+		Fine grained uncorrelated: 3.32272291183 seconds
+		Medium grained uncorrelated: 7.93533015251 seconds
+
+	N = 10:
+		Serial uncorrelated: 0.24231505394 seconds
+		Fine grained uncorrelated: 3.40580916405 seconds
+		Medium grained uncorrelated: 8.20488500595 seconds
+
+	N = 15:
+		Serial uncorrelated: 0.240128993988 seconds
+		Fine grained uncorrelated: 3.29489398003 seconds
+		Medium grained uncorrelated: 8.584608078 seconds
+
+	N = 20:
+		Serial uncorrelated: 0.236409187317 seconds
+		Fine grained uncorrelated: 3.41806912422 seconds
+		Medium grained uncorrelated: 8.30541706085 seconds
+
+Correlated:
+
+	N = 1:
+		Serial correlated: 0.27127289772 seconds
+		Fine grained correlated: 3.15137004852 seconds
+		Medium grained correlated: 7.30997490883 seconds
+
+	N = 5:
+		Serial correlated: 0.257848024368 seconds
+		Fine grained correlated: 2.98216104507 seconds
+		Medium grained correlated: 7.47939801216 seconds
+
+	N = 10:
+		Serial correlated: 0.283761024475 seconds
+		Fine grained correlated: 3.09087109566 seconds
+		Medium grained correlated: 7.64545416832 seconds
+
+	N = 15:
+		Serial correlated: 0.296566963196 seconds
+		Fine grained correlated: 3.05821895599 seconds
+		Medium grained correlated: 6.48907594681 seconds
+
+	N = 20:
+		Serial correlated: 0.266273021698 seconds
+		Fine grained correlated: 3.11176514626 seconds
+		Medium grained correlated: 6.52653598785 seconds
+
+
+The times of running program on parallel are all much slower than run program on serial. This because the locking takes overhead time. The medium grained takes longer time than fine grained. This may because the more locks the less waiting time but more locking overhead. The fine grained locking saving time on waiting and losing time of locking but the time it saved is more than the time it lost.
+
+For the correlated case, I think when N = 20, medium grained locking has best performance. And any number of N larger than 10 would outperform for any number of N smaller than 10. The reason is that in the medium grained lock, I check the distance between src and dest. Since the no destintion is more than 10 aways from its source in the correlated case, when we choose N larger than 10, my code will lock source and destintion together once. This operation will call lock only one time instead of locking the src and dest seperately.
+
