@@ -34,5 +34,25 @@ if __name__ == '__main__':
 
     print("{} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
 
-    plt.imshow(np.log(out_counts))
-    plt.show()
+    #plt.imshow(np.log(out_counts))
+    #plt.show()
+    print("Multithreading")
+    for num_threads in [1,2,4]:
+        in_coords, out_counts = make_coords()
+        with Timer() as t:
+            mandelbrot.mandelbrot_mul(in_coords, out_counts, 1024, num_t=num_threads)
+        seconds = t.interval
+
+        print("Number of threads={}, {} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(num_threads, out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
+
+    print("Instruction-level Parallelism")
+    for num_threads in [1,2,4]:
+        in_coords, out_counts = make_coords()
+        with Timer() as t:
+            mandelbrot.mandelbrot_opt(in_coords, out_counts, 1024, num_t=num_threads)
+        seconds = t.interval
+
+        print("Number of threads={}, {} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(num_threads, out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
+
+    #plt.imshow(np.log(out_counts))
+    #plt.show()
