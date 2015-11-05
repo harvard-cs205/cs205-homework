@@ -4,17 +4,17 @@ By Matheus C. Fernandes
 
 Step 1: Multithreading
 -------------------------------
-Using the multithreading option, I noticed a few things. Firstly, if I am comparing the multithreaded prange (for 1 thread) vs. the plain serial 1 thread I notice a small slow down. This, I believe, arrises from the the fact that the prange loop now has to controll threading for 1 thread and thus creates an overhead. However, if I use the more than 1 thread I see a small increase in performance, which was not what I expected. I expected to see a relatively large improvement in performance due to the ease of parallelization of these loops and the non-dependncies and reliance of each loop on the next iteration. 
+Using the multithreading option, I noticed a few things. Firstly, if I am comparing the multithreaded prange (for 1 thread) vs. the plain serial 1 thread I notice a small slow down. This, I believe, arrises from the the fact that the prange loop now has to control threading for 1 thread and thus creates an overhead. However, if I use the more than 1 thread I see a small increase in performance, which was not what I expected. I expected to see a relatively large improvement in performance due to the ease of parallelization of these loops and the non-dependancies and reliance of each loop on the next iteration. 
 
 
 Step 2: Spatial Decomposition
 -------------------------------
-This part of the assignment had a significant effect on the performance of the code. This is made possibly largely by making the code more efficient. This taught me a lesson that to speed up the code you cannot only rely on parallelizing the code, you must also account for making your code more efficient through logic as well as itterations. Before attempting to parallelize the code we must first attempt to reduce the amount of work we are doing. This can be done by trying to minimize nested for loops as seen in this part of the problem. Through this part we were able to reduce the amount of from from O(N^2) to O(N) for very very large values of N. This speedup cannot be accounted for by simply parallelizing your code. 
+This part of the assignment had a significant effect on the performance of the code. This is made possibly largely by making the code more efficient. This taught me a lesson that to speed up the code you cannot only rely on parallelizing the code, you must also account for making your code more efficient through logic as well as iterations. Before attempting to parallelize the code we must first attempt to reduce the amount of work we are doing. This can be done by trying to minimize nested for loops as seen in this part of the problem. Through this part we were able to reduce the amount of from from O(N^2) to O(N) for very very large values of N. This speedup cannot be accounted for by simply parallelizing your code. 
 
 
 Step 3: Spatial Coherent Sorting
 -------------------------------
-For this part I used Morton sorting although I believe Hilber sorting would have also done a good job. However, I believe the Morton sorting has a slight advantage of the Hilbert ordering because it provides a faster/simpler sorting algorythm than the Hilbert, thus we are able to reduce 'a little' bit of overhead of the function as well as save time coding the Hilbert ordering function. 
+For this part I used Morton sorting although I believe Hilbert sorting would have also done a good job. However, I believe the Morton sorting has a slight advantage of the Hilbert ordering because it provides a faster/simpler sorting algorithm than the Hilbert, thus we are able to reduce 'a little' bit of overhead of the function as well as save time coding the Hilbert ordering function. 
 
 
 Step 4: Locking
