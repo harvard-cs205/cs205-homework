@@ -1,0 +1,7 @@
+number of threads=1, 2.54070901871 seconds for 10 filter passes.
+number of threads=2, 1.27839994431 seconds for 10 filter passes.
+number of threads=4, 0.679213047028 seconds for 10 filter passes.
+
+From output above, we can see that 4-threads version > 2-threads version > 1-thread version
+
+For iteration i, I run it in parallel with number of threads. And then I wait until all threads are finished and start iteration i+1. 
