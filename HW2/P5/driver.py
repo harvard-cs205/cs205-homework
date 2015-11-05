@@ -87,7 +87,6 @@ if __name__ == '__main__':
 
     frame_count = 0
 
-    # SUBPROBLEM 4: uncomment the code below.
     # preallocate locks for objects
     locks_ptr = preallocate_locks(num_balls)
 

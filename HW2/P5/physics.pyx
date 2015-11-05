@@ -59,14 +59,18 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                      float R,
                      int i, int count,
                      UINT[:, ::1] Grid,
-                     float grid_spacing) nogil:
+                     float grid_spacing,
+                     omp_lock_t *locks) nogil:
     cdef:
         FLOAT *XY1, *XY2, *V1, *V2
         int j, k, dim
         float eps = 1e-5
         unsigned int gx, gy, grid_size
 
-    # SUBPROBLEM 4: Add locking
+    # lock the ith value
+    acquire(&locks[i])
+    
+    # initialize values for XY1 and V1
     XY1 = &(XY[i, 0])
     V1 = &(V[i, 0])
     #############################################################
@@ -89,8 +93,9 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                 V2 = &(V[Grid[j,k], 0])
                 # check if overlapping
                 if overlapping(XY1, XY2, R):
+                    # acquire lock of second element (avoids double-locking and deadlocking from above)
+                    acquire(&locks[Grid[j,k]])
                     # if overlapping, check if moving away
-                    # SUBPROBLEM 4: Add locking
                     if not moving_apart(XY1, V1, XY2, V2):
                         # adjust velocities accordingly due to the collision
                         collide(XY1, V1, XY2, V2)
@@ -98,7 +103,10 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                     # give a slight impulse to help separate them
                     for dim in range(2):
                         V2[dim] += eps * (XY2[dim] - XY1[dim])
-
+                    # release (Grid[j,k])th lock
+                    release(&locks[Grid[j,k]])
+    # finally release ith lock
+    release(&locks[i])
 
 # update the position and velocity vectors of all balls
 cpdef update(FLOAT[:, ::1] XY,
@@ -110,10 +118,9 @@ cpdef update(FLOAT[:, ::1] XY,
              float t):
     cdef:
         int count = XY.shape[0]
-        int i, j, dim, thrds = 4, chunk_size = count / 4
+        int i, j, dim, thrds = 3, chunk_size = count / 4
         FLOAT *XY1, *XY2, *V1, *V2
-        # SUBPROBLEM 4: uncomment this code.
-        # omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
+        omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
 
     assert XY.shape[0] == V.shape[0]
     assert XY.shape[1] == V.shape[1] == 2
@@ -130,7 +137,7 @@ cpdef update(FLOAT[:, ::1] XY,
         # bounce off of each other
         # parallelize this loop over 4 threads, with static scheduling.
         for i in prange(count, num_threads=thrds, schedule="static", chunksize=chunk_size):
-            sub_update(XY, V, R, i, count, Grid, grid_spacing)
+            sub_update(XY, V, R, i, count, Grid, grid_spacing, locks)
 
         # update the grid values
         # parallelize this loop over 4 threads (with static scheduling).
