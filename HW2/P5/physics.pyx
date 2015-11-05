@@ -113,7 +113,9 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     for xx in range(xMinLim,xMaxLim+1):
         for yy in range(yMinLim,yMaxLim+1):
             ball_grids= <int> Grid[xx,yy]
-            # THE STATEMENT ON THE RIGHT AVOIDS DEADLOCKING
+            # THE STATEMENT ON THE RIGHT AVOIDS DEADLOCKING AND ENSURES THAT BALLS 
+            # ARE DO NOT ACCOUNT FOR COLIDING TWICE, AS IT ONLY ALLOWS IT TO CONTINUE
+            # AT A CERTIAN ORDER.
             if ball_grids != negative_one and ball_grids>i: 
                 XY2 = &(XY[ball_grids, 0])
                 V2 = &(V[ball_grids, 0])
