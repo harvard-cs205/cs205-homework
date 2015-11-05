@@ -1,7 +1,10 @@
 Based on the data (see medium.svg, which is I git added to this directory), we see that
 in the uncorrelated case, we should use a small number of locks, around 10.  In the 
-correlated case, it makes the most sense to use a number of locks around 40.  This allows the right
+correlated case, it makes the most sense to use a number of locks around 30-40.  This allows the right
 balance in the tradeoff between the computational overhead of having a lot of locks around and locking them
 vs. the benefit of being able to lock a single lock to modify two data elements.  This makes sense --
 in the uncorrelated case, we are very unlikely to have the same lock be able to modify both data elements,
-while in the correlated case, this looks to be happneing all the time with a lock size of around 10.
+while in the correlated case, this looks to be happneing all the time with a lock size of around 10. Note:
+in the correlated model, things being switched are within 10 spots of each other, so it makes sense that
+a size of around 20-40 will be good, such that it is unlikely for us to have to grab another lock group
+(only necessary across halves).
