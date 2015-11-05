@@ -67,7 +67,7 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     acquire(&locks[i])
     XY1 = &(XY[i, 0])
     V1 = &(V[i, 0])
-    release(&locks[i])
+
     #############################################################
     # IMPORTANT: do not collide two balls twice.
     ############################################################
@@ -77,6 +77,7 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     # we check if grids have the same index
 
     # first convert XY1 to grid 1
+    # and calcualte the grid_size
     x_grid1 = <int>(XY[i,0]/grid_spacing)
     y_grid1 = <int>(XY[i,1]/grid_spacing)
     grid_size = <int>((1.0 / grid_spacing) + 1)
@@ -84,7 +85,6 @@ cdef void sub_update(FLOAT[:, ::1] XY,
 
     #then we shall check any grid which is 2 away from this one, it's like 5 * 5
     #and our grid is in the center of this grid
-
     for curr_grid_x in range(x_grid1 - 2, x_grid1 + 3):
 
         #we have to check if curr_grid_x is in range [0,1] before we move on
@@ -103,7 +103,7 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                         ball_index = Grid[curr_grid_x,curr_grid_y]
 
                         if(ball_index != -1 and ball_index != i):
-
+                            #acquire(&locks[ball_index])
                             XY2 = &(XY[ball_index,0])
                             V2 = &(V[ball_index,0])
 
@@ -113,17 +113,18 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                             #for j in range(i + 1, count):
                             #    XY2 = &(XY[j, 0])
                             #    V2 = &(V[j, 0])
+
                             if overlapping(XY1, XY2, R):
 
                                 # SUBPROBLEM 4: Add locking
-                                acquire(&locks[ball_index])
+
                                 if not moving_apart(XY1, V1, XY2, V2):
                                     collide(XY1, V1, XY2, V2)
                                 # give a slight impulse to help separate them
                                 for dim in range(2):
                                     V2[dim] += eps * (XY2[dim] - XY1[dim])
-                                release(&locks[ball_index])
-
+                            #release(&locks[ball_index])
+    release(&locks[i])
 
 
 cpdef update(FLOAT[:, ::1] XY,
@@ -149,7 +150,7 @@ cpdef update(FLOAT[:, ::1] XY,
     # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
     # scheduling.
     #for i in range(count):
-    for i in prange(count, nogil=True, schedule='static', chunksize = count/4, num_threads = 1):
+    for i in prange(count, nogil=True, schedule='static', chunksize = count/4, num_threads = 4):
         for dim in range(2):
             if (((XY[i, dim] < R) and (V[i, dim] < 0)) or
                 ((XY[i, dim] > 1.0 - R) and (V[i, dim] > 0))):
@@ -160,7 +161,7 @@ cpdef update(FLOAT[:, ::1] XY,
     # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
     # scheduling.
     #for i in range(count):
-    for i in prange(count,nogil=True, schedule='static', chunksize = count/4, num_threads = 1):
+    for i in prange(count,nogil=True, schedule='static', chunksize = count/4, num_threads = 4):
         sub_update(XY, V, R, i, count, Grid, grid_spacing,locks)
 
     # update positions
@@ -178,9 +179,8 @@ cpdef update(FLOAT[:, ::1] XY,
     #grid_size will be used for checking boundary later
     grid_size = <int>((1.0 / grid_spacing) + 1)
 
-    for i in prange(count,nogil=True, schedule='static', chunksize = count/4, num_threads = 1):
+    for i in prange(count,nogil=True, schedule='static', chunksize = count/4, num_threads = 4):
         #we use the Grid to label the balls' location
-
         #the position array get updated
         #then update the grid according to the position array
         for dim in range(2):

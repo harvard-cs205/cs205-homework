@@ -4,7 +4,8 @@ CS205
 HW2
 Problem 5: Simulation and domain decomposition
 
-Part2:Multithreading
+Part1: Performance results
+
 Performance:
 
 1 thread:
@@ -24,6 +25,9 @@ Performance:
 10.7273122537 simulation frames per second
 11.4661753208 simulation frames per second
 11.8020749211 simulation frames per second
+
+Note: parallel computing shows a good improvement on performance, almost two times better.
+
 
 
 Part3: Spatial decomposition
@@ -48,11 +52,42 @@ Performance data:
 1215.42236389 simulation frames per second
 1210.1877142 simulation frames per second
 
-
+Note: Compared to previous version, we get significantly improved on performance. The reason is we convert our
+algorithm from O(N2) to O(N). The complexity of our algorithm has decreased a lot.
 
 Part3 and 4: Spatially Coherent Sorting/Locking
 Performance data:
 
+Without locks:
+1 thread:
+
+600.858060863 simulation frames per second
+532.272081218 simulation frames per second
+562.544544961 simulation frames per second
+600.771996835 simulation frames per second
+605.484144606 simulation frames per second
+539.789182782 simulation frames per second
+599.794240421 simulation frames per second
+
+4 threads:
+1409.2252175 simulation frames per second
+1408.00731387 simulation frames per second
+1426.86656697 simulation frames per second
+1394.86643034 simulation frames per second
+1388.44132666 simulation frames per second
+1397.38323362 simulation frames per second
+1415.15194883 simulation frames per second
+1435.90348694 simulation frames per second
+1393.56483504 simulation frames per second
+1398.60638564 simulation frames per second
+
+
+
+Note: Since now the point close in space are actually close in memory, we get a little bit higher performance both
+in serial and parallel computing.
+
+
+With locks:
 
 1 thread:
 446.728488859 simulation frames per second
@@ -71,3 +106,13 @@ Performance data:
 1206.46048071 simulation frames per second
 1195.71637291 simulation frames per second
 
+Note: Although the performance is not changed that much, but we could notice the less simulation per second. Since we
+sacrifice the overhead introduced by locks to protect the data.
+
+**************************************************************************
+Part 2: Explanation of your choice for spatial sorting
+
+After I improved our spatially coherent, the performance got better, but just slightly.
+As for sorting velocities/positions arrays according to their spatial locality, I used Morton method. The goal of doing
+this is to make the point close in space are close in memories also. Thus, when we read the data, we have better
+locality, so the performance will be better.
