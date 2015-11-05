@@ -39,7 +39,8 @@ cdef inline void collide(FLOAT *x1, FLOAT *v1,
         float change_v1[2]
         float len_x1_m_x2, dot_v_x
         int dim
-    # https://en.wikipedia.org/wiki/Elastic_collision#Two-dimensional_collision_with_two_moving_objects
+    # https://en.wikipedia.org/wiki/Elastic_collision
+    # Two-dimensional_collision_with_two_moving_objects
     for dim in range(2):
         x1_minus_x2[dim] = x1[dim] - x2[dim]
         v1_minus_v2[dim] = v1[dim] - v2[dim]
@@ -132,7 +133,7 @@ cpdef update(FLOAT[:, ::1] XY,
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
-        for i in prange(count, num_threads=1, schedule='static', chunksize=count/4):
+        for i in prange(count, num_threads=4, schedule='static', chunksize=count/4):
             for dim in range(2):
                 if (((XY[i, dim] < R) and (V[i, dim] < 0)) or
                     ((XY[i, dim] > 1.0 - R) and (V[i, dim] > 0))):
@@ -142,7 +143,7 @@ cpdef update(FLOAT[:, ::1] XY,
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
-        for i in prange(count, num_threads=1, schedule='static', chunksize=count/4):
+        for i in prange(count, num_threads=4, schedule='static', chunksize=count/4):
             sub_update(XY, V, R, i, count, Grid, grid_spacing, locks)
 
         # update positions
@@ -150,7 +151,7 @@ cpdef update(FLOAT[:, ::1] XY,
         # SUBPROBLEM 1: parallelize this loop over 4 threads (with static
         #    scheduling).
         # SUBPROBLEM 2: update the grid values.
-        for i in prange(count, num_threads=1, schedule='static', chunksize=count/4):
+        for i in prange(count, num_threads=4, schedule='static', chunksize=count/4):
             if check_ball_bounds(XY, i):
                 gx = <unsigned int> (XY[i, 0] / grid_spacing)
                 gy = <unsigned int> (XY[i, 1] / grid_spacing)

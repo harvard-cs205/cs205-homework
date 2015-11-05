@@ -1,0 +1,45 @@
+Below is the output for the different runs:
+
+Uncorellated
+-------------
+Serial uncorrelated: 0.351544857025 seconds
+Fine grained uncorrelated: 3.66746997833 seconds
+Medium grained uncorrelated: 4.29019904137 seconds
+Coarse grained uncorrelated: 4.2315158844 seconds
+
+Medium grained uncorrelated: 4.19465112686 seconds, 1 granularity
+Medium grained uncorrelated: 4.28233790398 seconds, 2 granularity
+Medium grained uncorrelated: 4.22498488426 seconds, 5 granularity
+Medium grained uncorrelated: 4.24862194061 seconds, 10 granularity
+Medium grained uncorrelated: 4.19062399864 seconds, 20 granularity
+Medium grained uncorrelated: 4.17627000809 seconds, 50 granularity
+Medium grained uncorrelated: 4.19110488892 seconds, 100 granularity
+Medium grained uncorrelated: 4.18760514259 seconds, 200 granularity
+Medium grained uncorrelated: 4.19581484795 seconds, 500 granularity
+Medium grained uncorrelated: 4.15351605415 seconds, 1000 granularity
+
+Corellated
+-------------
+Serial correlated: 0.351461172104 seconds
+Fine grained correlated: 3.36870288849 seconds
+Medium grained correlated: 3.97900009155 seconds
+Coarse grained correlated: 4.0417869091 seconds
+
+Medium grained correlated: 3.91600012779 seconds, 1 granularity
+Medium grained correlated: 3.95240402222 seconds, 2 granularity
+Medium grained correlated: 4.0262389183 seconds, 5 granularity
+Medium grained correlated: 4.02517008781 seconds, 10 granularity
+Medium grained correlated: 3.98893094063 seconds, 20 granularity
+Medium grained correlated: 3.93332099915 seconds, 50 granularity
+Medium grained correlated: 4.00131011009 seconds, 100 granularity
+Medium grained correlated: 3.99953389168 seconds, 200 granularity
+Medium grained correlated: 4.024091959 seconds, 500 granularity
+Medium grained correlated: 4.00891399384 seconds, 1000 granularity
+
+Included is a plot of the above results. I attempted a variety of ranges for the medium granularity, but discovered that there was too much noise and no discernible pattern when by granularities were below 100. Even increasing the granularity to 1000 did not yield exceptional results, as can be seen both from the above numbers and from the graph itself, which seems rather flat and with no evident pattern.
+
+One thing to immediately note is how much better the serial options perform in both cases. I postulate that the overhead computation of locking and perhaps even lock contention itself was the cause of this slowdown when moving to a parallel solution.
+
+Coarse grained performed the worst out of all of the options, and fine grained performed the best. Perhaps this was caused by the functionality of the medium-grained implementation, requiring more pre-processing than the fine-grained code, the latter of which just blanket assigned a lock to each piece of data. 
+
+In terms of data correlation, one interesting observation is that the serial implementation gets *worse* when the data is correlated, while the parallelization algorithms perform markedly better. We can see based on the graph that regardless of granularity, computation time for the correlated data is always better when we parallelize. It then flattens out at the graph shows, but for both types of data, there is a dip around the mark of 50 granularity. That is the granularity I would propose, if parallelization was necessary. Otherwise, the serial performance is best in all scenarios.

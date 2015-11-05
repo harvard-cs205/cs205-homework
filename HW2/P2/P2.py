@@ -48,7 +48,14 @@ if __name__ == '__main__':
     assert counts.sum() == total, "Wrong total after move_data_medium_grained"
     print("Medium grained uncorrelated: {} seconds".format(t.interval))
 
-    uNvals = range(1, 100, 5)
+    N = orig_counts.size
+    counts[:] = orig_counts
+    with Timer() as t:
+        move_data_medium_grained(counts, src, dest, 100, N)
+    assert counts.sum() == total, "Wrong total after move_data_medium_grained"
+    print("Coarse grained uncorrelated: {} seconds".format(t.interval))
+
+    uNvals = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000]
     uTimes = []
     for testN in uNvals:
         counts[:] = orig_counts
@@ -93,7 +100,14 @@ if __name__ == '__main__':
     assert counts.sum() == total, "Wrong total after move_data_medium_grained"
     print("Medium grained correlated: {} seconds".format(t.interval))
 
-    cNvals = range(1, 100, 5)
+    N = orig_counts.size
+    counts[:] = orig_counts
+    with Timer() as t:
+        move_data_medium_grained(counts, src, dest, 100, N)
+    assert counts.sum() == total, "Wrong total after move_data_medium_grained"
+    print("Coarse grained correlated: {} seconds".format(t.interval))
+
+    cNvals = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000]
     cTimes = []
     for testN in cNvals:
         counts[:] = orig_counts

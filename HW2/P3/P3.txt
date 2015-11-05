@@ -1,0 +1,27 @@
+Below are the results generated after introducing a prange() loop to allow for multithreading of the Mandelbrot computation:
+
+1 Thread
+1074.6528 Million Complex FMAs in 5.4332420826 seconds, 197.792180739 million Complex FMAs / second
+
+2 Threads
+1074.6528 Million Complex FMAs in 2.73975086212 seconds, 392.244716429 million Complex FMAs / second
+
+4 Threads
+1074.6528 Million Complex FMAs in 1.503428936 seconds, 714.801194964 million Complex FMAs / second
+
+Clearly multithreading improves performance as we see a 2x increase with 2 threads and an almost 4x increase when moving to 4 threads.
+
+---------------
+Below are the results generated after introducing 8-way instruction-level parallelism using the AVX and float8 functionality:
+
+1 Thread
+1074.9472 Million Complex FMAs in 0.786278963089 seconds, 1367.13208729 million Complex FMAs / second
+
+2 Threads
+1074.9472 Million Complex FMAs in 0.410098075867 seconds, 2621.19542436 million Complex FMAs / second
+
+4 Threads
+1074.9472 Million Complex FMAs in 0.226361036301 seconds, 4748.81727689 million Complex FMAs / second
+
+The first thing to note is that comparing to its counterparts above, each of these providex approximately an 8x improvement (which follows logically). This is a fantastic performance improvement despite our use of AVX static scheduling (which assumes similar runtime for each chunk, which is not the case for this problem). I suspect that if we did some even more clever manipulation and perhaps introduced randomness as we did on the last homework with Spark, the improvment could be even more fantastic.
+

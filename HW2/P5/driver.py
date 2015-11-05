@@ -16,6 +16,7 @@ from physics import update, preallocate_locks
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
+# Citation: http://graphics.stanford.edu/~seander/bithacks.html#InterleaveBMN
 def part1by1(n):
     n&= 0x0000ffff
     n = (n | (n << 8)) & 0x00FF00FF
@@ -28,8 +29,8 @@ def interleave2((i, xy)):
     return part1by1(xy[0]) | (part1by1(xy[1]) << 1)
 
 if __name__ == '__main__':
-    num_balls = 500
-    radius = 0.015
+    num_balls = 10000
+    radius = 0.002
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -91,7 +92,7 @@ if __name__ == '__main__':
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
             glocations = (positions / grid_spacing).astype(int)
-            sorted_indices = map(lambda (i, value): i, sorted(enumerate(locations), key=interleave2))
+            sorted_indices = map(lambda (i, value): i, sorted(enumerate(glocations), key=interleave2))
 
             velocities = velocities[sorted_indices]
             positions = positions[sorted_indices]
