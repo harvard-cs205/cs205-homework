@@ -30,6 +30,7 @@ def py_median_3x3_0(image, iterations):
 
 def applyFilter(input_image,output_image,offset,step,controlS):
     filtering.median_3x3(input_image,output_image,offset,step)
+    # set event after filtering is done
     controlS.set()
     
 
@@ -43,7 +44,7 @@ def py_median_3x3(image, iterations, num_threads):
             th = threading.Thread(target=applyFilter,
                                   args=(tmpA,tmpB,threadidx,num_threads,control[threadidx]))
             th.start()
-        for ii in xrange(0,num_threads):
+        for ii in xrange(0,num_threads): # wait until all threads do filtering before moving on to next iteration
             control[ii].wait()
         tmpA, tmpB = tmpB, tmpA
         for ii in xrange(0,num_threads):
@@ -74,13 +75,11 @@ if __name__ == '__main__':
     
     pylab.figure()
     pylab.imshow(input_image[1200:1800, 3000:3500])
-    #pylab.imshow(input_image)
     pylab.title('before - zoom')
     pylab.show()
     
     # verify correctness
-    #from_cython = py_median_3x3(input_image, 2, 5)
-    #from_numpy = numpy_median(input_image, 2)
+
 
     num_iterations = 10
     num_threads = 1
@@ -90,20 +89,15 @@ if __name__ == '__main__':
     from_cython0 = py_median_3x3_0(input_image, num_iterations)
     from_cython = py_median_3x3(input_image, num_iterations, num_threads)
     from_numpy = numpy_median(input_image, num_iterations)
-    #print from_cython0[0][0:10] 
-    #print from_cython[0][0:10]
-    #print [sum(np.array(from_cython[ii] == from_cython0[ii])) for ii in xrange(0,600)]
-    #print sum(sum(np.array(from_cython[ii] == from_cython0[ii])) for ii in xrange(0,600))
+  
     assert np.all(from_cython == from_cython0)
     assert np.all(from_cython == from_numpy)
   
     with Timer() as t:
-        #new_image = py_median_3x3(input_image, 10, 8)
         new_image = py_median_3x3(input_image, num_iterations, num_threads)
 
     pylab.figure()
     pylab.imshow(new_image[1200:1800, 3000:3500])
-    #pylab.imshow(new_image)
     pylab.title('after - zoom')
 
     print("{} seconds for 10 filter passes.".format(t.interval))
