@@ -16,9 +16,25 @@ from physics import update, preallocate_locks
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
+def cmp_zorder(a, b):
+    j = 0
+    k = 0
+    x = 0
+    for k in range(2):
+        y = a[k] ^ b[k]
+        if less_msb(x, y):
+            j = k
+            x = y
+    return a[j] - b[j]
+
+def less_msb(x, y):
+    return x < y and x < (x ^ y)
+
 if __name__ == '__main__':
     num_balls = 10000
     radius = 0.002
+    #num_balls = 50
+    #radius = 0.01
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -61,22 +77,30 @@ if __name__ == '__main__':
     # preallocate locks for objects
     locks_ptr = preallocate_locks(num_balls)
 
+    num_threads=4
+
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
-                   radius, grid_size, locks_ptr,
-                   physics_step)
+                   radius, grid_spacing, grid_size, locks_ptr,
+                   physics_step, num_threads)
 
         # udpate our estimate of how fast the simulator runs
         physics_step = 0.9 * physics_step + 0.1 * t.interval
         total_time += t.interval
 
+
         frame_count += 1
         if total_time > anim_step:
             animator.update(positions)
-            print("{} simulation frames per second".format(frame_count / total_time))
+            print("Number of threads {}: {} simulation frames per second".format(num_threads, frame_count / total_time))
             frame_count = 0
             total_time = 0
+
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+            indexes = (positions/grid_spacing).astype(int)
+            orders = sorted(range(len(indexes)), cmp=lambda i, j: cmp_zorder(indexes[i], indexes[j]))
+            velocities = velocities[orders]
+            positions = positions[orders]
