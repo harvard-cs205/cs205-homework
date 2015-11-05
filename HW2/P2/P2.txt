@@ -9,12 +9,12 @@ Fine grained correlated: 4.89986205101 seconds
 Medium grained correlated: 7.39577698708 seconds
 
 
-For both correlated and uncorrelated data, the serial implementation is the fastest.  This is because the parallel implementation incurs both communication costs and time spent acquiring and releasing locks.  Using medium-grained locks slows the computation further because many elements are locked along with the element of interest.  For both locked versions, using correlated data speeds the computation because memory accesses are faster.  
+For both correlated and uncorrelated data, the serial implementation is the fastest.  This is because the parallel implementation incurs both communication costs and time spent acquiring and releasing locks.  Using medium-grained locks slows the computation further because many elements are locked along with the element of interest, causing the threads to wait for each other.  For both locked versions, using correlated data speeds the computation because memory accesses are faster.  
 
 I experimented with a wide range of N values approximately logarithmically spaced between N=1 and N=1000.  N=1 corresponds with a fine-grained implementation (every element has its own lock), and N=1000 corresponds with a serial implementation (All the elements use the same lock).  
 
 The results of my experimentation are displayed in P2.png.  
-For the uncorrelated data, spacing the locks more widely slows the computation down because it causes threads to wait for each other more because they become more likely to be trying to acquire the same lock.  The exception to this is N=1000 (serial implementation), which compensates for this by reducing the overhead of acquiring and releasing locks.  
+For the uncorrelated data, spacing the locks more widely slows the computation down because it causes threads to wait for each other more because they become more likely to be trying to acquire the same lock.  The exception to this is N=1000 (serial implementation), which compensates by reducing the overhead of acquiring and releasing locks (there is only one lock in each thread, never two).  
 
 For the correlated data, spacing the locks more widely generally slows the computation down for the same reason as the uncorrelated data (more threads waiting for each other), however there is a notable exception at N=20, which guarantees that all the threads will use only one lock each, thereby reducing the aquiring/releasing overhead.  This is still no faster than the fine-grained (N=1) implementation, however, because it still increases the amount that threads have to wait for one another.  
 
