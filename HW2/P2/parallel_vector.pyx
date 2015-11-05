@@ -116,17 +116,17 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
        for idx in prange(src.shape[0], nogil=True, num_threads=4, schedule=dynamic):
        #for idx in range(src.shape[0]):
            if counts[src[idx]] > 0:
-               if src[idx]/10 != dest[idx]/10: #in different neighborhood
-                   acquire(&(locks[dest[idx]/10]))
+               if src[idx]/N != dest[idx]/N: #in different neighborhood
+                   acquire(&(locks[dest[idx]/N]))
                    counts[dest[idx]] += 1
-                   release(&(locks[dest[idx]/10]))
-                   acquire(&(locks[src[idx]/10]))
+                   release(&(locks[dest[idx]/N]))
+                   acquire(&(locks[src[idx]/N]))
                    counts[src[idx]] -= 1
-                   release(&(locks[src[idx]/10]))
+                   release(&(locks[src[idx]/N]))
                else :
-                   acquire(&(locks[src[idx]/10]))
+                   acquire(&(locks[src[idx]/N]))
                    counts[dest[idx]] += 1
                    counts[src[idx]] -= 1
-                   release(&(locks[src[idx]/10]))
+                   release(&(locks[src[idx]/N]))
 
    free_N_locks(num_locks, locks)
