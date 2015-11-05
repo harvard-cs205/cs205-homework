@@ -1,1 +1,18 @@
+Prange() with 1 thread:
+1074.677197 Million Complex FMAs in 6.68912410736 seconds, 160.660376419 million Complex FMAs / second
+
+Prange() with 2 threads:
+1074.677197 Million Complex FMAs in 3.72856807709 seconds, 288.227859806 million Complex FMAs / second
+
+Prange() with 4 threads
+1074.677197 Million Complex FMAs in 3.70518898964 seconds, 290.046526643 million Complex FMAs / second
+
+
+
+Multi-threading, Inst-level parallelism 4 threads
+1082.029344 Million Complex FMAs in 0.431492805481 seconds, 2507.64168082 million Complex FMAs / second
+
+
+
+
 Acknowledgments: I received help on this problem from Kendrick Lo and Chuck Liu.  I also worked with Neil Chainani.  

@@ -9,6 +9,7 @@ from cython.parallel import prange
 cdef np.float64_t magnitude_squared(np.complex64_t z) nogil:
     return z.real * z.real + z.imag * z.imag
 
+# A Function to put AVX registers back into the array
 cdef void counts_to_output(AVX.float8 counts,
                       np.uint32_t [:, :] out_counts,
                       int i, int block) nogil:
@@ -19,6 +20,7 @@ cdef void counts_to_output(AVX.float8 counts,
     for idx in range(8):
         out_counts[i, 8*block + idx] = <unsigned int> tmp_counts[0]
 
+# A function to print out AVX registers to see what is in them.  VERY USEFUL.
 cdef void print_AVX(AVX.float8 reg) nogil:
     cdef:
         float regi[8]
@@ -36,35 +38,27 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                  int max_iterations=511):
     cdef:
         int i, iter, block, blox, j
+        np.complex64_t c, z
         float output[8]
         float [:, :] inco_real, inco_imag
         AVX.float8 avx0, avx1, avx2, avx4, magsquared, mask, zimag, zreal, zreal_inter, cimag, creal, itercounts 
-
-       # To declare AVX.float8 variables, use:
-       # cdef:
-       #     AVX.float8 v1, v2, v3
-       #
-       # And then, for example, to multiply them
-       #     v3 = AVX.mul(v1, v2)
-       #
-       # You may find the numpy.real() and numpy.imag() fuctions helpful.
 
     assert in_coords.shape[1] % 8 == 0, "Input array must have 8N columns"
     assert in_coords.shape[0] == out_counts.shape[0], "Input and output arrays must be the same size"
     assert in_coords.shape[1] == out_counts.shape[1],  "Input and output arrays must be the same size"
 
-# Without Instruction-level parallelism
-#    with nogil:
- #       for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=4):
-  #          for j in range(in_coords.shape[1]):
-   #             c = in_coords[i, j]
-    #            z = 0
-     #           for iter in range(max_iterations):
-      #              if magnitude_squared(z) > 4:
-       #                 break
-        #            z = z * z + c
-         #       out_counts[i, j] = iter
-
+    # With Multithreading, but without instruction-level parallelism
+    with nogil:
+        for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=4):
+            for j in range(in_coords.shape[1]):
+                c = in_coords[i, j]
+                z = 0
+                for iter in range(max_iterations):
+                    if magnitude_squared(z) > 4:
+                        break
+                    z = z * z + c
+                out_counts[i, j] = iter
+    """
     # Separate out the real and imaginary components of in_coords:
     inco_real = np.real(in_coords)
     inco_imag = np.imag(in_coords)
@@ -144,7 +138,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                     #    for zreal can still be used to update zimag, and update both components.  
                     zreal_inter = AVX.add(creal, AVX.sub(AVX.mul(zreal,zreal),AVX.mul(zimag,zimag)))
                     zimag = AVX.add(cimag, AVX.mul(avx2,AVX.mul(zreal,zimag)))
-                    zreal = zreal_inter
+                    zreal = zreal_inter"""
                        
 # An example using AVX instructions
 cpdef example_sqrt_8(np.float32_t[:] values):
