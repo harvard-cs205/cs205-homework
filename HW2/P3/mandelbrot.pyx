@@ -34,7 +34,7 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     assert in_coords.shape[1] == out_counts.shape[1],  "Input and output arrays must be the same size"
 
     with nogil:
-        for i in prange(in_coords.shape[0], num_threads=4, schedule='static', chunksize=1):
+        for i in prange(in_coords.shape[0], num_threads=2, schedule='static', chunksize=1):
         #for i in range(in_coords.shape[0]):
             for j in xrange(0, in_coords.shape[1], 8):
                 #c = in_coords[i, j]
