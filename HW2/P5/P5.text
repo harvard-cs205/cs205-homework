@@ -10,11 +10,11 @@ Multithreading:
 For 1 thread:
 11.616414682 simulation frames per second
 
-For 2 threads:
-18.8793143804
 
 For 4 threads:
 19.0222181909 simulation frames per second
+
+As we can see in the results, adding threads speeds up the process. 4 threads so almost double amout of simulations than 1 thread.
 
 ---------------------------------------------------
 Spatial decomposition:
@@ -22,11 +22,11 @@ Spatial decomposition:
 For 1 thread:
 622.29688615 simulation frames per second
 
-For 2 threads:
-1064.79896209 simulation frames per second
-
 For 4 threads:
 1113.46555376 simulation frames per second
+
+By using the spatial decomposition we increase the speed in about 60 times! This improvement is achieved because instead of checking for coalitions with all the possible balls we are only looking for coalitions in a 5x5 square on the grid. 
+Again, 4 threads gives us almost double of speed than 1 thread.
 
 ---------------------------------------------------
 Spatially coherent sorting
@@ -34,17 +34,18 @@ Spatially coherent sorting
 For 1 thread:
 671.119352374 simulation frames per second
 
-For 2 threads:
-1118.20316526 simulation frames per second
 
 For 4 threads:
 1301.31017701 simulation frames per second
 
+By using the Morton ordering we observe an slightly improvement on the simulation speed. This is probably due to the fact that re-ordering also takes so time and it might not always be necessary (the balls can be already in an efficient ordering).
 ---------------------------------------------------
-Locking
+Locking: with 4 threads, with gridding and sorting
 
 With locking:
 1082.52741634 simulation frames per second
 
 Without locking:
-1301.31017701 simulation frames per second
+1312.45442743 simulation frames per second
+
+As we can see the speed slightly decreases when adding the lock. This is probably due to the fact that is very unlikley that two threads need the same lock given the big amount of balls and the small amount of threads.
