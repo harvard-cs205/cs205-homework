@@ -1,0 +1,28 @@
+Multithreading comparison:
+
+With 1 thread: range from 3 - 3.5 simulation frames per second
+With 4 threads: range from 5 - 6.5 simulation frames per second, with spikes up to 300 every once in a while
+
+
+With Grid:
+
+With 1 thread: range from 1400-1550 simulation frames per second
+With 4 threads: range from 40 - 100 simulation frames per second, with spikes up to 400
+
+With Grid Sorting:
+
+With 1 thread: range from 1450-1650 simulation frames per second
+
+With 4 Threads: range of 40 - 90 simulation frames per second, with ever 4th being 2800-3200, so it averages out to about 800 frames/sec
+
+With locking:
+
+With 1 Thread: 1550 - 1650 simulation frames per second
+
+With 4 Threads: 40-70 simulation frames per second, with spikes ranging from 1000-3000, so averaging to about 600 frames/sec
+
+
+In terms of simulation frames per second calculated, the fastest was with all of multithreading, gridding, grid sorting, and locking. This makes sense since the grid reduces the total number of calculations by allowing the program to check for a ball in a larger area. The sorting allows the balls to be found faster relative to each other, and the locking limits the updates happening on a collision to one. With and without locking more or less ties in terms of amount of simulation frames per second, as the speedup is closely balanced with the locking overhead.
+However, the output for using more threads in my code resulted in a smaller amount of simulation frames per seconds. I am not sure why this is the case since I would expect the simulation computation to be done quicker. Perhaps there was actually a speedup but since there are 4 threads, the value got hidden in one of them, which is why I was seeing the spikes to a large number, so maybe the actual count is the large spike which registers once every 4 threads. 
+
+My method for spacial sorting was to use the Morton ordering method. I found the ordering function on Wikipedia to use when sorting the objects in the grid. Visually, the method orders the values in grids of Z- lines, with the bottom of one Z connecting to the top of the next. I believe this is a good choice as advised; things close to each other are sorted close in order.

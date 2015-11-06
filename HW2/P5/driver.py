@@ -16,6 +16,20 @@ from physics import update, preallocate_locks
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
+# from wikipedia for Morton
+def cmp_zorder(a, b):
+        j = 0
+        k = 0
+        x = 0
+        for k in range(2):
+            y = a[k] ^ b[k]
+            if less_msb(x, y):
+                j = k
+                x = y
+        return a[j] - b[j]
+def less_msb(x, y):
+        return x < y and x < (x ^ y)
+
 if __name__ == '__main__':
     num_balls = 10000
     radius = 0.002
@@ -80,3 +94,25 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+
+            boxes = (positions / grid_spacing).astype(int) 
+
+            # get list of (box num, value in box)
+            unorder = zip(range(len(boxes)), (tuple(x) for x in boxes))
+
+            # sort values in boxes with Morton method
+            unorder.sort(key = lambda x: x[1], cmp = cmp_zorder)
+
+            # ordered list containing index
+            order = [x[0] for x in unorder]
+
+            # change to be in new order
+            positions = positions[order]
+            velocities = velocities[order]
+
+            # reset grid
+            grid = (-1 * np.ones(grid.shape)).astype(np.uint32)
+
+            # update grid vals
+            for i in range(len(positions)):
+                grid[positions[i,0],positions[i,1]] = i

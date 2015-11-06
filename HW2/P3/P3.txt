@@ -1,0 +1,21 @@
+Multithreading:
+
+With 1 thread: 1074.677197 Million Complex FMAs in 5.15892601013 seconds, 208.31413261 million Complex FMAs / second
+
+With 2 threads: 1074.677197 Million Complex FMAs in 2.68077993393 seconds, 400.882289291 million Complex FMAs / second
+
+With 4 threads: 1074.677197 Million Complex FMAs in 1.49369978905 seconds, 719.473353936 million Complex FMAs / second
+
+With AVX:
+(The image did not show up because of a memory error, but when I set the iteration down down to 1000, it showed the correct image. These numbers are correct since they are independent of wether or not my VM can show the image.)
+
+With 1 thread: 1059.239961 Million Complex FMAs in 0.776834011078 seconds, 1363.53448214 million Complex FMAs / second
+
+With 2 threads: 1059.239961 Million Complex FMAs in 0.392957925797 seconds, 2695.55565994 million Complex FMAs / second
+
+With 4 threads: 1059.239961 Million Complex FMAs in 0.223266124725 seconds, 4744.29321646 million Complex FMAs / second
+
+We can see that there is huge improvement with multhreading and an even larger improvement with AVX 8-way parallelism.
+With simply multithreading, the improvements are nearly linear with the number of threads, as this is an embarassingly parallel problem. As expected, the improvement begins to deteriorate with more threads since there are some computations that take much much longer time. 
+
+By adding AVX 8-way parallelism, the improvement was not 8x, but rather about 6.5x, which is still huge. Again, this is because the problem is embarassingly parallel. It was not a full 8x improvement since all of the 8 counts have to be completed for the computation to stop (the mask makes it slightly less than optimal as the computation can happen when only one of the eight values still needs to be computed). Otherwise, we see a similar increase of roughly 2x for 2 threads and slightly less than 4x for 4 threads, as expected.

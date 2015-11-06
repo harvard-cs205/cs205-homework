@@ -1,0 +1,15 @@
+I had to scale down the image with 
+
+input_image = input_image[::2, ::2].copy()
+
+otherwise I got a memory error on my memory-limited VM
+
+With 1 Thread: 0.880386829376 seconds for 10 filter passes
+
+With 2 Threads: 0.849691867828 seconds for 10 filter passes.
+
+With 4 Threads: 0.81258893013 seconds for 10 filter passes.
+
+So there is some speedup by adding more threads, which I believe would be more pronounced if I did the computation on the entire image, not just a small subsection. The bigger jump in time is from 1 thread to 2 threads, which makes sense since the jump from serial to 2 threads allows it the threads' work to complement each other's, but from 2 to 4 threads the jump is smaller as the work cannot be done that much more effectively in the end. 
+
+To ensure threads do not continue until the thread on either side of it is at least at the previous iteration, I made events that could be broadcast to all threads, one for each thread reaching a certain iteration, then used .wait() to ensure that a given thread's neighbors had gotten to the same point. 
