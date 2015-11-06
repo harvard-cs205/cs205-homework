@@ -1,1 +1,14 @@
 # Your answers here
+
+The jobs don't neccessarily start and finish in the order one may expect. This could create race conditions, which are often the cause of bugs in parallel programs. One scenario where this is particularly important is in database updates. If two threads are updating a database value in parallel, it's possible that following could happen: 
+
+Thread 1 reads value
+Thread 2 reads value
+Thread 2 updates value
+Thread 1 updates value
+
+Now the effect of thread 2's update have been erased. Values need to be protected by locks to prevent this problem. 
+
+Part B
+
+The serial version is faster if the wait time is very short (the computation is very quick). This makes sense because creating a new thread/merging a thread back requires overhead. If each of the computations being done in parallel take less time than the overhead, it is faster to just run everything in serial.
