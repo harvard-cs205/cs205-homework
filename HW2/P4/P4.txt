@@ -1,0 +1,10 @@
+# Your discussion here
+1 thread
+13.5527689457 seconds for 10 filter passes.
+
+2 threads
+13.3241732121 seconds for 10 filter passes.
+
+4 threads
+13.2391269207 seconds for 10 filter passes.
+

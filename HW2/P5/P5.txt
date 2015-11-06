@@ -1,0 +1,69 @@
+
+___Subproblem 1: multithreading___
+
+sample results with
+
+num_threads = 4
+261.752857945 simulation frames per second
+471.760425161 simulation frames per second
+90.0292241069 simulation frames per second
+118.965410634 simulation frames per second
+118.492536133 simulation frames per second
+110.169129139 simulation frames per second
+146.378630409 simulation frames per second
+250.639640501 simulation frames per second
+
+num_threads = 2
+1317.40056822 simulation frames per second
+525.058466228 simulation frames per second
+1431.2384798 simulation frames per second
+1339.82395366 simulation frames per second
+568.06244342 simulation frames per second
+418.277150143 simulation frames per second
+1841.93941111 simulation frames per second
+672.009292731 simulation frames per second
+1246.52048513 simulation frames per second
+419.128029065 simulation frames per second
+1663.79327345 simulation frames per second
+
+num_threads = 1
+1204.75314558 simulation frames per second
+1270.20453697 simulation frames per second
+1159.75650324 simulation frames per second
+1167.84601765 simulation frames per second
+1197.06289286 simulation frames per second
+1298.57354152 simulation frames per second
+1228.61271148 simulation frames per second
+1105.39950994 simulation frames per second
+1268.17708275 simulation frames per second
+1255.73488256 simulation frames per second
+1303.66465577 simulation frames per second
+
+
+It seems to work slower for more threads
+
+___Subproblem2: spatial decomposition___
+Note: ignoring the instruction to subdivide simulation space due to
+piazza post 397
+
+optimizing calls to overlapping using grid
+if XY1 and XY2 are not within 2 spaces continue to next iteration of loop
+gridded version should be faster because you are checking overlap less
+
+___Subproblem3: spatially coherent sorting___
+sort an n by 2 array for position of balls
+if position = n x 2 array
+do position.sort(axis=0) each 1/30th second
+
+performance
+more sorting would take more time so the more sorts, the worse the
+performance. there will probably less of a gap in performance between
+threads. it may even be slower with more threads.
+
+
+___Subproblem4: locking___
+i would think it would be slower with locking
+
+
+
+

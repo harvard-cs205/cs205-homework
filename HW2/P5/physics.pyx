@@ -4,6 +4,7 @@ cimport numpy as np
 from libc.math cimport sqrt
 from libc.stdint cimport uintptr_t
 cimport cython
+from cython.parallel import prange
 from omp_defs cimport omp_lock_t, get_N_locks, free_N_locks, acquire, release
 
 # Useful types
@@ -72,6 +73,30 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     for j in range(i + 1, count):
         XY2 = &(XY[j, 0])
         V2 = &(V[j, 0])
+
+        # trying to reduce num calls to overlapping using the grid
+        # if you know space a round has nothing in it (-1) don't need
+        # to check
+        # Note: objects can collide up to two grid squares away
+        """
+        while(e):
+            if Grid[j+r,0] == -1 and Grid[j-r,0]==-1:
+                continue
+            if Grid[j-r,0] == -1:
+                continue
+        """
+        """
+        # check box around
+        if sum(sum(Grid[XY1[0]-2:XY[0]+2,XY1[1]-2:xY1[1]+2] == -1)) == 24:
+            continue
+        """
+        # check where in Grid XY1 and XY2 are
+        # compare and see if they are > 2 spaces apart
+        # if true, continue instead of going through overlap
+
+
+
+
         if overlapping(XY1, XY2, R):
             # SUBPROBLEM 4: Add locking
             if not moving_apart(XY1, V1, XY2, V2):
@@ -103,7 +128,9 @@ cpdef update(FLOAT[:, ::1] XY,
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
-        for i in range(count):
+
+        #for i in range(count):
+        for i in prange(count, schedule='static', chunksize=count/4, num_threads=1):
             for dim in range(2):
                 if (((XY[i, dim] < R) and (V[i, dim] < 0)) or
                     ((XY[i, dim] > 1.0 - R) and (V[i, dim] > 0))):
@@ -113,7 +140,9 @@ cpdef update(FLOAT[:, ::1] XY,
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
-        for i in range(count):
+
+        # for i in range(count):
+        for i in prange(count, schedule='static', chunksize=count/4, num_threads=1):
             sub_update(XY, V, R, i, count, Grid, grid_spacing)
 
         # update positions
@@ -121,9 +150,12 @@ cpdef update(FLOAT[:, ::1] XY,
         # SUBPROBLEM 1: parallelize this loop over 4 threads (with static
         #    scheduling).
         # SUBPROBLEM 2: update the grid values.
-        for i in range(count):
+
+        # for i in range(count):
+        for i in prange(count, schedule='static', chunksize=count/4, num_threads=1):
             for dim in range(2):
                 XY[i, dim] += V[i, dim] * t
+
 
 
 def preallocate_locks(num_locks):

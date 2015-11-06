@@ -1,0 +1,29 @@
+Performance for multithread over rows
+1 thread
+1074.677197 Million Complex FMAs in 7.01647806168 seconds, 153.164762656 million Complex FMAs / second
+
+
+2 threads
+1074.677197 Million Complex FMAs in 3.70396900177 seconds, 290.142060176 million Complex FMAs / second
+
+
+4 threads
+1074.677197 Million Complex FMAs in 2.24508094788 seconds, 478.680823521 million Complex FMAs / second
+
+
+AVX
+1 thread
+1159.738072 Million Complex FMAs in 2.69375514984 seconds, 430.528391591 million Complex FMAs / second
+1159.738072 Million Complex FMAs in 2.71006608009 seconds, 427.93719331 million Complex FMAs / second
+
+2 threads
+1159.738072 Million Complex FMAs in 2.32678508759 seconds, 498.429390057 million Complex FMAs / second
+1159.738072 Million Complex FMAs in 1.54321599007 seconds, 751.507293512 million Complex FMAs / second
+1159.738072 Million Complex FMAs in 1.70858407021 seconds, 678.771441349 million Complex FMAs / second
+
+
+4 threads
+1159.738072 Million Complex FMAs in 1.2049241066 seconds, 962.498854201 million Complex FMAs / second
+1159.738072 Million Complex FMAs in 1.206594944 seconds, 961.166029882 million Complex FMAs / second
+
+
