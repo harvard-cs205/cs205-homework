@@ -1,1 +1,7 @@
-# Your discussion here
+From Harvard_University to Kevin_Bacon, the distance is 3
+The path is: Harvard_University--->Gilmore_Girls--->Liza_Weil--->Kevin_Bacon
+
+From Kevin_Bacon to Harvard_University, the distance is 2
+The path is: Kevin_Bacon--->College_Bowl--->Harvard_University
+
+
