@@ -1,0 +1,26 @@
+Part 1: implement updates from neighbors
+    Maze 1: Finished after 840 iterations with 12.2246761095 ms per iteration.
+    Maze 2: Finished after 494 iterations with 13.8885251093 ms per iteration.
+    
+Part 2: fetch grandparents
+    Maze 1: Finished after 505 iterations with 14.7056821069 ms per iteration.
+    Maze 2: Finished after 260 iterations with 16.6569154231 ms per iteration.
+    
+Part 3: merge parent regions
+    Maze 1: Finished after 9 iterations with 18.1036442222 ms per iteration.
+    Maze 2: Finished after 8 iterations with 16.9824455 ms per iteration.
+
+Part 4: efficient grandparents
+    Maze 1: Finished after 8 iterations with 16.776571625 ms per iteration.
+    Maze 2: Finished after 8 iterations with 14.389150875 ms per iteration.
+    On my hardware (Intel(R) Core(TM) i7-3537U CPU @ 2.00GHz), part 4 provides a slight speedup over part 3, suggesting that this optimization is a small improvement despite forcing the computation to be sequential rather than in parallel, i.e., multithreaded, because it reduces time spent on memory reads. This means that grandparent calculation is memory bound and that parallelizing the computation involved is ineffective at creating a speedup. This makes sense since the only computation for each memory read is a little arithmetic. A machine with a better cache may improve the memory performance such that parallelizing the computation would be effective.
+    
+Part 5: no atomic operations
+    Using atomic operators guarantees correctness. In part 3, we increment a value in place using one or more threads. During the course of the algorithm, multiple coordinates are updated to have the same label in a given iteration. That label becomes the next iteration's old_label, so multiple coordinates will have the same old_label in a given iteration. This means that in the part 3 calculation, multiple threads may try to update labels[old_label]. Consider the scenario where thread A and thread B both have old_label = 5 and labels[5] = 6. During the iteration, A gets new_label 4 and B gets new_label 2. Now, both A and B want to update labels[5] from 6 to distinct new values. Since min() is not an atomic operation, there are 3 separate steps: 1) read in the value 2) compare 3) write the new value. Thread switching can occur between any steps, so imagine the following scenario:
+    A reads 6
+    B reads 6
+    B compares 2 and 6
+    B writes 2
+    A compares 4 and 6
+    A writes 4
+    Thus, a value can increase within an iteration but not between iterations because iterations are run sequentially. If min() were used, the time for each iteration could decrease because of more parallelism, but the number of iterations to reach the minimum may increase because, for example, it may take an extra iteration for labels[5] to equal 2 in the example above.
