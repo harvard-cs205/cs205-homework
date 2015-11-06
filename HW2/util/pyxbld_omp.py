@@ -17,6 +17,7 @@ def make_ext(modname, pyxfilename):
                                          '-Ofast',
                                          '-march=native',
                                          '-fopenmp',
+                                         '-mavx',
                                          '-I{}'.format(np.get_include()),
                                          '-I.'],
                      extra_link_args=extra_link_args)

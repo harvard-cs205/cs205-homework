@@ -1,0 +1,37 @@
+Author: Xingchi Dai Harvard University
+Class: CS205
+Homework 2
+Problem 3: Performance of Instruction and Thread-Level Parallelism
+
+Part1: Multithreading
+
+Compare 1, 2, 4 threads:
+thread 1:
+1074.656613 Million Complex FMAs in 5.49816393852 seconds, 195.45736086 million Complex FMAs / second
+thread 2:
+1074.656613 Million Complex FMAs in 2.6362080574 seconds, 407.652427122 million Complex FMAs / second
+thread 4:
+1074.656613 Million Complex FMAs in 1.32173895836 seconds, 813.062674898 million Complex FMAs / second
+
+
+I personally really satisfied the performance here. If we have a small data to process and a parallel computing is
+introduced, the performance won't improve that much because of overhead.
+However, in this case, since the computation amount is large, the performance get improved much, showing the benefit
+of using parallel computing.
+
+
+Part2: Instruction Level Parallelism
+
+With AVX, we add 8-way instruction-level parallelism. The performance result is shown as below:
+
+
+1 thread:
+1074.94829 Million Complex FMAs in 2.77294516563 seconds, 387.655804854 million Complex FMAs / second
+
+2 threads:
+1074.94829 Million Complex FMAs in 1.38655591011 seconds, 775.265016118 million Complex FMAs / second
+
+4 threads:
+1074.94829 Million Complex FMAs in 0.780517816544 seconds, 1377.22453891 million Complex FMAs / second
+
+With AVX, our performance has improved significantly, as we operate on 8 floating-points values in parallel.

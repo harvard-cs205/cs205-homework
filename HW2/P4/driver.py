@@ -20,9 +20,76 @@ def py_median_3x3(image, iterations=10, num_threads=1):
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
 
+
+    #the original method provided by professors
+    # for i in range(iterations):
+    #    filtering.median_3x3(tmpA, tmpB, 0, 1)
+    #    # swap direction of filtering
+    #    tmpA, tmpB = tmpB, tmpA
+    #
+    # #multiple-threads method
+    # #first,create an event for each (threads,iteration)
+    # #event will be used for protecting communications between threads
+    Events = []
+    for x in range(num_threads):
+        for iter in range(iterations):
+            Events.append(threading.Event())
+    #reshape the events, and access it in the future
+    Events = np.array(Events).reshape((num_threads,iterations))
+
+    #after the events are created, we need to create threads
+    #Threads event structure is created
+
+    Threads=[]
+    for x_thread in range(num_threads):
+        #call the parallelComputeImage method for every thread
+        #x_thread here means the nth thread
+        thread = threading.Thread(target=parallelComputeImage,args=(x_thread,num_threads,tmpA,tmpB,Events,iterations))
+        #start the thread and put the thread into the array
+        thread.start()
+        Threads.append(thread)
+
+    # kill the last thread, here I thought we could just kill the last thread
+    # however, since sometime, we cannot predict threads' order
+    # it is safe to kill all threads one by one
+    for th in range(num_threads):
+        Threads[th].join()
+
+    return tmpA
+
+
+#this function is used for processing image in multiple threads
+#The Events data structure needs to be passed in
+def parallelComputeImage(x_thread,num_threads,tmpA,tmpB,Events,iterations):
+    #create a function for processing image in multiple threads
+    #all threads will run parallel
+
     for i in range(iterations):
-        filtering.median_3x3(tmpA, tmpB, 0, 1)
-        # swap direction of filtering
+        #before running threads, make sure everything is ready to run
+        #We don't need to differentiate if its single thread/multiple threads here
+        #we need to check if n has completed its calculation
+
+        #the first iteration no need to wait for anything.
+        #the first thread has no x_thread - 1
+        #the last thread has no x_thread + 1
+        #print "iteration time=%d" %i
+        if(i != 0 and num_threads != 1):
+            Events[x_thread,i-1].wait()
+            #skip if it is the first x_thread
+            if(x_thread!=0):
+                Events[x_thread - 1,i-1].wait()
+            #skip if it is the last x_thread
+            if(x_thread!=num_threads - 1):
+                Events[x_thread + 1, i-1].wait()
+
+        #run filtering function(tmpA,tmpB,offset,step)
+        #step----step here is the numThread, since we are creating every Nth line
+        #offset---- here is Thread Number also, cuz we are starting at this line
+        #x here is the number assigned to every thread in the previous loop
+        filtering.median_3x3(tmpA, tmpB, x_thread, num_threads)
+        #here we send out the signal to make sure
+        Events[x_thread,i].set()
+        #swap in the single thread, and run everything again until we hit the max_iteration
         tmpA, tmpB = tmpB, tmpA
 
     return tmpA
@@ -57,7 +124,7 @@ if __name__ == '__main__':
     assert np.all(from_cython == from_numpy)
 
     with Timer() as t:
-        new_image = py_median_3x3(input_image, 10, 8)
+        new_image = py_median_3x3(input_image, 10, 4)
 
     pylab.figure()
     pylab.imshow(new_image[1200:1800, 3000:3500])

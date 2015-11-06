@@ -1,0 +1,40 @@
+Author: Xingchi Dai  Harvard University
+Class: CS205
+Homework 2
+Problem 4: Image Processing
+
+Part 1: Discussing about implementation choice
+
+In this problem, I used "Event" to communicate between threads. Since we are required to make sure the completion of
+threads of n, n-1,and n+1 have all finished i - 1 iteration. So before one event is kicked off, three singals have to
+be received. The basic logic is written as follows:
+
+-> thread(n,i) stops for waiting signals from other three event(event1,event2,event3)
+
+-> if event1(n-1,i-1) finished, send the signal1
+
+-> if event2(n,i-1) finished, send the signal2
+
+-> if event3(n+1,i-1) finished, send the signal3.
+
+Only if those three signals were received, the thread(n,i) could be started.
+
+Thus, after one event is finished, it has to send a "set" signal.
+
+
+Part2: Performance and Results
+
+1 thread:
+3.20314788818 seconds for 10 filter passes.
+
+2 threads:
+1.68510913849 seconds for 10 filter passes.
+
+4 threads:
+0.951035022736 seconds for 10 filter passes.
+
+According to results above, the performance has been improved SIGNIFICANTLY, showing the benefit of using parallel
+computing. Also, the results prove our implementation is correct.
+However, I have noticed that using 4 threads doesn't improve the performance four times. I think when I introduced
+Event object into the program, it also cause overhead delay. Also, parallel computing has overhead cost itself also.
+So, I expected the improvement of performance wouldn't be over four times.
