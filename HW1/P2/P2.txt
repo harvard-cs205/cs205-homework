@@ -1,1 +1,7 @@
-# Your discussion here
+# Author: Xingchi Dai
+Answer: 
+As the information given in the instruction, location close to one another tend to have 
+similar final iteration counts. Thus, if we put those local values under the same partition, the iteration counts for that specific partition will tend to have same iteration counts. For this reason, we don't use the patition well. 
+
+
+That's been said, if we shuffle our list, then each parition has random points to calculate, so it won't be restricted by the locality, which gives to a more efficient.
