@@ -1,0 +1,21 @@
+1. Time comparison
+
+(1) Uncorrelated (random)
+Serial uncorrelated: 0.255743026733 seconds
+Fine grained uncorrelated: 6.3752450943 seconds
+Medium grained uncorrelated: 6.8746650219 seconds
+
+(2) Correlated (N=10)
+Serial correlated: 0.330317974091 seconds
+Fine grained correlated: 6.20790791512 seconds
+Medium grained correlated: 5.56719088554 seconds
+
+When data exchange was correlated, we could learn that Medium grained locks were showing better performance compared to the Fine grained locks. This is because, since there are more threads sharing the locks, less overhead for waiting those locks would result such better performance.
+
+2. good N value :
+I modified P2.py code, to have experiment with various N values and I plotted a graph for comparison.
+
+When we see the graph, it is hard to find good N value for uncorrelated case. Since uncorrelated case has exchanging data at random places, therefore, this case always requires to use two different locks for dest list and src list.
+
+However, when we see correlated case, we can infer that when N=20, the time required to do this task was minimum value. This is because when 20 adjacent items share the lock, the highest probability of distance between two exchanging itmes is 10 (which means distance will make normal distribution with mean at 10, and decrease probability as N value varies). Therefore, half of cases(which has distance 1~10) will share the lock and half of cases (which has distance 11~20 cases) will use separate locks.
+I think sharing those two cases will balance the overhead caused by bottleneck of waiting a certain lock, or advantage caused by using less locks compared to fine-grained locks.

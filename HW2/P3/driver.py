@@ -28,6 +28,8 @@ def make_coords(center=(-0.575 - 0.575j),
 if __name__ == '__main__':
     in_coords, out_counts = make_coords()
 
+    #print in_coords
+
     with Timer() as t:
         mandelbrot.mandelbrot(in_coords, out_counts, 1024)
     seconds = t.interval

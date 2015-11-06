@@ -1,0 +1,26 @@
+1. Multithreading
+
+1) 1 thread
+1074.656613 Million Complex FMAs in 4.59789085388 seconds, 233.728169535 million Complex FMAs / second
+
+2) 2 threads
+1074.656613 Million Complex FMAs in 2.18646192551 seconds, 491.504837319 million Complex FMAs / second
+
+3) 4 threads
+1074.656613 Million Complex FMAs in 1.19199895859 seconds, 901.558348904 million Complex FMAs / second
+
+The computation time is improved as the number of threads increased.
+
+
+2. Instruction-level Parallelism
+
+1) 1 thread
+1074.94829 Million Complex FMAs in 0.620907068253 seconds, 1731.25471582 million Complex FMAs / second
+
+2) 2 threads
+1074.937033 Million Complex FMAs in 0.301413059235 seconds, 3566.32534678 million Complex FMAs / second
+
+3) 4 threads 
+1074.747923 Million Complex FMAs in 0.246752023697 seconds, 4355.57896101 million Complex FMAs / second
+
+The computataion time has been improved a lot as the number of threads increased, and also it showed much better performance compared to Non-AVX instruction case. Since AVX allows us to compute 8 variables at the same time (at the instruction level), it showed 4 times better performance. (The reason why it did not show 8 times better performance would be because of other overhead reasons.)

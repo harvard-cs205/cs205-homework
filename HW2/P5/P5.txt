@@ -1,0 +1,63 @@
+1. Multithreading
+
+thread 1 : 13~12 simulation frames per second
+thread 4 : 15~19 simulation frames per second
+
+The performance has been improved since we iterate number_of_ball times, which is quite huge(10,000), so more thread will give us performance improvement and this will override the overhead of context-swtich.
+
+2.  Spatial decomposition
+
+1) non-grided & thread 1 : 13~12 simulation frames per second
+2) non-grided & thread 4 : 15~19 simulation frames per second
+
+3) grided & thread 1 : around 980
+1031.29445155 simulation frames per second
+967.429210467 simulation frames per second
+971.353404354 simulation frames per second
+917.687167398 simulation frames per second
+
+4) grided & thread 4 : around 1700
+1678.92579505 simulation frames per second
+1776.28503589 simulation frames per second
+1520.86387487 simulation frames per second
+2025.78767109 simulation frames per second
+
+In this time, the improvement by griding itself was huge as well as performance improvement that multi-threading brought us. Grid version improved almost 100 times than non-grided version, and after grid, multithreading expedited performance 2 times.
+This is because, before we make grid system, the code iterate over every other balls, so it took num_balls iterations time for each time that update function has been called. However, after we apply grid system, it only compares 3 * 3 times of nearby balls, therefore, it reduced iteration time significantly. Therefore, we were able to see such huge improvment.
+
+
+3. Sorting
+
+1) sorted & thread 1 : around 1180
+1126.37756624 simulation frames per second
+1187.13716611 simulation frames per second
+1173.32214366 simulation frames per second
+1280.57620403 simulation frames per second
+
+2) sorted & thread 4 : around 2150
+2208.76947929 simulation frames per second
+2157.85269182 simulation frames per second
+2142.21285229 simulation frames per second
+2120.22059734 simulation frames per second
+
+I chose the Z-order (Morton) sorting algorithm to sort the balls visiting order.
+When we compare the performance with before-sorting, the performance has been improved around 20%. 
+This is because, by sorting, we are re-ordering in which order to visit the memory for the other balls, when we're compouting collision, therby allowing us to visit the nearby balls first. Since Z-order is helping us to reorder the positions and velocities in a way the memory access time can be reduced. Therefore, we are able to see the improvement in performance.
+
+
+4. Locking
+
+* with lock & thread 4 : around 1190
+1196.57978638 simulation frames per second
+1194.83926104 simulation frames per second
+1201.68872987 simulation frames per second
+1184.32980376 simulation frames per second
+
+* without lock & thread 4 : around 2150
+2208.76947929 simulation frames per second
+2157.85269182 simulation frames per second
+2142.21285229 simulation frames per second
+2120.22059734 simulation frames per second
+
+When we compare 4 threads without locks (which is sorted & thread 4), the performance has been reduced to half. This is because, since we are using several threads, bottleneck happens because of waiting for a certain lock until it is released. Therefore, it is undoubtable to see the performance decrease.
+
