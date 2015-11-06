@@ -1,3 +1,14 @@
+# mandelbrot.py
+
+######################
+#
+# Submission by Kendrick Lo (Harvard ID: 70984997) for
+# CS 205 - Computing Foundations for Computational Science (Prof. R. Jones)
+# 
+# Homework 3 - Problem 2
+#
+######################
+
 from __future__ import division
 import pyopencl as cl
 import numpy as np
