@@ -26,13 +26,16 @@ def make_coords(center=(-0.575 - 0.575j),
 
 
 if __name__ == '__main__':
-    in_coords, out_counts = make_coords()
+    # parallelize across 1, 2, or 4 threads
+    for nt in [1, 2, 4]:
+        in_coords, out_counts = make_coords()
 
-    with Timer() as t:
-        mandelbrot.mandelbrot(in_coords, out_counts, 1024)
-    seconds = t.interval
+        with Timer() as t:
+            mandelbrot.mandelbrot(in_coords, out_counts, nt, 1024)
+        seconds = t.interval
 
-    print("{} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
+        print("{} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
 
-    plt.imshow(np.log(out_counts))
-    plt.show()
+        # double-check that output still looks right
+        plt.imshow(np.log(out_counts))
+        plt.savefig('{}_thread.png'.format(nt))

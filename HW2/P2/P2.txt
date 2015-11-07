@@ -1,0 +1,37 @@
+In general, because this task is memory-bound rather than compute-bound, parallelizing slows it down (regardless of the level of locking) because of increased overhead.
+With fine-grained locking, the correlated transfers are somewhat faster than the uncorrelated transfers, perhaps because if a thread just had a particular lock, it's slightly less likely that any other thread is trying to modify any of the nearby elements, so that thread can pick up its next lock a little more quickly.
+I tested medium-grained locking varying from one lock per element (equivalent to fine-grained locking) to one lock for all the elements (equivalent to coarse-grained locking, zero concurrency). The medium-grained option equivalent to fine-grained locking still took noticeably longer than regular fine-grained locking. I would've expected a slight increase, because there's a little bit of extra logic, but I was surprised by how much of a difference this made.
+With truly "medium-grained" locking (i.e., between the two extremes), the uncorrelated transfers receive no speedup relative to fine-grained (and in fact take significantly longer). A smaller number of larger locks in this case only slows the transfers down by decreasing concurrency. However, the correlated transfers receive some speedup relative to fine-grained locking for N between roughly 10 and 80, where concurrency is balanced against a greater likelihood that each thread will only have to grab one lock for both the source and destination elements of counts. See P2_medium.png.
+
+----
+
+Serial uncorrelated: 0.32396697998 seconds
+Fine grained uncorrelated: 5.50496101379 seconds
+Medium grained (N=1) uncorrelated: 7.19199299812 seconds
+Medium grained (N=5) uncorrelated: 6.73083209991 seconds
+Medium grained (N=10) uncorrelated: 6.20352077484 seconds
+Medium grained (N=20) uncorrelated: 7.08833098412 seconds
+Medium grained (N=30) uncorrelated: 6.7327837944 seconds
+Medium grained (N=50) uncorrelated: 6.65126800537 seconds
+Medium grained (N=80) uncorrelated: 7.21557807922 seconds
+Medium grained (N=100) uncorrelated: 7.94809699059 seconds
+Medium grained (N=200) uncorrelated: 9.36057186127 seconds
+Medium grained (N=300) uncorrelated: 10.8112521172 seconds
+Medium grained (N=500) uncorrelated: 15.3437581062 seconds
+Medium grained (N=800) uncorrelated: 15.6512880325 seconds
+Medium grained (N=1000) uncorrelated: 15.8731780052 seconds
+Serial correlated: 0.32689499855 seconds
+Fine grained correlated: 4.62384200096 seconds
+Medium grained (N=1) correlated: 5.8017411232 seconds
+Medium grained (N=5) correlated: 5.06699705124 seconds
+Medium grained (N=10) correlated: 4.53155612946 seconds
+Medium grained (N=20) correlated: 4.34322190285 seconds
+Medium grained (N=30) correlated: 4.52251791954 seconds
+Medium grained (N=50) correlated: 4.4804110527 seconds
+Medium grained (N=80) correlated: 4.58753609657 seconds
+Medium grained (N=100) correlated: 4.67978000641 seconds
+Medium grained (N=200) correlated: 5.68671894073 seconds
+Medium grained (N=300) correlated: 6.8292081356 seconds
+Medium grained (N=500) correlated: 9.94776296616 seconds
+Medium grained (N=800) correlated: 13.2896721363 seconds
+Medium grained (N=1000) correlated: 15.2082731724 seconds

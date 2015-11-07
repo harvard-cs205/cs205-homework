@@ -1,0 +1,8 @@
+4.32582497597 seconds for 10 filter passes with 1 threads.
+1.78937721252 seconds for 10 filter passes with 2 threads.
+0.981823205948 seconds for 10 filter passes with 4 threads.
+----
+There's a significant speedup with 2 threads, diminishing returns with 4.
+
+I control cooperation between threads by maintaining an array of Events for each thread and iteration count, so each thread explicitly waits for its adjacent threads to perform the previous iteration (and then set the corresponding Event), but does not wait for any other threads. This lets threads start an iteration asynchronously (waiting only for their neighbors and disregarding the iteration count of other threads).
+I feel like there should be some clever way to do this with only one (or at least fewer than the number of iterations) communication instance per thread, but I couldn't come up with a way to do it (I contemplated Events being set and cleared in various ways, and Semaphores, but couldn't quite work either one out).
