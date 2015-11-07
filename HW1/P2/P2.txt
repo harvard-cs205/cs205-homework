@@ -1,1 +1,25 @@
 # Your discussion here
+
+In P2a, we partitioned based on Spark default partition strategy.
+When we see the Mandelbrot picture, we can see that locations close to one another tend to have similar final iteration counts.
+Since Spark stores data based on its key, this means that the area that has more computation tend to be in the same partition.
+That is why in 'P2a_hist.png', we can see a huge bar near 0, which means computation was not distributed well.
+
+Therefore, we needed to choose different option to balance the work evenly.
+A simple way to do this is partitioning randomly. 
+First, I made 2000 pixels and saved them in list_i, list_j.
+Then I shuffled them using random, and partition them in 10 and then do cartesian product to make 100 partitions.
+--------------------------
+list_i = range(2000)
+list_j = range(2000)
+random.shuffle(list_i)
+random.shuffle(list_j)
+rdd_i = sc.parallelize(list_i, 10)
+rdd_j = sc.parallelize(list_j, 10)
+--------------------------
+
+The advantage of this strategy is that it is simple and does not require a high computational cost,
+which means the time needed to run P2b.py is almost the same as the time to run P2a.py
+When we see the P2b_hist.png, we can see that this random strategy indeed balanced data well enough compared to the default partition strategy.
+
+Therefore, I think random partitioning is better for this problem case based on the trade-off between its costs, how well it balanced the work, and then easiness of implementation.
