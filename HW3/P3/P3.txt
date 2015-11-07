@@ -1,0 +1,27 @@
+configuration ('coalesced', 512, 64): 0.00305352 seconds
+
+Local machine setup:
+
+The platforms detected are:
+---------------------------
+Apple Apple version: OpenCL 1.2 (Dec 14 2014 22:29:47)
+The devices detected on platform Apple are:
+---------------------------
+Intel(R) Core(TM) i7-4650U CPU @ 1.70GHz [Type: CPU ]
+Maximum clock Frequency: 1700 MHz
+Maximum allocable memory size: 2147 MB
+Maximum work group size 1024
+Maximum work item dimensions 3
+Maximum work item size [1024, 1, 1]
+---------------------------
+HD Graphics 5000 [Type: GPU ]
+Maximum clock Frequency: 1100 MHz
+Maximum allocable memory size: 402 MB
+Maximum work group size 512
+Maximum work item dimensions 3
+Maximum work item size [512, 512, 512]
+---------------------------
+This context is associated with  2 devices
+The queue is using the device: HD Graphics 5000
+The device memory bandwidth is 13.2775087853 GB/s
+The host-device bandwidth is 6.70160436408 GB/s

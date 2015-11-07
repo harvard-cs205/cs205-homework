@@ -15,8 +15,6 @@ __kernel void sum_coalesced(__global float* x,
     const int k = get_global_size(0);
     const int i = get_global_id(0);
     int j;
-    // thread i (i.e., with i = get_global_id()) should add x[i],
-    // x[i + get_global_size()], ... up to N-1, and store in sum.
 
     for (j = 0; i+j*k<N; j++) { 
         sum += x[ i + j*k ];
@@ -47,18 +45,9 @@ __kernel void sum_blocked(__global float* x,
     int gid = get_global_id(0);
     int k = ceil((float)N / get_global_size(0));
 
-    // thread with global_id 0 should add 0..k-1
-    // thread with global_id 1 should add k..2k-1
-    // thread with global_id 2 should add 2k..3k-1
-    // ...
-    //     with k = ceil(N / get_global_size()).
-    // 
-    // Be careful that each thread stays in bounds, both relative to
-    // size of x (i.e., N), and the range it's assigned to sum.
-
-    for (int i = gid*k; (i < (gid+1)*k); i++) { // YOUR CODE HERE
-        if (i < N) {
-            sum += x[i]; // YOUR CODE HERE
+    for (int i = gid*k; (i < (gid+1)*k); i++) {  // stays in-bounds relative to local range
+        if (i < N) { //stays in-bounds relative to x
+            sum += x[i]; 
         }
     }
 
