@@ -33,3 +33,11 @@ Found 35 regions
 
 
 Part 4:
+
+maze1
+Finished after 10 iterations, 13.11656 ms total, 1.311656 ms per iteration
+Found 2 regions
+
+maze2
+Finished after 9 iterations, 11.6424 ms total, 1.2936 ms per iteration
+Found 35 regions

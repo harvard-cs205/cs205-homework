@@ -80,10 +80,26 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
-    if (old_label < w*h) {
-        buffer[buf_y * buf_w + buf_x] = labels[old_label];
+    //part 2
+    //if (old_label < w*h) {
+    //    buffer[buf_y * buf_w + buf_x] = labels[old_label];
+    //}
+    //part 4
+    if (lx+ly==0) { // pick (0,0) in local work group to run part 4
+        int last_ix, last_lab;
+        for (int i = 0; i < buf_w*buf_h; i++) {
+            if (buffer[i] < w*h) {
+                if (last_ix != buffer[i]) {
+                    buffer[i] = labels[buffer[i]];
+                    last_ix  = buffer[i];
+                    last_lab = labels[buffer[i]];
+                } else {
+                    buffer[i] = last_lab;
+                    last_ix = buffer[i];
+                }
+            }
+        }
     }
-
     barrier(CLK_LOCAL_MEM_FENCE);
 
     // stay in bounds
