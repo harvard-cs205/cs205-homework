@@ -80,7 +80,12 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
-    
+    if (old_label < w*h) {
+        buffer[buf_y * buf_w + buf_x] = labels[old_label];
+    }
+
+    barrier(CLK_LOCAL_MEM_FENCE);
+
     // stay in bounds
     if (((x < w) && (y < h)) && (old_label < w*h)) {
         // CODE FOR PART 1 HERE
