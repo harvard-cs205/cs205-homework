@@ -1,1 +1,16 @@
-# Your discussion here
+My graph has 6444 nodes, which is 5 less than the 6449 reported in the paper.  
+The representation is as tuples, in which the key is a given superhero, and the value is a list of superheroes that are connected to that hero.
+
+Captain America is connected to 6408 nodes, with a maximum distance of 3.       
+Miss Thing/Mary is connected to 7 nodes, with a maximum distance of 1.
+Orwell is connected to 9 nodes, with a maximum distance of 1.
+
+This means that Captain America, the most well-connected member in the graph, is not connected in any way to 35 of the nodes.  In other words, there are "islands" of nodes that contain heros who do not overlap with everyone else, no matter how many iterations are run.  
+
+Miss Thing and Orwell are examples of these islands.  Each of these characters is separated by a distance of 1 from a handful of other characters, each of which has no further connections.  This means that these groups of characters only ever appeared with each other.  
+
+If one character is not touched in the BFS run on a second character, it means that the two characters must be on separate islands; none of their connections share connections with one another.  
+
+The diameter of 10 implies that the shortest path between any two nodes is a distance of 10.  In practice, the diameter of this graph is actually smaller, because the maximum distance between any two nodes that can be connected is 3.  
+
+

@@ -1,1 +1,19 @@
 # Your discussion here
+
+With the default partitioning, the histogram shows that over half of the partitions perform a minimal amount of work (less than one million computations), while a handful perform a very large number of computations (up to nine million computations).  This means that, if all of the partitions
+are operating in parallel, most of the partitions will finish very quickly and sit idle while a small
+handful take a much longer time.  
+
+The optimal situation would be for each partition to perform an exactly equal amount of work, so that as they are all running simultaneously, they finish at the same time and no partition is working while the others are already finished.  
+
+For my more evenly balanced implementation, I simply reshuffled the partitions.  With this implementation, the range of of computations is much tighter, with a minimum of over a million and a maximum below three million computations.  This means that, if this were actually running in parallel, the slowest partition would finish much earlier than with the default partitioning strategy, because the work is much more evenly balanced across the partitions.  
+
+The tradeoff is that the repartitioning takes some time.  From the Spark UI, I see that the repartitioning took 5 seconds, and that the slowest partition took 3 seconds, so if the 100 partitions operated simultaneously, the whole thing would have taken 8 seconds to run.  In contrast, the default partitioning has no 5 second repartitioning, and the slowest partition takes 4 seconds, so the whole thing would have taken 4 seconds to run.  
+
+So in this case, distributing the computation evenly across the partitions does not save computation time, because the shuffling step of repartitioning is so slow.  
+
+Randomizing the partitioning in a different way may be quicker than using the repartition operation on the RDD.  
+
+
+
+##### Acknowledgements: Arthur and Thomas suggested randomizing the assignment of points within the array to partitions.  I was several hours deep into a more complicated strategy to spread the computation more evenly among the partitions, and their simple suggestion saved me a lot of time.  
