@@ -2,7 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt 
 import matplotlib.cm as cm
 
+
 def mandelbrot(x, y):
+    #print "ARguments are " + str(x) + " " + str(y)
     z = c = complex(x, y)
     iteration = 0
     max_iteration = 511  # arbitrary cutoff
@@ -18,6 +20,7 @@ def sum_values_for_partitions(rdd):
     return rdd.mapPartitions(lambda part: [sum(V for K, V in part)])
 
 def draw_image(rdd):
+#def draw_image(array):
     '''Given a (K, V) RDD with K = (I, J) and V = count,
     display an image of count at each I, J'''
 

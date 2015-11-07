@@ -1,1 +1,17 @@
-# Your discussion here
+My graph representation is an adjacency list in the form of a dictionary. The Key is the name of a character and the value
+is a list containing all immediate neighbors to that character. I load it into a dict as follows: First get all (book, character) KV pairs.
+The group by key to get (book, characters list). Then flatmap to create all pairwise permutations of characters that appear in a book together.
+Then groupbykey to get, for each character, a list of the other characters they were in a permutation with. 
+
+Because the diameter is 10, we know that any node is reachable through 10 iterations of the BFS. A BFS always returns the shortest path so if
+it took the BFS more than expansions to reach a node then the diameter would be greater than 10.
+
+When implementing the optimized version, I tried to do it slightly differently. Rather than using rdd.filter(), I only keep in the rdd the most
+recent nodes which are exactly the ones that need to be expanded. I also use a broadcast read-only variable to keep track of nodes we have already expanded. When avoiding duplicates, this has the advantage over the groupbykey because there is no shuffling except the passing of the broadcast variable. My accumulator is also a dict instead of a set. For the sake of this problem I realize a set would be sufficient. However if we wanted any more information, such as distances to various characters, then the dict contains that.  This solution ended up being buggy so I reimplemented
+the optimized version using a regular acculumator, some shuffle costs, and rdd.filter()
+
+If a character does not have a defined distance in the BFS then there is no path between the root character and the undefined distance character
+
+MISS THING 7 
+ORWELL 9 
+CAPTAIN AMERICA 6408

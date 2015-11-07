@@ -1,0 +1,1 @@
+links = sc.textFile('s3://Harvard-CS205/wikipedia/links-simple-sorted.txt')
