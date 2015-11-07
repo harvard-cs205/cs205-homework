@@ -1,1 +1,28 @@
 # Your discussion here
+
+# Collaborated with Chengcheng Qin on bfs
+
+The graph is a list of tuples, each tuple is consisted of a character as key, and the characters that are linked to this character as a list of values. It is of the form:
+[(char1, [char2, char3]), (char2, [char1, char3]), … ]
+
+
+The number of touched nodes in each of the searches is as below:
+"CAPTAIN AMERICA"
+1906
+4463
+38
+0
+
+
+"MISS THING/MARY"
+6
+0
+
+"ORWELL"
+8
+0
+
+We assume the diameter of the graph is 10. This implies that the maximum number of steps in which we search is 5. 
+
+If a character does not have a defined distance during the search, this means this character is not touched in this search, and is not in the comic with any one of the characters in the graph. 
+
