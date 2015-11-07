@@ -17,7 +17,7 @@ initialize_labels(__global __read_only int *image,
     }
 }
 
-int
+static int
 get_clamped_value(__global __read_only int *labels,
                   int w, int h,
                   int x, int y)
@@ -82,12 +82,24 @@ propagate_labels(__global __read_write int *labels,
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
     
     // stay in bounds
-    if ((x < w) && (y < h)) {
+    if (((x < w) && (y < h)) && (old_label < w*h)) {
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
-        new_label = old_label;
-
+        new_label = min(
+                        old_label, //compare min of neighbors against center pixel
+                        min(
+                            min( //west/east
+                                buffer[buf_y * buf_w + buf_x - 1], 
+                                buffer[buf_y * buf_w + buf_x + 1]
+                                ),
+                            min( // north/south
+                                buffer[(buf_y-1) * buf_w + buf_x], 
+                                buffer[(buf_y+1) * buf_w + buf_x]
+                                )
+                            )
+                        );
+        //printf("%d\n", new_label);
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
             // indicate there was a change this iteration.
@@ -95,5 +107,5 @@ propagate_labels(__global __read_write int *labels,
             *(changed_flag) += 1;
             labels[y * w + x] = new_label;
         }
-    }
+    } 
 }
