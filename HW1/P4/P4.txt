@@ -1,1 +1,40 @@
 # Your discussion here
+
+------------------------------------------
+1) Graph Representation:
+For my graph representation, I am using an RDD-based adjacency list representation. Basically, a key represents a character, and the value is an iterable over all of the others that the character shares a book with. 
+
+
+-----------------------------------------
+2) Numbers of Touched Nodes
+
+CAPTAIN AMERICA:
+1 was a distance 0 away (itself)
+1906 were a distance of 1 away
+4463 were a distance of 2 away
+38 were a distance of 3 away
+18 were unreachable
+TOTAL: 6407 reachable (including itself)
+
+MISS THING/MARY:
+1 was a distance 0 away (itself)
+6 were a distance of 1 away
+6419 were unreachable
+TOTAL: 7 reachable (including itself)
+
+ORWELL:
+1 was a distance 0 away (itself)
+8 were a distance of 1 away
+6417 were unreachable
+TOTAL: 9 reachable (including itself)
+
+
+----------------------------------------
+3) Questions from the pset
+
+If we can assume that the diameter of the graph is 10, then that means that there exists two nodes in this graph where the shortest path between them is 10 edges long. In the worst case, we will start BFS at one of these two nodes. Thus, this assumption tells us that, in the worst case, we will need to run BFS for 10 iterations.
+
+If a node does not have defined distance (indicated by -1 in the output of my bfs distances RDD), that means that the node was unreachable. In terms of the actual structure of the graph, we can interpret that as meaning that the node is in a different connected component. For a literal Marvel interpretation, it basically means that the node is in a total difference subspace of the Marvel universe, one that cannot be reached through the relationships between characters in the given books.
+
+
+
