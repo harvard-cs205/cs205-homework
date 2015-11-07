@@ -15,10 +15,31 @@ import filtering
 from timer import Timer
 import threading
 
-def worker(tmpA, tmpB, threadidx, num_threads):
+def worker(tmpA, tmpB, iterations, threadidx, num_threads, events):
+
+    for i in range(iterations):
+        # we care about events only when there are more than one thread
+        if num_threads>1:
+            # no wait at 1st iteration
+            if i > 0 :
+                # if first line just wait for the next one
+                if threadidx == 0:
+                    events[threadidx+1][i-1].wait()
+                # if last line just wait for the one before
+                elif threadidx == num_threads-1:
+                    events[threadidx-1][i-1].wait()
+                # else wait for line before and after
+                else :
+                    events[threadidx+1][i-1].wait()
+                    events[threadidx-1][i-1].wait()
 
         #have each thread work on every num_threads-th thread
         filtering.median_3x3(tmpA, tmpB, threadidx, num_threads)
+        # swap direction of filtering (change the pointers)
+        tmpA, tmpB = tmpB, tmpA
+        #awakes all the thread waiting for it
+        if num_threads>1:
+            events[threadidx][i].set()
 
 def py_median_3x3(image, iterations=10, num_threads=1):
     tmpA = image.copy()
@@ -27,20 +48,17 @@ def py_median_3x3(image, iterations=10, num_threads=1):
     #Initialize the events one event per (threadid, iteration step) tuple
     events = [[threading.Event() for _ in range(iterations)] for _ in range(num_threads)]
 
-    for _ in range(iterations):
-        #Initialize create a list of threads
-        thread_list=[]
-        for threadidx in range(num_threads):
-            #create num_threads one by one, note that we pass threadidx which is the index of the thread
-            th = threading.Thread(target = worker, args = (tmpA, tmpB, threadidx, num_threads))
-            thread_list.append(th)
-            th.start()
+    #Initialize create a list of threads
+    thread_list=[]
+    for threadidx in range(num_threads):
+        #create num_threads one by one, note that we pass threadidx which is the index of the thread
+        th = threading.Thread(target = worker, args = (tmpA, tmpB, iterations, threadidx, num_threads, events))
+        thread_list.append(th)
+        th.start()
 
-        # make sure it gets the results
-        for th in thread_list:
-            th.join()
-
-        tmpA, tmpB = tmpB, tmpA
+    # make sure it gets the results
+    for th in thread_list:
+        th.join()
 
     return tmpA
 
@@ -73,7 +91,7 @@ if __name__ == '__main__':
     from_numpy = numpy_median(input_image, 2)
     assert np.all(from_cython == from_numpy)
 
-    print("Synchronized")
+    print("Asynchronized")
     for N in [1,2,4]:
 
         with Timer() as t:

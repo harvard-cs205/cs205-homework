@@ -1,0 +1,61 @@
+results:
+
+Serial uncorrelated: 1.37711310387 seconds
+Fine grained uncorrelated: 16.4383928776 seconds
+With 1 Locks
+Medium grained uncorrelated: 18.7048819065 seconds
+With 2 Locks
+Medium grained uncorrelated: 18.8978350163 seconds
+With 3 Locks
+Medium grained uncorrelated: 20.5507380962 seconds
+With 4 Locks
+Medium grained uncorrelated: 19.6806840897 seconds
+With 5 Locks
+Medium grained uncorrelated: 20.4388020039 seconds
+With 6 Locks
+Medium grained uncorrelated: 20.5176510811 seconds
+With 7 Locks
+Medium grained uncorrelated: 20.5591681004 seconds
+With 8 Locks
+Medium grained uncorrelated: 22.5128788948 seconds
+With 9 Locks
+Medium grained uncorrelated: 20.3078861237 seconds
+With 10 Locks
+Medium grained uncorrelated: 18.6069779396 seconds
+
+Serial correlated: 1.38409495354 seconds
+Fine grained correlated: 13.2513270378 seconds
+With 1 Locks
+Medium grained uncorrelated: 18.3142380714 seconds
+With 2 Locks
+Medium grained uncorrelated: 18.2287211418 seconds
+With 3 Locks
+Medium grained uncorrelated: 16.2336008549 seconds
+With 4 Locks
+Medium grained uncorrelated: 15.4366669655 seconds
+With 5 Locks
+Medium grained uncorrelated: 15.2175059319 seconds
+With 6 Locks
+Medium grained uncorrelated: 15.6373009682 seconds
+With 7 Locks
+Medium grained uncorrelated: 16.2506999969 seconds
+With 8 Locks
+Medium grained uncorrelated: 16.4075810909 seconds
+With 9 Locks
+Medium grained uncorrelated: 16.0944931507 seconds
+With 10 Locks
+Medium grained uncorrelated: 16.2846899033 seconds
+
+
+Discussion:
+We see that the parallel program is performed 10 times poorer that the serial program.
+It is not depressing thou.
+The reason is most likely communication cost.
+Also my computer has only one CPU, that can only simulate two threads properly.
+Interestingly, the Medium grained with one lock, which is equivalent to a fine grained is slower than the fine grain,
+It might be because of the extra cost of choosing which lock to use.
+It is still still surprising.
+Correlated is slightly longer than uncorrelated on average.
+In the case of the medium grain, it makes sense because different threads might need the same lock at the same time in the correlated case.
+Varying the number of locks does not change the performance much.
+It is hard to say if there is an optimum. I don't have much intuition about it.

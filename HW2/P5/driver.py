@@ -12,6 +12,7 @@ import numpy as np
 from timer import Timer
 from animator import Animator
 from physics import update, preallocate_locks
+from hilbert import Hilbert_to_int
 
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
@@ -64,7 +65,7 @@ if __name__ == '__main__':
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
-                   radius, grid_size, locks_ptr,
+                   radius, grid_spacing, locks_ptr,
                    physics_step)
 
         # udpate our estimate of how fast the simulator runs
@@ -80,3 +81,23 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+
+            grid_coordinates = (positions/grid_spacing).astype(np.int)
+            # avoid being out of bound applying vectorize functions on the array
+            max_v = np.vectorize(lambda x : max(x, 0))
+            min_v = np.vectorize(lambda x : min(x, grid_size -1))
+            grid_coordinates = max_v(min_v(grid_coordinates))
+
+            #create the new indexing of the balls
+            #by sorting in function of the disctance on the Hilbert curve
+            #see hilbert.py for more information on the function
+            new_order = np.argsort([Hilbert_to_int([int(k),int(l)]) for k,l in grid_coordinates])
+
+            #reorder the positions and velocity arrays with respect to the sorting
+            positions = positions[new_order]
+            velocities = velocities[new_order]
+
+            #update the grid with the new ordering 
+            #(this will change the colors)
+            grid_coordinates_reordered = grid_coordinates[new_order]
+            grid[grid_coordinates_reordered[:, 0], grid_coordinates_reordered[:, 1]] = np.arange(num_balls)

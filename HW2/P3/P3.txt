@@ -1,0 +1,25 @@
+results
+
+Without AVX with 1 thread(s)
+1074.652832 Million Complex FMAs in 16.3464031219 seconds, 65.7424648091 million Complex FMAs / second
+Without AVX with 2 thread(s)
+1074.652832 Million Complex FMAs in 11.316598177 seconds, 94.9625333688 million Complex FMAs / second
+Without AVX with 4 thread(s)
+1074.652832 Million Complex FMAs in 10.221462965 seconds, 105.136890451 million Complex FMAs / second
+
+With AVX with 1 thread(s)
+1059.236124 Million Complex FMAs in 3.0956158638 seconds, 342.172986121 million Complex FMAs / second
+With AVX with 2 thread(s)
+1059.236124 Million Complex FMAs in 1.60934400558 seconds, 658.178810947 million Complex FMAs / second
+With AVX with 4 thread(s)
+1059.236124 Million Complex FMAs in 1.93741607666 seconds, 546.726197207 million Complex FMAs / second
+
+
+discussion
+My computer has only one CPU, that can only simulate two threads properly.
+I think that is why 4 threads is worse than 2 threads because it adds some overheard to simulate 2 more threads.
+We see a small difference in the number of FMAs.
+It might be because the program without AVX handles complex numbers differently from the AVX program.
+I tried to play with fmadd in order to be as efficient as possible. So I am happy to see that the number of FMAs is less in the AVX case.
+For 1 and 2 threads (which are the only interesting cases given my computer), AVX is about 6 times quicker than without AVX.
+I am happy with it, theoretically it should be 8 times faster, but there might some overhead in the way it is compiled that might make it a little slower.

@@ -1,0 +1,50 @@
+results
+Unfortunately I have not had the chance to take any class on data vizualization.
+So my histogram  plots don't look magically awesome.
+However , I hope they will get the messages I want to convey in the discussion across.
+
+The .png files I encourage you to look at are named this way.
+As an example is worth hours of speech let's take 'P5thread1q1.png' as an example.
+Be aware that there is no hidden message: P5 at the beginning stands for Problem 5,
+then thread 1 mean that those results have been taken using only one thread,
+q1 means that it is the result from the Subproblem 1.
+It is an histogram because I took many frames  (a good but not constant amount of frames, the number was depending on the length of my tea break).
+
+So to make sure we are on the same page:
+q1 is with just the prange
+q2 is with the grid
+q3 is with the sorting (I used Hilbert curves qhich is really cool!)
+q4 is with locks
+
+Please enjoy seeing 'overview.png', which is an overview of the normed histograms of q2 to q4.
+I did not put the results of q1 for they were too small compared to the other.
+It made things harder to read and was not aesthetically pleasant.
+
+discussion
+q1 As you may have seen the speedup from 1 to 4 threads is less than 2.
+From 1.6 to 2.7 frames per second.
+The reason is again my computer that can only simulate 2 independent threads properly.
+The less than 2 might come from overhead.
+
+q2 The results are multiplied by 100!
+Interestingly, the histogram for one thread shows only one mode around 160 frames per second.
+But the 4 thread one show 2 modes one around 140 (which is worse than 1 thread), and one near 240.
+The distribution of 4 threads is also more flat than the 1 thread distribution.
+I  actually have an intuition that the 2 mode shape of the 4 thread distribution might be related to memory access.
+There must be some kind of race conflicts. We see that things will get better with sorting and locks.
+
+q3 I used Hilbert curves. I am a big fan of Hilbert as a mathematician, but I did not know he also was an artist.
+The Hilbert curves are so pleasing to see, it's almost hypnotizing you.
+As for the results, we see they are slightly better when sorting. For 1 thread we are at arounf 240,
+while with 4 threads we are at 360-370, and it is already fairly one mode.
+I actually spent way more time implementing it than trying to understand why it matters.
+As a result, I see the improvement in performance, but I still don't clearly understand why it is important.
+My intuition is that the collisions will be between balls that are close in index so it will be faster.
+But it is a rather hand wavy explanation.
+
+q4  The locking make the results actually a little worse than only sorting.
+For 1 thread  we are around 190. For 4 threads, we are at 300.
+However, locking feels safer. We also see that the distribution for 4 threads is fairly one mode.
+It conforts us on the fact that now accessing the memory might be a little longer but it is more predictible.
+
+Thank you for reading!
