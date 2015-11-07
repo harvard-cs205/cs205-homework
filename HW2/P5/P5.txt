@@ -1,0 +1,55 @@
+SUBPROBLEM 1, Multithreading
+
+1 thread:
+7.51123096323 simulation frames per second
+
+4 threads:
+11.0130583302 simulation frames per second
+
+No perfect speed up when switching to 4 threads, but this is expected
+as always, due to scheduling overhead, as well as other parts of the program
+that are still serial.
+
+
+SUBPROBLEM 2, Spatial decomposition
+
+1 thread:
+1203.2304958 simulation frames per second
+
+4 threads:
+1467.2204985 simulation frames per second
+
+This is where the real improvement in performance comes in. We see a huge
+increase in number of simulation frames per second after we effectively
+changed our O(n^2) algorithm to O(n).
+
+
+SUBPROBLEM 3, Spatially Coherent Sorting
+
+1 thread:
+1410.30593853 simulation frames per second
+
+4 threads:
+2202.43509231 simulation frames per second
+
+Another huge increase in performance - as expected when taking advantage
+of spatial locality. In fact, this was a much better improvement than what
+I expected it would be.
+I really only chose Morton ordering because the code in its Wikipedia entry
+was easier to understand, but after looking at the animations accompanying
+the explanation of Hilbert ordering, perhaps it would have been just marginally
+more performant to choose that over Morton, especially with a smaller grid.
+
+
+SUBPROBLEM 4, Locking
+
+1 thread:
+1231.03434810 simulation frames per second
+
+4 threads:
+1897.03092324 simulation frames per second
+
+Introducing locking overhead again decreases our performance. It's actually
+interesting to compare this result to what I got in P2 - because the job is
+so much larger, introducing many more locks (fine-grained) impacted the
+performance disproportionately less when we tried it in P2.

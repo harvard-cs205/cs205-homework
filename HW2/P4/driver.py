@@ -15,15 +15,43 @@ import filtering
 from timer import Timer
 import threading
 
-def py_median_3x3(image, iterations=10, num_threads=1):
+def parallel_filter(imgA, imgB, tid, num_threads, events, iterations):
+    for i in range(iterations):
+        # for each thread on iteration i, make sure that:
+        # iteration i - 1 for threads n, n - 1, and n + 1 are done
+        if num_threads > 1 and i > 0:
+            events[(tid - 1) % num_threads][i - 1].wait()
+            events[(tid + 1) % num_threads][i - 1].wait()
+
+        # do work, after ready
+        filtering.median_3x3(imgA, imgB, tid, num_threads)
+        
+        # mark that iteration as done
+        events[tid][i].set()
+
+        # swap direction
+        imgA, imgB = imgB, imgA
+
+def py_median_3x3(image, num_threads, iterations=10):
     ''' repeatedly filter with a 3x3 median '''
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
 
-    for i in range(iterations):
-        filtering.median_3x3(tmpA, tmpB, 0, 1)
-        # swap direction of filtering
-        tmpA, tmpB = tmpB, tmpA
+    # keep track of finished iterations for each thread
+    events = [[threading.Event() for i in range(iterations)] for j in range(num_threads)]
+
+    # keep threads in list for easy joining later
+    # start each thread's job
+    threads = []
+    for tid in range(num_threads):
+        threads.append(threading.Thread(target=parallel_filter,
+                                        args=(tmpA, tmpB, tid, num_threads,
+                                              events, iterations)))
+        threads[tid].start()
+
+    # finish threads
+    for thread in threads:
+        thread.join()
 
     return tmpA
 
@@ -52,12 +80,12 @@ if __name__ == '__main__':
     pylab.title('before - zoom')
 
     # verify correctness
-    from_cython = py_median_3x3(input_image, 2, 5)
+    from_cython = py_median_3x3(input_image, 1, 2)
     from_numpy = numpy_median(input_image, 2)
     assert np.all(from_cython == from_numpy)
 
     with Timer() as t:
-        new_image = py_median_3x3(input_image, 10, 8)
+        new_image = py_median_3x3(input_image, 4, 10)
 
     pylab.figure()
     pylab.imshow(new_image[1200:1800, 3000:3500])

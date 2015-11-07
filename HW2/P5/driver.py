@@ -13,6 +13,22 @@ from timer import Timer
 from animator import Animator
 from physics import update, preallocate_locks
 
+
+# from Wikipedia entry on Morton order: https://en.wikipedia.org/wiki/Z-order_curve
+def less_msb(x, y):
+    return x < y and x < (x ^ y)
+
+def cmp_zorder(a, b):
+    j = 0
+    k = 0
+    x = 0
+    for k in range(2):
+        y = a[0][k] ^ b[0][k]
+        if less_msb(x, y):
+            j = k
+            x = y
+    return a[0][j] - b[0][j]
+
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
@@ -64,7 +80,7 @@ if __name__ == '__main__':
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
-                   radius, grid_size, locks_ptr,
+                   radius, grid_spacing, locks_ptr,
                    physics_step)
 
         # udpate our estimate of how fast the simulator runs
@@ -80,3 +96,22 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+            locs = (positions / grid_spacing).astype(int)
+            # keep track of how the indices move
+            indexed_locs = zip(locs, range(len(positions)))
+            indexed_locs.sort(cmp_zorder)
+            morton_idx = map(lambda x: x[1], indexed_locs)
+            
+            # update
+            positions = positions[morton_idx]
+            velocities = velocities[morton_idx]
+
+            # Reset Grid
+            grid[:,:] = -1
+
+            # Set new grid locations
+            for i in range(num_balls):
+                if positions[i, 0] >= 0 and positions[i, 1] >= 0 and \
+                   positions[i, 0] <= 1 and positions[i, 1] <= 1:
+                    grid[(positions[i, 0] / grid_spacing).astype(int),
+                         (positions[i, 1] / grid_spacing).astype(int)] = i

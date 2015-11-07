@@ -1,0 +1,32 @@
+Serial uncorrelated: 0.386842012405 seconds
+Fine grained uncorrelated: 4.31317400932 seconds
+Medium grained uncorrelated for 1 locks: 6.63538718224 seconds
+Medium grained uncorrelated for 5 locks: 7.94305586815 seconds
+Medium grained uncorrelated for 10 locks: 9.02486300468 seconds
+Medium grained uncorrelated for 15 locks: 9.97097992897 seconds
+Medium grained uncorrelated for 30 locks: 10.9998688698 seconds
+Medium grained uncorrelated for 50 locks: 15.2471399307 seconds
+
+Serial correlated: 0.710629940033 seconds
+Fine grained correlated: 4.5689868927 seconds
+Medium grained correlated for 1 locks: 5.5799601078 seconds
+Medium grained correlated for 5 locks: 6.14707899094 seconds
+Medium grained correlated for 10 locks: 6.46884894371 seconds
+Medium grained correlated for 15 locks: 6.7240011692 seconds
+Medium grained correlated for 30 locks: 7.07660079002 seconds
+Medium grained correlated for 50 locks: 6.84278821945 seconds
+
+This is a great example of the tradeoff between scheduling overhead and the
+potential benefit of multithreading. Here, we see that the serial code beats
+the multithreaded code in both cases, most likely because the overhead
+associated with handling locks is not made up for by the theoreticl increase
+in speed given by multithreading. Perhaps if we had many more threads, with
+a much larger job, the difference would have become more apparent to what we
+expect with multithreading.
+
+Reference: P2_plot.py
+Here it is unclear what the true best choice for number of locks should be, if
+we wanted to generalize it to any number of threads working on a job of any
+size. What is clear is that having only only lock in the medium-grained case
+consistently performed the fastest, even though theoretically more locks would
+have decreased the number of collisions.
