@@ -2,7 +2,9 @@ from __future__ import division
 import pyopencl as cl
 import numpy as np
 import pylab
-
+import os
+import pdb
+os.environ['PYOPENCL_COMPILER_OUTPUT'] = '1'
 def round_up(global_size, group_size):
     r = global_size % group_size
     if r == 0:
@@ -45,7 +47,7 @@ if __name__ == '__main__':
 
     # Create a queue for transferring data and launching computations.
     # Turn on profiling to allow us to check event times.
-    queue = cl.CommandQueue(context, context.devices[0],
+    queue = cl.CommandQueue(context, context.devices[1],
                             properties=cl.command_queue_properties.PROFILING_ENABLE)
     print 'The queue is using the device:', queue.device.name
 
@@ -54,6 +56,7 @@ if __name__ == '__main__':
     in_coords, out_counts = make_coords()
     real_coords = np.real(in_coords).copy()
     imag_coords = np.imag(in_coords).copy()
+
 
     gpu_real = cl.Buffer(context, cl.mem_flags.READ_ONLY, real_coords.size * 4)
     gpu_imag = cl.Buffer(context, cl.mem_flags.READ_ONLY, real_coords.size * 4)
@@ -64,7 +67,7 @@ if __name__ == '__main__':
     width = np.int32(in_coords.shape[1])
     height = np.int32(in_coords.shape[0])
     max_iters = np.int32(1024)
-
+    #pdb.set_trace()
     cl.enqueue_copy(queue, gpu_real, real_coords, is_blocking=False)
     cl.enqueue_copy(queue, gpu_imag, imag_coords, is_blocking=False)
 
@@ -73,7 +76,6 @@ if __name__ == '__main__':
                                width, height, max_iters)
 
     cl.enqueue_copy(queue, out_counts, gpu_counts, is_blocking=True)
-
     seconds = (event.profile.end - event.profile.start) / 1e9
     print("{} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
     pylab.imshow(np.log(out_counts))
