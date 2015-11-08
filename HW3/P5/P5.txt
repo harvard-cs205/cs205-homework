@@ -78,7 +78,8 @@ they both had the same number of iterations. The min() version was 1-2% faster o
 
 P5 Reporting
 
-* See iterations.png, total-time.png, and per-iteration.png for visualizations of reporting data.
+* See _maze1.png, _maze2.png for labeled maze images.
+* See _iterations.png, _total-time.png, and _per-iteration.png for visualizations of reporting data.
 
 Part 1:
 
