@@ -1,0 +1,61 @@
+Coarse-grained statistics:
+--------------------------
+coarse-grained uncorrelated: 7.50171613693 seconds
+coarse-grained uncorrelated: 7.81156492233 seconds
+coarse-grained uncorrelated: 8.13191080093 seconds
+coarse-grained uncorrelated: 7.8377840519 seconds
+coarse-grained uncorrelated: 7.8095099926 seconds
+
+
+coarse-grained correlated: 18.7061290741 seconds
+coarse-grained correlated: 19.5839300156 seconds
+coarse-grained correlated: 20.8557839394 seconds
+coarse-grained correlated: 18.2231030464 seconds
+coarse-grained correlated: 20.6448960304 seconds
+
+
+
+N = 16:
+-------
+Serial uncorrelated: 0.254282236099 seconds
+Fine grained uncorrelated: 6.16861701012 seconds
+Medium grained uncorrelated: 7.8024699688 seconds
+Serial correlated: 0.323307037354 seconds
+Fine grained correlated: 5.78356003761 seconds
+Medium grained correlated: 5.62990307808 seconds
+Serial uncorrelated: 0.269169092178 seconds
+Fine grained uncorrelated: 6.44110298157 seconds
+Medium grained uncorrelated: 7.88032007217 seconds
+Serial correlated: 0.343506813049 seconds
+Fine grained correlated: 6.13607311249 seconds
+Medium grained correlated: 5.99902296066 seconds
+
+N = 10:
+-------
+Fine grained uncorrelated: 6.40469694138 seconds
+Medium grained uncorrelated: 8.63560009003 seconds
+Serial correlated: 0.353370904922 seconds
+Fine grained correlated: 6.08355402946 seconds
+Medium grained correlated: 7.04086709023 seconds
+Serial uncorrelated: 0.265476942062 seconds
+Fine grained uncorrelated: 6.88308095932 seconds
+Medium grained uncorrelated: 9.61108207703 seconds
+Serial correlated: 0.345187187195 seconds
+Fine grained correlated: 6.87461900711 seconds
+Medium grained correlated: 6.89246702194 seconds
+Serial uncorrelated: 0.261367797852 seconds
+Fine grained uncorrelated: 6.16665005684 seconds
+Medium grained uncorrelated: 8.68660211563 seconds
+Serial correlated: 0.361235141754 seconds
+Fine grained correlated: 6.45366406441 seconds
+Medium grained correlated: 7.27928590775 seconds
+
+N = 5:
+-------
+Serial uncorrelated: 0.255202054977 seconds
+Fine grained uncorrelated: 6.25651311874 seconds
+Medium grained uncorrelated: 8.13269591331 seconds
+Serial correlated: 0.383741855621 seconds
+Fine grained correlated: 5.90306687355 seconds
+Medium grained correlated: 7.02958297729 seconds
+

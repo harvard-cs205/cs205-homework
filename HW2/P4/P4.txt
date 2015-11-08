@@ -1,0 +1,11 @@
+Problem 4:
+==========
+
+threads | time
+------------------------------------------------------
+1		| 3.59052395821 seconds for 10 filter passes.
+2		| 1.83024907112 seconds for 10 filter passes.
+4		| 1.687541008 seconds for 10 filter passes.
+
+
+For the implementation I choose a very basic approach. In every iteration I start N threads, which will work on the image according to the description. As for the example runs, we see that switching from serial (1 thread) to 2 threads yielded a significant performance gain. However, using 2 more threads turned out to be rather disappointing. The performance gain was very low. This is due to the great amount of overhead my implementation uses. Starting a thread typically is very costly. A better implementation therefore would start the 4 threads only once and use signals to signal them that a iteration is over (i.e. notifying them to wake up and process the next load of data). 
