@@ -1,12 +1,18 @@
 P5.4 Efficient Grandparents
 
-The number of iterations was the same compared to Part 3, however the per-iteration speed was much slower in Part 4 (about 3x slowdown).  Setting aside hardware differences, there still may be some cases where it makes sense to take this approach, wherein a single thread fetches all the grandparents in a workgroup.  Consider a few scenarios for a 3x3 workgroup:
+The number of iterations was the same compared to Part 3, however the per-iteration speed was much slower 
+in Part 4 (about 3x slowdown).  Setting aside hardware differences, there still may be some cases where it 
+makes sense to take this approach, wherein a single thread fetches all the grandparents in a workgroup.  
+Consider a few scenarios for a 3x3 workgroup:
 
 (a) All pixels in a local workgroup have different grandparents.
 	In this case, both the single-thread and multi-thread implementations need to read from global memory 9 times.  Multi-thread can do this in parallel, so it's inefficient to switch to a single thread.
 
 (b) Every pixel in a local workgroup has the same grandparent.
-	While multi-threading will still perform a separate global read per thread (total: 9), single-threading with 1-back recall will only have to read from global once.  It will still need to loop over all 9 pixels in the workgroup, while the other threads sleep.  So it is more efficient in terms of reading off the CPU, but does not make use of the main latency masking feature of GPUs, which is multi-threading.
+	While multi-threading will still perform a separate global read per thread (total: 9), single-threading with 
+	1-back recall will only have to read from global once.  It will still need to loop over all 9 pixels in 
+	the workgroup, while the other threads sleep.  So it is more efficient in terms of reading off the CPU, 
+	but does not make use of the main latency masking feature of GPUs, which is multi-threading.
 
 (c) Some, but not all, pixels in a local workgroup have the same grandparent.
 	Multi-thread still performs a global read per thread, and single-thread will perform 1 < n < 9 global reads.
@@ -24,14 +30,18 @@ For (b) and (c), the key metric to compute (and this is where hardware configura
 
 In the multi-thread case, if M == N, then Cost = GRC.  
 In the single-thread case, if M == 1 (scenario (b) above), then Cost = GRC. 
-If, in scenario (b), due to coalesced read restrictions (ie. not all threads are active at once), M > N for multi-thread, then Cost > GRC and single-threading will be faster.
+If, in scenario (b), due to coalesced read restrictions (ie. not all threads are active at once), 
+then M > N for multi-thread, and then Cost > GRC and single-threading will be faster.
 Different configurations of scenario (c) may also see single-threading end up faster. 
 
 ************
 
 P5.5 No atomic operations
 
-atomic_min() locks the target memory address between read and write operations, but min() does not. Locking creates serialization, which slows down GPU performance considerably, but guarantees that the address in memory isn't overwritten by another thread in-between read and write.  If we used min() instead, then it's possible for min() to actually increase the value of labels[old_label].  
+atomic_min() locks the target memory address between read and write operations, but min() does not. 
+Locking creates serialization, which slows down GPU performance considerably, but guarantees that the 
+address in memory isn't overwritten by another thread in-between read and write.  
+If we used min() instead, then it's possible for min() to actually increase the value of labels[old_label].  
 
 For example:
 
@@ -44,14 +54,23 @@ For example:
 	Thread B computers new = 9.
 	Thread B grabs labels[old] at the same time as Thread A, and so sees labels[old] = 10.
 	Thread B takes longer than Thread A to compute min(), and when it goes to write labels[old] = 9, it is
-	actually updating the output from Thread A (labels[old] = 7) to labels[old] = 9, increasing labels[old] as
-	the result of a min() computation.
+	actually updating the output from Thread A (labels[old] = 7) to labels[old] = 9, 
+	increasing labels[old] as the result of a min() computation.
 
-We should not see an increase between iterations; the starting value of labels[old] in a given iteration is an upper bound on its value at the end of that iteration. Across all threads, min() is always comparing new against labels[old], and so if new is ever larger than labels[old], labels[old] will retain its value. So while the differences in the amount min() lowers labels[old] may occur due to over-writes, we will never see the end result of an iteration be higher than its starting value.
+We should not see an increase between iterations; the starting value of labels[old] in a given iteration 
+is an upper bound on its value at the end of that iteration. Across all threads, min() is always comparing 
+new against labels[old], and so if new is ever larger than labels[old], labels[old] will retain its value. 
+So while the differences in the amount min() lowers labels[old] may occur due to over-writes, we will never 
+see the end result of an iteration be higher than its starting value.
 
-Freeing up the locking that comes with atomic operations should speed up the algorithm, and this speed increase will be a function of the number of overlapping reads created by the structure of the image being labeled (as well as the number of available threads). It's possible that the number of iterations will increase slightly, as it may take longer to reach the local minimum among neighbors, in the case of increase over-write described above.  But the end solution should be the same as in the atomic_min() implementation. 
+Freeing up the locking that comes with atomic operations should speed up the algorithm, and this speed 
+increase will be a function of the number of overlapping reads created by the structure of the image being 
+labeled (as well as the number of available threads). It's possible that the number of iterations will 
+increase slightly, as it may take longer to reach the local minimum among neighbors, in the case of increase 
+over-write described above.  But the end solution should be the same as in the atomic_min() implementation. 
 
-(I compared the min() and atomic_min() versions using the Part 4 setup on my local machine and found that they both had the same number of iterations. The min() version was 1-2% faster on average.
+(I compared the min() and atomic_min() versions using the Part 4 setup on my local machine and found that 
+they both had the same number of iterations. The min() version was 1-2% faster on average.
 
 
 ************
