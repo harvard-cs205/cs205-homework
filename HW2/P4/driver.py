@@ -18,25 +18,17 @@ import threading
 
 # thread class
 class workerThread(threading.Thread):
-    def __init__(self, threadID, offset, N, tmpA, tmpB, num_iterations, cvs):
+    def __init__(self, threadID, offset, N, tmpA, tmpB):
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.offset = offset
         self.N = N
         self.tmpA = tmpA
         self.tmpB = tmpB
-        self.num_iterations = num_iterations
-        self.cvs = cvs # condition variables
 
     def run(self):
         # perform filtering
-        # filtering.median_3x3(self.tmpA, self.tmpB, self.offset, self.N)
-
-        # perform num_iterations for each line.
-        for i in range(self.num_iterations):
-
-            # 
-            filtering.median_3x3(self.tmpA, self.tmpB, self.offset, self.N)
+        filtering.median_3x3(self.tmpA, self.tmpB, self.offset, self.N)
 
 
 
@@ -45,46 +37,27 @@ def py_median_3x3(image, iterations=10, num_threads=1):
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
 
-
-    # create num_threads threads
-    threads = []
-    cvs = [];
-    for i in range(num_threads):
-        cv = threading.Condition()
-        cvs.append(cv)
-
-    for i in range(num_threads):
-        thread = workerThread(i, i, num_threads, tmpA, tmpB, 10, cvs)
-        threads.append(thread)
-
-    # using n threads, start all of them 
-    for t in threads:
-        t.start()
-
-    # wait till are finished, before going to the next iteration
-    for t in threads:
-        t.join()
-
-    #for i in range(iterations):
+    for i in range(iterations):
         # one thread version
         #filtering.median_3x3(tmpA, tmpB, 0, 1)
 
-        # # create num_threads threads
-        # threads = []
-        # for i in range(num_threads):
-        #     thread = workerThread(i, i, num_threads, tmpA, tmpB)
-        #     threads.append(thread)
+        # multithreaded version
+        # create num_threads threads
+        threads = []
+        for i in range(num_threads):
+            thread = workerThread(i, i, num_threads, tmpA, tmpB)
+            threads.append(thread)
 
-        # # using n threads, start all of them
-        # for t in threads:
-        #     t.start()
+        # using n threads, start all of them
+        for t in threads:
+            t.start()
 
-        # # wait till are finished, before going to the next iteration
-        # for t in threads:
-        #     t.join()
+        # wait till are finished, before going to the next iteration
+        for t in threads:
+            t.join()
 
-        # swap direction of filtering
-      #  tmpA, tmpB = tmpB, tmpA
+        #swap direction of filtering
+        tmpA, tmpB = tmpB, tmpA
 
     return tmpA
 
@@ -118,7 +91,7 @@ if __name__ == '__main__':
     assert np.all(from_cython == from_numpy)
 
     with Timer() as t:
-        new_image = py_median_3x3(input_image, 10, 8)
+        new_image = py_median_3x3(input_image, 10, 4)
 
     pylab.figure()
     pylab.imshow(new_image[1200:1800, 3000:3500])
