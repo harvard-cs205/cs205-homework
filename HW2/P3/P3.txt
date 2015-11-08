@@ -1,14 +1,35 @@
+Problem 3:
+==========
+
+Below are some statistics from the runs in the 5 different versions.
+
+<<<<<
+
+Serial Version:
+---------------
+1074.656613 Million Complex FMAs in 4.27743196487 seconds,
+251.238738997 million Complex FMAs / second
+
 One Thread:
 -----------
-1074.656613 Million Complex FMAs in 4.24994087219 seconds, 252.86389748 million Complex FMAs / second
+1074.656613 Million Complex FMAs in 4.24994087219 seconds,
+252.86389748 million Complex FMAs / second
 
 Two threads:
 ------------
-1074.656613 Million Complex FMAs in 2.07837510109 seconds, 517.065765673 million Complex FMAs / second
+1074.656613 Million Complex FMAs in 2.07837510109 seconds,
+517.065765673 million Complex FMAs / second
 
 Four threads:
 -------------
-1074.656613 Million Complex FMAs in 1.28325009346 seconds, 837.449082199 million Complex FMAs / second
+1074.656613 Million Complex FMAs in 1.28325009346 seconds,
+837.449082199 million Complex FMAs / second
 
+AVX + 4 threads:
+----------------
+1043.531618 Million Complex FMAs in 0.250422000885 seconds,
+4167.09240527 million Complex FMAs / second
 
-==> Write something for comparison....
+>>>>>
+
+Overall, using multithreading and SIMD instructions the performance could be increased tremendously. I.e. using more threads (up to machine capacity on my 4 core system) gave faster results. Especially the speedup from 1 to 2 threads seems to be nearly perfect. Using 4 threads seems to add some scheduling overhead, which takes some performance. For the AVX case, when comparing the numbers one should note that the instructions become less. This is due to the unnecessary step in the for loop that I removed. (i.e. it is clear that the magnitude of 0 is always less than 4). Processing 8 complex numbers in parallel gives a speedup factor around 4 compared to the SISD case.
