@@ -61,6 +61,8 @@ cpdef move_data_serial(np.int32_t[:] counts,
     with nogil:
         for r in range(repeat):
             for idx in range(src.shape[0]):
+                # Assumption: Code here does not need to be changed
+                # for coarse-grained locking, one lock should be used
                 if counts[src[idx]] > 0:
                     counts[dest[idx]] += 1
                     counts[src[idx]] -= 1

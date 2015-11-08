@@ -1,0 +1,14 @@
+Problem 2
+=========
+
+In the given setup 1,000,000 samples are used. 
+
+Here the results of some sample runs shall be discussed
+
+In the file stats.txt some runs are listed. In general, the locking introduced overhead s.t. the serial version runned always a lot faster. It shall be thereof excluded form the comparison, so only algorithms with locks are compared. To simulate the coarse-grained case, N is set to the number of samples (this will yield one lock). 
+
+Generally speaking, the correlated data was always faster except for the coarse-grained case. There, the correlated data needed around ~20s to finish whereas the uncorrelated data finsihed in ~7-8s. This could be due to a lot of cache misses.
+
+Comparing the fine grained algorithm vs. the medium grained one yields that often the fine grained algorithm is faster, especially for larger N. In the uncorrelated case the fine grained algorithm outperformed (in contrary to my presumption) the medium grained algorithm. However, in the correlated case, setting i.e. N=16 yielded a little better performance. (as we can assume elements are not farther than 10 distanced in the correlated case, everything up to N=20 seems reasonable (10 in each direction!))
+
+In conclusion, except for the comparison coarsed vs. fine/medium results tended to be highly varying. To get more reliable results, a larger dataset, a better defined testing environment and more detailed problem specification should be used. I.e. I think that my results are highly disturbed due to the OS.
