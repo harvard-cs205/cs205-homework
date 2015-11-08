@@ -6,7 +6,8 @@ makes sense to take this approach, wherein a single thread fetches all the grand
 Consider a few scenarios for a 3x3 workgroup:
 
 (a) All pixels in a local workgroup have different grandparents.
-	In this case, both the single-thread and multi-thread implementations need to read from global memory 9 times.  Multi-thread can do this in parallel, so it's inefficient to switch to a single thread.
+	In this case, both the single-thread and multi-thread implementations need to read from global memory 9 times.  
+	Multi-thread can do this in parallel, so it's inefficient to switch to a single thread.
 
 (b) Every pixel in a local workgroup has the same grandparent.
 	While multi-threading will still perform a separate global read per thread (total: 9), single-threading with 
