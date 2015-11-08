@@ -1,5 +1,8 @@
+Problem 5:
+==========
+
 Multithreading (without Grid)
-===
+-----------------------------
 
 For one thread and the performance setting (10000, 0.002) around 13-14 frames per second are achieved.
 
@@ -54,3 +57,56 @@ Interestingly, using a smaller chunksize (i.e. setting it to one element) yields
 25.2276822769 simulation frames per second
 
 which roughly resembles a speed up of 2x. This means, that indeed data locality seems to have an enormous effect. With a better sorting of the data, also in the case of larger chunksizes better speedups should be achievable.
+
+Spatial decomposition:
+----------------------
+Reducing the complexity from O(N^2) to O(N) yields a tremendous speed up. The feactor compared to multithreaded versions is around 6-10x! This can be seen like curing with a better medication (better algorithm) vs. fighting the symptoms only (MT). 
+
+1887.22743571 simulation frames per second
+1370.85314367 simulation frames per second
+1934.33114156 simulation frames per second
+1345.16174553 simulation frames per second
+1887.19436811 simulation frames per second
+1956.73440285 simulation frames per second
+1865.59908817 simulation frames per second
+1932.90009713 simulation frames per second
+2023.88161907 simulation frames per second
+1972.5432071 simulation frames per second
+
+Spatially coherent sorting:
+---------------------------
+Sorting the data and using the locality gives another little boost of around 2-300 fps. However, in the measurement below the time the sorting needs is not considered and has to be carefully traded off. In the implementation a Hilbert curve was choosen because it is considered the curve with the better locality. 
+
+2179.60372161 simulation frames per second
+2156.40830316 simulation frames per second
+2316.16303124 simulation frames per second
+2174.6190811 simulation frames per second
+2241.08972258 simulation frames per second
+2006.75929809 simulation frames per second
+2190.62353813 simulation frames per second
+2384.4820921 simulation frames per second
+1836.32045081 simulation frames per second
+2449.80431933 simulation frames per second
+2202.23428742 simulation frames per second
+2065.62870969 simulation frames per second
+2265.85375632 simulation frames per second
+
+Complete version using locking:
+-------------------------------
+Introducing locking takes off some of the performance (fps) due to the unpredictable nature of the scheduler and the overhead, but overall it did not impact the performance heavily. Still fps around 2000 are achieved, which is great!
+
+1079.9083406 simulation frames per second
+2233.07162632 simulation frames per second
+1902.73149087 simulation frames per second
+2139.69326257 simulation frames per second
+2253.58329857 simulation frames per second
+2229.35260976 simulation frames per second
+2036.97274013 simulation frames per second
+1987.09089109 simulation frames per second
+1707.68091429 simulation frames per second
+2032.68885991 simulation frames per second
+2245.02426492 simulation frames per second
+2060.46673359 simulation frames per second
+1909.93373035 simulation frames per second
+2269.14417101 simulation frames per second
+2171.56529572 simulation frames per second
