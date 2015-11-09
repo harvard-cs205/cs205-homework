@@ -1,0 +1,19 @@
+Results
+Serial uncorrelated: 0.276435136795 seconds
+Fine grained uncorrelated: 5.97253799438 seconds
+Serial correlated: 0.268787126541 seconds
+Fine grained correlated: 5.65602898598 seconds
+
+
+
+The first observation after the implementation of the locks were that its 
+considerably slower  than the serial version which in this case is the coarse 
+grained locking. The fine grained locking is much slower than the serial 
+implementation due to the overhead with the locks even though we have paralellized
+over 4 threads. The same can be said for the medium grained locking as well. 
+The medium grained locking took higher time than fine grained locking because the
+locks take time to be released and lesser the number of locks more the time it 
+takes for the function to run. The uncorrelated transfers take higher time than
+the correlated transfers in the cases where locking is used. As the N increases,
+the time increases since there are higher chances a thread waits for one of the
+other threads to release the locks. 

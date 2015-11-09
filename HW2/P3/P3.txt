@@ -1,0 +1,23 @@
+AVX implementation:
+For 1 Thread:
+1074.945862 Million Complex FMAs in 0.92605805397 seconds, 1160.77589023 million Complex FMAs / second
+
+For 2 Threads:
+1074.945862 Million Complex FMAs in 0.47909283638 seconds, 2243.71098955 million Complex FMAs / second
+
+For 4 Threads:
+1074.945862 Million Complex FMAs in 0.271087884903 seconds, 3965.30395442 million Complex FMAs / second
+
+For the original implementation:
+For 1 Thread:
+1074.656613 Million Complex FMAs in 5.15367984772 seconds, 208.522190892 million Complex FMAs / second
+
+For 2 Threads:
+1074.656613 Million Complex FMAs in 2.56199908257 seconds, 419.460186506 million Complex FMAs / second
+
+For 4 Threads:
+1074.656613 Million Complex FMAs in 1.5052690506 seconds, 713.929920085 million Complex FMAs / second
+
+
+The 8 level paralell instruction implementation for a single thread gives about 6 times speed up over the serial implementation. On 4 threads the parallelized implementation is over 3 times faster than the single thread version. 
+

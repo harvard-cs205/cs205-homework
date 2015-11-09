@@ -1,0 +1,10 @@
+As seen in the graph we see that the performance of 4 threads is slightly better 
+than 2 threads but both outperform the 1 threaded implementation. 
+
+The method of implementation is using events. I use an event for every iteration 
+and thread. Hence its a list for every thread which is inside a list. Using
+event.wait() the function waits for the required events to be set after which I 
+initialize the filtering function and carry the swap as well while holding 
+on to the event which is set after the assignment is completed. This fits the
+extra credit portion since it allows the next threads to start which have been
+waiting for the event to be completed.

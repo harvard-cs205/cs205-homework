@@ -1,0 +1,64 @@
+Results for Part A
+
+For 1 thread:
+Average frames per second: 11.8349756824
+
+For 2 threads:
+Average frames per second: 19.2597383766
+
+For 4 threads:
+Average frames per second: 16.9015755993
+
+The Part A speeds up using threads since we are distributing work now over threads.
+
+Results for Part B
+
+For 1 thread:
+Average frames per second: 583.169328103
+
+For 2 threads:
+Average frames per second: 1038.1057414
+
+For 4 threads:
+Average frames per second: 1000.58345394
+
+The spatial decomposition speeds up the code by 50 times since the algorithm is now
+O(N) and not O(N^2). Instead of checking all the balls we are checking the balls 
+only in the near vicinity of the ball in question.
+
+The spatial sorting I decided to use was morton ordering. Ease of implementation and
+better sorting is what pushed me to choose morton ordering.
+
+Results for Part C
+
+For 1 thread:
+Average frames per second: 858.514493966
+
+For 2 threads:
+Average frames per second: 1585.46346701
+
+For 4 threads:
+Average frames per second: 1398.75795182
+
+Sorting helps in speeding up the process since there is lower cost in accessing the
+memory since the balls nearby for the spatial decompisition process lie closer in 
+the memory.
+
+Results for Part D
+
+For 1 thread:
+Average frames per second: 833.267590823
+
+For 2 threads:
+Average frames per second: 1469.65369723
+
+For 4 threads:
+Average frames per second: 1417.03007774
+
+Locking slows up the code by a bit since there is an additional overhead of creating
+locks as well as acquiring and releasing locks.
+
+A general observation is that 4 threads is slower than 2 threads which can be due 
+to communication issues.
+
+#Discussed with Taylor Killian for part2 and part3 of the problem.
