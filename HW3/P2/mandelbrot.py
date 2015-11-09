@@ -2,6 +2,8 @@ from __future__ import division
 import pyopencl as cl
 import numpy as np
 import pylab
+import os
+os.environ['PYOPENCL_COMPILER_OUTPUT'] = '1'
 
 
 def round_up(global_size, group_size):
