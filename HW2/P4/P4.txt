@@ -1,0 +1,13 @@
+(Plot: num_threads_result.png)
+
+In this problem, the original image is divided into "stripes" where every thread can perform median filtering on one set of stripes. For example, in the case with 4 threads, thread 1 will work on 0,4,8,... and thread 2 will work on 1,5,9,... After sufficient number of iterations, the parallelized output filtered image will be the same as that done by serial numpy median code. 
+
+However, the transformation under this parallel case should use extra caution because when performing median filtering, one thread may be transforming certain line another thread is currently reading. Therefore, I used events to avoid such issue. I initialized the events matrix that will store all the event states of threads in multiple iterations. When one thread is transforming the lines, it "locks" (set their event to wait) both the line above it and the line below it. When finished processing (no collision issue any more), the event will be set.
+
+I plotted the performance curve from 1 thread to 16 threads 'num_threads_result.png'. The performance enhancement is apparently significant. From 1 thread to 2 threads, time decreases to one half. After this, the performance is somehow just fluctuating between 1.6 to 2.4.
+
+* Consulted Taylor on event updating: initially I let event of iteration+1 wait and resulted in blank outputs. I modified into letting event iteration-1 wait and then it worked fine.
+
+-----------------------
+Time performance list of thread number from 1 to 16.
+[3.8952291011810303, 1.9527161121368408, 1.9355039596557617, 1.8978679180145264, 1.6866109371185303, 1.7588369846343994, 1.7240731716156006, 1.8186109066009521, 2.281008005142212, 2.4645941257476807, 1.7189021110534668, 1.6698811054229736, 1.8659181594848633, 2.0020480155944824, 1.9044520854949951, 1.7266809940338135]

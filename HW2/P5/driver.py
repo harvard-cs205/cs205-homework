@@ -11,14 +11,42 @@ pyximport.install()
 import numpy as np
 from timer import Timer
 from animator import Animator
-from physics import update, preallocate_locks
+from physics import update, preallocate_locks, update
 
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
+#############
+# Generate weighting grid described in P5.txt
+#############
+def weight_gen(grid):
+    weight = np.zeros_like(grid).astype(int)
+    x,y,idx = 0,0,1
+    while x<(int)(weight.shape[0]/2)*2 and y<(int)(weight.shape[1]/2)*2:
+        for j in range(x+1):
+            weight[x,j] = idx
+            idx += 1
+        for i in reversed(range(y)):
+            weight[i,y] = idx
+            idx += 1
+        for i in range(y+2):
+            weight[i,y+1] = idx
+            idx += 1
+        for j in reversed(range(x+1)):
+            weight[x+1,j] = idx
+            idx += 1
+        x = x+2
+        y = y+2
+    return weight
+##############
+
+
+
 if __name__ == '__main__':
     num_balls = 10000
     radius = 0.002
+    #num_balls = 500
+    #radius = 0.01
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -61,10 +89,12 @@ if __name__ == '__main__':
     # preallocate locks for objects
     locks_ptr = preallocate_locks(num_balls)
 
+    weight_grid = weight_gen(grid)
+
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
-                   radius, grid_size, locks_ptr,
+                   radius, grid_spacing, locks_ptr,
                    physics_step)
 
         # udpate our estimate of how fast the simulator runs
@@ -80,3 +110,19 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+
+            # Assign weights to each ball
+            loc = [((int)(ball[0]/grid_spacing), (int)(ball[1]/grid_spacing)) for ball in positions]
+            weight = [weight_grid[l[0], l[1]] if (l[0]<weight_grid.shape[0] and l[1]<weight_grid.shape[1]) else 0 for l in loc]
+
+            idx = np.argsort(weight)
+
+            # reset positions and velocities
+            positions = positions[idx]
+            velocities = velocities[idx]
+            # reset grid
+            grid[:,:] = -1
+            for i in range(num_balls):
+                if positions[i,0]<1 and positions[i,1]<1:
+                    grid[(int)(positions[i,0]/grid_spacing), (int)(positions[i,1]/grid_spacing)] = i
+

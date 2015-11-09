@@ -1,0 +1,86 @@
+1) Serial run yields performance of between 5 to 6 simulations per second, while parallel run yields 7-8 simulations per second. Therefore performance is better for 4 thread case, but not four times.
+
+2) Spatial decomposition surprisingly yields really good performance improvement from 7 to around 300 simulations per second. This is because a large part of calculation is done comparing whether two balls are close enough to each other to induce a collision. By decomposing space, the comparison's complexity is linear O(N) instead of a quadratic O(N^2) -  a significant increase and therefore boosting up the performance.
+
+3) Spatially coherent sorting improves performance from around 300 to around 360 simulations per second - a 20% increase. I thought for a while and used the following weighting grid to assign weights to each ball:
+ 1  2  9 10
+ 4  3  8 11
+ 5  6  7 12
+16 15 14 13...
+Then I googled and found a better weighting scheme - zorder curve, which is more balanced and efficient, but I think complexity is slightly higher than my scheme. The position list is then sorted according to the weights assigned.
+
+4) After adding locks, the performance decreased from 360 to around 320 simulations per second. Locking is necessary to prevent updating simutaneously. These safety checks impede performance by acquiring the locks and wait for potential collisions to pass and then release them, and they are essential for the sound physical movement of the colliding balls system.
+
+Through this problem I learned to use several ways to improve the performance of simple ball collision physics simulation: multithreading, decomposition and algorithm. The speed enhancement is significant. It also makes me think sometimes it would be better to first stop and think about the problem itself: is there any way to optimize the problem itself, rather than justing parallelizing it. It'll often surprise us how good this can perform with some simple optimization like the space decomposition we have in this problem.
+
+
+---------------------------
+Data:
+1) Serial run (one processor)
+6.18444652183 simulation frames per second
+5.52214887393 simulation frames per second
+5.67601684548 simulation frames per second
+6.09491923437 simulation frames per second
+5.97343055714 simulation frames per second
+5.59625555716 simulation frames per second
+5.51724573378 simulation frames per second
+5.83301324084 simulation frames per second
+5.96213734381 simulation frames per second
+5.60412917156 simulation frames per second
+5.80036785551 simulation frames per second
+
+2) Parallel run (four processors)
+7.86758504779 simulation frames per second
+7.77611456053 simulation frames per second
+7.92041634879 simulation frames per second
+7.04761584708 simulation frames per second
+7.14878067072 simulation frames per second
+7.26390805951 simulation frames per second
+7.0847695252 simulation frames per second
+7.80511333714 simulation frames per second
+7.61783541292 simulation frames per second
+7.2985797165 simulation frames per second
+7.00751156139 simulation frames per second
+7.69372605057 simulation frames per second
+
+3) Spatial decomposition
+323.750387695 simulation frames per second
+310.611793695 simulation frames per second
+312.162761588 simulation frames per second
+263.871995079 simulation frames per second
+322.593651238 simulation frames per second
+309.053387458 simulation frames per second
+303.533160966 simulation frames per second
+316.048170322 simulation frames per second
+317.252138515 simulation frames per second
+299.486183506 simulation frames per second
+317.95833362 simulation frames per second
+314.000462793 simulation frames per second
+280.756394209 simulation frames per second
+290.975359641 simulation frames per second
+
+4) Spatially Coherent Sorting
+343.563082342 simulation frames per second
+361.005779964 simulation frames per second
+366.89153254 simulation frames per second
+253.065282973 simulation frames per second
+375.473953133 simulation frames per second
+364.222651214 simulation frames per second
+353.187197822 simulation frames per second
+351.967105125 simulation frames per second
+373.158718861 simulation frames per second
+376.745172011 simulation frames per second
+382.971512053 simulation frames per second
+
+5) Adding lockings
+327.164158784 simulation frames per second
+327.88492808 simulation frames per second
+329.896492056 simulation frames per second
+316.653356485 simulation frames per second
+323.416778825 simulation frames per second
+293.373622069 simulation frames per second
+325.925373345 simulation frames per second
+327.414905545 simulation frames per second
+324.408268879 simulation frames per second
+328.195135831 simulation frames per second
+345.025624152 simulation frames per second
