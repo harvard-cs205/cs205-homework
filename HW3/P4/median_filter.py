@@ -1,7 +1,7 @@
 from __future__ import division
 import pyopencl as cl
 import numpy as np
-import imread
+#import imread
 import pylab
 
 def round_up(global_size, group_size):
@@ -54,12 +54,14 @@ if __name__ == '__main__':
     program = cl.Program(context, open('median_filter.cl').read()).build(options='')
 
     host_image = np.load('image.npz')['image'].astype(np.float32)[::2, ::2].copy()
+    #host_image = np.array([[1,2,3, 4, 5],[6,7,8, 9, 10],[11,12,13, 14, 15],[16, 17, 18, 19, 20],[21,22,23,24,25], [26,27,28,29,30]],dtype = np.float32)
     host_image_filtered = np.zeros_like(host_image)
 
     gpu_image_a = cl.Buffer(context, cl.mem_flags.READ_WRITE, host_image.size * 4)
     gpu_image_b = cl.Buffer(context, cl.mem_flags.READ_WRITE, host_image.size * 4)
 
     local_size = (8, 8)  # 64 pixels per work group
+    #local_size = (3,3)
     global_size = tuple([round_up(g, l) for g, l in zip(host_image.shape[::-1], local_size)])
     width = np.int32(host_image.shape[1])
     height = np.int32(host_image.shape[0])
@@ -86,5 +88,7 @@ if __name__ == '__main__':
         gpu_image_a, gpu_image_b = gpu_image_b, gpu_image_a
 
     cl.enqueue_copy(queue, host_image_filtered, gpu_image_a, is_blocking=True)
-
+    #print host_image_filtered
+   #print numpy_median(host_image, num_iters)
     assert np.allclose(host_image_filtered, numpy_median(host_image, num_iters))
+    print np.allclose(host_image_filtered, numpy_median(host_image, num_iters))
