@@ -3,6 +3,7 @@ import pyopencl as cl
 import numpy as np
 import pylab
 import os.path
+import pdb
 
 def round_up(global_size, group_size):
     r = global_size % group_size
@@ -42,7 +43,7 @@ if __name__ == '__main__':
 
     # Create a context with all the devices
     devices = platforms[0].get_devices()
-    context = cl.Context(devices)
+    context = cl.Context(devices[:2])
     print 'This context is associated with ', len(context.devices), 'devices'
 
     # Create a queue for transferring data and launching computations.
@@ -56,7 +57,6 @@ if __name__ == '__main__':
 
     host_image = np.load('image.npz')['image'].astype(np.float32)[::2, ::2].copy()
     host_image_filtered = np.zeros_like(host_image)
-
     gpu_image_a = cl.Buffer(context, cl.mem_flags.READ_WRITE, host_image.size * 4)
     gpu_image_b = cl.Buffer(context, cl.mem_flags.READ_WRITE, host_image.size * 4)
 
@@ -64,7 +64,7 @@ if __name__ == '__main__':
     global_size = tuple([round_up(g, l) for g, l in zip(host_image.shape[::-1], local_size)])
     width = np.int32(host_image.shape[1])
     height = np.int32(host_image.shape[0])
-
+    pdb.set_trace()
     # Set up a (N+2 x N+2) local memory buffer.
     # +2 for 1-pixel halo on all sides, 4 bytes for float.
     local_memory = cl.LocalMemory(4 * (local_size[0] + 2) * (local_size[1] + 2))
@@ -78,6 +78,7 @@ if __name__ == '__main__':
 
     num_iters = 10
     for iter in range(num_iters):
+        print iter
         program.median_3x3(queue, global_size, local_size,
                            gpu_image_a, gpu_image_b, local_memory,
                            width, height,
@@ -87,5 +88,5 @@ if __name__ == '__main__':
         gpu_image_a, gpu_image_b = gpu_image_b, gpu_image_a
 
     cl.enqueue_copy(queue, host_image_filtered, gpu_image_a, is_blocking=True)
-
+    #print np.allclose(host_image_filtered, numpy_median(host_image, num_iters))
     assert np.allclose(host_image_filtered, numpy_median(host_image, num_iters))
