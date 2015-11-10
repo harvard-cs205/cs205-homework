@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt 
 import matplotlib.cm as cm
 
-def mandelbrot(x, y):
+def mandelbrot(x,y):
     z = c = complex(x, y)
     iteration = 0
     max_iteration = 511  # arbitrary cutoff
