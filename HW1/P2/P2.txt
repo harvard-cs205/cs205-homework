@@ -1,1 +1,3 @@
 # Your discussion here
+
+Fromt the two histogram plots we can see that the load of workers in P2b is much more balanced than that of P2a, as the total iteration time for each partition is narrowed in a small range. However, the transform of repartition will result in shuffle, which causes much more overhead in computation time. So this is the tradeoff.

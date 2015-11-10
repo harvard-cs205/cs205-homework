@@ -1,1 +1,12 @@
-# Your discussion here
+Source: Kevin_Bacon, Index: 2729536
+End: Harvard_University, Index: 2152782
+Kevin_Bacon John_Lithgow Harvard_University
+Dist: 2
+
+Source: Harvard_University, Index: 2152782
+End: Kevin_Bacon, Index: 2729536
+Harvard_University Jack_Lemmon Rod_Steiger Kevin_Bacon
+Dist: 3
+
+
+Failed millions of times trying to run connected_components on AWS. Kept getting MLE.
