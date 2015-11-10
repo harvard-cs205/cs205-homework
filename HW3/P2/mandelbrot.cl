@@ -13,6 +13,9 @@ mandelbrot(__global __read_only float *coords_real,
     float z_old;
     int iter;
 
+    if (x % 1000 == 0) {
+        printf("%d \n", x);
+    }
 
     if ((x < w) && (y < h)) {
         c_real = coords_real[y * w + x];
