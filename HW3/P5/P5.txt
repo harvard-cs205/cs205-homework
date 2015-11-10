@@ -1,0 +1,50 @@
+Performance:
+
+Part 1: Implement updates from neighbors
+-----------------------------------------
+Maze 1:
+Finished after 915 iterations, 203.1936 ms total, 0.222069508197 ms per iteration
+Found 2 regions
+
+Maze 2:
+Finished after 532 iterations, 118.20936 ms total, 0.222198045113 ms per iteration
+Found 35 regions
+
+
+Part 2: Fetch Grandparents
+----------------------------------------
+Maze 1:
+Finished after 529 iterations, 113.90464 ms total, 0.215320680529 ms per iteration
+Found 2 regions
+
+Maze 2:
+Finished after 272 iterations, 58.57104 ms total, 0.215334705882 ms per iteration
+Found 35 regions
+
+
+Part 3: Merge Parent Regions
+-----------------------------------------
+Maze 1:
+Finished after 10 iterations, 3.08912 ms total, 0.308912 ms per iteration
+Found 2 regions
+
+Maze 2:
+Finished after 9 iterations, 2.65512 ms total, 0.295013333333 ms per iteration
+Found 35 regions
+
+Part 4: Efficient Grandparents
+-----------------------------------------
+Maze 1:
+
+
+Maze 2:
+
+
+Part 5: No Atomic Operations
+-----------------------------------------
+Maze 1:
+
+
+Maze 2:
+
+
