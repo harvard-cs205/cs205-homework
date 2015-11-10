@@ -75,18 +75,25 @@ propagate_labels(__global __read_write int *labels,
     // the local buffer is loaded
     barrier(CLK_LOCAL_MEM_FENCE);
 
-    // Fetch the value from the buffer the corresponds to
+    // Fetch the value from the buffer that corresponds to
     // the pixel for this thread
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
-    
+    int a,b,c,d;
+    //int wh = w*h;
     // stay in bounds
     if ((x < w) && (y < h)) {
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
-        new_label = old_label;
+        if(old_label!=w*h){
+        new_label = min(min(min(min(buffer[(buf_y-1)*buf_w+buf_x],\
+           buffer[(buf_y)*buf_w+buf_x-1]),buffer[(buf_y)*buf_w+buf_x+1]),\
+           buffer[(buf_y+1)*buf_w+buf_x]),old_label);
+        }else{
+            new_label=old_label;
+         }
 
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
