@@ -1,1 +1,23 @@
-# Your discussion here
+# Problem 2 Discussion
+
+From my bar chart obtained in Part a, I noticed that there were large amounts of "computation" that were focused about specific partitions, which I validated by going through the Spark UI. The histogram of compute times also shows such a skewed distribution. To take advantage of parallelism, we would want to load balance (i.e., split the amount of compute evenly across the partitions). 
+
+One solution to this is to randomize the allocation of coordinates across partitions so as to avoid these cluster effects. From the P2b bar chart, there appears to be a fairly uniform distribution of compute times across all partitions. I used a partitionBy function to effect this partitioning, which invokes a shuffle. To validate the load balancing of this strategy, I looked at the compute times for running these scripts with 1, 2, and 4 cores on my local machine.
+
+1 core:
+2A:
+collect() without shuffle: 1.0 min (range 0.05 s - 6 s)
+2B:
+partitionBy(): 27 s (range 0.2 s - 0.5 s; 28 MB)
+collect() aafter shuffle: 1.1 min (range 0.5 s - 2 s)
+
+4 cores:
+2A:
+collect() without shuffle: 39 s (range 0.1 s - 14 s)
+2B:
+partitionBy(): 16 s (range 0.4 s - 1 s; 28 MB)
+collect() after shuffle: 41 s (range 1 s - 2 s)
+
+From this preliminary data, it is fairly clear that the compute loads are being balanced reasonably well across all partitions (with decreased ranges in compute times). Although the overall compute times of adding a shuffle increased significantly, it is reasonable to hypothesize that increasing the number of cores further would lead to increased performance by randomly shuffling the partitions. Each shuffle task takes up to 1 s to complete, and each collect() after the shuffle takes up to 2 s. Conversely, the collect() without the shuffle could take up to 14 s, or perhaps even longer. With 100 cores, we may see a time decrease on the order of (14 - (2 + 1)) = 11 s in performance between the randomly partitioned vs. typically partitioned strategies. This number represents a very naive approximation of the performance gain we may see; with that said, it would not be unreasonable for this estimate to be decreased due to further overhead costs associated with more cores involved in the shuffle.
+
+Another approach is to isolate pixels with high compute and distribute them evenly across the partitions (and then similar with the low compute pixels: some sort of stratified partitioning). This method may yield a better distribution of compute across partitions, as we are adjusting the compute based on our knowledge of the problem; however, it should be noted that this method only works when the complexity as a function of pixel is already known. 
