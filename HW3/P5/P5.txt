@@ -1,0 +1,5 @@
+# solution to P5
+part 1 - Finished after 507 iterations, 245.189408 ms total, 0.483608299803 ms per iteration
+part 2 - Finished after 273 iterations, 139.493408 ms total, 0.510964864469 ms per iteration
+part 3 - Finished after 10 iterations, 5.323872 ms total, 0.5323872 ms per iteration
+part 4 - Finished after 28 iterations, 41.906272 ms total, 1.49665257143 ms per iteration
