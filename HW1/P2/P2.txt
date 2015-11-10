@@ -1,1 +1,23 @@
 # Your discussion here
+
+The initial mandelbrot calculation without partitioning had a
+few workers doing a lot of work, and about 85 workers doing 
+little to no work. The standard deviation of the number of 
+calculations over the 100 workers was 5152754.37964. Looking 
+at the Spark job page, you can see the individual runtimes of 
+each worker, most workers ran in .1 or .1 seconds, but some ran 
+for as long as 7 seconds.
+
+My initial test was just to randomize the distribution of the nodes.
+The shuffle took 22 seconds, but now each worker was working .7-.8
+seconds and the std went down to 31141.589793. Although in this 
+example the total calculation time was roughly the same because
+of the 22 second shuffle cost, as the number of nodes scales 
+it will pay off much better.
+
+My next approach was to equally split the middle of the mandelbrot
+plot where there is the heaviest computation, then randomly partition
+the rest of the graph. I took the box x = [800, 1000], y = [700, 1200]
+and subsequently the std deviation was 24852.3251531. The shuffle 
+was 24 seconds and the workers were again about .8 seconds of 
+compute time. This is what's shown in the histogram plot for 2b.
