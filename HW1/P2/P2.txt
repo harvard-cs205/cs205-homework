@@ -1,1 +1,7 @@
-# Your discussion here
+I compared default partitioning against the repartition() transformation.
+
+The default partitioning regime ran faster (0.0378s), but was very unbalanced across workers, with many workers having almost no work to do (in the range of <1e3 iterations), and just a few workers having a huge amount of work to do (up to 2.5e7 iterations).
+
+The repartition() method ran about 3x slower, but was much better balanced, and each partition ran about an order of magnitude faster than the most expensive ones in the default scheme.  This is likely because of the shuffling overhead incurred by repartition().  From the Spark programming guide: "Repartition: Reshuffle the data in the RDD randomly to create either more or fewer partitions and balance it across them. This always shuffles all data over the network."  Random assignment helped to distribute the computation-heavy "bright" spots in the Mandelbrot fractal, but the randomization itself came at a price.  
+
+In this case, reshuffling resulted in overall slower execution time, despite the better balancing and faster per-worker speeds.  In cases where per-iteration computation is extremely expensive, it'd likely be worth it to repartition an imbalanced distribution, as the reshuffling is essentially fixed by the number of components to shuffle, whereas the per-worker computation time can scale quadratically or worse, based on the per-iteration cost.
