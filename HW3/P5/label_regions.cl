@@ -1,3 +1,6 @@
+#define min(a, b) (((a) < (b)) ? (a) : (b))
+#define max(a, b) (((a) < (b)) ? (b) : (a))
+
 __kernel void
 initialize_labels(__global __read_only int *image,
                   __global __write_only int *labels,
@@ -58,9 +61,13 @@ propagate_labels(__global __read_write int *labels,
     const int idx_1D = ly * get_local_size(0) + lx;
     
     int old_label;
+    int old_label_1, old_label_2, old_label_3, old_label_4;
     // Will store the output value
     int new_label;
     
+    int last_index = -1;
+    int last_label = -1;
+
     // Load the relevant labels to a local buffer with a halo 
     if (idx_1D < buf_w) {
         for (int row = 0; row < buf_h; row++) {
@@ -80,16 +87,35 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
+    if(idx_1D == 0){
+        for(int buf_xx = halo; buf_xx < buf_w - halo; buf_xx++){
+            for(int buf_yy = halo; buf_yy < buf_h - halo; buf_yy++){
+                if(buffer[buf_yy * buf_w + buf_xx] == last_index)
+                    buffer[buf_yy * buf_w + buf_xx] = last_label;
+                else if(buffer[buf_yy * buf_w + buf_xx] < w * h){
+                    last_index = buffer[buf_yy * buf_w + buf_xx];
+                    last_label = labels[last_index];
+                }
+            }
+        }
+    }
     
+    barrier(CLK_LOCAL_MEM_FENCE);
+
     // stay in bounds
     if ((x < w) && (y < h)) {
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
-        new_label = old_label;
+        old_label_1 = buffer[(buf_y - 1) * buf_w + buf_x];
+        old_label_2 = buffer[buf_y * buf_w + buf_x - 1];
+        old_label_3 = buffer[buf_y * buf_w + buf_x + 1];
+        old_label_4 = buffer[(buf_y + 1) * buf_w + buf_x];
+        if(old_label < w * h) new_label = min(min(min(min(old_label, old_label_1), old_label_2), old_label_3), old_label_4);
 
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
+            labels[old_label] = min(labels[old_label], new_label);
             // indicate there was a change this iteration.
             // multiple threads might write this.
             *(changed_flag) += 1;
