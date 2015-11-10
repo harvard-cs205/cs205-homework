@@ -11,7 +11,7 @@ if __name__ == "__main__":
     devices = [d for platform in platforms for d in platform.get_devices()]
     for i, d in enumerate(devices):
         print("#{0}: {1} on {2}".format(i, d.name, d.platform.name))
-    ctx = cl.Context(devices)
+    ctx = cl.Context(devices[2:])
 
     queue = cl.CommandQueue(ctx, properties=cl.command_queue_properties.PROFILING_ENABLE)
 
