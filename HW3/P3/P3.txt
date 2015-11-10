@@ -1,0 +1,2 @@
+configuration ('coalesced', 256, 64): 0.000470016 seconds
+
