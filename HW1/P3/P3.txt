@@ -1,1 +1,13 @@
-# Your discussion here
+[(u'aelst',
+  11,
+  [u'least',
+   u'leats',
+   u'salet',
+   u'slate',
+   u'stale',
+   u'steal',
+   u'stela',
+   u'taels',
+   u'tales',
+   u'teals',
+   u'tesla'])]
