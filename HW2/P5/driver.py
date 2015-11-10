@@ -16,6 +16,33 @@ from physics import update, preallocate_locks
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
+
+#Based on the C function presented in https://en.wikipedia.org/wiki/Hilbert_curve
+def d_hilbert(x,y,n):
+    
+    s = n / 2
+    d = 0
+    while s > 0 :
+        rx = (x & s) > 0
+        ry = (y & s) > 0
+        d += (s**2)*((3 * rx) ^ ry)
+        x, y = rot(s,x,y,rx,ry)
+        s /= 2
+    return d
+    
+#Based on the C function presented in https://en.wikipedia.org/wiki/Hilbert_curve
+def rot(n,x,y,rx,ry):
+    if not ry:
+        if rx:
+            x = n - 1 - x
+            y =  n - 1 - y
+            
+        #Swap x and y
+        oldx = x
+        x = y
+        y = oldx
+    
+    return x,y   
 if __name__ == '__main__':
     num_balls = 10000
     radius = 0.002
@@ -64,7 +91,7 @@ if __name__ == '__main__':
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
-                   radius, grid_size, locks_ptr,
+                   radius, grid_spacing, locks_ptr,
                    physics_step)
 
         # udpate our estimate of how fast the simulator runs
@@ -80,3 +107,21 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+            
+            #Switching to integer coordinate in the grid:
+            grid_coords = zip((positions[:,0]/grid_spacing).astype(int),(positions[:,1]/grid_spacing).astype(int))
+            
+            #Evaluate the Hilbert distance:
+            d = map(lambda xy: d_hilbert(xy[0],xy[1],grid_size),grid_coords)
+            
+            #Getting ordered indices:
+            order = np.argsort(d)
+            
+            #Update positions and velocities:
+            positions = positions[order]
+            velocities = velocities[order]
+            
+            #Update grid:
+            grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
+            grid[(positions[:, 0] / grid_spacing).astype(int),(positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
+                        

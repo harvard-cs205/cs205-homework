@@ -1,0 +1,48 @@
+***** PLEASE NOTE *****
+
+I had originally chosen to first acquire the lock of dest[idx], perform the update and release it afterward and then to the same with src[idx]. But talking to Isadora Nun, she mentioned that there might be a smarter way to do it by looking starting locking the minimum of of the two dest[idx] and src[idx], which I found more elegant and therefore chose to implement.
+
+********
+
+Results:
+
+The first thing we can notice is that both in the uncorrelated and correlated case, the serial code works much much faster than the parallel codes. We get a completion time of about 0.25s (unc) / 0.3s  (c) whereas we are more in the 6s to 9s for the parallel.
+
+I then observed that when using uncorrelated data, fine grained works better than medium grained by a second. We get a 6.15s time for fine grained, when the best medium grained time is obtained by a second when using 1 lock. The completion time increases with number of locks for uncorrelated data.
+
+For the correlated data set, medium grained slightly outperforms fine grained. We seem to find an optimum number of lock in the interval [19,23] depending of the experiments. The results are the following and we add a plot:
+
+Serial uncorrelated: 0.252358913422 seconds
+Fine grained uncorrelated: 6.11318302155 seconds
+Working with N=1
+Medium grained uncorrelated: 7.33709192276 seconds
+Working with N=2
+Medium grained uncorrelated: 7.77483010292 seconds
+Working with N=3
+Medium grained uncorrelated: 8.20295190811 seconds
+Working with N=4
+Medium grained uncorrelated: 8.25202512741 seconds
+Working with N=5
+Medium grained uncorrelated: 8.17385792732 seconds
+Serial correlated: 0.381729841232 seconds
+Fine grained correlated: 6.00023603439 seconds
+Working with N=15
+Medium grained correlated: 5.84990692139 seconds
+Working with N=16
+Medium grained correlated: 5.99943304062 seconds
+Working with N=17
+Medium grained correlated: 5.91888093948 seconds
+Working with N=18
+Medium grained correlated: 5.9284760952 seconds
+Working with N=19
+Medium grained correlated: 5.8584549427 seconds
+Working with N=20
+Medium grained correlated: 5.80940008163 seconds
+Working with N=21
+Medium grained correlated: 5.59709405899 seconds
+Working with N=22
+Medium grained correlated: 5.83539605141 seconds
+Working with N=23
+Medium grained correlated: 7.28862905502 seconds
+Working with N=24
+Medium grained correlated: 8.06198406219 seconds

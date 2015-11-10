@@ -1,0 +1,25 @@
+N = 1 thread
+
+1074.656613 Million Complex FMAs in 4.98039698601 seconds, 215.777299685 million Complex FMAs / second
+
+N = 2 threads
+
+1074.656613 Million Complex FMAs in 2.29383778572 seconds, 468.497214445 million Complex FMAs / second
+
+N = 4 threads
+
+1074.656613 Million Complex FMAs in 1.27308177948 seconds, 844.137926033 million Complex FMAs / second
+
+WITH instruction-level parallelism:
+
+N = 1:
+
+1074.948319 Million Complex FMAs in 1.01928591728 seconds, 1054.60921295 million Complex FMAs / second
+
+N = 2:
+
+1074.948319 Million Complex FMAs in 0.488299131393 seconds, 2201.41353914 million Complex FMAs / second
+
+N = 4:
+
+1074.948319 Million Complex FMAs in 0.30831193924 seconds, 3486.56079181 million Complex FMAs / second

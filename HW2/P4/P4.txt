@@ -1,0 +1,10 @@
+**** Was helped by Andrew Petschek to understand the pseudo code and more particularly the advantages of using the event matrix****
+
+
+I also wanted to say that I am still not sure to understand the point Thouis made in @388 on piazza. My code is working, but I'm not sure why it is the case. It started with a very naive approach but worked by creating tmpA and tmpB before creating the threads. But thinking more about it, if my target median function updates for each thread, is the reason why we don't observe corruption is that the median_3x3 makes sure each thread changes particular lines in the image? This is the approach I used but would love for someone to correct me if I didn't get it !
+
+What we can see on the plot added in git, the performance increases with the number of thread used. The algorithm is twice as performant when using 2 threads rather than in serial. I was expecting a similar gap between 2 and 4 threads but was then surprised to see such a small improvement (-0.2).
+
+In order to control cooperation between threads, I used the combination of Events.wait() and Events.set(). I originally tried to create while loops to check for the previous iterations completion but then Andrew directed me towards the wait function.
+
+

@@ -81,10 +81,27 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
    ##########
    with nogil:
        for r in range(repeat):
-           for idx in range(src.shape[0]):
+           for idx in prange(src.shape[0],num_threads=4):
+                #To avoid deadlock, we first lock the smallest value of src[idx]/dest[idx]:
+               if src[idx]<dest[idx]:
+                   acquire(&(locks[src[idx]]))
+                   acquire(&(locks[dest[idx]]))
+               elif dest[idx]<src[idx]:
+                   acquire(&(locks[dest[idx]]))
+                   acquire(&(locks[src[idx]]))
+                #In the case where they are equal, we only need to lock it onceL
+               elif dest[idx]==src[idx]:
+                   acquire(&(locks[src[idx]]))
+
                if counts[src[idx]] > 0:
                    counts[dest[idx]] += 1
                    counts[src[idx]] -= 1
+               
+               if dest[idx]!=src[idx]:    
+                   release(&(locks[src[idx]]))
+                   release(&(locks[dest[idx]]))
+               else:
+                   release(&(locks[src[idx]]))
 
    free_N_locks(counts.shape[0], locks)
 
@@ -107,9 +124,30 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
    ##########
    with nogil:
        for r in range(repeat):
-           for idx in range(src.shape[0]):
+           for idx in prange(src.shape[0],num_threads=4):
+
+               if src[idx]/N<dest[idx]/N:
+                   acquire(&(locks[src[idx]/N]))
+                   acquire(&(locks[dest[idx]/N]))
+               elif dest[idx]/N<src[idx]/N:
+                   acquire(&(locks[dest[idx]/N]))
+                   acquire(&(locks[src[idx]/N]))
+               elif dest[idx]/N==src[idx]/N:
+                   acquire(&(locks[src[idx]/N]))  
+             
                if counts[src[idx]] > 0:
                    counts[dest[idx]] += 1
                    counts[src[idx]] -= 1
 
+               if dest[idx]/N!=src[idx]/N:    
+                   release(&(locks[src[idx]/N]))
+                   release(&(locks[dest[idx]/N]))
+               else:
+                   release(&(locks[src[idx]/N]))
+
    free_N_locks(num_locks, locks)
+
+
+
+
+

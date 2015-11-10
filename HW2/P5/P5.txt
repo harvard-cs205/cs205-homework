@@ -1,0 +1,23 @@
+**** Nicolas Drizard helped me solve double collisions by suggesting to collide only if the grid entry was smaller or bigger than i, I choose bigger****
+
+
+This solution allowed also to avoid double locking since i>Grid[(x+xgrid),(y+ygrid)]. This solution uses the same technique in a way as the one mentioned in P2 of the homework (suggested by Isadora Nun).
+
+
+Performance:
+
+•Multithreading 1 Thread: ~12 sf/s
+•Multithreading 4 Thread: ~18 sf/s
+
+•Spatial decomposition 1 Thread: ~500 sf/s
+•Spatial decomposition 4 Thread: ~800 sf/s
+
+•Hilbert Spatially Coherent Sorting 1 Thread: ~ 650 sf/s
+•Hilbert Spatially Coherent Sorting 4 Thread: ~ 1250 sf/s
+
+•With locks 1 Thread: ~450 sf/s
+•With Locks 4 Thread: ~950 sf/s
+
+What we observe is that (fortunately) going from 1 to 4 threads increases the performance by factor contained between 1.5 and 2. The second thing we not is every level of parallelism incorporated to the code increases the performance as well, excepted for the addition of locks. This part of the code cuts the performance quite significantly which is expected as we then take a much more conservative approach.
+
+My choice for Hilbert’s sorting is a bit random but I of course knew Hilton and never heard of Morton :-). Does the choice influence the performance?
