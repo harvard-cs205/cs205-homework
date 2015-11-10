@@ -1,1 +1,18 @@
-# Your discussion here
+
+
+1) Use your code to compute one of the shortest paths from “Kevin Bacon” to “Harvard University:" 
+
+	A shortest path I found from “Kevin Bacon” to “Harvard University" is:
+
+	Kevin Bacon -->   College_Bowl ---> Harvard 
+
+	Three degrees of separation
+
+
+2) and the reverse (Harvard to Mr. Bacon).
+
+	A shortest path for the reverse,  “Harvard University" to “Kevin Bacon” is:
+	
+	Harvard University-->  Cornell University ---> Edmund Bacon ---> Kevin Bacon 
+
+	Four degrees of separation
