@@ -1,1 +1,17 @@
-# Your discussion here
+# On this problem I collaborated with the following:
+Abhishek Malali, Andrew Petschek, Avery Faller, Virgile Audi, Jonathan Friedman, and Charles Liu
+
+
+Harvard to Kevin Bacon:  3  connections away through the following 2 representative paths
+
+[(Harvard_University, [0]), (2006, [1]), (2004_in_film, [2]), (Kevin_Bacon, [3])]
+[(Harvard_University, [0]), (United_States_dollar, [1]), (The_Colbert_Report, [2]), (Kevin Bacon, [3])] <<< I found this one humorous.
+
+Kevin Bacon to Harvard:  2  connections away through the following 2 representative paths
+
+[(Kevin_Bacon, [0]), (2008, [1]), (Harvard_University, [2])]
+[(Kevin_Bacon, [0]), (The_New_York_Times, [1]), (Harvard_University, [2])]
+
+———————————————————————————————————
+
+After processing my connected components code on AWS in several circumstances I didn’t have the fortune of my code converging (AWS would time out or fail to write throwing “Broken Pipe” or memory overflow errors time after time). I can’t understand why this is happening. I optimized my code against the Marvel Graph and other test data derived from the Wikipedia graph. In the initial part of problem 5, my BFS algorithm runs in less than 2 minutes per iteration. So the fact that it peters out when searching for the connected components baffles me. I am afraid that I’ve exhausted my AWS credits, even after using Spot Instances, and I am unsure if I will be able to get to any completed solution before the assignment is due.

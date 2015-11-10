@@ -1,1 +1,11 @@
-# Your discussion here
+# On this problem I collaborated with the following:
+Abhishek Malali, Andrew Petschek, Avery Faller, Virgile Audi, Jonathan Friedman, and Charles Liu
+
+I chose to represent the Marvel Graph in two ways. An adjacency list as well as with tuple describing the edges of the graph. I ultimately chose to utilize the adjacency lists because my code ran faster and I had better intuition while using them. The imposed diameter of this graph strongly implied that BFS could not run more than 10 iterations. In practice I found that it rarely ran more than 4 or 5 iterations. If a character doesn’t have a defined distance during any particular search, it means that they are not connected to the particular source node chosen for that instance of BFS. This also means that the character is not connected to anyone else in that portion of the graph that is reached through BFS.
+
+Exhausted graph at a distance of: 4
+With "CAPTAIN AMERICA" as your source, you touched 6408 nodes.
+Exhausted graph at a distance of: 2
+With "MISS THING/MARY" as your source, you touched 7 nodes.
+Exhausted graph at a distance of: 2
+With "ORWELL" as your source, you touched 9 nodes.
