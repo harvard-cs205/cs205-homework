@@ -1,1 +1,5 @@
-# Your discussion here
+To equally distribute the computing load between the partitions I shuflledled the list of (x, y) value before turning it into an RDD. This  requires very little time (< 1s) compared to calculation of the mandelbrot set (about 180s).
+
+The result is that the workload is very equally distributed between partitions (2,000,000 +/- 150,000) compared to before (5,000,000 +/- 4,000,000).
+
+If the list (alternatively the list can be turned into an RDD before shuffling) becomes so large that the shuffling takes a long time compared to the average processing time (mandelbrot) of an unshufflled RDD and furthermore there are many processors available to process many small partitions in parallel then shuffling the list might actually decrease the performance.
