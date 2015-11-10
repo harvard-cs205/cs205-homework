@@ -1,1 +1,45 @@
 # Your discussion here
+
+
+
+1. A description of my graph representation:
+
+In my graph representation, 
+each rdd tuple key is a character, 
+corresponding rdd tuple value is a list of characters that have connection with key,
+here "having connection with" means they appear in the same issue.
+
+
+
+2. number of touched nodes in each of the searches:
+
+CAPTAIN AMERICA:
+1906
+4463
+38
+0
+number of touched nodes = 1(itself distance=0) + 1906(distance=1) + 4463(distance=2) + 38(distance=3) = 6408
+
+MISS THING/MARY:
+6
+0
+number of touched nodes = 1(itself distance=0) + 6(distance=1) = 7
+
+ORWELL:
+8
+0
+number of touched nodes = 1(itself distance=0) + 8(distance=1) = 9
+
+
+
+3. discuss the two questions
+
+What does this diameter imply about the maximum number of steps in which your
+search must be executed?
+Answer: diameter 10 is the maximum number of steps in which my search must be executed,
+that is, I can touch all possible nodes in at most 10 steps.
+
+What does it mean if a character does not have a defined distance during the
+search?
+Answer: not having a defined distance means it can not be touched from the current starting node.
+
