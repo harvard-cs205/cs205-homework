@@ -1,1 +1,20 @@
-# Your discussion here
+
+
+In both P2a and P2b, I use 100 partitions. In P2a the partitioning is the default for both the x and y values. 
+The image is formed from the cartesian product the the x and y value arrays. This results in a very 
+unbalanced load distribution as seen in P2a_hist.png. You can also see the results in default_events.png.
+
+In P2b, I use a different random hashing for the x and y value arrays. This results in the image worker computations
+being uniformly equal in expectation. This is because each pixel is equally likely to be in each partition unlike
+the default case which forms partitions from the 10 200x200 pixel squares (meaning the computation heavy pixels in the
+middle are likely to be in the same partitions). The worker computation is more balanced as seen in P2b_hist.png. The 
+load balancing is also seen in custom_events.png. Note the total time for the custom partitioning is more (3.1 min) 
+than the default case (1.6 min). Since my virtual machine only has 1 core, I don't get the speed ups from the load 
+balanced partitiong and the communication and shuffling costs of partitionBy result in the additional 1.5min. 
+The shuffling cost is high because the x and y value arrays are not copartitioned. If they were copartitioned using
+the same random hashing for the x and y arrays, then there would be less randomness so less load partitioning at the 
+cost of less shuffling. 
+
+I ran the code on AWS with 4 machines, one core each, and it took P2a 34 seconds and P2b 39 seconds. See aws 
+screenshots. Thus the difference is not as great but P2a is still faster. This means the compute imbalance between
+workers is not enough to offset the shuffling cost from P2b.

@@ -1,3 +1,4 @@
+from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt 
 import matplotlib.cm as cm
@@ -29,3 +30,5 @@ def draw_image(rdd):
     im[I, J] = np.log(C + 1)  # log intensity makes it easier to see levels
     plt.imshow(im, cmap=cm.gray)
     plt.show()
+
+    

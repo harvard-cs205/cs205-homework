@@ -1,1 +1,64 @@
 # Your discussion here
+
+Shortest Paths:
+
+P5_bfs.py is a script to comptute shortest paths between 2 nodes. From Kevin Bacon to Harvard, the shortest
+paths have distance 2. While the script prints all paths, only one is required and that is below. The paths
+are listed as the page indices so I added a couple of lines in the script to look up the indices for the paths 
+below (not shown, I forgot to save the lookup lines). You can see all the paths in the file full_list.txt. 
+The shortest paths from Harvard to Kevin have distance 3. 
+
+Kevin To Harvard:
+[u'Kevin_Bacon', u'Marisa_Silver', u'Harvard_University']
+also represented as [2729536, 3229511, 2152782]
+
+Harvard To Kevin:
+[u'Harvard_University', u'Cornell_University', u'Empire_State_Building', u'Kevin_Bacon']
+also represented as [2152782, 1185660, 1593422, 2729536]
+
+Connected Components:
+
+I form my nodes using all lines in the page_names file. This results in a lot of nodes with no 
+edges as seen below. 
+
+Case 1. Keep all edges (directed edges are treated as undirected) connected components by size:
+
+I find connected components by starting BFS from a random collection of 500 nodes. While some
+of these nodes may be in the same connected components, I use the indices of the nodes as the 
+stopping criterion. More specifically, for each node, I store the minimum index of any node that 
+has visited it. Once all the stored values stop changing, then all the connected components touched
+by the 500 nodes have been fully explored. Each connected component is labeled with the same 
+minimum index of the node in the connected component that is also in the original set of 500. 
+I use this technique to remove explored nodes and keep track of the component sizes.
+
+Number of connected components: 6373
+Biggest connected component size: 5709800
+
+Size  Number of Connected Componenets
+1   : 5815
+2   : 504
+3   : 37
+4   : 12
+5   : 4
+6   : 1
+5709800: 1
+
+Case 2. Only Keep symmetric edges connected components:
+
+Number of connected components: 19569
+Biggest connected component size: 5696043
+
+Size  Number of Connected Componenets
+1   : 18566
+2   : 891
+3   : 72
+4   : 24
+5   : 6
+6   : 5
+7   : 1
+8   : 1
+14  : 1
+16  : 1
+5696043: 1
+
+
