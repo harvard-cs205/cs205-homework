@@ -17,6 +17,7 @@ initialize_labels(__global __read_only int *image,
     }
 }
 
+
 int
 get_clamped_value(__global __read_only int *labels,
                   int w, int h,
@@ -26,6 +27,7 @@ get_clamped_value(__global __read_only int *labels,
         return w * h;
     return labels[y * w + x];
 }
+
 
 __kernel void
 propagate_labels(__global __read_write int *labels,
@@ -56,6 +58,14 @@ propagate_labels(__global __read_write int *labels,
 
     // 1D index of thread within our work-group
     const int idx_1D = ly * get_local_size(0) + lx;
+
+    //neighbors of old_value
+    int neighbor_1;
+    int neighbor_2;
+    int neighbor_3;
+    int neighbor_4;
+    int grandparent;
+    int min_label;
     
     int old_label;
     // Will store the output value
@@ -79,6 +89,9 @@ propagate_labels(__global __read_write int *labels,
     // the pixel for this thread
     old_label = buffer[buf_y * buf_w + buf_x];
 
+    //must assign a default value to this
+    new_label = old_label;
+
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
     
     // stay in bounds
@@ -86,7 +99,28 @@ propagate_labels(__global __read_write int *labels,
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
-        new_label = old_label;
+        if (old_label < w * h)
+        {
+            neighbor_1 = buffer[(buf_y + 1) * buf_w + (buf_x)];
+            neighbor_2 = buffer[(buf_y) * buf_w + (buf_x + 1)];
+            neighbor_3 = buffer[(buf_y - 1) * buf_w + (buf_x)];
+            neighbor_4 = buffer[(buf_y) * buf_w + (buf_x - 1)];
+            min_label = min(old_label, min(min(min(neighbor_1, neighbor_2), neighbor_3), neighbor_4));
+        
+        if (min_label < old_label)
+        {
+            new_label = min_label;
+        }
+
+        else {
+            new_label = old_label;
+        }
+
+        } 
+
+
+
+
 
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
@@ -97,3 +131,5 @@ propagate_labels(__global __read_write int *labels,
         }
     }
 }
+
+
