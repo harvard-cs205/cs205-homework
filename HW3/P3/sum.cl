@@ -8,8 +8,10 @@ __kernel void sum_coalesced(__global float* x,
 
     // thread i (i.e., with i = get_global_id()) should add x[i],
     // x[i + get_global_size()], ... up to N-1, and store in sum.
-    for (;;) { // YOUR CODE HERE
-        ; // YOUR CODE HERE 
+    int i = get_global_id(0);
+    int k = get_global_size(0);
+    for (int p = i; p < N; p+=k) {
+        sum += x[p];
     }
 
     fast[local_id] = sum;
@@ -24,8 +26,11 @@ __kernel void sum_coalesced(__global float* x,
     // You can assume get_local_size(0) is a power of 2.
     //
     // See http://www.nehalemlabs.net/prototype/blog/2014/06/16/parallel-programming-with-opencl-and-python-parallel-reduce/
-    for (;;) { // YOUR CODE HERE
-        ; // YOUR CODE HERE
+    for (uint j = get_local_size(0)/2; j > 0; j >>= 1) {
+        if (local_id < j) {
+            fast[local_id] += fast[local_id + j];
+        }
+        barrier(CLK_LOCAL_MEM_FENCE);
     }
 
     if (local_id == 0) partial[get_group_id(0)] = fast[0];
@@ -48,8 +53,11 @@ __kernel void sum_blocked(__global float* x,
     // 
     // Be careful that each thread stays in bounds, both relative to
     // size of x (i.e., N), and the range it's assigned to sum.
-    for (;;) { // YOUR CODE HERE
-        ; // YOUR CODE HERE
+    int i = get_global_id(0);
+    for (int a = k*i; a < k*(i+1); a+=1) {
+        if (a < N) {
+            sum += x[a];
+        }
     }
 
     fast[local_id] = sum;
@@ -64,8 +72,11 @@ __kernel void sum_blocked(__global float* x,
     // You can assume get_local_size(0) is a power of 2.
     //
     // See http://www.nehalemlabs.net/prototype/blog/2014/06/16/parallel-programming-with-opencl-and-python-parallel-reduce/
-    for (;;) { // YOUR CODE HERE
-        ; // YOUR CODE HERE
+    for (uint j = get_local_size(0)/2; j > 0; j >>= 1) {
+        if (local_id < j) {
+            fast[local_id] += fast[local_id + j];
+        }
+        barrier(CLK_LOCAL_MEM_FENCE);
     }
 
     if (local_id == 0) partial[get_group_id(0)] = fast[0];

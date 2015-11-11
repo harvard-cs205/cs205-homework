@@ -1,0 +1,96 @@
+Machine
+MacBook Pro (Retina, Mid 2012)
+OS X (Yosemite)
+
+Best Configuration: 
+configuration ('coalesced', 16, 128): 0.00242208 seconds
+
+Console Output:
+#0: Intel(R) Core(TM) i7-3720QM CPU @ 2.60GHz on Apple
+#1: HD Graphics 4000 on Apple
+#2: GeForce GT 650M on Apple
+coalesced reads, workgroups: 8, num_workers: 4, 0.0942532 seconds
+coalesced reads, workgroups: 8, num_workers: 8, 0.04242368 seconds
+coalesced reads, workgroups: 8, num_workers: 16, 0.02296096 seconds
+coalesced reads, workgroups: 8, num_workers: 32, 0.01236888 seconds
+coalesced reads, workgroups: 8, num_workers: 64, 0.0065404 seconds
+coalesced reads, workgroups: 8, num_workers: 128, 0.00355504 seconds
+coalesced reads, workgroups: 16, num_workers: 4, 0.04577888 seconds
+coalesced reads, workgroups: 16, num_workers: 8, 0.02225232 seconds
+coalesced reads, workgroups: 16, num_workers: 16, 0.01192544 seconds
+coalesced reads, workgroups: 16, num_workers: 32, 0.00626176 seconds
+coalesced reads, workgroups: 16, num_workers: 64, 0.00341568 seconds
+coalesced reads, workgroups: 16, num_workers: 128, 0.00242208 seconds
+coalesced reads, workgroups: 32, num_workers: 4, 0.0227868 seconds
+coalesced reads, workgroups: 32, num_workers: 8, 0.01174088 seconds
+coalesced reads, workgroups: 32, num_workers: 16, 0.00626168 seconds
+coalesced reads, workgroups: 32, num_workers: 32, 0.00339336 seconds
+coalesced reads, workgroups: 32, num_workers: 64, 0.00247728 seconds
+coalesced reads, workgroups: 32, num_workers: 128, 0.0024736 seconds
+coalesced reads, workgroups: 64, num_workers: 4, 0.02383744 seconds
+coalesced reads, workgroups: 64, num_workers: 8, 0.01290256 seconds
+coalesced reads, workgroups: 64, num_workers: 16, 0.0077712 seconds
+coalesced reads, workgroups: 64, num_workers: 32, 0.00384384 seconds
+coalesced reads, workgroups: 64, num_workers: 64, 0.00276168 seconds
+coalesced reads, workgroups: 64, num_workers: 128, 0.00260312 seconds
+coalesced reads, workgroups: 128, num_workers: 4, 0.02802152 seconds
+coalesced reads, workgroups: 128, num_workers: 8, 0.01612112 seconds
+coalesced reads, workgroups: 128, num_workers: 16, 0.00816504 seconds
+coalesced reads, workgroups: 128, num_workers: 32, 0.0041384 seconds
+coalesced reads, workgroups: 128, num_workers: 64, 0.00294144 seconds
+coalesced reads, workgroups: 128, num_workers: 128, 0.0029328 seconds
+coalesced reads, workgroups: 256, num_workers: 4, 0.03213424 seconds
+coalesced reads, workgroups: 256, num_workers: 8, 0.01530504 seconds
+coalesced reads, workgroups: 256, num_workers: 16, 0.00822616 seconds
+coalesced reads, workgroups: 256, num_workers: 32, 0.00412784 seconds
+coalesced reads, workgroups: 256, num_workers: 64, 0.00282088 seconds
+coalesced reads, workgroups: 256, num_workers: 128, 0.00277664 seconds
+coalesced reads, workgroups: 512, num_workers: 4, 0.03204088 seconds
+coalesced reads, workgroups: 512, num_workers: 8, 0.01614736 seconds
+coalesced reads, workgroups: 512, num_workers: 16, 0.00819368 seconds
+coalesced reads, workgroups: 512, num_workers: 32, 0.00409232 seconds
+coalesced reads, workgroups: 512, num_workers: 64, 0.00261408 seconds
+coalesced reads, workgroups: 512, num_workers: 128, 0.002978 seconds
+blocked reads, workgroups: 8, num_workers: 4, 0.12200232 seconds
+blocked reads, workgroups: 8, num_workers: 8, 0.0641592 seconds
+blocked reads, workgroups: 8, num_workers: 16, 0.0460828 seconds
+blocked reads, workgroups: 8, num_workers: 32, 0.02156632 seconds
+blocked reads, workgroups: 8, num_workers: 64, 0.0099644 seconds
+blocked reads, workgroups: 8, num_workers: 128, 0.01806848 seconds
+blocked reads, workgroups: 16, num_workers: 4, 0.05949336 seconds
+blocked reads, workgroups: 16, num_workers: 8, 0.03259888 seconds
+blocked reads, workgroups: 16, num_workers: 16, 0.02628944 seconds
+blocked reads, workgroups: 16, num_workers: 32, 0.0115716 seconds
+blocked reads, workgroups: 16, num_workers: 64, 0.02343832 seconds
+blocked reads, workgroups: 16, num_workers: 128, 0.0584376 seconds
+blocked reads, workgroups: 32, num_workers: 4, 0.02862568 seconds
+blocked reads, workgroups: 32, num_workers: 8, 0.01746416 seconds
+blocked reads, workgroups: 32, num_workers: 16, 0.01147352 seconds
+blocked reads, workgroups: 32, num_workers: 32, 0.02360208 seconds
+blocked reads, workgroups: 32, num_workers: 64, 0.05992104 seconds
+blocked reads, workgroups: 32, num_workers: 128, 0.07013688 seconds
+blocked reads, workgroups: 64, num_workers: 4, 0.02717872 seconds
+blocked reads, workgroups: 64, num_workers: 8, 0.01408176 seconds
+blocked reads, workgroups: 64, num_workers: 16, 0.01071256 seconds
+blocked reads, workgroups: 64, num_workers: 32, 0.01669672 seconds
+blocked reads, workgroups: 64, num_workers: 64, 0.06578216 seconds
+blocked reads, workgroups: 64, num_workers: 128, 0.07014264 seconds
+blocked reads, workgroups: 128, num_workers: 4, 0.0218044 seconds
+blocked reads, workgroups: 128, num_workers: 8, 0.0131152 seconds
+blocked reads, workgroups: 128, num_workers: 16, 0.00999992 seconds
+blocked reads, workgroups: 128, num_workers: 32, 0.02020464 seconds
+blocked reads, workgroups: 128, num_workers: 64, 0.06949288 seconds
+blocked reads, workgroups: 128, num_workers: 128, 0.04729424 seconds
+blocked reads, workgroups: 256, num_workers: 4, 0.02276432 seconds
+blocked reads, workgroups: 256, num_workers: 8, 0.01331176 seconds
+blocked reads, workgroups: 256, num_workers: 16, 0.00883656 seconds
+blocked reads, workgroups: 256, num_workers: 32, 0.02751728 seconds
+blocked reads, workgroups: 256, num_workers: 64, 0.05326112 seconds
+blocked reads, workgroups: 256, num_workers: 128, 0.03399392 seconds
+blocked reads, workgroups: 512, num_workers: 4, 0.02252984 seconds
+blocked reads, workgroups: 512, num_workers: 8, 0.01359464 seconds
+blocked reads, workgroups: 512, num_workers: 16, 0.0104872 seconds
+blocked reads, workgroups: 512, num_workers: 32, 0.02653344 seconds
+blocked reads, workgroups: 512, num_workers: 64, 0.03996184 seconds
+blocked reads, workgroups: 512, num_workers: 128, 0.02305144 seconds
+configuration ('coalesced', 16, 128): 0.00242208 seconds
