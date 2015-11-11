@@ -87,13 +87,16 @@ propagate_labels(__global __read_write int *labels,
 
     // Fetch the value from the buffer the corresponds to
     // the pixel for this thread
-    old_label = buffer[buf_y * buf_w + buf_x];
+    old_label = labels[buffer[buf_y * buf_w + buf_x]];
 
     //must assign a default value to this
     new_label = old_label;
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
     
+    barrier(CLK_LOCAL_MEM_FENCE);
+
+
     // stay in bounds
     if ((x < w) && (y < h)) {
         // CODE FOR PART 1 HERE
@@ -101,10 +104,10 @@ propagate_labels(__global __read_write int *labels,
         // to adjust this for correctness.
         if (old_label < w * h)
         {
-            neighbor_1 = buffer[(buf_y + 1) * buf_w + (buf_x)];
-            neighbor_2 = buffer[(buf_y) * buf_w + (buf_x + 1)];
-            neighbor_3 = buffer[(buf_y - 1) * buf_w + (buf_x)];
-            neighbor_4 = buffer[(buf_y) * buf_w + (buf_x - 1)];
+            neighbor_1 = labels[buffer[(buf_y + 1) * buf_w + (buf_x)]];
+            neighbor_2 = labels[buffer[(buf_y) * buf_w + (buf_x + 1)]];
+            neighbor_3 = labels[buffer[(buf_y - 1) * buf_w + (buf_x)]];
+            neighbor_4 = labels[buffer[(buf_y) * buf_w + (buf_x - 1)]];
             min_label = min(old_label, min(min(min(neighbor_1, neighbor_2), neighbor_3), neighbor_4));
         
         if (min_label < old_label)
