@@ -1,0 +1,22 @@
+
+No instruction-level parallelism:
+1 thread
+191.385470309 million Complex FMAs / second
+
+2 threads 
+380.128606342 million Complex FMAs / second
+
+4 threads
+742.79250914 million Complex FMAs / second
+
+
+With instruction-level parallelism:
+1 thread
+1487.42089435 million Complex FMAs / second
+2 threads
+3070.70750229 million Complex FMAs / second
+4 threads
+5957.29727686 million Complex FMAs / second
+
+
+Adding multithreading resulted in speed increases linear with the number of threads (up to four, this is reasonable since my machine has four cores and the problem is "embarassingly parallel"). Adding instruction level parallelism resulted in an approximately 8x increase over the first version - operations using the float8s were around as fast as operations with normal floats. Using the AVX interface is extra work but definitely pays off in terms of performance.

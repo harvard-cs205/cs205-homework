@@ -8,6 +8,7 @@ import pyximport
 pyximport.install()
 
 import numpy as np
+import matplotlib.pyplot as plt
 from timer import Timer
 from parallel_vector import move_data_serial, move_data_fine_grained, move_data_medium_grained
 
@@ -21,12 +22,15 @@ if __name__ == '__main__':
 
     total = orig_counts.sum()
 
+    N_values = [2, 5, 10, 50, 100, 500, 1000]
+
     # serial move
     counts = orig_counts.copy()
     with Timer() as t:
         move_data_serial(counts, src, dest, 100)
     assert counts.sum() == total, "Wrong total after move_data_serial"
     print("Serial uncorrelated: {} seconds".format(t.interval))
+    serial_uncorrelated = t.interval
     serial_counts = counts.copy()
 
     # fine grained
@@ -34,18 +38,21 @@ if __name__ == '__main__':
     with Timer() as t:
         move_data_fine_grained(counts, src, dest, 100)
     assert counts.sum() == total, "Wrong total after move_data_fine_grained"
+    fine_grained_uncorrelated = t.interval
     print("Fine grained uncorrelated: {} seconds".format(t.interval))
 
     ########################################
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################
-    N = 10
-    counts[:] = orig_counts
-    with Timer() as t:
-        move_data_medium_grained(counts, src, dest, 100, N)
-    assert counts.sum() == total, "Wrong total after move_data_medium_grained"
-    print("Medium grained uncorrelated: {} seconds".format(t.interval))
+    coarse_uncorrelated = {}
+    for N in N_values:
+        counts[:] = orig_counts
+        with Timer() as t:
+            move_data_medium_grained(counts, src, dest, 100, N)
+        assert counts.sum() == total, "Wrong total after move_data_medium_grained"
+        print("Medium grained uncorrelated (N={}): {} seconds".format(N, t.interval))
+        coarse_uncorrelated[N] = t.interval
 
     ########################################
     # Now use correlated data movement
@@ -61,6 +68,7 @@ if __name__ == '__main__':
         move_data_serial(counts, src, dest, 100)
     assert counts.sum() == total, "Wrong total after move_data_serial"
     print("Serial correlated: {} seconds".format(t.interval))
+    serial_correlated = t.interval
     serial_counts = counts.copy()
 
     # fine grained
@@ -69,14 +77,41 @@ if __name__ == '__main__':
         move_data_fine_grained(counts, src, dest, 100)
     assert counts.sum() == total, "Wrong total after move_data_fine_grained"
     print("Fine grained correlated: {} seconds".format(t.interval))
+    fine_grained_correlated = t.interval
+
 
     ########################################
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################
-    N = 10
-    counts[:] = orig_counts
-    with Timer() as t:
-        move_data_medium_grained(counts, src, dest, 100, N)
-    assert counts.sum() == total, "Wrong total after move_data_medium_grained"
-    print("Medium grained correlated: {} seconds".format(t.interval))
+    coarse_correlated = {}
+    for N in N_values:
+        counts[:] = orig_counts
+        with Timer() as t:
+            move_data_medium_grained(counts, src, dest, 100, N)
+        assert counts.sum() == total, "Wrong total after move_data_medium_grained"
+        print("Medium grained correlated (N={}): {} seconds".format(N, t.interval))
+        coarse_correlated[N] = t.interval
+
+    # display results
+    keys, values = zip(*sorted(coarse_correlated.items(), key = lambda x: x[0]))
+    values = [serial_correlated, fine_grained_correlated] + list(values)
+    labels = ['Serial', 'Fine Grained'] + ['N=%d' % n for n in keys]
+    positions = np.arange(len(values))
+    plt.bar(positions, values, align='center')
+    plt.xticks(positions, labels)
+    plt.ylabel('Time to move data')
+    plt.title('Correlated Data Movement Times')
+    plt.show()
+
+    keys, values = zip(*sorted(coarse_uncorrelated.items(), key = lambda x: x[0]))
+    values = [serial_uncorrelated, fine_grained_uncorrelated] + list(values)
+    labels = ['Serial', 'Fine Grained'] + ['N=%d' % n for n in keys]
+    positions = np.arange(len(values))
+    plt.bar(positions, values, align='center')
+    plt.xticks(positions, labels)
+    plt.ylabel('Time to move data')
+    plt.title('Uncorrelated Data Movement Times')
+
+    plt.show()
+

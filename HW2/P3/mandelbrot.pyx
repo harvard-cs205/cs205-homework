@@ -12,11 +12,11 @@ cdef np.float64_t magnitude_squared(np.complex64_t z) nogil:
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cpdef mandelbrot(np.complex64_t [:, :] in_coords,
-                 np.uint32_t [:, :] out_counts,
+                 np.float32_t [:, :] out_counts,
                  int max_iterations=511):
     cdef:
        int i, j, iter
-       np.complex64_t c, z
+       AVX.float8 counts, c_real, c_imaginary, z_real, z_real_temp, z_imaginary, mask
 
        # To declare AVX.float8 variables, use:
        # cdef:
@@ -32,16 +32,66 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     assert in_coords.shape[1] == out_counts.shape[1],  "Input and output arrays must be the same size"
 
     with nogil:
-        for i in range(in_coords.shape[0]):
-            for j in range(in_coords.shape[1]):
-                c = in_coords[i, j]
-                z = 0
-                for iter in range(max_iterations):
-                    if magnitude_squared(z) > 4:
-                        break
-                    z = z * z + c
-                out_counts[i, j] = iter
+        ones = AVX.float_to_float8(1.0)
+        fours = AVX.float_to_float8(4.0)
 
+        for i in prange(in_coords.shape[0], schedule='static', chunksize=1, num_threads=1):
+            for j in range(0, in_coords.shape[1], 8):
+
+                counts = AVX.float_to_float8(0.0)
+
+                #  not allowed to use tuple comprehension here
+                c_real = AVX.make_float8(
+                    in_coords[i, j+7].real,
+                    in_coords[i, j+6].real,
+                    in_coords[i, j+5].real,
+                    in_coords[i, j+4].real,
+                    in_coords[i, j+3].real,
+                    in_coords[i, j+2].real,
+                    in_coords[i, j+1].real,
+                    in_coords[i, j].real
+                )
+
+                c_imaginary = AVX.make_float8(
+                    in_coords[i, j+7].imag,
+                    in_coords[i, j+6].imag,
+                    in_coords[i, j+5].imag,
+                    in_coords[i, j+4].imag,
+                    in_coords[i, j+3].imag,
+                    in_coords[i, j+2].imag,
+                    in_coords[i, j+1].imag,
+                    in_coords[i, j].imag
+                )
+
+                z_real = AVX.float_to_float8(0.0)
+                z_imaginary = AVX.float_to_float8(0.0)
+
+                for iter in range(max_iterations):
+                    #  0 if magnitude of z is greater than four, -1 otherwise
+                    mask = AVX.greater_than(
+                        fours,
+                        AVX.fmadd(z_real, z_real, AVX.mul(z_imaginary, z_imaginary))
+                    )
+
+                    # finished if all values greater than four
+                    if AVX.signs(mask) == 0:
+                        break
+
+                    # increment count for entries not greater than four
+                    counts = AVX.add(counts, AVX.bitwise_and(mask, ones))
+
+                    #  update z to z**2 + c
+                    z_real_temp = AVX.add(
+                        c_real,
+                        AVX.sub(AVX.mul(z_real, z_real), AVX.mul(z_imaginary, z_imaginary))
+                    )
+                    z_imaginary = AVX.add(
+                        c_imaginary,
+                        AVX.add(AVX.mul(z_real, z_imaginary), AVX.mul(z_real, z_imaginary))
+                    )
+                    z_real = z_real_temp
+
+                AVX.to_mem(counts, &(out_counts[i, j]))
 
 
 # An example using AVX instructions
