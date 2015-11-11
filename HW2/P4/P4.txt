@@ -1,0 +1,22 @@
+Below are the results for this implementation running on multiple threads:
+
+Serial
+3.70600199699 seconds for 10 filter passes.
+
+1 Thread
+3.72661685944 seconds for 10 filter passes.
+
+2 Threads
+1.90358614922 seconds for 10 filter passes.
+
+4 Threads
+1.07973599434 seconds for 10 filter passes.
+
+8 Threads
+0.96150302887 seconds for 10 filter passes.
+
+The main insight of this problem was the use of Semaphores instead of locks to signal the conclusion of a single line. The original idea behind the implementation was to assign a single semaphore to each thread so that any other thread trying to run the filter on the thread's line or those adjacent to it would have to wait for the semaphore to be released. The idea was that for an iteration i, thread n could only start the iteration if its semaphore was released.
+
+However, this solution was imperfect as it didn't account for threads n-1 and n+1 being complete and did not allow for asynchronous filtering (which was called for by the extra credit). Instead, I assigned each thread *two* semaphores - one for the line above and one for the line below. Then, before proceeding to apply the filtering median, I acquired both the bottom sempahore of the higher thread (thread n-1) and the top semaphore of the lower thread (thread n+1). This way, it was ensured that iteration i-1 had been completed by all three of n, n-1, and n+1 and the rest of the threads did not matter (allowing this to work asynchronously).
+
+The perfomance enhancement of this approach is evident from the above results. With 4 threads, we get almost a 4x time improvement. It's interesting to note that with 8 threads the performance increase is negligible to 4 threads, though this may be a factor of my operating system.

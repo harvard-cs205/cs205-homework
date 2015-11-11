@@ -71,7 +71,7 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
                              np.int32_t[:] dest,
                              int repeat):
    cdef:
-       int idx, r
+       int idx, r, lock1, lock2
        omp_lock_t *locks = get_N_locks(counts.shape[0])
 
    ##########
@@ -80,11 +80,18 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
    # data movement.  Be sure to avoid deadlock, and double-locking.
    ##########
    with nogil:
-       for r in range(repeat):
-           for idx in range(src.shape[0]):
-               if counts[src[idx]] > 0:
-                   counts[dest[idx]] += 1
-                   counts[src[idx]] -= 1
+     for r in range(repeat):
+         for idx in range(src.shape[0]):
+             if src[idx] == dest[idx]:
+                 continue
+             if counts[src[idx]] > 0:
+                 acquire(&(locks[dest[idx]]))
+                 counts[dest[idx]] += 1
+                 release(&(locks[dest[idx]]))
+
+                 acquire(&(locks[src[idx]]))
+                 counts[src[idx]] -= 1
+                 release(&(locks[src[idx]]))
 
    free_N_locks(counts.shape[0], locks)
 
@@ -105,11 +112,17 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
    # to parallelize data movement.  Be sure to avoid deadlock, as well as
    # double-locking.
    ##########
-   with nogil:
-       for r in range(repeat):
-           for idx in range(src.shape[0]):
-               if counts[src[idx]] > 0:
-                   counts[dest[idx]] += 1
-                   counts[src[idx]] -= 1
+   for r in range(repeat):
+       for idx in range(src.shape[0]):
+           if src[idx] == dest[idx]:
+               continue
+           if counts[src[idx]] > 0:
+               acquire(&(locks[dest[idx]/N]))
+               counts[dest[idx]] += 1
+               release(&(locks[dest[idx]/N]))
+
+               acquire(&(locks[src[idx]/N]))
+               counts[src[idx]] -= 1
+               release(&(locks[src[idx]/N]))
 
    free_N_locks(num_locks, locks)
