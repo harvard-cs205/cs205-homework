@@ -1,1 +1,10 @@
 # Your discussion here
+Shortest path from Kevin_Bacon to Harvard_University:
+[[u'Kevin_Bacon'], [u'Time_(magazine)'], [u'Harvard_University']]
+
+(# of connected components, Size of largest connected component)
+Singly linked graph:
+(21, 5708503)
+
+Doubly linked graph:
+Ran out of memory, did not compute this.

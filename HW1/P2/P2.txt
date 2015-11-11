@@ -1,1 +1,7 @@
-# Your discussion here
+Discussion of P2:
+
+In our computation, we mapped each (i, j) coordinate to its mandelbrot value, and then performed a shuffled in which we summed these values within each partition.
+
+The default RDD partitioning takes rows (or columns) of contiguous pixel coordinates and groups them together to be performed in the same task. But because the work-intensive pixels also tend to be contiguous, some partitions get much more load than the others. By devising an alternative partitioning scheme in which we assign each pixel to a random partition, we can manage to balance out the load across partitions, because the work-intensive pixels will be uniformly distributed across all partitions.
+
+However, there is a tradeoff caused by the time taken to read values from memory during the shuffle. It is faster to read when partitions hold contiguous pixels, because these are also neighbors in terms of memory location. When each partition holds pixels that are randomly distributed, it may take many more memory reads to collect all the data for the partition.
