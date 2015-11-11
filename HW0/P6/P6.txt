@@ -1,1 +1,131 @@
-# Your answers here
+P6A
+----
+See below for sample output of running P6A.py
+It's clear from this output that not all jobs complete in exactly the same order as they begin. On each run, the "Hi" outputs all appear in the same expected order, but the "Bye" outputs at the conclusion of each operation appear in a completely different order. In fact, on different runs, the ordering of the "Bye" outputs is likewise completely different. This can be explained by the fact that despite the fact that the wait times across all concurrent threads are the same, some threads finish quicker that others (this is likely caused by the way the machine actually allocates resources to each thread).
+This could seriously affect our ability to parallelize our programs if some of these calls depended on the others to complete in the expected order or at some expected time. If this was the case, we could run into serious issues with consistency and expected behavior. 
+Take, for example, the naive money counting example from P5. If, instead of communcating, the cashiers in the second level of computation were simply placed later in the input list to a program like this, assuming that by the time it was theur turn to compute, the previous computations would have already been made. This expectation, if it turned out to be false (as is shown to be possible by the below "Hi"/"Bye" output) could easily lead cashiers later in the line to make summations with 0s, garbage values, or other values entirely if the order of the previous cashiers got jumbled.
+
+P6B
+----
+The trend is generally upwards, beginning below the 0.5 mark and tapering off at around the 4.0 mark. This makes sense, as with very short computation time, serial processing actually performs better (as will be explained shortly), while at long computation times, the parallelized solution wins out by no better than the number of processes permitted to run concurrently (in this case, 4). 
+It is possible for parallel threads to take longer than the serial executions. In this graph, we see that this happens around and below the 10^-5 mark of computation time. Thus, when the actual wait time per action is small enough, the overhead of distributing and recombining resources actually slows the parallelized solution down relative to the serialized one. This makes sense if we again consider the bags of coins problem in P5. There, we noticed that when the compute time at the lowest level was only 1 second, the parallelized solution spent more time handing out the bags to the cashiers than it would have taken to simply make a serial computation. In that problem, we found that at longer computation times, with the overhead of multithreading reduced, the parallel solution proved much more effective. This exact behavior can be seen through the P6.png graph included here.
+
+Log of P6A output
+------------------
+sergs@ubuntu ~/Documents/cs205/cs205-homework/HW0/P6
+ % python P6A.py 
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 2
+Bye Job 0
+Bye Job 3
+Bye Job 1
+Hi Job 4
+Hi Job 5
+Hi Job 6
+Hi Job 7
+Bye Job 4
+Hi Job 8
+Bye Job 6
+Hi Job 9
+Bye Job 5
+Bye Job 7
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+sergs@ubuntu ~/Documents/cs205/cs205-homework/HW0/P6
+ % python P6A.py
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 2
+Bye Job 1
+Bye Job 3
+Bye Job 0
+Hi Job 4
+Hi Job 5
+Hi Job 6
+Hi Job 7
+Bye Job 4
+Bye Job 5
+Bye Job 6
+Bye Job 7
+Hi Job 8
+Hi Job 9
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+sergs@ubuntu ~/Documents/cs205/cs205-homework/HW0/P6
+ % python P6A.py
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 1
+Bye Job 0
+Bye Job 3
+Hi Job 4
+Bye Job 2
+Hi Job 5
+Hi Job 6
+Hi Job 7
+Bye Job 4
+Hi Job 8
+Bye Job 5
+Bye Job 7
+Hi Job 9
+Bye Job 6
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+sergs@ubuntu ~/Documents/cs205/cs205-homework/HW0/P6
+ % python P6A.py
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 1
+Bye Job 2
+Bye Job 3
+Bye Job 0
+Hi Job 4
+Hi Job 5
+Hi Job 6
+Hi Job 7
+Bye Job 6
+Bye Job 4
+Hi Job 8
+Hi Job 9
+Bye Job 5
+Bye Job 7
+Bye Job 9
+Bye Job 8
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+sergs@ubuntu ~/Documents/cs205/cs205-homework/HW0/P6
+ % python P6A.py
+Hi Job 1
+Hi Job 0
+Hi Job 2
+Hi Job 3
+Bye Job 2
+Bye Job 3
+Bye Job 0
+Bye Job 1
+Hi Job 4
+Hi Job 5
+Hi Job 6
+Hi Job 7
+Bye Job 4
+Bye Job 7
+Bye Job 5
+Hi Job 8
+Bye Job 6
+Hi Job 9
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+sergs@ubuntu ~/Documents/cs205/cs205-homework/HW0/P6
+ % 
