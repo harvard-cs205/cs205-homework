@@ -14,14 +14,19 @@ mandelbrot(__global __read_only float *coords_real,
 
     if ((x < w) && (y < h)) {
         // YOUR CODE HERE
-        c_real = coords_real[x][y];
-        c_imag = coords_imag[x][y];
+        c_real = coords_real[y*w + x];
+        c_imag = coords_imag[y*w + x];
         z_real = 0;
         z_imag = 0;
-        for( iter=0; iter<=max_iter; ++iter)
-            if magnitude_squared(z) > 4:
-                break
-                z = z * z + c
-            out_counts[i, j] = iter
+        for( iter=0; iter<=max_iter; ++iter){
+            if( z_real*z_real + z_imag*z_imag > 4 ){
+                break;
+            }
+            float tmpr = z_real*z_real - z_imag*z_imag + c_real;
+            float tmpi = 2.0*z_real*z_imag + c_imag;
+            z_real = tmpr;
+            z_imag = tmpi;
+        }
+        out_counts[y*w + x] = iter;
     }
 }
