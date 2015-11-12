@@ -20,11 +20,25 @@ def py_median_3x3(image, iterations=10, num_threads=1):
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
 
-    for i in range(iterations):
-        filtering.median_3x3(tmpA, tmpB, 0, 1)
-        # swap direction of filtering
-        tmpA, tmpB = tmpB, tmpA
-
+    if num_threads == 1:
+        for i in range(iterations):
+            filtering.median_3x3(tmpA, tmpB, 0, 1)
+            # swap direction of filtering
+            tmpA, tmpB = tmpB, tmpA
+    else:
+        print "number of threads:", num_threads
+        for i in range(iterations):
+            threads = []
+            for th in range(num_threads):
+                onethread = threading.Thread(target=filtering.median_3x3,
+                                             args=(tmpA, tmpB, th, num_threads))
+                threads.append(onethread)
+                onethread.start()
+            for onethread in threads:
+                onethread.join()
+            # swap direction of filtering
+            tmpA, tmpB = tmpB, tmpA
+    
     return tmpA
 
 def numpy_median(image, iterations=10):
@@ -52,16 +66,17 @@ if __name__ == '__main__':
     pylab.title('before - zoom')
 
     # verify correctness
-    from_cython = py_median_3x3(input_image, 2, 5)
-    from_numpy = numpy_median(input_image, 2)
-    assert np.all(from_cython == from_numpy)
-
+    #from_cython = py_median_3x3(input_image, 2, 5)
+    #from_numpy = numpy_median(input_image, 2)
+    #assert np.all(from_cython == from_numpy)
+    
+    num_threads = 4
     with Timer() as t:
-        new_image = py_median_3x3(input_image, 10, 8)
+        new_image = py_median_3x3(input_image, 10, num_threads)
 
     pylab.figure()
     pylab.imshow(new_image[1200:1800, 3000:3500])
     pylab.title('after - zoom')
 
-    print("{} seconds for 10 filter passes.".format(t.interval))
+    print("threads = {}: {} seconds for 10 filter passes.".format(num_threads, t.interval))
     pylab.show()

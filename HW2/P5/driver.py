@@ -16,9 +16,54 @@ from physics import update, preallocate_locks
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
+# Hilbert_curve
+#convert (x,y) to d
+def xy2d(n, x, y):
+    s = int(n/2)
+    d = 0;
+    while (s > 0):
+        rx = (x & s) > 0;
+        ry = (y & s) > 0;
+        d += s * s * ((3 * rx) ^ ry)
+        x, y = rot(s, x, y, rx, ry)
+        s /= 2
+    return d
+
+#convert d to (x,y)
+def d2xy(n, d):
+    s = 1
+    t = d
+    x = y = 0
+    while(s<n):
+        rx = 1 & (t/2)
+        ry = 1 & (t ^ rx)
+        x, y = rot(s, x, y, rx, ry)
+        x += s * rx
+        y += s * ry
+        t /= 4
+        s *= 2
+    return x, y
+
+
+#rotate/flip a quadrant appropriately
+def rot(n, x, y, rx, ry):
+    if ry == 0 :
+        if rx == 1:
+            x = n-1 - x
+            y = n-1 - y
+        #Swap x and y
+        temp = x
+        x = y
+        y = temp
+    return x, y    
+    
+    
+    
 if __name__ == '__main__':
     num_balls = 10000
     radius = 0.002
+    #num_balls = 50
+    #radius = 0.05
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -46,6 +91,7 @@ if __name__ == '__main__':
     grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
     grid[(positions[:, 0] / grid_spacing).astype(int),
          (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
+    print("grid_spacing: {} grid_size:{}".format(grid_spacing, grid_size))
 
     # A matplotlib-based animator object
     animator = Animator(positions, radius * 2)
@@ -60,11 +106,12 @@ if __name__ == '__main__':
     # SUBPROBLEM 4: uncomment the code below.
     # preallocate locks for objects
     locks_ptr = preallocate_locks(num_balls)
-
+    stats = np.empty(500)
+    ll = 0
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
-                   radius, grid_size, locks_ptr,
+                   radius, grid_spacing, grid_size, locks_ptr,
                    physics_step)
 
         # udpate our estimate of how fast the simulator runs
@@ -75,8 +122,22 @@ if __name__ == '__main__':
         if total_time > anim_step:
             animator.update(positions)
             print("{} simulation frames per second".format(frame_count / total_time))
+            stats[ll] = frame_count / total_time
+            ll += 1
             frame_count = 0
             total_time = 0
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+            order = np.empty(positions.shape[0])
+            for i,idx in enumerate((positions/grid_spacing).astype(int)):
+                order[i] = xy2d(positions.shape[0], idx[0], idx[1])
+            neworder = np.argsort(order)
+            positions = positions[neworder]
+            velocities = velocities[neworder]
+            
+        if ll >= len(stats):
+            #ll = 0
+            break
+    print "avg:", stats.mean()
+    print "std:", stats.std()

@@ -1,3 +1,5 @@
+import matplotlib
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from matplotlib.collections import EllipseCollection
 import numpy as np
@@ -34,3 +36,4 @@ class Animator(object):
     def update(self, positions):
         self.circles.set_offsets(positions)
         plt.draw()
+        plt.pause(10.**-6.)

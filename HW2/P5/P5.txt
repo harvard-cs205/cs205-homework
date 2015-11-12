@@ -1,0 +1,36 @@
+The following numbers are the number of simulation frames per second
+
+Multithreading
+thread = 1
+avg: 9.14044702681
+std: 0.373354406061
+threads = 4
+avg: 12.6323963585
+std: 1.73063584529
+Four threads version is faster than serial version because multi-thread allows several objects to examine collision at the same time. The overhead to schedule in parallel is smaller than the improvement of performance; thus, so we obtain a faster parallel version.
+
+Spatial decomposition
+thread = 1
+avg: 544.102407698
+std: 65.5169305126
+threads = 4
+avg: 499.49717424
+std: 128.358476809
+Spatial decomposition is much faster than pure multi-threading. The speed boost from algorithm is significant. However, the parallel version is not faster than the serial one, which means the overhead to parallel scheduling in spatial decomposition is larger than the improvement of performance gain from multi-threading. The reason is even though the objects are allocated to processors evenly, processors still need to communicate for the collided objects that allocated to other processors, which costs much communication time.
+
+Spatially Coherent Sorting
+thread = 1
+avg: 640.223547871
+std: 63.2580413243
+thread = 4
+avg: 1183.09590474
+std: 287.377242276
+Spatially Coherent Sorting sorts the objects to let physically close objects also near to each other in the object array. This improves the performance from Spatial decomposition because the I/O time of collision detection is reduced. The grid search lets only objects close together will test collision, and coherent sorting let they are near in the object array as well, which decreases the I/O time. The parallel version of Spatially Coherent Sorting improves performance significantly because static scheduling distributes successive objects in the object array to the same processor. In coherent sorting they are likely the ones need to examine collision; thus, each thread are likely only need the information of the objects that allocate in its own thread, and do not need to communicate for the objects allocated in other processors.
+
+Locking
+thread = 4
+avg: 995.031160581
+std: 173.236876738
+Locking actually decreases the performance from Spatially Coherent Sorting. It is because setting locks requires extra efforts, but since we have prevented the examine of the same two objects collision in one time frame, we have no need to use lock to prevent two objects are examined simultaneously in two different threads.
+
+
