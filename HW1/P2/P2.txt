@@ -1,1 +1,16 @@
 # Your discussion here
+My partitioning strategy consists of assigning a random partition to each pixel (x,y).
+The reason for this is clear: most of the computation of the mandelbrot set is centralized. The edges receive
+significantly less counts, while the giant "blob" in the center requires a significant amount of compute time.
+The ideal way to split up the computation in such a case is to simply split it up randomly. In doing so, we guarantee
+that each partition will get an equal amount of work. In the case where there is some structure to the partitioning -
+take, for example, the case where we partition in even squares that tile the plane or by columns or rows - some partitions
+will necessarily be forced to do more work.
+
+On the other hand, it is clear that choosing a random partitioning strategy will lead to the highest initial shuffle cost. This
+is due to the fact that, no matter what partitioning scheme Spark chooses by default, there simply cannot be any relation
+between the final partitioning scheme and the original partitionig scheme. It is likely for this reason that we see that, despite
+the fact that the work looks significantly more spread out in the random case (see the plot - as expected, the work is spread out
+in what appears to be, to a very good approximation, a normal distribution), the computation takes an equal amount of time.
+
+I am unsure how to explain the spike of work at the tail of the distribution, but it consistently appears despite the rest of the structure remaining constant.
