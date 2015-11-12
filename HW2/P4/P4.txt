@@ -1,0 +1,22 @@
+###########################################################################
+#Jaemin Cheun
+#CS205, Fall 2015 Computing Foundations for Computer Science
+#Nov 4, 2015
+#P4.txt
+###########################################################################
+
+
+Single Thread:  
+
+3.40759706497 seconds for 10 filter passes.
+
+2 threads:
+
+1.72921705246 seconds for 10 filter passes.
+
+4 threads:
+
+0.939245939255 seconds for 10 filter passes.
+
+In order to control cooperation between threads (correctly compute iteration i for thread n, thread n, n-1, n+1 must have completed iteratio i -1), we make sure that we wiat for those threads to finish before we start. 
+I have used events for this, because we can keep an internal flag which can control threads to wait. Looking at the result, we see that as number of threads increases, the speed of the passes does indeed gets faster .

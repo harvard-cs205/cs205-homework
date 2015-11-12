@@ -16,6 +16,24 @@ from physics import update, preallocate_locks
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
+#from the wikipeida page for Z-order curve https://en.wikipedia.org/wiki/Z-order_curve, dimension is 2
+def cmp_zorder(a, b):
+        j = 0
+        k = 0
+        x = 0
+        for k in range(2):
+            y = a[1][k] ^ b[1][k]
+            if less_msb(x, y):
+                j = k
+                x = y
+        return a[1][j] - b[1][j]
+
+def less_msb(x, y):
+    return x < y and x < (x ^ y)
+    
+
+
+
 if __name__ == '__main__':
     num_balls = 10000
     radius = 0.002
@@ -64,8 +82,8 @@ if __name__ == '__main__':
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
-                   radius, grid_size, locks_ptr,
-                   physics_step)
+                   radius, grid_spacing, locks_ptr,
+                   physics_step, grid_size)
 
         # udpate our estimate of how fast the simulator runs
         physics_step = 0.9 * physics_step + 0.1 * t.interval
@@ -80,3 +98,23 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+
+            # We add index to the position in order to sort objects by location
+            grid_positions = (positions / grid_spacing).astype(int)
+            grid_positions = zip(range(grid_positions.shape[0]), grid_positions)
+
+            # We now use the Morton ordering to sort
+            grid_positions.sort(cmp_zorder)
+
+            # Updating sorted positions and velocities
+            sorted_index = [idx[0] for idx in grid_positions]
+            positions = positions[sorted_index]
+            velocities = velocities[sorted_index]
+
+            # Update the grid indices
+            grid = -np.ones((grid_size, grid_size), dtype=np.uint32)
+            for i in range(num_balls):
+                if positions[i,0] >= 0 and positions[i,0] <= 0 and positions[i,1] >= 0 and positions[i,1] <= 0:
+                    grid_x = (positions[i,0] / grid_spacing).astype(int)
+                    grid_y = (positions[i,1] / grid_spacing).astype(int)
+                    Grid[grid_x,grid_y] = i
