@@ -1,1 +1,12 @@
 # Your discussion here
+
+1. My graph representation is a key value pair where the key is a character, and the values are a list of all the characters that are directly connected (same issue). 
+
+2. Touched Nodes:
+CAPTAIN AMERICA : 6408
+MISS THING/MARY : 7
+ORWELL : 9
+
+3. The diameter implies that the shortest distance between any two nodes in the graph is bounded by 10, which means the search must be executed in maximum 10 steps. 
+
+4. If a character does not have a defined distance during the search, it means that the character cannot be reached from the source node. 
