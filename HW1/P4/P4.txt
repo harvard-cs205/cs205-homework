@@ -1,1 +1,16 @@
-# Your discussion here
+# Your discussion here.
+
+Description of graph representation:
+
+I used the adjacency list representation for my graph. The adjacency list representation is basically an array of all nodes in the graph, each entry pointing to a list of all neighbors of that corresponding node. Two nodes are neighbors if there is an edge connecting them, and all connections are mutual/two-way in this case (i.e. the graph is undirected).
+
+Number of touched nodes in searches:
+	1) Captain America: 6408.
+	2) Miss Thing/Mary: 7.
+	3) Orwell: 9.
+
+Two questions:
+
+Assuming that the diameter of the graph is 10 means that the maximum minimum distance between any two nodes in the graph is 10. This also implies that maximum number of steps in which our search has to be executed is at most 10.
+
+If a character does not have a defined distance during the search, it means that that character has no path to the original source node, i.e. they are in two separated components of the graph.
