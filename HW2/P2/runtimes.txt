@@ -1,0 +1,47 @@
+N = 5:
+Serial uncorrelated: 0.775149822235 seconds
+Fine grained uncorrelated: 15.9034318924 seconds
+Medium grained uncorrelated: 24.0580909252 seconds
+Serial correlated: 0.735618114471 seconds
+Fine grained correlated: 14.2648720741 seconds
+Medium grained correlated: 20.8760027885 seconds
+
+N = 10:
+Serial uncorrelated: 0.723427057266 seconds
+Fine grained uncorrelated: 15.4527769089 seconds
+Medium grained uncorrelated: 28.0213057995 seconds
+Serial correlated: 0.740005970001 seconds
+Fine grained correlated: 14.5977950096 seconds
+Medium grained correlated: 21.4254288673 seconds
+
+N = 20:
+Serial uncorrelated: 0.762849807739 seconds
+Fine grained uncorrelated: 16.1108250618 seconds
+Medium grained uncorrelated: 38.8494958878 seconds
+Serial correlated: 0.881717920303 seconds
+Fine grained correlated: 14.2473139763 seconds
+Medium grained correlated: 20.7328078747 seconds
+
+N = 30:
+Serial uncorrelated: 0.743113040924 seconds
+Fine grained uncorrelated: 15.8863618374 seconds
+Medium grained uncorrelated: 43.2022929192 seconds
+Serial correlated: 0.729395151138 seconds
+Fine grained correlated: 14.3881089687 seconds
+Medium grained correlated: 22.3900079727 seconds
+
+N = 40:
+Serial uncorrelated: 0.74767780304 seconds
+Fine grained uncorrelated: 15.442111969 seconds
+Medium grained uncorrelated: 50.5700490475 seconds
+Serial correlated: 0.726634025574 seconds
+Fine grained correlated: 16.1129579544 seconds
+Medium grained correlated: 29.9155938625 seconds
+
+N = 50:
+Serial uncorrelated: 0.754047870636 seconds
+Fine grained uncorrelated: 15.4274530411 seconds
+Medium grained uncorrelated: 57.035820961 seconds
+Serial correlated: 0.739080905914 seconds
+Fine grained correlated: 14.5144851208 seconds
+Medium grained correlated: 27.2443861961 seconds

@@ -1,0 +1,11 @@
+With instruction level parallelism:
+4 threads: 1074.94829 Million Complex FMAs in 0.973726987839 seconds, 1103.95244604 million Complex FMAs / second
+2 threads: 1074.94829 Million Complex FMAs in 0.972718954086 seconds, 1105.09647775 million Complex FMAs / second
+1 thread:  1074.94829 Million Complex FMAs in 1.91828012466 seconds, 560.370863556 million Complex FMAs / second
+
+With no instruction level parallelism:
+4 threads: 1074.656613 Million Complex FMAs in 4.93152499199 seconds, 217.915678162 million Complex FMAs / second
+2 threads: 1074.656613 Million Complex FMAs in 4.95052313805 seconds, 217.079404142 million Complex FMAs / second
+1 thread:  1074.656613 Million Complex FMAs in 9.46772193909 seconds, 113.507411806 million Complex FMAs / second
+
+Performing the computtion on two threads doubles the calculation speed. Using instruction level parallelism additionaly increases the calculation speed by factor 5. Calculating the mandelbrot set is an "embarassingly parallel" task.

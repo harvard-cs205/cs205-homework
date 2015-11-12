@@ -1,0 +1,5 @@
+1 thread:  6.60881018639 seconds for 10 filter passes.
+2 threads: 3.62633299828 seconds for 10 filter passes.
+4 threads: 3.69899082184 seconds for 10 filter passes.
+
+I was running this code on a dual-core machine without hyperthreading support. Using 2 threads therefore result in almost 2x speedup, while using 4 threads did not bring any additional performance. In my code I use the thread number as the offset and the number of threads as the steps size. Thus each thread computes the every nth line. Once all threads are done computing, the next iteration ca begin. I use the thread.join() command to wait for each of the threads to finish.
