@@ -1,0 +1,14 @@
+Instruction-level is faster than multithreading. 
+
+1074.677197 Million Complex FMAs in 5.22984409332 seconds, 205.489337315 million Complex FMAs / second
+
+Multithreading
+Number of threads=1, 1074.677197 Million Complex FMAs in 5.28903603554 seconds, 203.18961523 million Complex FMAs / second
+Number of threads=2, 1074.677197 Million Complex FMAs in 2.62392306328 seconds, 409.568867335 million Complex FMAs / second
+Number of threads=4, 1074.677197 Million Complex FMAs in 1.57080483437 seconds, 684.157047068 million Complex FMAs / second
+
+Instruction-level Parallelism
+Number of threads=1, 1074.94829 Million Complex FMAs in 0.740305185318 seconds, 1452.03398722 million Complex FMAs / second
+Number of threads=2, 1075.015672 Million Complex FMAs in 0.370867967606 seconds, 2898.64794455 million Complex FMAs / second
+Number of threads=4, 1074.206175 Million Complex FMAs in 0.216820001602 seconds, 4954.36844877 million Complex FMAs / second
+

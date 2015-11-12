@@ -1,0 +1,42 @@
+1. Multithreading:
+4 threads outperforms 1 thread version because we can save the time by update points in parallel.
+
+2. Spatial decomposition:
+Number of threads 1: 69.0772904692 simulation frames per second
+Number of threads 1: 51.0076007248 simulation frames per second
+Number of threads 1: 101.942676591 simulation frames per second
+Number of threads 1: 87.4323355291 simulation frames per second
+Number of threads 1: 83.003476368 simulation frames per second
+
+Number of threads 4: 55.1603884006 simulation frames per second
+Number of threads 4: 30.7348196457 simulation frames per second
+Number of threads 4: 24.8009035058 simulation frames per second
+Number of threads 4: 87.3419081665 simulation frames per second
+Number of threads 4: 39.0845886119 simulation frames per second
+Number of threads 4: 87.2758749844 simulation frames per second
+
+It is much faster with spatial decomposition. However, serial version slightly runs better than 4 thread version. I think it is because overhead in this case is larger than the improvement of parallel computing.
+
+3. Spatially Coherent Sorting:
+Number of threads 1: 193.530519155 simulation frames per second
+Number of threads 1: 89.2645677558 simulation frames per second
+Number of threads 1: 214.549263084 simulation frames per second
+Number of threads 1: 234.133902716 simulation frames per second
+Number of threads 1: 248.464641146 simulation frames per second
+
+Number of threads 4: 829.827534552 simulation frames per second
+Number of threads 4: 837.228205 simulation frames per second
+Number of threads 4: 101.96002358 simulation frames per second
+Number of threads 4: 745.097704825 simulation frames per second
+Number of threads 4: 800.586819744 simulation frames per second
+
+I use Morton ordering. Spatially coherent sorting makes it much faster. I think it is after sorting, we don't need to retrieve data as frequent as before. Also, 4-thread version are much faster than 1-thread version. It means the overhead is much smaller than the benefit of parallel computing.
+
+
+4 Locking
+Number of threads 4: 313.678104497 simulation frames per second
+Number of threads 4: 713.210874232 simulation frames per second
+Number of threads 4: 355.436940786 simulation frames per second
+Number of threads 4: 148.30819278 simulation frames per second
+Number of threads 4: 602.044975462 simulation frames per second
+With locking, it decreases the performance but it makes sense because we need time to acquire and release locks.
