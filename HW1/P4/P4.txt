@@ -1,1 +1,12 @@
 # Your discussion here
+
+I represented my graph as an adjacency list rdd, where the node was the key and the value was a set of edges coming out of that node.
+
+The number of nodes touched when searching for:
+	"CAPTAIN AMERICA" -> 6408        
+	"MISS THING/MARY" -> 7           
+	"ORWELL" -> 9
+
+The diameter is effectively the max distance between any two nodes in a graph. Since, the BFS searches the graph in frontiers, then the max number of frontiers we would need to search is the diameter. Thus, it won't take more than the diameter for the number of iterations of the bfs to run. 
+
+Furthermore, if a node doesn't have a defined distance during the search, then either it doesn't exist in the graph or it can't be reached by the source node. This is because, since the diameter of the graph tells us the max distance between any two nodes, any node that cannot be reached in that distance is not connected in at all. In the context of this graph, this means that the source character is not at all connected to this target node by comic books.

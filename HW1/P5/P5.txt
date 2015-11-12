@@ -1,1 +1,7 @@
 # Your discussion here
+
+Kevin Bacon to Harvard University:
+'Kevin_Bacon' -> 'Marisa_Silver' -> 'Harvard_University'
+
+Harvard University to Kevin Bacon:
+'Harvard_University' -> u'Dartmouth_College' ->'National_Lampoon's_Animal_House' -> 'Kevin_Bacon'
