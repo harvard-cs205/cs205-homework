@@ -1,0 +1,46 @@
+-------(1) 1 Thread--------
+
+(i) Multithreading
+13.4254536821 simulation frames per second
+13.5346242354 simulation frames per second
+
+(ii) Spatial Decomposition
+443.642343455 simulation frames per second
+469.134546542 simulation frames per second
+
+(iii) Spatially Coherent Sorting
+701.834354335 simulation frames per second
+686.012343204 simulation frames per second
+
+(iv) Locking
+621.835346435 simulation frames per second
+646.012543451 simulation frames per second
+
+
+
+-------(2) 4 Threads--------
+
+(i) Multithreading
+18.2593485239 simulation frames per second
+18.9345234536 simulation frames per second
+
+(ii) Spatial Decomposition
+912.434366432 simulation frames per second
+853.717567526 simulation frames per second
+
+(iii) Spatially Coherent Sorting
+1082.43234655 simulation frames per second
+1150.22345323 simulation frames per second
+
+(iv) Locking
+782.42353129 simulation frames per second
+780.23582908 simulation frames per second
+
+
+In the first subproblem, we can see the 4 threads' result is better because we're computing in a parallel way. However, the performance boost is not always proportional to number of threads we used. I think that might be because of the overhead. 
+
+In the spatial decomposition problem, we can see the griding largely helps to improve the performance. I think that's because the time complexity for sub_update() improves to O(N) while it is originally O(N^2). 
+
+In the spatially coherent sorting part, I used the morton code sorting method where the code comes from wiki And in this problem the time computation changes from O(N) to O(N*logN). 
+
+In the last locking part, we can see the locking slows down the performan by adding locks.
