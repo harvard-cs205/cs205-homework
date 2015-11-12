@@ -11,10 +11,21 @@ pyximport.install()
 import numpy as np
 from timer import Timer
 from animator import Animator
-from physics import update, preallocate_locks
+from physics import update, preallocate_locks, xy2d
 
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
+
+def re_sort_hilbert( positions, grid_spacing, grid_size ):
+    positions_new = np.zeros((positions.shape[0],3))
+    positions_new[:, :-1] = positions
+    # Compute Hilbert distance
+    for i in range(positions.shape[0]):
+        positions_new[i,2] = xy2d(grid_size, int((positions_new[i,0] / grid_spacing)), int((positions_new[i,1] / grid_spacing)))
+    # sort based on hilbert distance
+    sorting_order = np.argsort(positions_new[:, 2])
+    positions = positions[sorting_order]
+    return positions, sorting_order
 
 if __name__ == '__main__':
     num_balls = 10000
@@ -64,7 +75,7 @@ if __name__ == '__main__':
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
-                   radius, grid_size, locks_ptr,
+                   radius, grid_spacing, locks_ptr,
                    physics_step)
 
         # udpate our estimate of how fast the simulator runs
@@ -80,3 +91,8 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+            positions, sorting_order = re_sort_hilbert(positions, grid_spacing, grid_size)
+            velocities = velocities[sorting_order]
+            grid[(positions[:, 0] / grid_spacing).astype(int), \
+                 (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
+            

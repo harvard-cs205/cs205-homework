@@ -1,0 +1,34 @@
+# Solutions for HW2 - P3
+
+1) There was a roughly 3.3x improvement between the serial implementaion and using four threads in parallel, both with and without instruction level parallelism. 
+2) Instruction level parallelism provided a further 7x improvement for every parallel implementation irrespective of the number of threads used. 
+Thus, there was roughly a 20x improvement between the naive serial implementation and the final four thread with AVX implementation.
+
+Data in table below and can be seen in associated plot. 
+Raw data below that.
+
+	   Number of threads 	Without AVX (s)	 With AVX (s)	Speedup with AVX (4.57/0.62)
+          Serial 0.5            4.57            0.62	       7.370967742
+	          1	                4.56	        0.61	       7.475409836
+	          2	                2.29	        0.3	           7.633333333
+	          4	                1.36	        0.2	           6.8
+Max speedup with 4 threads 	  3.360294118	   3.1	
+          (4.57/1.36)
+
+Raw Data:
+
+# Without instruction level parallelism
+
+serial - 1074.656613 Million Complex FMAs in 4.57006692886 seconds, 235.151176061 million Complex FMAs / second
+1 - 1074.656613 Million Complex FMAs in 4.56185603142 seconds, 235.574425321 million Complex FMAs / second
+2 - 1074.656613 Million Complex FMAs in 2.28727388382 seconds, 469.84168385 million Complex FMAs / second
+4 - 1074.656613 Million Complex FMAs in 1.2978219986 seconds, 828.046229885 million Complex FMAs / second
+4 - 1074.656613 Million Complex FMAs in 1.36192011833 seconds, 789.074629661 million Complex FMAs / second
+4 - 1074.656613 Million Complex FMAs in 1.39453601837 seconds, 770.619474035 million Complex FMAs / second
+
+# With instruction level parallelism
+
+serial - 1074.9472 Million Complex FMAs in 0.619947910309 seconds, 1733.9314838 million Complex FMAs / second
+1 - 1074.9472 Million Complex FMAs in 0.607554912567 seconds, 1769.30048258 million Complex FMAs / second
+2 - 1074.9472 Million Complex FMAs in 0.297333955765 seconds, 3615.28570538 million Complex FMAs / second
+4 - 1074.9472 Million Complex FMAs in 0.199167966843 seconds, 5397.18920186 million Complex FMAs / second

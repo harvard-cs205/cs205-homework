@@ -1,0 +1,30 @@
+# solutions for HW2 - P5
+
+1) Adding prange to all three areas indicated in the skeleton code actually slowed down the code. Adding prange to only the "subupdate" part of the code, gave a marginal speedup for four threads and a more substantial speedup for 8 threads. 
+
+Average simulation frames per second  N
+5.13                                  1
+5.68                                  4
+8.45                                  8
+
+2) The gridded version is significantly faster due to the improvement in the algorithm in going from O(N^2) to O(N) when it comes to identifying which balls the given ball will collide with. It also seems like the parallel threads are having more of an impact with the grid than without the grid when compared to the serial version.
+
+Average simulation frames per second  N
+191.64                                1
+295.32                                4
+341.05                                8
+
+3) The Hilbert ordering model was chosen for sorting the positions due to its attractive property of maintianing locality when transforming from 2D to 1D. Its relatively simple computation also helped.
+Sorting marginally improves performance for N = 1 and 4 but not so for N = 8, with the grid enabled.
+
+Average simulation frames per second  N
+210.18                                1
+338.76                                4
+325.80                                8
+
+4) Locking seems to marginally improve the serial implementation, although due to high variability of performance timings its hard to draw a concrete conclusion. It seems to have slowed down N = 4 and not had much of an effect on N = 8. This is with both gridding and sorting enabled.
+
+Average simulation frames per second  N
+254.32                                1
+301.95                                4
+348.72                                8

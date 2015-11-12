@@ -38,14 +38,15 @@ if __name__ == '__main__':
 
     ########################################
     # You should explore different values for the number of locks in the medium
-    # grained locking
+    # grained locking; run across a range of values of N
     ########################################
-    N = 10
-    counts[:] = orig_counts
-    with Timer() as t:
-        move_data_medium_grained(counts, src, dest, 100, N)
-    assert counts.sum() == total, "Wrong total after move_data_medium_grained"
-    print("Medium grained uncorrelated: {} seconds".format(t.interval))
+    for i in [1,3,5,7,9,10,12,15,18,20, 25, 30, 40, 50, 75, 100, 150, 200, 500]:    
+        N = i
+        counts[:] = orig_counts
+        with Timer() as t:
+            move_data_medium_grained(counts, src, dest, 100, N)
+        assert counts.sum() == total, "Wrong total after move_data_medium_grained"
+        print("Medium grained uncorrelated: {} seconds".format(t.interval))
 
     ########################################
     # Now use correlated data movement
@@ -72,11 +73,12 @@ if __name__ == '__main__':
 
     ########################################
     # You should explore different values for the number of locks in the medium
-    # grained locking
+    # grained locking; run across a range of values of N
     ########################################
-    N = 10
-    counts[:] = orig_counts
-    with Timer() as t:
-        move_data_medium_grained(counts, src, dest, 100, N)
-    assert counts.sum() == total, "Wrong total after move_data_medium_grained"
-    print("Medium grained correlated: {} seconds".format(t.interval))
+    for i in [1,3,5,7,9,10,12,15,18,20, 25, 30, 40, 50, 75, 100, 150, 200, 500]:
+        N = i
+        counts[:] = orig_counts
+        with Timer() as t:
+            move_data_medium_grained(counts, src, dest, 100, N)
+        assert counts.sum() == total, "Wrong total after move_data_medium_grained"
+        print("Medium grained correlated: {} seconds".format(t.interval))
