@@ -1,1 +1,19 @@
-# Your discussion here
+The representation used for this problem was a straightforward adjacency list, with characters ("char"s) as the keys and with the characters to whom the keys are connected through comics ("neighb"s) as the values, in the form of lists. The implementation of this representation can be seen in P4.py. It was accomplished through a series of maps and permutations, and because duplicates were not removed from the permutations, the adjacency list correctly maintained symmetry between links. This representation made sense since the entirety of the problem was focused on finding connections between characters and running breadth first search to find all links. Thus, as comic books were not involved, they were used as keys for the groupBy() commands and then discarded.
+--
+
+A graph diameter of 10 implies that the longest traversal from one end of the graph to the other is no more than 10 nodes. This implies that it is impossible to find any two nodes (provided they are connected at all in the first place - see next response for a discussion on this) that cannot be reached in fewer than 11 total steps. This knowledge provides us with a distinct advantage, since it allows us to place a predetermined stopper on the BFS algorithm. This was done in the first pass of implementing BFS, before the accumulator was introduced.
+--
+
+If a character does not have a defined distance during a serach, it implies that its node is entirely disconnected from the node of the target character. It could also imply that the diameter measure provided was incorrect, though for the purposes of this assignment we are assuming that this is not the case. With this possibility ruled out, a lack of defined distance simply means that the graph has disconnects and is not fully interconnected. It could be possible, then, to find connected components in the graph and to use these as a way to understand how certain characters cannot reach each other.
+--
+
+Results of running P4 with the P4_bfs:
+
+CAPTAIN AMERICA:
+6408
+MISS THING/MARY:
+7
+ORWELL:
+9
+
+Here, numbers represent the total number of characters in the comic books connected to said character. 
