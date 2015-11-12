@@ -1,0 +1,16 @@
+The output of the time when N=10 is:
+
+Serial uncorrelated: 0.613505840302 seconds
+Fine grained uncorrelated: 4.70983815193 seconds
+Medium grained uncorrelated: 7.92237710953 seconds
+
+Serial correlated: 0.674780130386 seconds
+Fine grained correlated: 4.54506778717 seconds
+Medium grained correlated: 6.94881796837 seconds
+
+No matter for uncorrelated or correlated data, serial implementation are the fastest among the three and Fine
+grained implementation is faster than medium grained. Medium grained implementation does better when the data
+is correlated.
+
+From this plot we could see that the best N to choose for medium-grained locking in the correlated case is 20.
+However, for the uncorrelated case, it seems like larger N has worse performance.

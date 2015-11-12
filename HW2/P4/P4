@@ -1,0 +1,13 @@
+3.6639399529 seconds for 10 filter passes with 1 threads.
+2.0646030807 seconds for 10 filter passes with 2 threads.
+1.4476099491 seconds for 10 filter passes with 4 threads.
+
+From the result above, we could see that multi-threading speedup the process however it's less than linear speedup.
+
+I used matrix of events to coordinate the threads. Problem here is about waiting for neighbor threads to finish last
+iteration before current thread can proceed. It is a coornation problem rather than a resource sharing problem.
+So I don't need lock here (condition contains lock and event) but events. After deciding on using events, the problem
+is reduced to how to implement so that current event will be notified to proceed when the neighbors finish their
+i - 1 th iteration. A natural idea is using a matrix of events, with different rows reperesenting different iterations,
+and different columns reperesenting different iterations, so that the thread can easily check whether the neighboring
+threads has finished i - 1 th iteration or not.

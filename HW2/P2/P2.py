@@ -1,15 +1,20 @@
 import sys
+
 sys.path.append('../util')
 
 import set_compiler
+
 set_compiler.install()
 
 import pyximport
+
 pyximport.install()
 
 import numpy as np
 from timer import Timer
 from parallel_vector import move_data_serial, move_data_fine_grained, move_data_medium_grained
+
+import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
     ########################################
@@ -47,6 +52,15 @@ if __name__ == '__main__':
     assert counts.sum() == total, "Wrong total after move_data_medium_grained"
     print("Medium grained uncorrelated: {} seconds".format(t.interval))
 
+    # try different values for the number of locks
+    N_range = range(1, 100, 10)
+    time_u = []
+    for N in N_range:
+        with Timer() as t:
+            move_data_medium_grained(counts, src, dest, 100, N)
+        assert counts.sum() == total, "Wrong total after move_data_medium_grained"
+        time_u.append(t.interval)
+
     ########################################
     # Now use correlated data movement
     ########################################
@@ -80,3 +94,19 @@ if __name__ == '__main__':
         move_data_medium_grained(counts, src, dest, 100, N)
     assert counts.sum() == total, "Wrong total after move_data_medium_grained"
     print("Medium grained correlated: {} seconds".format(t.interval))
+
+
+    # try different values for the number of locks
+    N_range = range(1, 100, 10)
+    time_c = []
+    for N in N_range:
+        with Timer() as t:
+            move_data_medium_grained(counts, src, dest, 100, N)
+        assert counts.sum() == total, "Wrong total after move_data_medium_grained"
+        time_c.append(t.interval)
+
+    plt.figure()
+    plt.plot(N_range, time_u, color='red', label='uncorrelated')
+    plt.plot(N_range, time_c, color='blue', label='correlated')
+    plt.legend()
+    plt.show()
