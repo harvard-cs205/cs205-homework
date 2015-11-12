@@ -1,1 +1,60 @@
-# Your answers here.
+1. It would take 255 seconds since that is the number of consecutive pairs.
+
+2. Yes. There are a total of 8 people counting, so each person takes on 256 / 8 = 32 bags.
+   It takes each person 31 seconds to verify his/her bags. Then they are left with 8 numbers to add.
+   Now, they can have 4 people each adding 2 numbers, this takes 1 more second. After which there 
+   are 4 numbers left. Again they will have 2 people each counting 2 numbers which takes another second.
+   Finally, there are only 2 numbers left and the cashier can verify this, which takes 1 last second. 
+   Thus in total they can do this in: 31 + 1 + 1 + 1 = 34 seconds.
+   
+3. Even if there are infinite number of employees, only 128 of them can actually do any work since
+   there are only 128 pairs of numbers to add initially. This first step takes 1 second. In the next
+   step, there is half the number of pairs left (or 64), so following this recursion, it would take a total of
+   log(256) * 1 = 8 seconds to verify the sum.
+   
+4. Let k be such that 2^k >= N >= 2^(k-1). Then with similar reasoning to part (3), it will take 
+   the store k seconds to verify the sum. If N is not a power of 2, we can make the process exactly the same as
+   in part (3) by adding "virtual" bags with zero counts so that the total number of bags is 2^k. Then the same 
+   counting procedure follows. Note that k = ceil(log(N)).
+   
+5. In this case, they can start off with 256 people each having a bag (assuming infinite number of employees). 
+   Then in the first round, half of them need to communicate the bag numbers with the other half so the latter 
+   each has 2 numbers to add. This round takes 2 seconds to complete. Similarly for every consequent round. 
+   Since there are 8 rounds in total (in round 8, 2 people each has 1 bag, so one needs to communicate to the 
+   other, and the other can add the final two numbers), it will take 2 * 8 = 16 seconds. 
+   
+6. If each cashier takes 1 bag then the total time to hand all 256 bags to the 256 cashiers would be 256 seconds.
+   Once they each has a bag, half of the employees can either hand the other half a bag or simply communicate the 
+   bag number. In other words, they can follow the strategy in part (5). Thus the total time it will
+   take is 256 + 16 = 272 seconds. 
+   
+   On the other hand, if each cashier takes 2 bags, the bag-exchange time would reduce to 128 seconds. Thus the total
+   time would be 128 + 16 = 144 seconds.
+   
+   A better strategy would be to have the cashiers start communicating & verifying numbers as soon as they receive a
+   bag, i.e. they don't have to wait until everyone has received a bag before doing work. However, this strategy
+   still has a bottleneck in that there is only 1 bag "distributor", so the cashiers have to queue up to get bags.
+   As a result it requires more than 256 seconds to verify the sum (the last person to get a bag is at 256th second,
+   afterwards he/she will have to do more work).
+
+   An even better strategy is to first hand out half the bags (or 128) to a cashier. Then we have 2 distributors. 
+   At any stage, as long as a distributor has more than 2 bags, he/she should give half to somebody else who doesn't 
+   already has bags. So, for example in the next stage, each of the 2 distributors gives out 64 bags to another cashier, 
+   ending up with 4 distributors each holding 64 bags. We can visualize these stages of distribution as follows:
+
+   stage  bags  time  # distributors
+   1      256   1     1
+   2      128   1     2
+   3      64    1     4
+   4      32    1     8
+   5      16    1     16
+   6      8     1     32
+   7      4     1     64
+   8      2     1     128
+
+   Thus, to completely distribute bags to others so that each cashier has 2 bags, it takes 8 stages (or log(256))
+   or equivalently 8 seconds. From here on, the same strategy as in (5) applies except that we start with 128 employees
+   each holding 2 bags, instead of 256 employees each holding 1 bag. Thus it takes 1 second less than that in (5)
+   which gives the total time of verification: 8 + 15 == 23 seconds. Assuming one person can only do 1 task at a time
+   (i.e. either distribute bags or communicate sum or adding totals), this should be the optimal solution as we get the
+   maximum number of employees working at the same time.
