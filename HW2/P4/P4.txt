@@ -1,0 +1,5 @@
+1 thread -> 4.38577389717 seconds for 10 filter passes.
+2 threads -> 2.15182089806 seconds for 10 filter passes.
+4 threads -> 1.88287091255 seconds for 10 filter passes.
+
+Jumping from 1 to 2 threads gave roughly a linear increase on speed (decreased time by half). Jumping from 2 to 4 threads did not because my computer has 4 cores, and background processes are limiting the programs full usage of my hardware. The speed increase make sense. I maintained thread control by creating an event for each iteration i in each thread. This way, we can set the event's flag to true when the filtering for that row is completed. This allows for the nth thread to wait only on the i-1th iteration of the neighboring threads (n-1 and n+1) rather than every other thread.

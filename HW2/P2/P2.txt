@@ -1,0 +1,22 @@
+Output:
+
+Serial uncorrelated: 0.39484000206 seconds
+Fine grained uncorrelated: 6.80591201782 seconds
+Medium grained uncorrelated for N=1: 7.44034385681 seconds
+Medium grained uncorrelated for N=5: 7.92711281776 seconds
+Medium grained uncorrelated for N=10: 8.19174599648 seconds
+Medium grained uncorrelated for N=20: 8.84985613823 seconds
+Medium grained uncorrelated for N=50: 10.5244321823 seconds
+Medium grained uncorrelated for N=100: 15.6824059486 seconds
+Serial correlated: 0.422016143799 seconds
+Fine grained correlated: 6.59243297577 seconds
+Medium grained correlated for N=1: 6.9456911087 seconds
+Medium grained correlated for N=5: 6.65748500824 seconds
+Medium grained correlated for N=10: 6.24126791954 seconds
+Medium grained correlated for N=20: 5.59781002998 seconds
+Medium grained correlated for N=50: 5.45601391792 seconds
+Medium grained correlated for N=100: 6.04672312737 seconds
+
+The parallelized data exchange takes much longer than the serial data exchange. This is due to overhead of acquiring and releasing locks. Perhaps if the number of elements we move was much larger, the serial implementation would lag behind the parallelized implementation.
+
+I ran 5 trials of the medium grained correlated and uncorrelated data exchange for N = {1, 5, 10, 20, 50, 100} and took the minimum time over the 5 trials. This gave us the graph depicted in P2.png. The graph shows that the optimal time is given where N is between 20 and 50. This is because a data exchange is not more than 10 indices away from each other. Thus, if two threads are accesing the same segment (a lock is required), the max absolute distance between the overlapping sources and destinations is 20. It is for this reason that for N, where 20 <= N <= 50, there are fewer collisions of locks, which means fewer instances of waiting. Given this reasoning, N=20 is theoretically optimal, but variations can be attributed to not having timed for enough values of N.
