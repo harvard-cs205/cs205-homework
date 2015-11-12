@@ -54,10 +54,8 @@ __kernel void sum_blocked(__global float* x,
     // Be careful that each thread stays in bounds, both relative to
     // size of x (i.e., N), and the range it's assigned to sum.
     int i = get_global_id(0);
-    for (int a = k*i; a < k*(i+1); a+=1) {
-        if (a < N) {
-            sum += x[a];
-        }
+    for (int a = k*i; (a < k*(i+1)) && a < N; a+=1) {
+        sum += x[a];
     }
 
     fast[local_id] = sum;
