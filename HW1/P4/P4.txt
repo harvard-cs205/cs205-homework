@@ -1,1 +1,10 @@
-# Your discussion here
+# SSBFS
+Connected characters to CAPTAIN AMERICA: 6408
+Connected characters to MISS THING/MARY: 7
+Connected characters to ORWELL: 9
+
+# Graph Diameter
+If we assume that the graph has a diameter of 10, then all ssbfs searches must run in <= 10 iterations, since the maximum distance between two nodes is 10.  For characters with few, closely connected characters, this should run in much fewer iterations.  For characters that have many connections, or even for those characters with only a few connections, but whose connections are not tightly grouped, but look more like a string with beads on it, this may take up to the full 10 cycles.
+
+# Untouched nodes
+If a character does not have a defined distance during a search it means that they are not at all connected to the character we are searching for, or the distance between the two characters is greater than our max diameter cutoff.  Once we've taken the diameter limit out, if they still do not have a defined distance they are likely in a separate isolated network that has no path to the character we are performing ssbfs on.
