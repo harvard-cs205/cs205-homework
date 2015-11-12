@@ -1,0 +1,30 @@
+## 1 Thread ##:
+
+3.34695315361 seconds for 10 filter passes.
+
+
+## 2 Threads ##:
+
+1.73415994644 seconds for 10 filter passes.
+
+## 4 Threads ##:
+
+1.5313680172 seconds for 10 filter passes.
+
+
+We see a speed-up for increasing amounts of threads like we would expect,
+but also should note that there is a much larger increase from 1 to 2 threads than
+we saw from 2 to 4 threads.
+
+I used Conditional Variables in order to help my threads communicate with one another. The crux
+of what I do is create a condition for each thread and each iteration so I can later verify that
+for any given thread, the thread before and after it in the previous iteration is done (may have been 
+possible to dynamically create conditions only for the thread immediately before and after this thread
+in the previous iteration and thus have fewer conditions but I didn't do it in this manner here). 
+Once the conditions are all initialized, I go ahead and start all the threads with each have a reference
+to the array of all conditions. Once a thread starts on the main part of the parallelized function (which
+I put into a separate function called parallel_helper), it acquires a "lock" from the condition allocated
+for it. Then it checks if any of the other conditions from a previous condition are still waiting -- note that
+if it can't wait then it will actually throw an error which is the reason for the try/except block (it can either
+just wait or it doesn't have to and then throws an error and just passes to the rest of the code).
+After I'm done with doing those checks, I notify all the other conditions that I am done and release my lock. 

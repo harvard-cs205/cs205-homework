@@ -1,0 +1,34 @@
+# Without Instruction Level Parallelism #
+
+1 Thread:
+
+1074.656613 Million Complex FMAs in 5.5871360302 seconds, 192.344809074 million Complex FMAs / second
+
+2 Threads:
+
+1074.656613 Million Complex FMAs in 2.71843004227 seconds, 395.322519355 million Complex FMAs / second
+
+
+4 Threads:
+
+1074.656613 Million Complex FMAs in 1.47918701172 seconds, 726.518421597 million Complex FMAs / second
+
+
+
+# With Instruction Level Parallelism:  #
+
+1 Thread:
+1074.94829 Million Complex FMAs in 0.767266988754 seconds, 1401.00943447 million Complex FMAs / second
+
+
+2 Threads:
+1074.94829 Million Complex FMAs in 0.374233961105 seconds, 2872.39641968 million Complex FMAs / second
+
+4 Threads:
+1074.94829 Million Complex FMAs in 0.250962972641 seconds, 4283.2943788 million Complex FMAs / second
+
+
+# Analysis : #
+
+More threads is certainly helpful to get a speed-up but we see that the instruction-level parallelism
+gives us even bigger performance increases so there seems to be a lot of value in doing that as well. 

@@ -1,0 +1,187 @@
+## PART 1: MULTI-THREADING ##
+
+With just 1-thread (serial), I see framerates in the high 4s and low 5 simulation frames per second.
+With 4 threads, I see an increase in speed with frame rates in the high 6s (~6.8 to 6.9) per second.
+
+## PART 2: SPATIAL DECOMPOSITION ##: 
+
+I see a fairly dramatic increase after implementing spatial decomposition. 
+For 1 Thread: We see the simulation frames per second being primarily between
+300 to 400 frames per second. 
+For 4 threads, we see that simulation frames per second are primarily between 500-680 frames per second.
+
+So, it becomes apparent that looking for collisions using the grid and thus making it an O(N) algorithm rather than an O(N^2)
+algorithm was one of the most helpful things we could do. 
+
+
+## PART 3 : SPATIALLY COHERENT SORTING ##
+
+We see some noticeable speed-ups here:
+1-Threaded: Averages between 450-530 simulation frames per second.
+4-threads: Primarily around 1000 simulation frames per second.
+
+I use Hilbert Ordering for this aspect and re-implemented the key Hilbert Functions in python based on the C code
+available on the Wiki Page referenced. At first I thought this might slow down the implementation overall, but the calls
+to sort are within the range we are calling. Instead, this speeds us up by making sure that nearby objects physically are also nearby in memory so we have to look less and thus can iterate through our objects more quickly.
+
+
+## PART 4: Locking ##
+
+I noticed a fairly significant slow down associated with implementing locks: 
+Instead of being in the 1000s, now the 4-threaded locked version was usually around 780-850 simulation frames per second.
+This might make sense because of the additional overhead associated with locking that we saw in the earlier parts of this pset as well.
+
+
+##################################################################################################
+
+Below are some sample outputs for every case referenced above to validate the averages I mentioned
+
+##################################################################################################
+
+
+## PART 1: Multi-Threading ##
+
+1 Thread:
+
+4.33358095842 simulation frames per second
+5.36123598593 simulation frames per second
+4.91767420483 simulation frames per second
+5.23064682474 simulation frames per second
+4.09495626603 simulation frames per second
+4.83685057821 simulation frames per second
+5.26984182825 simulation frames per second
+5.4056091051 simulation frames per second
+5.02186760663 simulation frames per second
+4.81322174445 simulation frames per second
+4.6487623595 simulation frames per second
+
+4 Threads:
+
+5.12043128633 simulation frames per second
+6.68123241804 simulation frames per second
+6.82052774765 simulation frames per second
+6.89431942022 simulation frames per second
+6.6570442263 simulation frames per second
+6.82943445504 simulation frames per second
+6.7812267084 simulation frames per second
+6.65225080054 simulation frames per second
+6.78877812469 simulation frames per second
+6.68283985769 simulation frames per second
+6.82463393878 simulation frames per second
+7.0021185132 simulation frames per second
+
+
+## PART 2 : SPATIAL DECOMPOSITION ##
+
+
+1 Threads:
+
+458.848340228 simulation frames per second
+409.22605599 simulation frames per second
+412.778765043 simulation frames per second
+322.738073253 simulation frames per second
+350.594158581 simulation frames per second
+417.468298995 simulation frames per second
+380.13338074 simulation frames per second
+264.318015679 simulation frames per second
+433.015540903 simulation frames per second
+422.185866422 simulation frames per second
+418.170313455 simulation frames per second
+478.702779819 simulation frames per second
+435.655857856 simulation frames per second
+416.432088959 simulation frames per second
+411.384886996 simulation frames per second
+317.175622452 simulation frames per second
+276.526852938 simulation frames per second
+432.908277713 simulation frames per second
+
+
+4 Threads:
+
+200.524893476 simulation frames per second
+386.149803375 simulation frames per second
+515.640282758 simulation frames per second
+684.400527832 simulation frames per second
+629.474643564 simulation frames per second
+626.086719172 simulation frames per second
+661.090649927 simulation frames per second
+562.854652682 simulation frames per second
+623.368111008 simulation frames per second
+162.272213768 simulation frames per second
+560.897641453 simulation frames per second
+648.41770178 simulation frames per second
+428.004762067 simulation frames per second
+522.991417112 simulation frames per second
+525.806612519 simulation frames per second
+533.358803541 simulation frames per second
+626.572381153 simulation frames per second
+670.254028028 simulation frames per second
+
+
+
+## PART 3 :  Spatially Coherent Sorting ##:
+
+1 THREADs: 
+
+408.218957906 simulation frames per second
+571.812790555 simulation frames per second
+491.76294355 simulation frames per second
+517.070556811 simulation frames per second
+495.415477398 simulation frames per second
+505.137351583 simulation frames per second
+436.98860203 simulation frames per second
+523.155643377 simulation frames per second
+449.788299006 simulation frames per second
+499.304422114 simulation frames per second
+468.035931485 simulation frames per second
+465.294780186 simulation frames per second
+505.811020941 simulation frames per second
+530.440410818 simulation frames per second
+396.895254446 simulation frames per second
+456.588111227 simulation frames per second
+457.11059798 simulation frames per second
+
+
+4 THREADS: 
+
+87.7830627664 simulation frames per second
+1030.26668912 simulation frames per second
+989.279204071 simulation frames per second
+1068.34785439 simulation frames per second
+1067.59249125 simulation frames per second
+1026.88668621 simulation frames per second
+1086.21937272 simulation frames per second
+1062.588891 simulation frames per second
+1049.71569132 simulation frames per second
+1269.90939432 simulation frames per second
+1042.1370816 simulation frames per second
+1204.06144712 simulation frames per second
+1103.09733092 simulation frames per second
+1168.90586747 simulation frames per second
+593.241161786 simulation frames per second
+1010.94792361 simulation frames per second
+
+
+## PART 4: LOCKING ##
+
+4 THREADS:
+
+29.0452197277 simulation frames per second
+802.095135564 simulation frames per second
+823.930011155 simulation frames per second
+895.848311975 simulation frames per second
+849.07902691 simulation frames per second
+799.659704275 simulation frames per second
+868.584355675 simulation frames per second
+850.492011439 simulation frames per second
+881.996298996 simulation frames per second
+828.056095635 simulation frames per second
+805.277735903 simulation frames per second
+869.47801932 simulation frames per second
+803.945734508 simulation frames per second
+421.123315729 simulation frames per second
+381.105813116 simulation frames per second
+263.70646078 simulation frames per second
+781.719965762 simulation frames per second
+854.0511301 simulation frames per second
+
