@@ -1,0 +1,2 @@
+The times are all much slower than serial implementation, which is expected. I tried to run the code with N = 5, 10, 20, 40, 80 with correlated/uncorrelated setup. The less the number of locks is, the worse the performance is, as expected. I think this time difference is primarily due to acquiring/releasing locks.
+

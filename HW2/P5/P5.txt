@@ -1,0 +1,8 @@
+
+When thread number changed from 1 to 4, the number of frame per second increased by 2.5 times. From average around 9 to around 23. 
+
+Adding Grid component improved a lot since the running time decreased from O(N^2) to O(N). I got around 1500 frame per second for single thread (this might because I ran it on my desktop workstation). And I got around 3500 fps for 4 threads.
+
+Adding Hilbert sorting algorithm did not do much. I perceived like 100 fps increase per thread, and around 250-300 fps increase for 4 threads.
+
+Adding lock hurts the running time. I got on average around 2600 fps for 4 threads. Sometimes I got as low as 2300 fps but somethings I got 3100 fps. So on average ~2600.

@@ -11,17 +11,44 @@ pyximport.install()
 import numpy as np
 from timer import Timer
 from animator import Animator
-from physics import update, preallocate_locks
+from physics import set_hilbert_array, cleargrid, setgrid, update, preallocate_locks
+
+def hilbert_xy2d(n, x, y):
+    d = 0
+    s = n / 2
+    rx = 0
+    ry = 0
+    while s > 0:
+        if (x & s) > 0:
+            rx = 1
+        else:
+            rx = 0
+        if (y & s) > 0:
+            ry = 1
+        else:
+            ry = 0
+
+        d += s * s * ((3 * rx) ^ ry)
+        if ry == 0: 
+            if rx == 1:
+                x = s - 1 - x
+                y = s - 1 - y
+            t = x
+            x = y
+            y = t
+        s = s / 2
+
+    return d
+
 
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
 if __name__ == '__main__':
-    num_balls = 10000
+    num_balls = 10000 
     radius = 0.002
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
-
     # make a hole in the center
     while True:
         distance_from_center = np.sqrt(((positions - 0.5) ** 2).sum(axis=1))
@@ -47,6 +74,16 @@ if __name__ == '__main__':
     grid[(positions[:, 0] / grid_spacing).astype(int),
          (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
 
+    # Construct hilbert_map for sorting in SUBPROBLEM 3
+    hilbert_array = np.ones(num_balls, dtype=np.uint32)
+    hilbert_map = np.zeros((grid_size, grid_size), dtype=np.uint32)
+    n = 1
+    while n < grid_size:
+        n = n * 2
+    for x in range(grid_size):
+        for y in range(grid_size):
+            hilbert_map[x, y] = hilbert_xy2d(n, x, y)
+
     # A matplotlib-based animator object
     animator = Animator(positions, radius * 2)
 
@@ -64,8 +101,9 @@ if __name__ == '__main__':
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
-                   radius, grid_size, locks_ptr,
+                   radius, grid_spacing, locks_ptr,
                    physics_step)
+        #print("t: %f" % t.interval)
 
         # udpate our estimate of how fast the simulator runs
         physics_step = 0.9 * physics_step + 0.1 * t.interval
@@ -77,6 +115,16 @@ if __name__ == '__main__':
             print("{} simulation frames per second".format(frame_count / total_time))
             frame_count = 0
             total_time = 0
+            # uncomment the "continue" line to disable reorder of positions 
+            # continue
+
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+            set_hilbert_array(positions, hilbert_map, hilbert_array, grid_spacing)
+            sort_idx = np.argsort(hilbert_array, kind="quiksort")
+
+            cleargrid(positions, grid, grid_spacing)
+            positions[:, :] = positions[sort_idx]
+            velocities[:, :] = velocities[sort_idx]
+            setgrid(positions, grid, grid_spacing)
