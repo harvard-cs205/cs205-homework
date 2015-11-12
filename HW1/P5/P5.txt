@@ -1,1 +1,5 @@
-# Your discussion here
+Path from Harvard University to Kevin Bacon
+Harvard_University->Matt_Damon->Gene_Hackman->Kevin_Bacon
+
+Path from Kevin Bacon to Harvard University
+Kevin_Bacon->John_Lithgow->Harvard_University

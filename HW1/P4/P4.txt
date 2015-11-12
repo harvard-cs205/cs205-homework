@@ -1,1 +1,17 @@
-# Your discussion here
+Graph representation:
+[node, [adjacent_node1, adjacent_node2, ...]]
+
+Number of nodes touched excluding itself:
+(Before deleting leading and trailing whitespace)
+CAPTAIN AMERICA is connected by 6407
+MISS THING/MARY is connected by 6
+ORWELL is connected by 8
+
+(After deleting leading and trailing whitespace)
+CAPTAIN AMERICA is connected by 6402
+MISS THING/MARY is connected by 6
+ORWELL is connected by 8
+
+The maximum number of steps we need to execute is the diameter. In my new BFS algorithm, we just need to keep trach those visited nodes, so we don't need the diameter to run BFS.
+
+Untouched nodes mean that they are not connected to the connected component where root is in.
