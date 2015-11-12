@@ -1,1 +1,20 @@
-# Your discussion here
+The strategy I used to more evenly distribute work over partitions was to
+randomize distribution of coordinate points. I found that using Spark's native
+repartition function gave a distribution of work centered closer to lower
+numbers of iteration, while first randomizing input coordinates with the
+random package produced a more normal distribution.
+
+Randomized distribution of work produces generally good results for a wide
+range of problems, but as I started to see with calculating the Mandelbrot set,
+if the variance of work per pixel were large, it would produce a normal
+distribution also with larger variance. Because many of the pixels in our
+image of the Mandelbrot set did not require many iterations at all, and many
+others required close to our maximal number of iterations, randomly distributing
+the coordinates could only do so much to balance the load.
+
+While this strategy isn't ideal, it is strong in that it works as a base for
+many calculations in general, it is easy to implement, and it introduces very
+little calculation overhead. This is on the opposite end of the spectrum from
+first fully calculating the Mandelbrot set and using those results to define a
+function to repartition your initial RDD of coordinates into a perfectly
+load-balanced partitions.

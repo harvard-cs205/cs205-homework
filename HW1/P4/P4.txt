@@ -1,1 +1,14 @@
-# Your discussion here
+Nodes reachable within 10 steps by "CAPTAIN AMERICA":   6408
+Nodes reachable within 10 steps by "MISS THING/MARY":   7
+Nodes reachable within 10 steps by "ORWELL":            9
+
+I represented my graph as an adjacency list, with tuples in the RDD for each
+node, with the node and a list of nodes that the node has an edge to.
+
+In my BFS, I am keeping track of all nodes touched, starting from that source.
+Originally, this was limited to only the nodes that could be reached in a
+number of steps within our limit on the diameter. This means that we would
+only expand our frontier at most diameter number of times.
+After relaxing assumptions on diameter, it is clear that these nodes are all
+those reachable from the source. If a node is in the graph but not in that list
+then that node is not reachable from the source.
