@@ -1,1 +1,4 @@
 # Your discussion here
+For balancing work, I simply use repartition function which would randomly repartition the rdd, and from the result, it works well to balance work.
+Previously there are over 50% partitions whose computing cost(number of iterations) is 0-1e6, with the range of computing cost 0-9*1e6, which means that over 50% partitions are just doing less than 10% of the work. I think this is because by default partitioning, the data which are partitioned in those half of partitions only require little computation, so by random repartition, we can shuffle the data randomly so the work may get more evenly distributed. 
+The result is much better after repartition. The work now range from 1.4*1e6 to only 2.6*1e6, which means the work are better balanced. And you can also see this from the histogram.

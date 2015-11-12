@@ -1,1 +1,21 @@
-# Your discussion here
+The graph I use is a table of tuples which have the shape: (key_hero, [list of neighbor heros])
+And in the BFS, I extend the nodes to something like: (key_hero, ([list of neighbor heros], distance_to_starting_node) 
+
+For “CAPTAIN AMERICA”, the number of nodes visited is:
+Current Level:  0 Newly Visited Nodes:  1906 
+Current Level:  1 Newly Visited Nodes:  4463 
+Current Level:  2 Newly Visited Nodes:  38 
+Total Nodes Touched: 6408
+
+For “MISS THING/MARY”:
+Current Level:  0 Newly Visited Nodes:  6 
+Current Level:  1 Newly Visited Nodes:  0 
+Total Nodes Touched:  7
+
+For "ORWELL”:
+Current Level:  0 Newly Visited Nodes:  8 
+Current Level:  1 Newly Visited Nodes:  0 
+Total Nodes Touched:  9
+
+For the first question, the diameter of the graph actually determines the number of iterations you need to go through. Because it's a BFS, it searches all the nodes in the same level before going to the next level of the graph.
+And for the second question, if a character doesn't have a defined distance(or INFINITE distance), then we know it hasn't been touched yet.
