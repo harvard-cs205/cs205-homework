@@ -1,1 +1,9 @@
-# Your discussion here
+The histograms P2a_hist.png and P2b_hist.png show the distribution of the amount of computation carried out by each partition when running the mandelbrot calculation.  
+
+P2a_hist.png shows the effort distribution for the default partitioning strategy, while P2b_hist.png shows the effort distribution when applying partitionBy(100) during the map call that applies the mandelbrot function. The former is visibly unequally balanced, with 60 of the 100 partitions carrying out significantly less computations than the other partitions. By comparison, the latter graph is much more evenly distributed, particularly when considering that the range of the x-axis much narrower for this graph. 
+
+The second approach is more evenly balanced from a computational perspective, with each partition carrying out roughly the same amount of work and a lower chance of any one partition becoming a bottleneck. This is clearly visible in the time spent on the two collect calls:
+- Mandelbrot calculation: 30 seconds with first approach, vs 0.7 seconds with second approach.
+- Plotting histogram: 27 seconds with first approach, vs 2 seconds with second approach.
+
+Despite the improved runtime, it is important to note that the second approach imposes the following shuffle costs: a 31.7MB shuffle write when carrying out the mandelbrot calculation, a 31.7MB shuffle read when collecting results for the image, and a 31.7MB shuffle read when collecting results for the histogram. By comparison, the first approach does not involve any shuffles.

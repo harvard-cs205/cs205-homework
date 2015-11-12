@@ -1,1 +1,17 @@
-# Your discussion here
+1. Graph representation:
+My graph representation includes one entry per character, where each entry has the following format:
+(character name, [connected character #1, connected character #2, ...])
+i.e. the key is the character name, and the value is a list of all (directly) connected characters.
+
+When loading the data to create the list, I clean up the data by removing quotation marks around both the character name and the comic book name. I also strip out trailing whitespace and aggregate characters with otherwise identical names (e.g. 'QUASAR DOPPELGANGER ' vs 'QUASAR DOPPELGANGER'). This results in a lower overall number of unique characters, as well as a potentially lower number of nodes touched during the breadth-first search (depending on the given start node).
+
+2. Search results:
+6403 touched nodes when starting from CAPTAIN AMERICA
+7 touched nodes when starting from MISS THING/MARY
+9 touched nodes when starting from ORWELL
+
+3. What does this diameter (10) imply about the maximum number of steps in which your search must be executed?
+Using a diameter of 10 implies that the search must be executed in a maximum of 10 iterations, i.e. the last nodes added to the frontier will be set to distance 10 from the starting node character.
+
+4. What does it mean if a character does not have a defined distance during the search?
+If a character does not have a defined distance during the search, that means that there is no direct path between it and the starting node character.
