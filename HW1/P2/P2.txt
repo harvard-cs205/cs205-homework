@@ -1,1 +1,2 @@
 # Your discussion here
+The histograms show a significant improvement of work balance among partitions. The computation can complete faster because the balanced work loading reduced the running time of partition needs the longest time. However, the repartition needs extra efforts to partition the tasks evenly. The trade off is this overhead for the repartition. This overhead needs to be shorter than the improvement of running time to worth doing the repartition.
