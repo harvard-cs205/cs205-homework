@@ -1,1 +1,12 @@
 # Your discussion here
+
+As indicated by the questions in P2, the problem with the first method in P2a is the fact that the workload is very badly dispatched over the workers. If one looks at the first histogram, 90% of the tasks are finished much faster than the rest, giving a total computing time of about 30s.
+
+This can be explained by the fact that the computationally expensive tasks are the ones in the middle of the Mandelbrot fractal. Since by default, the rdd is partitioned in sequence 
+(the first 100 values, the second 100, etc), we are left with only black partitions and only white partitions which are much slower to evaluate.
+
+We therefore need a better way to balance the workload by creating partitions that have both black and white pixels in them. I first wanted to create partitions by explicitly adding black and white pixels with the same amounts for the 100 partitions. But this was too complicated since it was difficult to actually get the coordinates of these two categories, and because of the x-axis asymetry.  
+
+The amount of black and white pixels being grossly the same, by allocating randomly pixels to partitions, the workload would be better distributed. To do so, instead of a partition by hash strategy, I chose to randomly create 2 linear RDDs partitioned by corresponding to the x-value and y-value of the pixels and then use a cartesian product, resulting in an 100 partition RDD. 
+
+The results were much more balanced compared to the first histograms. Nevertheless, balancing the workload had for trade-off to increase the computational time by 10 seconds. Having 90 short tasks and 10 more expensive ones may have been for this particular example been more efficient than 100 more balanced tasks. It is also important to note that we did not achieve a perfect balance, but instead the distribution seems to be normally distributed. 

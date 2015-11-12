@@ -1,1 +1,11 @@
 # Your discussion here
+
+I got 3 strings that had each 11 anagrams:
+
+('aerst', 11, ['arets', 'aster', 'rates', 'reast', 'resat', 'stare', 'stear', 'strae', 'tares', 'tears', 'teras'])
+
+
+('aelst', 11, ['least', 'leats', 'salet', 'slate', 'stale', 'steal', 'stela', 'taels', 'tales', 'teals', 'tesla'])
+
+
+('aeprs', 11, ['asper', 'pares', 'parse', 'pears', 'prase', 'presa', 'rapes', 'reaps', 'spaer', 'spare', 'spear'])
