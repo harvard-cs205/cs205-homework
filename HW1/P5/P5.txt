@@ -1,1 +1,6 @@
 # Your discussion here
+Shortest Paths:
+    From Kevin Bacon to Harvard University:
+        Path Length = 2: [u'Kevin_Bacon', u'Time_(magazine)', u'Harvard_University']
+    From Harvard University to Kevin Bacon:
+        Path Length = 3: [u'Harvard_University', u'London', u'Elvis_Costello', u'Kevin_Bacon']

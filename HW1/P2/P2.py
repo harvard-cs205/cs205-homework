@@ -1,7 +1,7 @@
+
 import numpy as np
 import matplotlib.pyplot as plt 
 import matplotlib.cm as cm
-
 def mandelbrot(x, y):
     z = c = complex(x, y)
     iteration = 0
@@ -29,3 +29,4 @@ def draw_image(rdd):
     im[I, J] = np.log(C + 1)  # log intensity makes it easier to see levels
     plt.imshow(im, cmap=cm.gray)
     plt.show()
+
