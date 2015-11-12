@@ -1,8 +1,8 @@
 from __future__ import division
 import pyopencl as cl
 import numpy as np
-import imread
-import pylab
+import os
+os.environ['PYOPENCL_COMPILER_OUTPUT'] = '1'
 
 def round_up(global_size, group_size):
     r = global_size % group_size
@@ -77,6 +77,8 @@ if __name__ == '__main__':
 
     num_iters = 10
     for iter in range(num_iters):
+        print "Iteration:", iter
+
         program.median_3x3(queue, global_size, local_size,
                            gpu_image_a, gpu_image_b, local_memory,
                            width, height,
@@ -84,6 +86,7 @@ if __name__ == '__main__':
 
         # swap filtering direction
         gpu_image_a, gpu_image_b = gpu_image_b, gpu_image_a
+        print "Done"
 
     cl.enqueue_copy(queue, host_image_filtered, gpu_image_a, is_blocking=True)
 
