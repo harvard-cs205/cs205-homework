@@ -1,3 +1,5 @@
+import matplotlib
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from matplotlib.collections import EllipseCollection
 import numpy as np

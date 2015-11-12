@@ -1,0 +1,99 @@
+# P2 write up
+
+In this problem I used a double locking mechanism that locks both the src and dst index simultaneously. This mechanism was later pointed out to be unnecessary because we can always lock the src, decrease count[src] by 1, release src's lock, and do the same for dst. I think the argument is valid under this case, but is generally not a good approach as this will expose some internel state to the outside. Therefore I chose this atomic-style operation at the price of execution efficiency.
+
+Below is a comparison of the performance using different N.
+
+### Uncorrelated benchmark:
+
+N = 1
+-----------------------
+Serial uncorrelated: 0.280958890915 seconds
+Fine grained uncorrelated: 6.71725606918 seconds
+Medium grained uncorrelated: 6.84371519089 seconds
+
+N = 2
+-----------------------
+Serial uncorrelated: 0.255897045135 seconds
+Fine grained uncorrelated: 6.48718595505 seconds
+Medium grained uncorrelated: 7.03478693962 seconds
+
+N = 4
+-----------------------
+Serial uncorrelated: 0.265401124954 seconds
+Fine grained uncorrelated: 6.74698710442 seconds
+Medium grained uncorrelated: 7.31049704552 seconds
+
+N = 10
+-----------------------
+Serial uncorrelated: 0.257702112198 seconds
+Fine grained uncorrelated: 7.21606302261 seconds
+Medium grained uncorrelated: 7.80914092064 seconds
+
+N = 20
+-----------------------
+Serial uncorrelated: 0.261359930038 seconds
+Fine grained uncorrelated: 6.78643202782 seconds
+Medium grained uncorrelated: 7.88543200493 seconds
+
+N = 50
+-----------------------
+Serial uncorrelated: 0.25825214386 seconds
+Fine grained uncorrelated: 6.96861791611 seconds
+Medium grained uncorrelated: 10.2554728985 seconds
+
+N = 100
+-----------------------
+Serial uncorrelated: 0.255542993546 seconds
+Fine grained uncorrelated: 7.21698880196 seconds
+Medium grained uncorrelated: 12.7295789719 seconds
+
+We can see that serial version is much faster than parallel version, because of the large overhead introduced by using lock mechanism.
+As we can see, with the number of locks decreased using larger N, the amount of time spent using medium grained locks increased. Since the data are uncorrelated, increasing the number of locks will increase the concurrency, which explains why fine grained locks mechanism performs better than medium grained locks mechanism.  Under this situation, we want to make N as smaller as possible, hence the optimal N = 1.
+
+### Correlated benchmark:
+
+N = 1
+-----------------------
+Serial correlated: 0.328006029129 seconds
+Fine grained correlated: 6.43000793457 seconds
+Medium grained correlated: 6.68893194199 seconds
+
+N = 2
+-----------------------
+Serial correlated: 0.339514017105 seconds
+Fine grained correlated: 6.14865398407 seconds
+Medium grained correlated: 6.57574319839 seconds
+
+N = 4
+-----------------------
+Serial correlated: 0.371975183487 seconds
+Fine grained correlated: 6.32297492027 seconds
+Medium grained correlated: 6.47770881653 seconds
+
+N = 10
+-----------------------
+Serial correlated: 0.374314069748 seconds
+Fine grained correlated: 6.50761890411 seconds
+Medium grained correlated: 5.62723898888 seconds
+
+N = 20
+-----------------------
+Serial correlated: 0.361630916595 seconds
+Fine grained correlated: 6.23360586166 seconds
+Medium grained correlated: 5.18169593811 seconds
+
+N = 50
+-----------------------
+Serial correlated: 0.388350963593 seconds
+Fine grained correlated: 5.94884181023 seconds
+Medium grained correlated: 4.71206903458 seconds
+
+N = 100
+-----------------------
+Serial correlated: 0.369651794434 seconds
+Fine grained correlated: 5.9009950161 seconds
+Medium grained correlated: 5.99991798401 seconds
+
+We can see that serial version is much faster than parallel version, because of the large overhead introduced by using lock mechanism.
+As we can see, with the number of locks decreased using larger N, the amount of time spent using medium grained locks first decreased and then increased again, with N = 50 being the optimal. Since the data are correlated this time, decreasing the number of locks does not effect the concurrency too much, as usually we will only acquire one lock (instead of two under uncorrelated situation).

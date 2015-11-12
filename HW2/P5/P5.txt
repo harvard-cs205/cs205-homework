@@ -1,0 +1,69 @@
+# P5 write up
+
+### Multithreading
+
+When using single thread, typically the number of simulation frame is around 13 per second.
+
+    13.4251666821 simulation frames per second
+    12.7958997514 simulation frames per second
+    13.5710763536 simulation frames per second
+
+When using 4 threads with static scheduling and chunksize = num_particles / 4, the number of simulation frame is around 19 per second.
+
+    20.6756514281 simulation frames per second
+    18.8436904719 simulation frames per second
+    18.9189125797 simulation frames per second
+
+The performance boost here is because we're computing the particle states in a parallel way. However, the performance boost is not proportional to number of threads.
+
+### Spatial Decomposition
+
+When using spatial decomposition, the time complexity for sub_update() drops from O(N^2) to O(N). 
+
+For single thread, the number of simulation frame is around 550-580 per second.
+
+    543.648688935 simulation frames per second
+    569.190380618 simulation frames per second
+    584.453873433 simulation frames per second
+    583.482277002 simulation frames per second
+    585.379687653 simulation frames per second
+
+For 4 threads, the number of simulation frame is around 900-1000 per second.
+
+    949.08281145 simulation frames per second
+    1012.96578374 simulation frames per second
+    983.976454865 simulation frames per second
+    988.496589432 simulation frames per second
+    853.732825826 simulation frames per second
+
+### Spatially Coherent Sorting
+
+When using spatially coherent sorting, the time complexity increases from O(N) to O(N*logN) because of the sorting. However, we can expect a much better cache coherence. In this assignment I used Morton Code Order sort. 
+
+For single thread, the number of simulation frame is around 650-700 per second.
+
+    713.899782135 simulation frames per second
+    686.016355904 simulation frames per second
+    640.879263383 simulation frames per second
+    621.444131654 simulation frames per second
+    658.640337619 simulation frames per second
+
+For 4 threads, the number of simulation frame is around 1100-1200 per second.
+
+    1206.46491432 simulation frames per second
+    1213.96375753 simulation frames per second
+    1197.5009211 simulation frames per second
+    1213.98089725 simulation frames per second
+    1130.78399655 simulation frames per second
+    1150.22349455 simulation frames per second
+
+### Locking
+
+When using Locking mechanism for correctness, the performance dropped, because locking forces some serial order among concurrent threads, to around 700-800 per second.
+
+    681.908250915 simulation frames per second
+    706.012736709 simulation frames per second
+    769.624221038 simulation frames per second
+    783.187366624 simulation frames per second
+    776.402227 simulation frames per second
+    774.954713122 simulation frames per second

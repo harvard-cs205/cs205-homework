@@ -1,0 +1,17 @@
+# P3 write up
+
+Using only thread-level parallelism without AVX
+
+1 thread:   1074.656613 Million Complex FMAs in 4.31406807899 seconds, 249.105158593 million Complex FMAs / second
+2 threads:  1074.656613 Million Complex FMAs in 2.14328384399 seconds, 501.406575714 million Complex FMAs / second
+4 threads:  1074.656613 Million Complex FMAs in 1.14892983437 seconds, 935.354432321 million Complex FMAs / second
+
+We can see that the throughput increased proportional to the number of threads being used.
+
+Using both thread-level parallelism and AVX
+
+1 thread:   1074.94829 Million Complex FMAs in 0.621812105179 seconds, 1728.73490408 million Complex FMAs / second
+2 threads:  1074.94829 Million Complex FMAs in 0.315968036652 seconds, 3402.07921469 million Complex FMAs / second
+4 threads:  1074.94829 Million Complex FMAs in 0.216665029526 seconds, 4961.33728804 million Complex FMAs / second
+
+AVX is insane.
