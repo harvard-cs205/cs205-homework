@@ -11,7 +11,7 @@ if __name__ == "__main__":
     devices = [d for platform in platforms for d in platform.get_devices()]
     for i, d in enumerate(devices):
         print("#{0}: {1} on {2}".format(i, d.name, d.platform.name))
-    ctx = cl.Context(devices)
+    ctx = cl.Context(devices[1:])
 
     queue = cl.CommandQueue(ctx, properties=cl.command_queue_properties.PROFILING_ENABLE)
 
@@ -30,7 +30,6 @@ if __name__ == "__main__":
             event = program.sum_coalesced(queue, (num_workgroups * num_workers,), (num_workers,),
                                           x, partial_sums, local, np.uint64(N))
             cl.enqueue_copy(queue, host_partial, partial_sums, is_blocking=True)
-
             sum_gpu = sum(host_partial)
             sum_host = sum(host_x)
             seconds = (event.profile.end - event.profile.start) / 1e9
