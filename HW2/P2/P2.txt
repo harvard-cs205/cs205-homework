@@ -1,0 +1,8 @@
+Serial uncorrelated: 0.303185939789 seconds
+Fine grained uncorrelated: 6.05953598022 seconds
+Medium grained uncorrelated: 7.50213098526 seconds
+Serial correlated: 0.365971803665 seconds
+Fine grained correlated: 5.79004693031 seconds
+Medium grained correlated: 7.57752990723 seconds
+
+With N = 10, we actually get worse performance than with the fine grained locking. This is because many threads have to wait for each other in order to get locks. In the fine grained example, things took a long time to run becauase of overhead in creating and grabbing locks. 

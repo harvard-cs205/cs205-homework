@@ -1,0 +1,10 @@
+1 Thread 
+4.75295901299 seconds for 10 filter passes.
+
+2 Threads
+1.80794882774 seconds for 10 filter passes.
+
+4 Threads
+1.72959399223 seconds for 10 filter passes.
+
+It seems like we get a great improvement from 1 to 2 threads, but then afterwards the adding more threads doesn't help us too much. The reason is similar to that of problem 1, where if we use more fine-grained locking, sometimes the overhead will be quite large that it cancels out the time gained by having extra threads. 

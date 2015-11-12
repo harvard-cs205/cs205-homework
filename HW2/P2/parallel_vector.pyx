@@ -81,10 +81,17 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
    ##########
    with nogil:
        for r in range(repeat):
-           for idx in range(src.shape[0]):
+           for idx in prange(src.shape[0], num_threads = 4):
                if counts[src[idx]] > 0:
-                   counts[dest[idx]] += 1
-                   counts[src[idx]] -= 1
+                  # acquire and release first lock for source
+                  acquire(&(locks[src[idx]]))
+                  counts[src[idx]] -= 1
+                  release(&(locks[src[idx]]))
+
+                  # acquire and release second lock for destination
+                  acquire(&(locks[dest[idx]]))
+                  counts[dest[idx]] += 1
+                  release(&(locks[dest[idx]]))
 
    free_N_locks(counts.shape[0], locks)
 
@@ -107,9 +114,16 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
    ##########
    with nogil:
        for r in range(repeat):
-           for idx in range(src.shape[0]):
+           for idx in prange(src.shape[0], num_threads = 4):
                if counts[src[idx]] > 0:
-                   counts[dest[idx]] += 1
-                   counts[src[idx]] -= 1
+                  # acquire and release first lock for source
+                  acquire(&(locks[src[idx]/N]))
+                  counts[src[idx]] -= 1
+                  release(&(locks[src[idx]/N]))
+
+                  # acquire and release second lock for destination
+                  acquire(&(locks[dest[idx]/N]))
+                  counts[dest[idx]] += 1
+                  release(&(locks[dest[idx]/N]))
 
    free_N_locks(num_locks, locks)

@@ -11,7 +11,7 @@ pyximport.install()
 import mandelbrot
 from timer import Timer
 
-import pylab as plt
+import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -28,11 +28,14 @@ def make_coords(center=(-0.575 - 0.575j),
 if __name__ == '__main__':
     in_coords, out_counts = make_coords()
 
+    print in_coords.shape
+
     with Timer() as t:
         mandelbrot.mandelbrot(in_coords, out_counts, 1024)
     seconds = t.interval
 
     print("{} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
+    print out_counts
 
     plt.imshow(np.log(out_counts))
     plt.show()
