@@ -1,1 +1,12 @@
 # Your discussion here
+(a)
+In P2a, the parallelize function directly partitioned range(200) by 10 so pixels actually are partitioned by
+their locations. Pixel locations close to one another tend to be in the same partition.
+However, because pixel locations close to one another tend to have similar final iteration counts, the work
+in each partition would be very unbalanced which we could see from P2a_hist.png.
+
+In P2b, we shuffled the list (range(200)) first and then partition it so in each partition the pixel locations
+would be disperse and thus the work would be much more balanced.
+
+(b)
+The cost is that shuffle takes time. If we have millions of pixels, then the shuffle would take a lot of time.
