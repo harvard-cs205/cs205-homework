@@ -20,11 +20,32 @@ initialize_labels(__global __read_only int *image,
 int
 get_clamped_value(__global __read_only int *labels,
                   int w, int h,
+                  int x, int y);
+int
+get_clamped_value(__global __read_only int *labels,
+                  int w, int h,
                   int x, int y)
 {
     if ((x < 0) || (x >= w) || (y < 0) || (y >= h))
         return w * h;
     return labels[y * w + x];
+}
+
+
+int
+get_min(int x, int up, int down, int left, int right);
+
+int
+get_min(int x, int up, int down, int left, int right)
+{
+    // Returns the minimum of its inputs
+    // There is probably a better way to do this
+    int min;
+    if (up > down) min = down; else min = up;
+    if (min > left) min = left;
+    if (min > right) min = right;
+    if (min > x) min = x;
+    return min;
 }
 
 __kernel void
@@ -60,7 +81,7 @@ propagate_labels(__global __read_write int *labels,
     int old_label;
     // Will store the output value
     int new_label;
-    
+
     // Load the relevant labels to a local buffer with a halo 
     if (idx_1D < buf_w) {
         for (int row = 0; row < buf_h; row++) {
@@ -80,20 +101,47 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
+    // for (int i = y - ly; i < buf_h; i++) {
+    //     for (int j = x - lx; j < buf_w; j++) {
+    //         buffer[i * buf_w + j] = labels[buffer[i * buf_w + j]];
+    //     }
+    // }
+
+    int prev = -1, idx = -1;
+
+    for (int i = y - ly; i < buf_h; i++) {
+        for (int j = x - lx; j < buf_w; j++) {
+            if (idx == buffer[i * buf_w + j]) {
+                buffer[i * buf_w + j] = prev;
+            }
+
+            else {
+                idx = buffer[i * buf_w + j];
+                prev = labels[buffer[i * buf_w + j]];
+                buffer[i * buf_w + j] = prev;
+            }
+        }
+    } 
+
+    barrier(CLK_LOCAL_MEM_FENCE);
     
     // stay in bounds
     if ((x < w) && (y < h)) {
-        // CODE FOR PART 1 HERE
-        // We set new_label to the value of old_label, but you will need
-        // to adjust this for correctness.
-        new_label = old_label;
+        if (old_label < w * h)
+            new_label = get_min(old_label,
+                                buffer[(buf_y - 1) * buf_w + buf_x],
+                                buffer[(buf_y + 1) * buf_w + buf_x],
+                                buffer[buf_y * buf_w + buf_x - 1],
+                                buffer[buf_y * buf_w + buf_x + 1]);
+        else
+            new_label = old_label;
 
         if (new_label != old_label) {
-            // CODE FOR PART 3 HERE
             // indicate there was a change this iteration.
             // multiple threads might write this.
             *(changed_flag) += 1;
-            labels[y * w + x] = new_label;
+            atomic_min(&labels[old_label], new_label);
+            atomic_min(&labels[y * w + x], new_label);
         }
     }
 }
