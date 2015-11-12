@@ -1,1 +1,23 @@
-# Your discussion here
+I represent the graph as an adjacency list where the keys are the nodes and 
+the values are sets of neighbors of the nodes. When implementing the BFS job,
+I keep track of the traversed nodes and the search terminates when the number 
+of neighbors yet to be traversed drops to 0.
+
+Below are the number of nodes touched in both the serial implementation and 
+parallel implementation of BFS job. The root is not counted.
+
+CAPTAIN AMERICA
+Nodes touched: 6407
+
+ORWELL
+Nodes touched: 8
+
+MISS THING/MARY
+Nodes touched: 6
+
+The maximum number of steps is equal to the diameter of the graph as you 
+reach nodes you've already traversed beyond the diameter.
+
+If a character does not have a defined distance during the search, this means
+that the character is not connected with the root character via other 
+characters in associated comics.
