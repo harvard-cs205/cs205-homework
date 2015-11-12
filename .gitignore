@@ -1,3 +1,5 @@
-*~
-*.pyc
-*.pyxbldc
+# Large data files
+HW1/P5/links-simple-sorted.txt
+HW1/P5/titles-sorted.txt
+
+

@@ -1,3 +1,5 @@
+# Note: includes all my comments from reviewing the skeleton code
+
 #cython: boundscheck=False, wraparound=False
 
 cimport numpy as np
@@ -27,21 +29,32 @@ cdef inline FLOAT GETPIX(FLOAT[:, :] im, int i, int j) nogil:
         j = im.shape[1] - 1
     return im[i, j]
 
-# median filtering
+# Median filtering
 cpdef median_3x3(FLOAT[:, :] input_image,
                  FLOAT[:, :] output_image,
                  int offset, unsigned int step):
     cdef:
         int i, j
 
+    # Check that dimensions of input and output images match
     assert input_image.shape[0] == output_image.shape[0], "median requires same size images for input and output"
     assert input_image.shape[1] == output_image.shape[1], "median requires same size images for input and output"
 
     with nogil:
+        
+        # Starting point based on number of threads
         i = offset
+
+        # Loop through all relevant rows (starting point based on # of threads)
         while i < input_image.shape[0]:
-            for j in range(input_image.shape[1]):  # columns
-                    output_image[i, j] = median9(GETPIX(input_image, i-1, j-1), GETPIX(input_image, i-1, j), GETPIX(input_image, i-1, j+1),
-                                                 GETPIX(input_image, i,   j-1), GETPIX(input_image, i,   j), GETPIX(input_image, i,   j+1),
-                                                 GETPIX(input_image, i+1, j-1), GETPIX(input_image, i+1, j), GETPIX(input_image, i+1, j+1))
+
+            # Loop through columns
+            for j in range(input_image.shape[1]):
+
+                # Calculate median of 3x3 block surrounding pixel
+                output_image[i, j] = median9(GETPIX(input_image, i-1, j-1), GETPIX(input_image, i-1, j), GETPIX(input_image, i-1, j+1),
+                                             GETPIX(input_image, i,   j-1), GETPIX(input_image, i,   j), GETPIX(input_image, i,   j+1),
+                                             GETPIX(input_image, i+1, j-1), GETPIX(input_image, i+1, j), GETPIX(input_image, i+1, j+1))
+            
+            # Increment based on number of threads
             i += step

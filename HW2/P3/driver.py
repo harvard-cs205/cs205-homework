@@ -14,7 +14,6 @@ from timer import Timer
 import pylab as plt
 import numpy as np
 
-
 # create coordinates, along with output count array
 def make_coords(center=(-0.575 - 0.575j),
                 width=0.0025,
@@ -26,13 +25,27 @@ def make_coords(center=(-0.575 - 0.575j),
 
 
 if __name__ == '__main__':
+
     in_coords, out_counts = make_coords()
 
+    # Multi-threading without instruction-level parallelism:
+
     with Timer() as t:
-        mandelbrot.mandelbrot(in_coords, out_counts, 1024)
+        mandelbrot.mandelbrot_without_avx(in_coords, out_counts, 1024)
     seconds = t.interval
 
-    print("{} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
+    print("Without AVX: {} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
+
+    plt.imshow(np.log(out_counts))
+    plt.show()
+
+    # Multi-threading with instruction-level parallelism:
+
+    with Timer() as t:
+        mandelbrot.mandelbrot_with_avx(in_coords, out_counts, 1024)
+    seconds = t.interval
+
+    print("With AVX: {} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
 
     plt.imshow(np.log(out_counts))
     plt.show()
