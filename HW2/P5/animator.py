@@ -1,3 +1,5 @@
+import matplotlib
+matplotlib.use('TKagg')
 import matplotlib.pyplot as plt
 from matplotlib.collections import EllipseCollection
 import numpy as np
@@ -15,14 +17,14 @@ class Animator(object):
         self.ax = ax
 
         diameters = np.ones(self.count) * diameter
-        colors = [randcolor() for _ in range(self.count)]
+        self.colors = np.array([randcolor() for _ in range(self.count)])
         self.circles = EllipseCollection(widths=diameters,
                                          heights=diameters,
                                          angles=np.zeros_like(diameters),
                                          units='xy',
                                          offsets=positions,
                                          transOffset=ax.transData,
-                                         edgecolor='face', facecolor=colors)
+                                         edgecolor='face', facecolor=self.colors)
         ax.add_collection(self.circles)
 
         ax.axis([0, 1, 0, 1])
@@ -33,4 +35,5 @@ class Animator(object):
 
     def update(self, positions):
         self.circles.set_offsets(positions)
+        self.circles.set_color(self.colors)
         plt.draw()

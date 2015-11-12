@@ -1,0 +1,74 @@
+>>Characterize the performance of each approach (coarse, medium, and fine-grained locking)
+on the two cases in P2.py: random data exchanges and correlated data exchanges.
+
+Let us list the running times of each scenario first.
+
+#### Uncorrelated ####
+serial: 0.20 seconds
+fine grained: 3.67 seconds
+medium grained: I plotted this as a function of N. See "uncorrelated_vs_N.png". Times range from 6.5 seconds to 17
+                seconds depending on N. Note that multiple runs were averaged together to make this plot.
+
+#### Correlated ####
+serial: 0.21 seconds
+fine grained: 2.56 seconds
+medium grained: See "correlated_vs_N.png". Times range from 4 seconds to about 10 seconds depending on N. Note that
+                multiple runs were averaged together to make this plot.
+
+Let us now characterize the performance of each approach.
+
+1. Fine Grained
+
+a) Uncorrelated
+
+In the fine grained case, we have a lock for each element in the counts array. The idea here is that the overhead
+associated with grabbing, releasing, and waiting for a lock will be offset by the speedup of 4 simultaneous threads
+moving data around. Unfortunately, the fine grained uncorrelated code runs almost 10 times slower than the serial
+uncorrelated case! Evidently, the penalty of using locks is greater than the gain of using 4 simultaneous threads.
+
+b) Correlated
+
+The correlated fine-grained code runs *faster* than the uncorrelated code. This is surprising to me...naively, I would
+expect that if the source and destination are correlated when transferring data, there would be more contention for locks
+(i.e. different threads would be more likely to simultaneously read and write to the same indices).
+This does not appear to be the case. I think this must be attributed to OpenMP and compiler strangeness.
+
+2. Medium Grained
+
+a) Uncorrelated
+
+Now, there are less locks; a single lock controls access to multiple array elements. Naively, this could be a good
+choice as it will lessen the penalty of assigning and releasing many locks. It will only speed up the code if there
+is not a lot of contention for the locks; if N is too big relative to the total number of indices in the array,
+there will be too much contention for locks and the code will slow down.
+
+See plot "uncorrelated_vs_N.png". Strangely, when N=1, we record a time of roughly 9 seconds. N=1 corresponds to the
+fine-grained case where we recorded a time of roughly 2.56 seconds; evidently the overhead associated with assigning
+locks is large (i.e. doing division and addition). I again attribute this to compiler strangeness.
+
+Regardless, the trends we see in the plot make sense; there is a peak in time around N=3; the combination of many locks
+and increased contention for locks must create this. After N=3, the time elapsed falls off rapidly and reaches a minimum
+at approximately N=30. This must be the sweet spot between assigning and maintaining many locks and contention. As
+expected, as N is increased further, the time elapsed increases, likely as a result of increased contention for locks
+(N is no longer small relative to the total number of indices). Strangely, as N grows even larger, there appears to be
+a slight dip in the time elapsed; I am not exactly sure what causes
+this; it could be due to stochastic fluctuations in the execution of the code.
+
+I think the takeaway message here is that fine-grained and coarse-grained locking are rarely ideal; a medium-grained,
+balanced locking technique is generally the best.
+
+b) Correlated
+
+In the correlated case, the source and destination indices are within 10 indices of each other. This suggests that we can
+decompose the problem into groups of 10 indices at a time. Naively, we expect lock contention to be minimized when
+each index has its own lock. If N > 10, there should always be contention for locks, as the source and destination
+will be contained within the same lock; the other indices within the lock will fight for lock control.
+
+See "correlated_vs_N.png" for my results. Even though lock contention is likely increased for N > 10, we find a minimum
+time of roughly N ~ 35. This implies that the overhead associated with maintaining grabbing, and releasing locks is very
+large; there is a much greater penalty for having many locks than fighting to grab a few.
+
+At N larger than 35, the code again becomes slow. This is likely because at large N, less elements can be swapped at
+once, as a single lock controls a large number of indices relative to the total number of
+indices. N ~ 35 must be the sweet spot because it avoids the overhead of having too many locks
+and avoids contention due to too many locked indices at once (large N).

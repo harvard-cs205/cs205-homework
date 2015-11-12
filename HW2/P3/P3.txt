@@ -1,0 +1,68 @@
+I will list the performance for each case below.
+
+#### Default Serial ####
+
+1074.69 Million Complex FMAs in 3.04275608063 seconds
+353.196613045 million Complex FMAs / second
+
+##### prange alone ####
+
+prange with one thread:
+1074.691142 Million Complex FMAs in 3.09189105034 seconds
+347.583768155 million Complex FMAs / second
+
+prange with two threads:
+1074.691142 Million Complex FMAs in 1.547093153 seconds
+694.651863668 million Complex FMAs / second
+
+prange with four threads:
+1074.691142 Million Complex FMAs in 0.777901887894 seconds,
+1381.5253038 million Complex FMAs / second
+
+prange with 12 threads (max):
+1074.691142 Million Complex FMAs in 0.296374082565 seconds
+3626.13064104 million Complex FMAs / second
+
+
+#### prange and AVX ####
+
+prange with one thread:
+1074.94829 Million Complex FMAs in 0.585830926895 seconds
+1834.9121575 million Complex FMAs / second
+
+prange with two threads:
+1074.94829 Million Complex FMAs in 0.314192056656 seconds
+3421.30956919 million Complex FMAs / second
+
+prange with four threads:
+1074.94829 Million Complex FMAs in 0.174145936966 seconds
+6172.68659108 million Complex FMAs / second
+
+prange with 12 threads (max):
+1074.94829 Million Complex FMAs in 0.11225104332 seconds
+9576.28774049 million Complex FMAs / second
+
+############ Summary ##########################
+
+See the plot "timing_vs_technique_scaled.png". For 1, 2, and 4 threads we see behavior
+we expect. For 1 thread vs. serial code, the threaded code runs slightly slower
+due to the overhead of threading. When we we add two threads, we get a speedup
+of approximately 2. When we have 4 threads, we get a speedup of approximately 4. Interestingly,
+when we use 12 threads (the number of effective cores my computer has), we find a speedup of
+about 10, indicating that the execution speed does not scale perfectly with the number of cores. This could
+be due to a bottleneck in the code (i.e. with an infinite number of cores, we would only see a speedup of about
+10x), or could represent the cost associated with creating and maintaining additional parallel jobs.
+
+When we add AVX and threading, the results are more unexpected. Naively, since we operate on 8 numbers at once,
+we would expect the speed with N threads relative to serial code to be roughly 8N. Instead, with
+1 thread, we speedup of about 5x, 2 threads ~ 10x, 4 threads ~18x, and 12 threads ~ 28x. So, for 1 to 4 threads,
+we see a speedup of roughly 5N instead of 8N. The reason for this imperfect
+scaling is likely that when we are operating on 8 numbers at once, we do not stop operating on them until *all*
+pixels have finished. Hence, the speedup in each set of 8 is limited by the slowest pixel, and on average we get a
+speedup of about 5x.
+
+Interestingly, the speedup for 12 threads does not obey the scaling for small numbers of threads (i.e. for N threads,
+we got a speedup of 5N). This could be because my desktop has 6 physical cores which, via hyperthreading, act like 12.
+If each physical core can only process one set of AVX instructions at once, our maximum expected speedup would be
+about 6*5 = 30x instead of 12*5 = 60x (what I expected via hyperthreading) which is approximately what we see.
+Hopefully the OpenCL unit will teach me how to identify how many sets of AVX instructions my cores can run at once!
