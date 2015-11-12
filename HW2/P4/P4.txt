@@ -1,0 +1,16 @@
+Written part for Problem 4
+By Matheus C. Fernandes
+
+The way I implemented this code was by looking at the lines of the image and trying to divided each line uniformly between the threads. Each thread then reports their status to the threadEvent array which keeps track of which thread is done for which itteration. Before a thread can continue to the next iteration, they must verify with the threadEvent array to see if their neighboring lines are finished being worked on by the neighboring lines. The code takes into consideration the last and the first thread to make sure that the lines neighboring which will invoke the other end of the number of threads are done being worked on. 
+
+RESUTLS FOR THE CODE:
+
+The following is the output of the code continaing the information for comparison between the number of threads and thus coparing the parallel performance.
+
+For non threaded it takes 3.20597219467 seconds for 10 filter passes.
+For 2 threads it takes 1.61033391953 seconds for 10 filter passes.
+For 4 threads it takes 1.65549111366 seconds for 10 filter passes.
+
+CONCLUSION FROM THE CODE:
+
+Going from no thread to having 2 threads significantly enhanes the performance of the code because it is able to aleternate between lines. However, when you double that, namely having 4 threads, you do not see a doubling in the speed because it has reached a satruration point for the threading scheme. This is an important aspect as the number of threads are hurting the speed of the computation (although very minimaly). This I believe may come from the logistics overhead when one tread is waiting for another thread and if one thread is lagging it will delay the other 3 threads. If you have only 2 threads the lagging will be distributed more evenly between the threads. 

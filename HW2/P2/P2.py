@@ -10,6 +10,7 @@ pyximport.install()
 import numpy as np
 from timer import Timer
 from parallel_vector import move_data_serial, move_data_fine_grained, move_data_medium_grained
+import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
     ########################################
@@ -47,6 +48,21 @@ if __name__ == '__main__':
     assert counts.sum() == total, "Wrong total after move_data_medium_grained"
     print("Medium grained uncorrelated: {} seconds".format(t.interval))
 
+    plot=[]
+    NN=[]
+    for N in range(5,15,3)+range(20,60,10):
+        counts[:] = orig_counts
+        with Timer() as t:
+            move_data_medium_grained(counts, src, dest, 100, N)
+        plot.append(t.interval)
+        NN.append(N)
+    plt.figure()
+    plt.plot(NN,plot)
+    plt.xlabel('N')
+    plt.ylabel('Time in seconds')
+    plt.savefig('MediumGrainedUncorrelated.png')
+   
+
     ########################################
     # Now use correlated data movement
     ########################################
@@ -80,3 +96,17 @@ if __name__ == '__main__':
         move_data_medium_grained(counts, src, dest, 100, N)
     assert counts.sum() == total, "Wrong total after move_data_medium_grained"
     print("Medium grained correlated: {} seconds".format(t.interval))
+
+    plot=[]
+    NN=[]
+    for N in range(5,15,3)+range(20,60,10):
+        counts[:] = orig_counts
+        with Timer() as t:
+            move_data_medium_grained(counts, src, dest, 100, N)
+        plot.append(t.interval)
+        NN.append(N)
+    plt.figure()
+    plt.plot(NN,plot)
+    plt.xlabel('N')
+    plt.ylabel('Time in seconds')
+    plt.savefig('MediumGrainedCorrelated.png')
