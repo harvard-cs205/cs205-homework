@@ -1,0 +1,24 @@
+Performance for pure multithreading:
+
+num_threads = 1
+1074.677197 Million Complex FMAs in 5.38133406639 seconds, 199.704605539 million Complex FMAs / second
+
+num_threads = 2
+1074.677197 Million Complex FMAs in 2.83916711807 seconds, 378.518471195 million Complex FMAs / second
+
+num_threads = 4
+1074.677197 Million Complex FMAs in 1.63223195076 seconds, 658.409606857 million Complex FMAs / second
+
+Performance with AVX and multithreading:
+
+num_threads = 1
+1074.94829 Million Complex FMAs in 1.75275993347 seconds, 613.288944751 million Complex FMAs / second
+
+num_threads = 2
+1078.144806 Million Complex FMAs in 0.943248033524 seconds, 1143.01304395 million Complex FMAs / second
+
+num_threads = 4
+1077.290872 Million Complex FMAs in 0.562258958817 seconds, 1916.00481434 million Complex FMAs / second
+
+We see that there are some significant speed-up using AVX vs not. This is
+usually about a factor of 3 faster.
