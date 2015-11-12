@@ -1,0 +1,101 @@
+N=10
+Serial uncorrelated: 0.315571069717 seconds
+Fine grained uncorrelated: 5.07081413269 seconds
+Medium grained uncorrelated: 6.37231898308 seconds
+Serial correlated: 0.329191923141 seconds
+Fine grained correlated: 4.82436203957 seconds
+Medium grained correlated: 4.8664867878 seconds
+
+N=100
+Serial uncorrelated: 0.314683198929 seconds
+Fine grained uncorrelated: 5.27880001068 seconds
+Medium grained uncorrelated: 9.99726891518 seconds
+Serial correlated: 0.328505992889 seconds
+Fine grained correlated: 5.10451292992 seconds
+Medium grained correlated: 5.2350051403 seconds
+
+Medium grained uncorrelated: 6.39034605026 seconds with N = 1 -- START GOOD Range
+Medium grained uncorrelated: 6.28729510307 seconds with N = 2
+Medium grained uncorrelated: 6.28529500961 seconds with N = 3 -- BEST
+Medium grained uncorrelated: 6.31388187408 seconds with N = 4
+Medium grained uncorrelated: 6.34997797012 seconds with N = 5
+Medium grained uncorrelated: 6.50552582741 seconds with N = 6
+Medium grained uncorrelated: 6.31980085373 seconds with N = 7
+Medium grained uncorrelated: 6.31497883797 seconds with N = 8
+Medium grained uncorrelated: 6.4181728363 seconds with N = 9
+Medium grained uncorrelated: 6.45673513412 seconds with N = 10
+Medium grained uncorrelated: 6.59830188751 seconds with N = 11
+Medium grained uncorrelated: 6.65455794334 seconds with N = 12 -- END GOOD Range
+Medium grained uncorrelated: 6.68764019012 seconds with N = 13
+Medium grained uncorrelated: 6.7353579998 seconds with N = 14
+Medium grained uncorrelated: 6.79562497139 seconds with N = 15
+Medium grained uncorrelated: 6.98138594627 seconds with N = 16
+Medium grained uncorrelated: 6.8490049839 seconds with N = 17
+Medium grained uncorrelated: 6.89437508583 seconds with N = 18
+Medium grained uncorrelated: 7.20053887367 seconds with N = 19
+Medium grained uncorrelated: 6.41020107269 seconds with N = 10
+Medium grained uncorrelated: 6.75057291985 seconds with N = 20
+Medium grained uncorrelated: 7.13983106613 seconds with N = 30
+Medium grained uncorrelated: 7.48864984512 seconds with N = 40
+Medium grained uncorrelated: 7.9286301136 seconds with N = 50
+Medium grained uncorrelated: 8.22825813293 seconds with N = 60
+Medium grained uncorrelated: 8.63514995575 seconds with N = 70
+Medium grained uncorrelated: 8.99762105942 seconds with N = 80
+Medium grained uncorrelated: 9.42044305801 seconds with N = 90
+Medium grained uncorrelated: 9.84108304977 seconds with N = 100
+Medium grained uncorrelated: 10.3723759651 seconds with N = 110
+Medium grained uncorrelated: 10.7448270321 seconds with N = 120
+Medium grained uncorrelated: 11.0970869064 seconds with N = 130
+Medium grained uncorrelated: 11.7403512001 seconds with N = 140
+Medium grained uncorrelated: 11.9808900356 seconds with N = 150
+Medium grained uncorrelated: 12.3980929852 seconds with N = 160
+Medium grained uncorrelated: 12.5905730724 seconds with N = 170
+Medium grained uncorrelated: 12.8428099155 seconds with N = 180
+Medium grained uncorrelated: 13.2466068268 seconds with N = 190
+
+Medium grained correlated: 6.5096180439 seconds with N = 1
+Medium grained correlated: 6.00705981255 seconds with N = 2
+Medium grained correlated: 5.65381383896 seconds with N = 3
+Medium grained correlated: 5.65820002556 seconds with N = 4
+Medium grained correlated: 5.53510808945 seconds with N = 5
+Medium grained correlated: 5.47714591026 seconds with N = 6
+Medium grained correlated: 5.37173986435 seconds with N = 7
+Medium grained correlated: 5.29881000519 seconds with N = 8
+Medium grained correlated: 5.18535494804 seconds with N = 9
+Medium grained correlated: 5.12440609932 seconds with N = 10
+Medium grained correlated: 5.09733700752 seconds with N = 11
+Medium grained correlated: 5.11191987991 seconds with N = 12
+Medium grained correlated: 4.96078896523 seconds with N = 13
+Medium grained correlated: 4.93442988396 seconds with N = 14
+Medium grained correlated: 4.83690094948 seconds with N = 15
+Medium grained correlated: 4.83068585396 seconds with N = 16
+Medium grained correlated: 4.73991203308 seconds with N = 17
+Medium grained correlated: 4.75149893761 seconds with N = 18
+Medium grained correlated: 4.68187594414 seconds with N = 19
+Medium grained correlated: 4.53862500191 seconds with N = 20
+Medium grained correlated: 4.56312918663 seconds with N = 21
+Medium grained correlated: 4.51694703102 seconds with N = 22
+Medium grained correlated: 4.52618479729 seconds with N = 23
+Medium grained correlated: 4.48813295364 seconds with N = 24 -- START GOOD Range
+Medium grained correlated: 4.49063301086 seconds with N = 25
+Medium grained correlated: 4.5048520565 seconds with N = 26
+Medium grained correlated: 4.45727014542 seconds with N = 27
+Medium grained correlated: 4.45415782928 seconds with N = 28
+Medium grained correlated: 4.46873402596 seconds with N = 29
+Medium grained correlated: 4.44010806084 seconds with N = 30
+Medium grained correlated: 4.41943717003 seconds with N = 40  -- BEST
+Medium grained correlated: 4.47201704979 seconds with N = 50
+Medium grained correlated: 4.47521805763 seconds with N = 60
+Medium grained correlated: 4.54895401001 seconds with N = 70 -- END GOOD RANGE
+Medium grained correlated: 4.60012698174 seconds with N = 80
+Medium grained correlated: 4.70151901245 seconds with N = 90
+Medium grained correlated: 4.86318802834 seconds with N = 100
+Medium grained correlated: 4.87865185738 seconds with N = 110
+Medium grained correlated: 4.93614912033 seconds with N = 120
+Medium grained correlated: 5.02619194984 seconds with N = 130
+Medium grained correlated: 5.15520095825 seconds with N = 140
+Medium grained correlated: 5.25066184998 seconds with N = 150
+Medium grained correlated: 5.43210196495 seconds with N = 160
+Medium grained correlated: 5.64114809036 seconds with N = 170
+Medium grained correlated: 5.78407001495 seconds with N = 180
+Medium grained correlated: 5.90126800537 seconds with N = 190
