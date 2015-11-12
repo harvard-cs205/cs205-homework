@@ -1,0 +1,26 @@
+P3.txt
+
+### Serial Implementation ###
+1074.656613 Million Complex FMAs in 6.37947392464 seconds, 168.455365708 million Complex FMAs / second
+
+### Multithread Implementation ###
+1 Thread
+1074.656613 Million Complex FMAs in 6.59998703003 seconds, 162.827079525 million Complex FMAs / second
+2 Threads
+1074.656613 Million Complex FMAs in 3.32439684868 seconds, 323.263636057 million Complex FMAs / second
+4 Threads
+1074.656613 Million Complex FMAs in 1.87254285812 seconds, 573.902278571 million Complex FMAs / second
+
+### AVX Implementation ###
+1 Thread
+1074.656613 Million Complex FMAs in 1.8737821579 seconds, 573.522705652 million Complex FMAs / second
+2 Threads
+1074.957423 Million Complex FMAs in 0.47437620163 seconds, 2266.04416349 million Complex FMAs / second
+4 Threads
+1074.957423 Million Complex FMAs in 0.386723995209 seconds, 2779.65018028 million Complex FMAs / second
+
+In this problem we worked with the infamous Mandelbrot data set which we have become so familiar with over the past month, and the task was to implement the calculation first using multithreading, then instruction-level parallelism. In the multithread implementation, we can observe that there is performance decrease when comparing the serial version to the 1 threaded solution. This once again highlights the communication costs of using a threaded approach. However, once the number of thread are increased, a significant speed up in the calculation is achieved. By doubling the amount of threads, the same number of complex FMAs are performed in approximately half the time. In the 4 thread implementation, the performance is improved by x3.5. This shows that adding threads to a ridiculous parallel problem does in fact increase the performance.
+
+In the instruction-level parallelism portion of this problem, we were asked to implement the Mandelbrot calculation using 8-way instruction-level parallelism via AVX. The performance boost achieved by implementing SIMD is outstanding. The 8-way parallel implementation with just one thread is almost 4 times faster than the serial version. Using 4 threads, there is a speed up of ~x16!
+
+AVX was quite an adventure for me, I had no experience using SIMD but I have previous programmed in assembly. I have to say that it was very difficult, but also very rewarding. It's obvious that there are real performance benefits associated with AVX, but it comes with a price, which is a complex program. I had to completely change the way I thought about the problem and really consider every implementation decision that I made. The discovery of both fmadd and fmsub turned out to be very helpful for the real and imaginary z calculations. I spent a few office hour sessions walking through this calculation and I have to thank both Kevin, Phillipe and Adi for their assistance. 
