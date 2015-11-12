@@ -1,1 +1,5 @@
-# Your discussion here
+Below are the shortest paths from Kevin Bacon to Harvard University and vice versa.
+
+Kevin_Bacon -> Marisa_Silver -> Harvard_University
+
+Harvard_University -> University_of_Oregon -> National_Lampoon's_Animal_House -> Kevin_Bacon

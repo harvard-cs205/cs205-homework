@@ -1,1 +1,20 @@
-# Your discussion here
+For this problem, my graph representation is:
+
+Character -> [Characters]
+
+which made each entry of my RDD look like:
+
+(Character, [Characters])
+
+In both of these cases, the [Characters] is the adjacency list of characters that are reachable by the original Character via some series of comic books. 
+
+The diameter of the graph is the maximum distance between any two nodes in the graph. In terms of steps of the search, this means that if we have a graph of diameter d, then no more than d iterations of BFS should be executed to touch any reachable node of the graph.
+
+
+For each of the characters below, their number of touched nodes are (including the root itself):
+
+'CAPTAIN AMERICA': 6408
+'MISS THING/MARY': 7
+'ORWELL': 9
+
+If a character has an undefined distance during the search, then it could mean that the character is either disconnected from the source vertex (i.e. you cannot reach that character), or it does not exist in the graph at all. This is due to the fact that because we know the diameter d is the maximum distance between any two nodes, then if we still have not reached a given vertex after d iterations of BFS, that vertex must not have been reachable from our source vertex in the first place.

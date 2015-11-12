@@ -1,1 +1,7 @@
-# Your discussion here
+The question asks us to "Discuss your choice in terms of (a) how well it balances work, and (b) its costs, particularly shuffle costs."
+
+In P2a.py, which was the initial Mandelbrot calculation without partitioning, this took about 52 seconds to run. From the histogram, it is obvious that the distribution of work is very skewed right. That is, most of the workers were doing very little work, while there were a small number of workers doing a large amount of work, making the standard deviation relatively high. Therefore, it is clear that the work is not evenly balanced among the workers.
+
+In P2b.py, I used a partitioning strategy that randomized the distribution of the nodes. This took about 49 seconds to run, which is slightly (but not significantly) faster than P2a.py. From the histogram, we can see that this yielded a much more normal distribution of iterations run by each of the partitions, making the standard deviation lower since each of the workers is doing (relatively) similar amounts of work. Therefore, the work is much more evenly balanced among the workers. 
+
+However, looking at the costs, the second method had more than 50% of the time occupied by shuffling, which is definitely concerning. As a result, the second method is only faster if the bottleneck caused by shuffling is outweighted by the increased efficiency and benefits of having the work more balanced.
