@@ -16,7 +16,8 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
                  int max_iterations=511):
     cdef:
        int i, j, iter
-       np.complex64_t c, z
+       # np.complex64_t c, z
+       AVX.float8 z_real, z_imag, c_real, c_imag, iters, fours, ones, newz_real, newz_imag, mask, z_magnitude_squared_avx
 
        # To declare AVX.float8 variables, use:
        # cdef:
@@ -31,18 +32,75 @@ cpdef mandelbrot(np.complex64_t [:, :] in_coords,
     assert in_coords.shape[0] == out_counts.shape[0], "Input and output arrays must be the same size"
     assert in_coords.shape[1] == out_counts.shape[1],  "Input and output arrays must be the same size"
 
+    # with nogil:
+    #     for i in range(in_coords.shape[0]):
+    #         for j in range(in_coords.shape[1]):
+    #             c = in_coords[i, j]
+    #             z = 0
+    #             for iter in range(max_iterations):
+    #                 if magnitude_squared(z) > 4:
+    #                     break
+    #                 z = z * z + c
+    #             out_counts[i, j] = iter
+
+
     with nogil:
-        for i in range(in_coords.shape[0]):
-            for j in range(in_coords.shape[1]):
-                c = in_coords[i, j]
-                z = 0
-                for iter in range(max_iterations):
-                    if magnitude_squared(z) > 4:
-                        break
-                    z = z * z + c
-                out_counts[i, j] = iter
+        for i in prange(in_coords.shape[0], num_threads=4, schedule='static', chunksize=1):
+            # jump in chunks of 8 columns
+            for j in range(0, in_coords.shape[1], 8):
+              # split c and z into real and imaginary components
+              c_real = AVX.make_float8(in_coords[i, j+7].real,
+                                       in_coords[i, j+6].real,
+                                       in_coords[i, j+5].real,
+                                       in_coords[i, j+4].real,
+                                       in_coords[i, j+3].real,
+                                       in_coords[i, j+2].real,
+                                       in_coords[i, j+1].real,
+                                       in_coords[i, j].real)
+              c_imag = AVX.make_float8(in_coords[i, j+7].imag,
+                                       in_coords[i, j+6].imag,
+                                       in_coords[i, j+5].imag,
+                                       in_coords[i, j+4].imag,
+                                       in_coords[i, j+3].imag,
+                                       in_coords[i, j+2].imag,
+                                       in_coords[i, j+1].imag,
+                                       in_coords[i, j].imag)
+              z_real = AVX.float_to_float8(0.0)
+              z_imag = AVX.float_to_float8(0.0)
 
+              iters = AVX.float_to_float8(0.0)
+              fours = AVX.float_to_float8(4.0)
+              ones = AVX.float_to_float8(1.0)
+              for iter in range(max_iterations):
+                  # zr^2 + zi^2
+                  z_magnitude_squared_avx = AVX.fmadd(z_real, z_real, AVX.mul(z_imag, z_imag))
+                  mask = AVX.less_than(z_magnitude_squared_avx, fours)
+                  # if all magnitudes are greater than 4, exit the loop
+                  if AVX.signs(mask) == 0:
+                      break
+                  iters = AVX.add(iters, AVX.bitwise_and(mask, ones))
+                  # zr' = zr^2 - zi^2
+                  newz_real = AVX.fmsub(z_real, z_real, AVX.mul(z_imag, z_imag))
+                  # zi' = 2zrzi
+                  newz_imag = AVX.fmadd(z_real, z_imag, AVX.mul(z_real, z_imag))
+                  z_real = AVX.add(newz_real, c_real)
+                  z_imag = AVX.add(newz_imag, c_imag)
+              counts_to_output(iters, out_counts, i, j)
 
+# taken from instructor's piazza post, ensures threads don't clobber each other
+# and deals with ints instead of flaots
+cdef void counts_to_output(AVX.float8 counts,
+                      np.uint32_t [:, :] out_counts,
+                      int i, int j) nogil:
+    cdef:
+        float tmp_counts[8]
+        int val, simd
+
+    AVX.to_mem(counts, &(tmp_counts[0]))
+
+    simd = 8
+    for val in range(simd):
+        out_counts[i, j+val] = <np.uint32_t>tmp_counts[val]
 
 # An example using AVX instructions
 cpdef example_sqrt_8(np.float32_t[:] values):

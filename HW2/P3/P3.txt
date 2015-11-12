@@ -1,0 +1,24 @@
+Without simd parallelism:
+
+1 thread:
+1074.656613 Million Complex FMAs in 5.18065714836 seconds, 207.436350684 million Complex FMAs / second
+
+2 threads:
+1074.656613 Million Complex FMAs in 2.54523897171 seconds, 424.126706429 million Complex FMAs / second
+
+4 threads:
+1074.656613 Million Complex FMAs in 1.34523897171 seconds, 798.85926263 million Complex FMAs / second
+
+
+
+With simd parallelism:
+
+1 thread:
+1074.94829 Million Complex FMAs in 0.751341819763 seconds, 1430.70472284 million Complex FMAs / second
+
+2 threads:
+1074.94829 Million Complex FMAs in 0.345108032227 seconds, 3114.81678089 million Complex FMAs / second
+
+4 threads:
+1074.94829 Million Complex FMAs in 0.171285867691 seconds, 6275.75587228 million Complex FMAs / second
+

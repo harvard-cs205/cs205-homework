@@ -1,0 +1,26 @@
+Serial uncorrelated: 0.268878936768 seconds
+Fine grained uncorrelated: 4.4031829834 seconds
+Medium grained uncorrelated: (look at figure 1 for different values of N)
+Coarse grained uncorrelated: 12.7589728832 seconds
+
+Serial correlated: 0.273308038712 seconds
+Fine grained correlated: 4.15658903122 seconds
+Medium grained correlated: (look at figure 1 for different values of N)
+Coarse grained correlated: 13.2592439651 seconds
+
+It's obvious that serial was much better than better, because there was no locking overhead and no idle waiting. However, the results were probably all messed up, so it is a price we have to pay for correctness.
+
+We notice that there's not that much of a difference between coarse grain uncorrelated and correlated, but they're both pretty bad, because threads will have to wait for each other so this is similar to the serial implementation, except with the overhead of locking, so pretty horrible. 
+
+Fine-grained was better than medium-grained, even though it introduced more locking overhead, because parallel threads did not wait for each other since they were very likely to be accessing different locks anyway. 
+Notice however that fine-grained was even better for correlated than uncorrelated, and that's because each thread was more likely to be using the same lock for src and dest, meaning that there was less locking overhead within the thread's execution. 
+
+For uncorrelated:
+medium-grained locking gets worse the larger N gets, and that is because it's more likely that threads will wait for each other for longer, since they are more likely to be using the same lock. 
+
+For correlated:
+medium-grained locking gets better at first as we increase N, and that is because within one thread's execution, it was more likely to be using the same lock for src and dest so less locking overhead (optimal range for N around 20 which makes sense if src and dest are at most 10 apart). However, when N got larger (> 30), the performance became worse, and that's because parallel threads were more likely to be using the same lock and therefore had to wait for each other.
+
+
+Therefore, a good N for uncorrelated access would be the smallest N possible, so 2 for example.
+And a good N for correlated access would be around 20.
