@@ -44,11 +44,10 @@ __kernel void sum_blocked(__global float* x,
     size_t i = get_global_id(0);
     size_t k = (size_t)ceil((float)N / (float)get_global_size(0));
     size_t n = (size_t)N;
-    size_t L = get_global_size(0);
 
     // Partial sum
 
-    for (size_t j = i * L; j < i * L + L ; j++) {
+    for (size_t j = i * k; j < i * k + k ; j++) {
         if (j < n) {
             sum += x[j];
         }
