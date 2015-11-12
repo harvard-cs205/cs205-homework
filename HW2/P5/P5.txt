@@ -1,0 +1,37 @@
+# In this problem, I have discussed with Peilin Duan, Xiaowen Chang and Jeewon Hwang
+
+Part 1 Multithreading:
+	Parallelzation with number of thread = 1:
+		the program simulated 12-14 frames per sec
+	Parallelzation with number of thread = 4:
+		the program simulated 41-46 frames per sec
+
+Part 2 Spatial Decomposition:
+	Parallelzation with number of thread = 1:
+		the program simulated 900-1100 frames per sec
+	Parallelzation with number of thread = 4:
+		the program simulated 2200 - 2300 frames per sec
+
+	With out using grid, the multithreading has a speed up as expected. Using number of thread = 4, the program has about 4 times frames per sec comparing the run the program serial.
+
+	With the grid, the spatial decomposition improve the performance a lot compared with no spatial decomposition implementation. This may because if we don't use grid, for each ball we compare it to all other balls for collide and overlap. However, actually for a single ball, it is very unlikely for it to collide with another ball far away from it. Since the size of neighbor is fixed, for each ball, its number of neighbor is almost fixed. When we grided the whole space, for each ball, we actually only compare it with its close neighbor for collide and overlap. Thus, by using grid, we reduced the totally number of comparision changed from O(n^2) to O(n) and resulted in the big performance improvement.
+
+	With the grid, the FPS of running on 4 threads is about double that of 1 single thread. The speedup is about 2 instead of 4. This may because with the grid implement, each time we need to update the position of grid and result in higher overhead. The higher overhead reduce the speed up of parallelization.
+
+Part 3 Spatially Coherent Sorting
+	Parallelzation with number of thread = 1:
+		the program simulated 1300-1400 frames per sec
+	Parallelzation with number of thread = 4:
+		the program simulated 2600 - 2700 frames per sec
+
+	The sorting method I used in the problem is Morton and I refered to the code on wikipedia website. The FPSes of running on 1 thread and 4 threads are both higher than those without ordering. The sorting put the ball closer to each other in close memory location and thus enhance the access efficiency when the program tring to fetch ball's position. 
+
+	Similiarly, the speedup of griding with sorting is about 2 which is close the the griding without sorting. 
+
+Part 4 Locking:
+	Parallelzation with number of thread = 1:
+		the program simulated 500-600 frames per sec
+	Parallelzation with number of thread = 4:
+		the program simulated 1800 - 1950 frames per sec
+
+	With locking, the performance of sorting and griding running on 4 threads are actually deccreased from 2600 - 2700 FPS to 1800 - 1950 FPS. This may because the locking method I used is a fine grained locking. In this method, I add a lock for each ball. The overhead for acquiring and releasing the lock is high and thus result in a decreased performance.

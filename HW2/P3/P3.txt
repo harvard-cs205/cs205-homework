@@ -1,0 +1,19 @@
+parallelization with prange:
+	Thread = 1:
+		1074.94829 Million Complex FMAs in 9.49916887283 seconds
+	Thread = 2:
+		1074.947782 Million Complex FMAs in 4.37321305275 seconds
+	Thread = 4:
+		1074.973929 Million Complex FMAs in 2.17788004875 seconds
+
+parallelization with prange + AVX instruction level:
+	Thread = 1:
+		1074.947782 Million Complex FMAs in 0.867263266965 seconds
+	Thread = 2:
+		1074.947782 Million Complex FMAs in 0.468961029913 seconds
+	Thread = 4:
+		1074.947782 Million Complex FMAs in 0.224550029287 seconds
+
+When we parallelize the program without using AVX instruction, the speedup is as expected. As the number of thread double, the time is about the half.
+
+When we parallelize the program with AVX instructions, the program could parallely calculate 0 float numbers. The performance is significantly better than the performance of parallelization with only prange. Also, as the number of threads double, the running time is about half.
