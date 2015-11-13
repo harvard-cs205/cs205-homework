@@ -1,0 +1,44 @@
+Explanation of files:
+=======================
+
+driver.py is the original driver file. This can be run with physics_sp1.pyx or physics_sp2.pyx to see the results of subproblem 1 (threading) and 2 (gridding) respectively.
+driver_sp3.py is the driver file corresponding to subproblem 3 (i.e., spatial sorting included). physics_sp2.pyx should be driven by driver_sp3.py to see results for subproblem 3, i.e., the improvement given by spatially coherent sorted on top of gridding.
+physics_sp4.pyx corresponds to subproblem 4, i.e. locking had been enabled. physics_sp4.pyx can be ran with driver_3.py for a computation involving gridding, locking, and sorting. To comparing gridding and sorting to gridding, locking, and sorting, we run physics_sp4.pyx with driver_3.py vs running physics_sp3.pyx with driver_3.py.
+
+Subproblem 1:
+==============
+
+I have to say, times I have tested this in the past have gotten me much higher FPS. I'm not sure why.
+
+1 thread: ~12 FPS
+4 threads: ~25 FPS
+
+We naturally expect a pretty significant speedup in switching to multiple threads for this problem as the problem is highly parallelizable. Because we ignore the locking issues at this stage, every computation is entirely independent of every other computation. For this reason, I would expect 4 threads to incur a 4x speedup. In fact, I believe I have seen this on previous runs on this PC (which is a quad-core, although I only saw a 2x speedup on my Mac with hyperthreading), but for some reason at the moment my computer appears to be having trouble running this code. I do not have a good explanation as to why the speedup would only be 2x versus 4x given that there is no communication overhead or locking required, and that all required memory is shared.
+
+
+Subproblem 2:
+==============
+
+1 thread: ~1000 FPS
+4 threads: ~2300-3000 FPS (varies widely depending on the number of collisions occurring)
+
+The speedup in going from 1 threads to 4 threads is comparable in this case to subproblem 1 (i.e., about 2x). This makes sense; the scaling should be preserved as we are solving essentially the same problem. There is, however, an absolutely massive speedup in switching from scanning all the balls to using a grid-based approach. The reasoning is exactly as described in the problem, in that we switch from an O(N^2) algorithm (compare each ball to each other ball) to an O(N) algorithm (compare each ball to at most the 5x5 grid around it).
+
+Subproblem 3:
+================
+
+We chose to use Hilbert ordering for our spatially coherent sorting. This was chosen because it was recommended, there was a significant amount of information about it online (see hilbert.py for a link to a particularly relevant blog post, from which the x,y to hilbert code was taken), and furthermore, I thought it was pretty cool. Last, a bit of what I read online suggested that it was better than Morton ordering at preserving spatial locality, but I'm sure the difference in this case would be minimal.
+
+1 thread: ~1200 FPS
+4 threads: ~4200 FPS
+
+We see a fairly significant speedup in going from the previous subproblem to the current subproblem. This is easy to understand in the context of memory locations. Previously, there was no guarantee that balls close to each other on the grid would have their coordinates data stored close to each other in memory. Such a storage scheme is highly desirable given the grid based approach: we know that we will only be comparing balls that are close to each other in space. Thus, if we can store the data for balls that are close to each other in space close in memory, retrieving the data to calculate collisions will be faster. It does incur an O(N) overhead to calculate the Hilbert ordering at each iteration, sort the data (O(NLogN)), and rearrange it. It is worth noting that this overhead is likely non-negligible as our Grid algorithm is O(N) as well, but clearly it is not significant enough to detract from the overall performance gains due to memory locality.
+
+Comparing 1 thread to 1 thread, we see a 20% speedup, and 4 threads to 4 threads, we see almost twice the speed! Furthermore, it is worth noting that in this case we actually see the expected 4x speedup in going from 1 thread to 4 threads. This perhaps sheds some light on why we did not see such a speedup in the previous case. Without spatially coherent sorting, perhaps the amount of random reads to memory located long distances from each other was enough to negate some of the performance gain from switching to four threads. Such a rationalization can also explain why there is a more significant speedup comparing 4 threads to 4 threads across subproblems than 1 thread to 1 thread: in the previous subproblems, memory access was limiting the speedup provided by increasing the number of threads. By handling these difficulties, we can experience the full speedup.
+
+Subproblem 4
+==============
+
+4 Threads: ~3500 FPS
+
+As expected, we see a decrease in performance when comparing locking (this subproblem) to non-locking (subproblem 3). Adding locking does absolutely nothing to aid performance (only correctness) and adds locking overhead. Previously, all threads could go and update whatever ball they were assigned at a given iteration with no worry about the other balls. Now, when thread i is updating ball n, thread i' cannot access ball n's data until thread i has completed. It is this waiting time that causes the noticeable FPS decrease between subproblem 4 and subproblem 3. However, locking must be enabled to ensure that all balls have their values updated properly!

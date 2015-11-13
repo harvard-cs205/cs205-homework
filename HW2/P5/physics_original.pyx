@@ -4,7 +4,6 @@ cimport numpy as np
 from libc.math cimport sqrt
 from libc.stdint cimport uintptr_t
 cimport cython
-from cython.parallel import prange
 from omp_defs cimport omp_lock_t, get_N_locks, free_N_locks, acquire, release
 
 # Useful types
@@ -56,72 +55,31 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                      float R,
                      int i, int count,
                      UINT[:, ::1] Grid,
-                     float grid_spacing,
-                     omp_lock_t *locks) nogil:
+                     float grid_spacing) nogil:
     cdef:
         FLOAT *XY1, *XY2, *V1, *V2
-        int k, j, dim
-        int grid_x_dim, grid_y_dim
-        FLOAT x1, y1
-        int grid_x1, grid_y1, other_ball_grid_val
-        int first_lock, second_lock, same_lock
+        int j, dim
         float eps = 1e-5
 
     # SUBPROBLEM 4: Add locking
-    acquire(&(locks[i]))
     XY1 = &(XY[i, 0])
     V1 = &(V[i, 0])
-
-    # Get the current particles coordinate to look up in the grid
-    x1 = XY[i, 0]
-    y1 = XY[i, 1]
-    grid_x_dim = Grid.shape[0]
-    grid_y_dim = Grid.shape[1]
-
-    # And find where they are in the grid
-    grid_x1 = int(x1 / grid_spacing)
-    grid_y1 = int(y1 /grid_spacing)
     #############################################################
     # IMPORTANT: do not collide two balls twice.
     ############################################################
     # SUBPROBLEM 2: use the grid values to reduce the number of other
     # objects to check for collisions.
-    for j in range(-2, 3):
-        for k in range(-2, 3):
-            if (j != 0) or (k != 0):
-                # See if somebody is in one of these adjacent grid points
-                # But first check our bounds:
-                if (grid_x1 + j < grid_x_dim) and (grid_y1 + k < grid_y_dim) and (grid_x1 + j > 0) and (grid_y1 + k > 0):
-                    other_ball_grid_val = Grid[grid_x1 + j, grid_y1 + k]
+    for j in range(i + 1, count):
+        XY2 = &(XY[j, 0])
+        V2 = &(V[j, 0])
+        if overlapping(XY1, XY2, R):
+            # SUBPROBLEM 4: Add locking
+            if not moving_apart(XY1, V1, XY2, V2):
+                collide(XY1, V1, XY2, V2)
 
-                    # If we have someone there and their ball number is bigger than ours
-                    if (other_ball_grid_val != -1) and (other_ball_grid_val > i):
-
-                        # We apply the same logic as in P2 except now it is easier!
-                        # Because we only compare ball i to ball j if j > i, we automatically lock in the same order!
-
-
-                        # Now pick up our new lock
-                        acquire(&(locks[other_ball_grid_val]))
-
-                        XY2 = &(XY[other_ball_grid_val, 0])
-                        V2 = &(V[other_ball_grid_val, 0])
-
-                        if overlapping(XY1, XY2, R):
-                            # SUBPROBLEM 4: Add locking
-                            if not moving_apart(XY1, V1, XY2, V2):
-                                collide(XY1, V1, XY2, V2)
-
-                            # give a slight impulse to help separate them
-                            for dim in range(2):
-                                V2[dim] += eps * (XY2[dim] - XY1[dim])
-
-                        # And now release the new locks
-                        release(&(locks[other_ball_grid_val]))
-
-
-    # And release the old lock
-    release(&(locks[i]))
+            # give a slight impulse to help separate them
+            for dim in range(2):
+                V2[dim] += eps * (XY2[dim] - XY1[dim])
 
 cpdef update(FLOAT[:, ::1] XY,
              FLOAT[:, ::1] V,
@@ -129,15 +87,13 @@ cpdef update(FLOAT[:, ::1] XY,
              float R,
              float grid_spacing,
              uintptr_t locks_ptr,
-             float t,
-             int nthreads):
+             float t):
     cdef:
         int count = XY.shape[0]
-        int i, j, dim, new_grid_x, new_grid_y, old_grid_x, old_grid_y
-        int chunk_size = count / nthreads 
+        int i, j, dim
         FLOAT *XY1, *XY2, *V1, *V2
         # SUBPROBLEM 4: uncomment this code.
-        omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
+        # omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
 
     assert XY.shape[0] == V.shape[0]
     assert XY.shape[1] == V.shape[1] == 2
@@ -147,7 +103,7 @@ cpdef update(FLOAT[:, ::1] XY,
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
-        for i in prange(count, num_threads=nthreads, chunksize=chunk_size, schedule='static'):
+        for i in range(count):
             for dim in range(2):
                 if (((XY[i, dim] < R) and (V[i, dim] < 0)) or
                     ((XY[i, dim] > 1.0 - R) and (V[i, dim] > 0))):
@@ -157,33 +113,17 @@ cpdef update(FLOAT[:, ::1] XY,
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
-        for i in prange(count, num_threads=nthreads, chunksize=chunk_size, schedule='static'):
-            sub_update(XY, V, R, i, count, Grid, grid_spacing, locks)
+        for i in range(count):
+            sub_update(XY, V, R, i, count, Grid, grid_spacing)
 
         # update positions
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads (with static
         #    scheduling).
         # SUBPROBLEM 2: update the grid values.
-        for i in prange(count, num_threads=nthreads, chunksize=chunk_size, schedule='static'):
-
-            old_grid_x = int(XY[i, 0] / grid_spacing)
-            old_grid_y = int(XY[i, 1] / grid_spacing)
-
+        for i in range(count):
             for dim in range(2):
                 XY[i, dim] += V[i, dim] * t
-
-            # Now update the grid according to the new coordinates
-            # If two fall in the same point, then just overwrite and take the latest ones
-            new_grid_x = int(XY[i, 0] / grid_spacing)
-            new_grid_y = int(XY[i, 1] / grid_spacing)
-
-            # Also set our old point to empty since we aren't there any more
-            # This may overwrite someone who IS there already - e.g., say particle 1 and particle 2
-            # are in the same grid point, but particle 2 was put in there later, so its value is stored in grid.
-            # This shouldn't matter because we are sweeping over the whole grid and updating everything anyways
-            Grid[old_grid_x, old_grid_y] = -1
-            Grid[new_grid_x, new_grid_y] = i
 
 
 def preallocate_locks(num_locks):

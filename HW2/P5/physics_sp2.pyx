@@ -56,19 +56,16 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                      float R,
                      int i, int count,
                      UINT[:, ::1] Grid,
-                     float grid_spacing,
-                     omp_lock_t *locks) nogil:
+                     float grid_spacing) nogil:
     cdef:
         FLOAT *XY1, *XY2, *V1, *V2
         int k, j, dim
         int grid_x_dim, grid_y_dim
         FLOAT x1, y1
         int grid_x1, grid_y1, other_ball_grid_val
-        int first_lock, second_lock, same_lock
         float eps = 1e-5
 
     # SUBPROBLEM 4: Add locking
-    acquire(&(locks[i]))
     XY1 = &(XY[i, 0])
     V1 = &(V[i, 0])
 
@@ -94,16 +91,10 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                 if (grid_x1 + j < grid_x_dim) and (grid_y1 + k < grid_y_dim) and (grid_x1 + j > 0) and (grid_y1 + k > 0):
                     other_ball_grid_val = Grid[grid_x1 + j, grid_y1 + k]
 
-                    # If we have someone there and their ball number is bigger than ours
-                    if (other_ball_grid_val != -1) and (other_ball_grid_val > i):
+                    # If we have someone there, and their ball number is bigger than ours (don't compare i to j and then j to i)
+                    if ((other_ball_grid_val != -1) and (other_ball_grid_val > i)):
 
-                        # We apply the same logic as in P2 except now it is easier!
-                        # Because we only compare ball i to ball j if j > i, we automatically lock in the same order!
-
-
-                        # Now pick up our new lock
-                        acquire(&(locks[other_ball_grid_val]))
-
+                        # then treat it accordingly
                         XY2 = &(XY[other_ball_grid_val, 0])
                         V2 = &(V[other_ball_grid_val, 0])
 
@@ -115,13 +106,6 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                             # give a slight impulse to help separate them
                             for dim in range(2):
                                 V2[dim] += eps * (XY2[dim] - XY1[dim])
-
-                        # And now release the new locks
-                        release(&(locks[other_ball_grid_val]))
-
-
-    # And release the old lock
-    release(&(locks[i]))
 
 cpdef update(FLOAT[:, ::1] XY,
              FLOAT[:, ::1] V,
@@ -137,7 +121,7 @@ cpdef update(FLOAT[:, ::1] XY,
         int chunk_size = count / nthreads 
         FLOAT *XY1, *XY2, *V1, *V2
         # SUBPROBLEM 4: uncomment this code.
-        omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
+        # omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
 
     assert XY.shape[0] == V.shape[0]
     assert XY.shape[1] == V.shape[1] == 2
@@ -158,7 +142,7 @@ cpdef update(FLOAT[:, ::1] XY,
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
         for i in prange(count, num_threads=nthreads, chunksize=chunk_size, schedule='static'):
-            sub_update(XY, V, R, i, count, Grid, grid_spacing, locks)
+            sub_update(XY, V, R, i, count, Grid, grid_spacing)
 
         # update positions
         #

@@ -1,0 +1,18 @@
+Non-AVX Code:
+=================
+1074.691142 Million Complex FMAs in 3.20840287209 seconds, 334.961407543 million Complex FMAs / second for 1 threads
+1074.691142 Million Complex FMAs in 1.61219096184 seconds, 666.602882313 million Complex FMAs / second for 2 threads
+1074.691142 Million Complex FMAs in 0.897825956345 seconds, 1196.99272939 million Complex FMAs / second for 4 threads
+
+These results are to be expected. First, the number of Complex FMA's stays constant when varying the number of threads. This is a way (in addition to the output image) to see that the parallelization is working. The task stays the same, so the overall level of computation should take the same too.
+
+Next, computing the Mandelbrot set is clearly an "embarssingly parallel" problem, i.e., the computation at [i, j] is totally independent of the computation at [i', j'] if i != i' or j != j' (or both). Thus, wee see that doubling the number of threads essentially halves the computation time (with some noise), and quadrupling the number of threads divides the computation time by four.
+
+
+AVX Code:
+=====================
+1074.949755 Million Complex FMAs in 0.471885919571 seconds, 2277.98650144 million Complex FMAs / second for 1 threads
+1074.949755 Million Complex FMAs in 0.240005970001 seconds, 4478.84590119 million Complex FMAs / second for 2 threads
+1074.949755 Million Complex FMAs in 0.149736881256 seconds, 7178.92443052 million Complex FMAs / second for 4 threads
+
+These results are also to be expected as above. First off, we essentially see the same performance gains as we increase the number of threads as in the first part. This makes sense from the previous argument about Mandelbrot being "embarassingly parallel". We also see that using AVX increases tghe performance by about 8x, by comparing the result for n threads between AVX and non-AVX. This is again to be expected, as we are simply doing 8x as many things at once. The slight reduction in exact 8x performance is likely noise or some other low-level technical issue that we did not cover inclass.

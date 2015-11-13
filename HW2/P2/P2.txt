@@ -1,0 +1,17 @@
+Results can be found in uncorrelated.dat and correlated.dat. These are only results for medium-grained locking, but N=1 (the first element) corresponds to fine-grained locking both in my implementation and in theory.
+
+The serial code was found to be much faster than its parallel counterparts. This makes sense, because our "computation" isn't much of a computation at all. Thus, the overhead from adding locking increases the time to complete a given run significantly. This added time is not counteracted by the added parallelization.
+
+From here, I will split my answer up into what I would expect, and what I actually found.
+
+Would Expect:
+==============
+
+I would have expected fine-grained locking to be faster than medium-grained locking but with more complex code. This is because medium-grained locking can lead to situations where one thread is waiting for another thread to finish so it can pick up the corresponding lock, even if they are not acting on the same elements (i.e., differnt elements in source and dest can use the same locks which leads to more conflicts). Fine-grained locking does not have this problem: the only time one thread will wait for another is when both threads require access to the exact same element. I also would expect that there to be a massive slowdown for less than 10 locks, as by construction of our correlated dataset, this is exactly when we might expect regular conflicts, as source and dest always fall within a distance of 10 from each other. Thus, a good choice of N should correspond to something with more than 10 locks, and it might take some experimentation to determine what is actually the best choice of N in this range.
+
+Actually Happened:
+================== 
+
+In this case, medium grained locking does worse than fine-grained locking. Furthermore, the code really isn't any simpler - in fact, one might argue that it's more complex because of the need to wrap indices around. In general, however, this should not be the case, and medium-grained locking should be easier to implement than fine-grained locking. We are just dealing with a pedagogical example.
+
+Unfortunately, it was pretty difficult to find a good choice of N for medium-grained locking. This is reflected in the two data files correlated.dat and uncorrelated.dat, where I have charted the run times as a function of N and (equivalently) the number of locks. Note that N=1 corresponds to fine-grained locking. Decreasing the number of locks causes an increase in the amount of time taken consistently - thus, the closer our code is to fine-grained locking, the better our performance. I do not have a valid explanation for this, as I would have thought that there would be some balance between seralization and locking ovehead in the medium-grained case, so that correlated.dat and uncorrelated.dat would both describe a curve with a minumum runtime for some value of N. This appears to all be washed out, as Thouis mentioned might happen on Piazza. Looking at correlated.dat, however, we do see a significant (~50%) jump in runtime right at the transition to 10 locks, as predicted in the previous section. At least this can be rationalized in the context of our construction of correlated data. Note that the point at which such a jump occurs will obviously depend on the type of correlation present in the data, and 10 is specific to our case.
