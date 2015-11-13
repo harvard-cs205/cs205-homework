@@ -1,0 +1,16 @@
+
+
+Implementation results for 1, 2 and 4-way parallel:
+
+For 1 thread:
+4.28624010086 seconds for 10 filter passes.
+
+For 2 threads:
+2.86615920067 seconds for 10 filter passes.
+
+For 4 threads:
+2.07792901993 seconds for 10 filter passes.
+
+As we can see from results above, the performance with 2 threads improves significantly compared to that with 1 thread, increasing from 4.28 to 2.86. 
+
+The method I chose to control cooperation between threads: we have to ensure that threads do not start an iteration of filtering before the data for that iteration is ready. To control the cooperation between threads, I used thread.join() to wait for the current iteration to complete and then use it for the next iteration. 

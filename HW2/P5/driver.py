@@ -61,6 +61,23 @@ if __name__ == '__main__':
     # preallocate locks for objects
     locks_ptr = preallocate_locks(num_balls)
 
+
+    # Morton code from http://www.thejach.com/view/2011/9/playing_with_morton_numbers
+    def tomorton(x,y):
+        x = bin(x)[2:]
+        lx = len(x)
+        y = bin(y)[2:]
+        ly = len(y)
+        L = max(lx, ly)
+        m = 0
+        for j in xrange(1, L+1):
+            # note: ith bit of x requires x[lx - i] since our bin numbers are big endian
+            xi = int(x[lx-j]) if j-1 < lx else 0
+            yi = int(y[ly-j]) if j-1 < ly else 0
+            m += 2**(2*j)*xi + 2**(2*j+1)*yi
+        return m/4
+
+        
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
@@ -80,3 +97,27 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+
+            # get the grid positions
+            positions_grid = (positions / grid_spacing).astype(np.int)
+            # sort balls using Morton ordering
+            ordered = []
+            for i in range(num_balls):
+                ordered.append(tomorton(int(positions[i,0]*grid_size), int(positions[i,1]*grid_size)))
+
+            sorted_positions = np.argsort(ordered)
+
+            # new ordered possitions and velocities
+            positions = positions[sorted_positions]
+            velocities = velocities[sorted_positions]
+  
+            # update grid
+            # check if in bounds
+            positions_grid_ordered = positions_grid[sorted_positions]
+            positions_grid_ordered[positions_grid_ordered > grid_size-1] = grid_size-1
+            positions_grid_ordered[positions_grid_ordered < 0] = 0
+            for i in range(num_balls):
+                grid[positions_grid_ordered[i,0], positions_grid_ordered[i,1]] = i
+
+
+
