@@ -1,0 +1,7 @@
+####### Performance Comparison #########
+
+1 Thread:  3.29990720749 seconds for 10 filter passes.
+2 Treahds: 1.70069313049 seconds for 10 filter passes.
+4 Threads: 1.50296592712 seconds for 10 filter passes.
+
+Within each iteration, I parallelize the data exchange step. Namely, set offset equal 0, 1, ..., num_threads-1 respectively for each thread, with step = num_threads. When they are finished, join them and go to the next iteration. This ensures that each median call run in multiple threads. However, the iteration level is still iterative. 

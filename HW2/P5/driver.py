@@ -16,11 +16,25 @@ from physics import update, preallocate_locks
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
+### zorder code copied from github
+def cmp_zorder(a, b):
+    j = 0
+    k = 0
+    x = 0
+    for k in range(2):
+
+        y = a[k] ^ b[k]
+        if (x < y and x < (x ^ y)):
+            j = k
+            x = y
+    return a[j] - b[j]
+
 if __name__ == '__main__':
     num_balls = 10000
     radius = 0.002
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
+
 
     # make a hole in the center
     while True:
@@ -60,23 +74,36 @@ if __name__ == '__main__':
     # SUBPROBLEM 4: uncomment the code below.
     # preallocate locks for objects
     locks_ptr = preallocate_locks(num_balls)
+    iterations = 0
+    interval = []
 
-    while True:
+    while iterations < 200:
         with Timer() as t:
             update(positions, velocities, grid,
-                   radius, grid_size, locks_ptr,
-                   physics_step)
+                   radius, grid_spacing, locks_ptr,
+                   physics_step, 1)
+
 
         # udpate our estimate of how fast the simulator runs
         physics_step = 0.9 * physics_step + 0.1 * t.interval
         total_time += t.interval
-
+        iterations += 1
         frame_count += 1
         if total_time > anim_step:
             animator.update(positions)
             print("{} simulation frames per second".format(frame_count / total_time))
+            interval += [frame_count / total_time]
             frame_count = 0
             total_time = 0
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+            # Sort the grid using morton order
+            gridPos = (positions / grid_spacing).astype(int)
+            mortonOrder = map(cmp_zorder, gridPos, np.append(gridPos [1:], gridPos [:1], axis=0))
+            posIndex = np.argsort(mortonOrder)
+            # Update positions and velocities
+            positions, velocities = positions[posIndex], velocities[posIndex]
+
+    print("{} average simulation frames per second".format(np.mean(interval)))
+
