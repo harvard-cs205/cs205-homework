@@ -1,0 +1,23 @@
+# Problem 2 writeup.
+
+Each experiment was done three times, and the minimum times were taken.
+
+Uncorrelated:
+Serial uncorrelated: 0.270640850067 seconds
+Fine grained uncorrelated: 6.8197889328 seconds
+Medium grained uncorrelated at 1: 9.51855707169 seconds
+Medium grained uncorrelated at 10: 10.0314590931 seconds
+Medium grained uncorrelated at 100: 16.7286269665 seconds
+Medium grained uncorrelated at 1000: 30.2048308849 seconds
+
+Correlated:
+Serial correlated: 0.286468029022 seconds
+Fine grained correlated: 6.46632218361 seconds
+Medium grained correlated at 1: 8.81487703323 seconds
+Medium grained correlated at 10: 7.5754609108 seconds
+Medium grained correlated at 100: 9.61066412926 seconds
+Medium grained correlated at 1000: 28.3380169868 seconds
+
+From this data, we see that, broadly speaking, the correlated data exchanges yielded faster results than the uncorrelated data exchanges. Specifically, the medium-grained correlated data exchanges performed significantly better than the medium-grained uncorrelated data exchange at various sizes of N. The serial approach performed better than the fine grained approach, which performed better than the medium-grained approach, possibly due to the overhead of initializing and scheduling/maintaining/using locks. The difference between the serial correlated and uncorrelated times was very small (on the order of 0.01 s). 
+
+Due to the correlative distance of 10 between points, one would suspect that a graining of size 20 may be most effective in the medium-graining scheme among correlated data. From the plots (P2a.png and P2b.png), it certainly seems that decreasing the resolution of the graining generally decreases the time of the data exchange up to a size of 20. Increasing the graining further seems to lead to a general increase in the time (e.g., N = 100 or 1000), although the noise of the data makes it difficult to draw further conclusions.
