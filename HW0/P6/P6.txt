@@ -1,1 +1,35 @@
 # Your answers here
+
+1.The Count to Ten
+example of the result:
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+Hi Job 2
+Hi Job 1
+Hi Job 0
+Hi Job 3
+Bye Job 2Bye Job 1Bye Job 0Bye Job 3
+
+
+
+Hi Job 5
+Hi Job 4
+Hi Job 6
+Hi Job 7
+Bye Job 5Bye Job 4Bye Job 6Bye Job 7
+
+
+
+Hi Job 9
+Hi Job 8
+Bye Job 9Bye Job 8
+
+
+
+For job 0,1,2,3, 4 processes are ramdomly distributed during each run, i.e we cannot guarantee output order with "map". Thus, the result "Hi job num" will also be randomly posted for these 4 jobs. The same for job 4,5,6,7. 
+Therefore, if we consider a problem concerning output order(for example, print top 50 universities in descending order), the randomness of the processes will affect the reslut. 
+
+2. How much faster
+
+The ratio of serial to parallel execution time against sleep time becomes bigger and bigger. If we consider a small sleep time, like 1e-6 or 1e-5, we find the ratio is smaller than 1, which means a parallel program could take longer than its serial version. 
+
+
