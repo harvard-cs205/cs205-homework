@@ -1,5 +1,6 @@
 import pyopencl as cl
 import numpy as np
+import matplotlib.pyplot as plt
 
 def create_data(N):
     return host_x, x
@@ -54,6 +55,34 @@ if __name__ == "__main__":
             times['blocked', num_workgroups, num_workers] = seconds
             print("blocked reads, workgroups: {}, num_workers: {}, {} seconds".
                   format(num_workgroups, num_workers, seconds))
+
+    # intensity plot of times vs. # of workgroups & workers
+    matrix_coalesced = np.zeros((7, 4))
+    for i in range(7):
+        for k in range(4):
+            matrix_coalesced[i, k] = times['coalesced', 2**(i+3), 2**(k+2)]
+    matrix_blocked = np.zeros((7, 4))
+    for i in range(7):
+        for k in range(4):
+            matrix_blocked[i, k] = times['blocked', 2**(i+3), 2**(k+2)]
+    fig, ax = plt.subplots()
+    cax = ax.imshow(matrix_coalesced, cmap='RdPu', interpolation='nearest', origin='lower', extent=[2, 5.9, 3, 9.9])
+    ax.set_yticks(np.arange(3,10))
+    ax.set_xticks(np.arange(2,6))
+    ax.set_ylabel('# of workgroups ($2^n$)')
+    ax.set_xlabel('# of workers ($2^n$)')
+    ax.set_title('Time to sum vs. number of workgroups & workers')
+    cbar = fig.colorbar(cax)
+    plt.savefig('coalesced.png')
+    fig, ax = plt.subplots()
+    cax = ax.imshow(matrix_blocked, cmap='RdPu', interpolation='nearest', origin='lower', extent=[2, 5.9, 3, 9.9])
+    ax.set_yticks(np.arange(3,10))
+    ax.set_xticks(np.arange(2,6))
+    ax.set_ylabel('# of workgroups ($2^n$)')
+    ax.set_xlabel('# of workers ($2^n$)')
+    ax.set_title('Time to sum vs. number of workgroups & workers')
+    cbar = fig.colorbar(cax)
+    plt.savefig('blocked.png')
 
     best_time = min(times.values())
     best_configuration = [config for config in times if times[config] == best_time]
