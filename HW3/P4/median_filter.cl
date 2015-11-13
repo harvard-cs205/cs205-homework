@@ -1,11 +1,5 @@
 #include "median9.h"
 
-// helper function to compute 1d index from (x, y)
-inline int genidx(int x, int y, int w) 
-{
-    return y * w + x;
-}
-
 // 3x3 median filter
 __kernel void
 median_3x3(__global __read_only float *in_values,
@@ -56,7 +50,7 @@ median_3x3(__global __read_only float *in_values,
         {
             int y_idx = buf_corner_y + row;
             y_idx = max(0, min(h-1, y_idx));
-            buffer[genidx(idx_1D, row, buf_w)] = in_values[genidx(x_idx, y_idx, w)];
+            buffer[idx_1D + row * buf_w] = in_values[x_idx + y_idx * w];
         }
 
     }
@@ -70,13 +64,13 @@ median_3x3(__global __read_only float *in_values,
     // Each thread in the valid region (x < w, y < h) should write
     // back its 3x3 neighborhood median.
     if (x < w && y < h)
-        out_values[genidx(x, y, w)] = median9(buffer[genidx(buf_x-1, buf_y-1, buf_h)], 
-                                              buffer[genidx(buf_x,   buf_y-1, buf_h)],
-                                              buffer[genidx(buf_x+1, buf_y-1, buf_h)],
-                                              buffer[genidx(buf_x-1, buf_y,   buf_h)],
-                                              buffer[genidx(buf_x,   buf_y,   buf_h)],
-                                              buffer[genidx(buf_x+1, buf_y,   buf_h)],
-                                              buffer[genidx(buf_x-1, buf_y+1, buf_h)],
-                                              buffer[genidx(buf_x,   buf_y+1, buf_h)],
-                                              buffer[genidx(buf_x+1, buf_y+1, buf_h)]);
+        out_values[x + y * w] = median9(buffer[buf_x-1 + (buf_y-1) * buf_h], 
+                                        buffer[buf_x + (buf_y-1) * buf_h],
+                                        buffer[buf_x+1 + (buf_y-1) * buf_h],
+                                        buffer[buf_x-1 + buf_y * buf_h],
+                                        buffer[buf_x + buf_y * buf_h],
+                                        buffer[buf_x+1 + buf_y * buf_h],
+                                        buffer[buf_x-1 + (buf_y+1) * buf_h],
+                                        buffer[buf_x + (buf_y+1) * buf_h],
+                                        buffer[buf_x+1 + (buf_y+1) * buf_h]);
 }
