@@ -1,3 +1,4 @@
+
 # Cython Definition file for AVX.h
 
 cdef extern from "AVX.h" nogil:
@@ -28,6 +29,7 @@ cdef extern from "AVX.h" nogil:
     #     in each of the 8 locations.  Note that -1.0 is all 1s in its
     #     repesentation.  This can be useful with bitwise_and(), below.
     float8 less_than(float8 a, float8 b)     # (a < b) -> 0.0 or -1.0
+    float8 less_than_equal(float8 a, float8 b)     # (a < b) -> 0.0 or -1.0
     float8 greater_than(float8 a, float8 b)  # (a > b) -> 0.0 or -1.0
 
     # Bitwise AND:

@@ -1,0 +1,26 @@
+First of all, it seems that the problem of locking makes parallelizing this problem not a good idea. Clearly, all of the work is dominated by 
+
+I also find that I get much better performance for fine grained locking. This is because, for this particular problem, I don't have to do any work if the source and destination are the same. As a result, for these situations, no locks are required. You can see this effect when you compare fine grained time to medium grained time, with locks every 1 value. 
+
+That said, you can still tell that, for uncorrelated data, peformance gets worse by locking less, and, for correlated data, performance gets beter with less locking. This could be becuase the memory read/write times for data far away from each other is slightly longer than lock/unlock times. In this case, parallelizing more helps slightly. For correlated data, the read/write times are small relative to lock times, so using fewer locks is better. It seems the best graining to use in this case is around 1 lock/25 values. 
+
+
+
+Serial uncorrelated: 0.320640087128 seconds
+Fine grained uncorrelated: 5.09282016754 seconds
+Medium grained uncorrelated, locks every 1 values: 6.29382896423 seconds
+Medium grained uncorrelated, locks every 4 values: 6.17064094543 seconds
+Medium grained uncorrelated, locks every 7 values: 6.66883516312 seconds
+Medium grained uncorrelated, locks every 10 values: 6.50680398941 seconds
+Medium grained uncorrelated, locks every 13 values: 6.76003289223 seconds
+Medium grained uncorrelated, locks every 16 values: 6.92610001564 seconds
+Medium grained uncorrelated, locks every 19 values: 6.67238402367 seconds
+Serial correlated: 0.348388910294 seconds
+Fine grained correlated: 4.70851612091 seconds
+Medium grained correlated, locks every 1 values: 5.85367298126 seconds
+Medium grained correlated, locks every 7 values: 5.42882299423 seconds
+Medium grained correlated, locks every 13 values: 4.9290459156 seconds
+Medium grained correlated, locks every 19 values: 4.77443313599 seconds
+Medium grained correlated, locks every 25 values: 4.60514116287 seconds
+Medium grained correlated, locks every 31 values: 4.82233476639 seconds
+Medium grained correlated, locks every 37 values: 4.71852898598 seconds

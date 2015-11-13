@@ -32,6 +32,7 @@ typedef __m256 float8;
 #define bitwise_andnot(a, b)  _mm256_andnot_ps((a), (b))
 //Logical
 #define less_than(a, b)        _mm256_cmp_ps((a), (b), _CMP_LT_OS)
+#define less_than_equal(a, b)        _mm256_cmp_ps((a), (b), _CMP_LE_OS)
 #define greater_than(a, b)     _mm256_cmp_ps((a), (b), _CMP_GT_OS)
 //Helpers
 #define signs(a)               (_mm256_movemask_ps(a) & 255)

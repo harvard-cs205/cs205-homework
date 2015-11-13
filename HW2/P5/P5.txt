@@ -1,0 +1,17 @@
+P5 notes
+Without threading, I see ~10 frames per second
+With 4 threads, I see ~20 frames per second.
+
+
+
+After implementing the grid, I see 
+1 thread, ~300 frames/sec
+2 threads, ~600 frames/sec
+4 threads, ~800 frames/sec
+This indicates that the biggest bottleneck in the code was searching for nearby objects. If we call overlapping on every object pair -- equivalent to sum(N-i), i=0->N = N/2(N+1) - this scales faster than N^2. By searching with the grid, it scales by ~N. 
+
+
+After implementing the spatial reordering, I don't really see any performance change. If anything it is slightly slower. I changed the coloring for the animation so you could verify that the reording is working as desired (see the file "maintaining_ordered_points.png"). I have implemented the reordering by converting the points (X,Y)--> D, where D is the 1D index for the hilbert curve. It's possible that I could have implemented this reordering in an inefficient way, but it's hard to imagine that it would be so inefficient that the process of doing that reordering every ~30 frames would cancel out the benefit of reducing the number of reads/writes.
+
+
+Adding locks should make the code strictly slower, but I see no clear performance change when adding the locks. It's also hard for me to verify that the locking is working, but at least the code runs and does not perform worse than it does without locks. 
