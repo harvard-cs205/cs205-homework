@@ -3,6 +3,7 @@ import pyopencl as cl
 import numpy as np
 import pylab
 import os.path
+import time
 
 def round_up(global_size, group_size):
     r = global_size % group_size
@@ -42,7 +43,7 @@ if __name__ == '__main__':
 
     # Create a context with all the devices
     devices = platforms[0].get_devices()
-    context = cl.Context(devices)
+    context = cl.Context([devices[2]])
     print 'This context is associated with ', len(context.devices), 'devices'
 
     # Create a queue for transferring data and launching computations.
@@ -51,8 +52,11 @@ if __name__ == '__main__':
                             properties=cl.command_queue_properties.PROFILING_ENABLE)
     print 'The queue is using the device:', queue.device.name
 
-    curdir = os.path.dirname(os.path.realpath(__file__))
-    program = cl.Program(context, open('median_filter.cl').read()).build(options=['-I', curdir])
+#    curdir = os.path.dirname(os.path.realpath(__file__))
+#    program = cl.Program(context, open('median_filter.cl').read()).build(options=['-I', curdir])
+
+    # Don't know why I needed to fix this
+    program = cl.Program(context, open('median_filter.cl').read()).build(options='')
 
     host_image = np.load('image.npz')['image'].astype(np.float32)[::2, ::2].copy()
     host_image_filtered = np.zeros_like(host_image)
@@ -77,15 +81,25 @@ if __name__ == '__main__':
     cl.enqueue_copy(queue, gpu_image_a, host_image, is_blocking=False)
 
     num_iters = 10
+    t0 = time.time()
     for iter in range(num_iters):
-        program.median_3x3(queue, global_size, local_size,
-                           gpu_image_a, gpu_image_b, local_memory,
-                           width, height,
-                           buf_width, buf_height, halo)
-
+        t1 = time.time()
+        event = program.median_3x3(queue, global_size, local_size,
+                                   gpu_image_a, gpu_image_b, local_memory,
+                                   width, height,
+                                   buf_width, buf_height, halo)
+#        seconds = (event.profile.end - event.profile.start) / 1e9
+        t2 = time.time()
+        print("Iteration: {}, time: {} seconds".
+              format(iter, t2 - t1))
         # swap filtering direction
         gpu_image_a, gpu_image_b = gpu_image_b, gpu_image_a
 
     cl.enqueue_copy(queue, host_image_filtered, gpu_image_a, is_blocking=True)
+    print("Total time: {}".format(time.time() - t0))
 
-    assert np.allclose(host_image_filtered, numpy_median(host_image, num_iters))
+    t1_serial = time.time()
+    serial_image = numpy_median(host_image, num_iters)
+    t2_serial = time.time()
+    print("Serial version took: {}".format(t2_serial - t1_serial))
+    assert np.allclose(host_image_filtered, serial_image)
