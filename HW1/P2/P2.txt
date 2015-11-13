@@ -1,1 +1,5 @@
 # Your discussion here
+To better allocate work, I randomly shuffled the input lists before taking their cartesian product. The defailt partitioning scheme works poorly because the amount of work is not independent of pixel location. In fact, pixels that are close together tend to have similar amounts of work (both on the low ends and the high ends). By making the partition choice indpendent of pixel location, we hope to break this correlation. Examining the resulting histograms, it is clear that randomly partitioning the pixels performs much better than (produces more even workload) than the default partitioning strategy. 
+
+This approach has the benefit of being very simple to implement. However, it does not perfectly balance the work. We might be better able to take advantage of the fact that we know that pixels in the middle of the picture will take many times longer than pixels in the boundary, and choose a partitioning accordingly. 
+
