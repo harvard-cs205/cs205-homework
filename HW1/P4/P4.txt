@@ -1,1 +1,51 @@
 # Your discussion here
+
+--My graph representation--
+
+
+(key, (flag, AdjacentNodes, distance))
+
+-----------------------------
+
+My graph was a large RDD with each element as a K,V pair.
+Key is the node's name. 
+Value is a tuple of three elements. Flag indicates if this node is being visited in a certain iteration. AdjacentNodes is the list of neighbors of a certain node. Distance element keep track of the distance of a given node with respect to the Origin. 
+
+-----------------------------
+
+
+
+
+--------Touched nodes--------
+
+Origin = CAPTAIN AMERICA
+The diameter is3
+The total number of nodes touched:6408
+After 1 turn, the number of new visited nodes is 1906
+After 2 turn, the number of new visited nodes is 4463
+After 3 turn, the number of new visited nodes is 38
+After 4 turn, the number of new visited nodes is 0
+
+
+
+Origin = MISS THING/MARY
+The diameter is1
+The total number of nodes touched:7
+After 1 turn, the number of new visited nodes is 6
+After 2 turn, the number of new visited nodes is 0
+
+
+
+Origin = ORWELL
+The diameter is1
+The total number of nodes touched:9
+After 1 turn, the number of new visited nodes is 8
+After 2 turn, the number of new visited nodes is 0
+
+
+The diameter of CAPTAIN AMERICA is 3. Which means that if we start running bfs on CAPTAIN AMERICA, it will traverse a connected component of a graph in 3 hops.
+As known that CAPTAIN AMERICAN is on of the most characters in Marvel's comic, so it has a lot of connections. And hence the connected component which CAPTAIN AMERICAN lies in is expected to be a large one. And the the program's result correctly depicts this fact. It has 6408 nodes, comparing with other two connected components, which are 7 and 9, respectively. 
+
+If a character has a distance that is not defined in such a search, it means that this character is not within the same connected_components of the character which the search began with.
+
+-------------END-------------
