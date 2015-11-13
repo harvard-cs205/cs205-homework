@@ -1,0 +1,16 @@
+4 Threads:
+
+Average: 1.4037395716 seconds for 10 passes
+
+2 Threads:
+
+Average: 1.6622445106 seconds for 10 passes
+
+1 Thread:
+
+Average: 3.35969305038 seconds for 10 passes
+
+
+To control communication between threads, I used events. I created an event for each iteration in each thread. For each iteration, we will launch a thread; we will pass that thread the two images, as well as the list of events. Since we have an event for each iteration in each thread, we can check if the previous thread events are free. To compute iteration i for thread n, threads n, n-1, and n+1 must have completed iteration i-1. We can use the events to wait for these threads to be complete before processing thread n for iteration i. Finally, we can set the event for thread n and interation i to be complete.
+
+As we increase the number of threads, we increase performance; we get a full 2x performance boost from 1 thread to 2 threads, but only a 1.2x performance increase from 2 to 4 threads. 
