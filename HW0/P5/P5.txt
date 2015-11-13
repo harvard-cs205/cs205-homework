@@ -1,1 +1,20 @@
 # Your answers here.
+1. 255s
+
+2. Yes, they only need 34s.
+
+3. 8s
+
+4. log2(N)
+
+5. 15s for infinite employess.
+
+6. Takes one bag:  272s for infinite employees
+   Takes two bags: 143s for infinite employees
+   Yes, there is a better strategy. 
+   Better strategy (39s):
+   16 employees each take 16 bags.
+   Step 1: Each employee takes their 16 bags. (16s)
+   Step 2: All the 16 employees start to compute their own 16 bags together. (15s)
+   Step 3: Compute the total of this 16 numbers. (4+4=8s)
+   ===> 16+15+8=39ss
