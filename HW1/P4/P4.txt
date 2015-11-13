@@ -1,1 +1,15 @@
-# Your discussion here
+My BFS gives the following output:
+BFS starting from CAPTAIN AMERICA touches 6408 nodes
+BFS starting from MISS THING/MARY touches 7 nodes
+BFS starting from ORWELL touches 9 nodes
+(counts include the root node)
+
+What does this diameter imply about the maximum number of steps in which your search must be executed?
+
+A graph's diameter is the largest number of vertices that must be traversed to get from one vertex to another. In other words, it is the longest of all of the shortest path between vertices. Our search only needs to go through <diameter> iterations because we know we can get from any node to any other connected node within <diameter> steps. 
+
+What does it mean if a character does not have a defined distance during the search?
+
+It means that the character is in a separate connected component of the graph and could not be reached by the search. 
+
+I implemented two versions of BFS. The first one uses Python sets to maintain a queue and uses the graph diameter assumption to terminate. The second one uses accumulators to terminate when it is not exploring any more nodes and uses Spark joins to prevent visiting duplicate nodes without broadcasting any Python sets. Despite running for more iterations, the first version is much faster (~20 seconds vs. ~60 seconds to run the three searches in the problem description) than the second. However, I don't think the first version would work on a larger graph because the queue would become to large to each worker. I worked on addressing this problem in my P5 BFS implementation. shortest_path_test.py contains code I used to test my P5 BFS. 
