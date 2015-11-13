@@ -1,0 +1,60 @@
+========================================
+Part 1: implement updates from neighbors
+========================================
+maze1.npy
+Finished after 915 iterations, 198.33032 ms total, 0.216754448087 ms per iteration
+Found 2 regions
+
+maze2.npy
+Finished after 532 iterations, 113.82384 ms total, 0.213954586466 ms per iteration
+Found 35 regions
+
+==========================
+Part 2: fetch grandparents
+==========================
+maze1.npy
+Finished after 529 iterations, 110.2204 ms total, 0.208356143667 ms per iteration
+Found 2 regions
+
+maze2.npy
+Finished after 273 iterations, 56.98632 ms total, 0.208741098901 ms per iteration
+Found 35 regions
+
+============================
+Part 3: merge parent regions
+============================
+maze1.npy
+Finished after 10 iterations, 3.07192 ms total, 0.307192 ms per iteration
+Found 2 regions
+
+maze2.npy
+Finished after 10 iterations, 2.93448 ms total, 0.293448 ms per iteration
+Found 35 regions
+
+==============================
+Part 4: efficient grandparents
+==============================
+maze1.npy
+Finished after 10 iterations, 5.91888 ms total, 0.591888 ms per iteration
+Found 2 regions
+
+maze2.npy
+Finished after 10 iterations, 5.92992 ms total, 0.592992 ms per iteration
+Found 35 regions
+
+Discussion:
+Comparing Part 4 with Part 3, we see that in Part 4 time per iteration increased by approximately 100%. In the earlier iterations, a single thread doing multiple global memory reads in different locations is slower than multiple threads. However, towards the end of the iterations, a single thread would be doing less global memory reads than multiple threads. With a Intel(R) Iris(TM) Graphics 6100 GPU, a single thread fetching grandparents does not achieve enough speedup in the later iterations to outrun parallel threads fetching grandparents with potential serialization.
+
+============================
+Part 5: no atomic operations
+============================
+maze1.npy
+Finished after 10 iterations, 6.0256 ms total, 0.60256 ms per iteration
+Found 2 regions
+
+maze2.npy
+Finished after 10 iterations, 5.9496 ms total, 0.59496 ms per iteration
+Found 35 regions
+
+Discussion:
+Comparing Part 5 and Part 4, we see that the final results are still correct, since each foreground pixel ultimately will equal the minimum of its neighboring connected pixels. If we allow race conditions by using min() instead of atomic_min(), a value in labels could decrease first and then potentially increase if another threads' next labels have a higher value. However, the values cannot increase between iterations. The impact is that the time and iterations could potentially increase. In practice, I do observe a slight increase in time but not in iterations compared with Part 4.

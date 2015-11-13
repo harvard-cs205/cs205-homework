@@ -1,3 +1,6 @@
+#define min(a, b) (((a) < (b)) ? (a) : (b))
+#define max(a, b) (((a) < (b)) ? (b) : (a))
+
 __kernel void
 initialize_labels(__global __read_only int *image,
                   __global __write_only int *labels,
@@ -56,6 +59,9 @@ propagate_labels(__global __read_write int *labels,
 
     // 1D index of thread within our work-group
     const int idx_1D = ly * get_local_size(0) + lx;
+
+    // max index
+    const int max_label = w * h; 
     
     int old_label;
     // Will store the output value
@@ -80,18 +86,59 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
-    
+    /*
+    // Part 2
+    if (old_label < max_label)
+        buffer[buf_y * buf_w + buf_x] = labels[old_label];
+    */
+
+    // Part 4
+    // use (0, 0) in workgroup to fetch grandparents
+    if (lx + ly == 0) {
+        int prev_idx = -1;
+        int prev_label = -1;
+        // operate only on non-halo values
+        for (int buf_i = halo; buf_i < buf_w - halo; buf_i++) {
+            for (int buf_j = halo; buf_j < buf_h - halo; buf_j++) {
+                int buf_idx = buf_i + buf_j * buf_w;
+                // avoid global memory reads
+                if (buffer[buf_idx] == prev_idx) {
+                    buffer[buf_idx] = prev_label;
+                    continue;
+                }
+                if (buffer[buf_idx] == max_label) {
+                    continue;
+                }
+                prev_idx = buffer[buf_idx];
+                prev_label = labels[prev_idx];
+                buffer[buf_idx] = prev_label;
+            }
+        }
+    }
+
+    // Part 2/4
+    barrier(CLK_LOCAL_MEM_FENCE);
+
     // stay in bounds
     if ((x < w) && (y < h)) {
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
         new_label = old_label;
-
+        if (new_label < max_label) {
+            // Minimum of its 4 neighboring pixels and itself
+            new_label = min(new_label, buffer[buf_x+1 + buf_y * buf_w]);
+            new_label = min(new_label, buffer[buf_x-1 + buf_y * buf_w]);
+            new_label = min(new_label, buffer[buf_x + (buf_y + 1) * buf_w]);
+            new_label = min(new_label, buffer[buf_x + (buf_y - 1) * buf_w]);
+        }
+        
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
             // indicate there was a change this iteration.
             // multiple threads might write this.
+            // atomic_min(labels + old_label, new_label); // part 3
+            labels[old_label] = min(labels[old_label], new_label); // part 5
             *(changed_flag) += 1;
             labels[y * w + x] = new_label;
         }
