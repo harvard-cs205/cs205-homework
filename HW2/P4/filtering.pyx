@@ -41,7 +41,13 @@ cpdef median_3x3(FLOAT[:, :] input_image,
         i = offset
         while i < input_image.shape[0]:
             for j in range(input_image.shape[1]):  # columns
-                    output_image[i, j] = median9(GETPIX(input_image, i-1, j-1), GETPIX(input_image, i-1, j), GETPIX(input_image, i-1, j+1),
-                                                 GETPIX(input_image, i,   j-1), GETPIX(input_image, i,   j), GETPIX(input_image, i,   j+1),
-                                                 GETPIX(input_image, i+1, j-1), GETPIX(input_image, i+1, j), GETPIX(input_image, i+1, j+1))
+                    output_image[i, j] = median9(GETPIX(input_image, i-1, j-1), 
+                                                 GETPIX(input_image, i-1, j), 
+                                                 GETPIX(input_image, i-1, j+1),
+                                                 GETPIX(input_image, i,   j-1), 
+                                                 GETPIX(input_image, i,   j), 
+                                                 GETPIX(input_image, i,   j+1),
+                                                 GETPIX(input_image, i+1, j-1), 
+                                                 GETPIX(input_image, i+1, j), 
+                                                 GETPIX(input_image, i+1, j+1))
             i += step

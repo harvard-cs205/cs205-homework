@@ -1,0 +1,27 @@
+==============
+Multithreading
+==============
+num_threads = 1
+1074.691142 Million Complex FMAs in 3.98780107498 seconds, 269.494671824 million Complex FMAs / second
+
+num_threads = 2
+1074.691142 Million Complex FMAs in 1.96358013153 seconds, 547.312088131 million Complex FMAs / second
+
+num_threads = 4
+1074.691142 Million Complex FMAs in 1.15905785561 seconds, 927.210955693 million Complex FMAs / second
+
+=============================
+Instruction-level Parallelism
+=============================
+num_threads = 1
+1074.944485 Million Complex FMAs in 0.594756126404 seconds, 1807.37017624 million Complex FMAs / second
+
+num_threads = 2
+1074.49629 Million Complex FMAs in 0.334830999374 seconds, 3209.07052217 million Complex FMAs / second
+
+num_threads = 4
+1076.277853 Million Complex FMAs in 0.221354007721 seconds, 4862.24696847 million Complex FMAs / second
+
+With just multithreading, the number of FMAs per second increases by a factor of 2 and 1.7 as we increase the number of threads from 1 to 2 and from 2 to 4.
+Similarly, with instruction-level parallelism, the number of FMAs per second increases by a factor of 1.8 and 1.5 as we increase the number of threads from 1 to 2 and from 2 to 4.
+In general, the instruction-level parallel code shows 5 - 7 times more FMAs per second relative to the base multithreading code.
