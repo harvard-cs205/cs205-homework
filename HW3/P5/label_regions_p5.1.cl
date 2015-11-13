@@ -94,16 +94,13 @@ propagate_labels(__global __read_write int *labels,
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
 
-    // for part 4 use an if () statement to pic out one thread to load in the group members grandparents with one thread
-    //need a for () loop to ensure one thread loads in all the proper grandparents
-
-    if (old_label < w * h) //Added for part P5.2
-    {
-        buffer[buf_y * buf_w + buf_x] = labels[old_label];
-    }
+    //if (old_label < w * h)
+    //{
+      //  buffer[buf_y * buf_w + buf_x] = labels[old_label];
+    //}
 
     
-    barrier(CLK_LOCAL_MEM_FENCE);
+    //barrier(CLK_LOCAL_MEM_FENCE);
 
 
     // stay in bounds
@@ -121,15 +118,11 @@ propagate_labels(__global __read_write int *labels,
             neighbor_4 = buffer[(buf_y) * buf_w + (buf_x - 1)];
             min_label = min(old_label, min(min(min(neighbor_1, neighbor_2), neighbor_3), neighbor_4));
         
-            
-
-            if (min_label < old_label)
-            {
-              //  atomic_min(&labels[old_label], min_label); //changed for P5.3
-                new_label = min_label; //for P5.2 and before
-                atomic_min(&labels[old_label], min_label); //added for P5.3
-
-            }
+        if (min_label < old_label)
+        {
+            //labels[new_label] = min_label; //changed for P5.3
+            new_label = min_label; //for P5.2 and before
+        }
 
         //else {
           //  new_label = old_label;
@@ -146,8 +139,7 @@ propagate_labels(__global __read_write int *labels,
             // indicate there was a change this iteration.
             // multiple threads might write this.
             *(changed_flag) += 1;
-            atomic_min(&labels[y * w + x], new_label);
-            //labels[y * w + x] = new_label;
+            labels[y * w + x] = new_label;
         }
     }
 }

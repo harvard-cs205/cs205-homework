@@ -94,10 +94,7 @@ propagate_labels(__global __read_write int *labels,
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
 
-    // for part 4 use an if () statement to pic out one thread to load in the group members grandparents with one thread
-    //need a for () loop to ensure one thread loads in all the proper grandparents
-
-    if (old_label < w * h) //Added for part P5.2
+    if (old_label < w * h)
     {
         buffer[buf_y * buf_w + buf_x] = labels[old_label];
     }
@@ -127,7 +124,7 @@ propagate_labels(__global __read_write int *labels,
             {
               //  atomic_min(&labels[old_label], min_label); //changed for P5.3
                 new_label = min_label; //for P5.2 and before
-                atomic_min(&labels[old_label], min_label); //added for P5.3
+                atomic_min(&labels[old_label], min_label);
 
             }
 
