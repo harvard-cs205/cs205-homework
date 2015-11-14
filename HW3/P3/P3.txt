@@ -1,0 +1,5 @@
+Results seem to vary - I ran the tuning 10 times and got the following results:
+
+configuration ('coalesced', 128, 64): 1 times, 0.0050584 average seconds
+configuration ('coalesced', 8, 128): 2 times, 0.00328868 average seconds
+configuration ('coalesced', 16, 128): 7 times, 0.00274028571429 average seconds

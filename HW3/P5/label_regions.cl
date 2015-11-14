@@ -80,13 +80,47 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
+    //if (old_label != w*h) {
+        //Part 2
+        //buffer[buf_y * buf_w + buf_x] = labels[buffer[buf_y * buf_w + buf_x]];
+    //}
+
+    //Part 4
+    if (lx + ly == 0) {
+        int label_idx = w*h;
+        int label_val;
+
+        for (uint i = 0 ; i < get_local_size(0) ; ++i) {
+            for (uint j = 0 ; j < get_local_size(1) ; ++j) {
+                uint b_idx = (j + halo)*buf_w + (i + halo);
+                if (buffer[b_idx] != w*h) {
+                    if (label_idx != buffer[b_idx]) {
+                        label_idx = buffer[b_idx];
+                        buffer[b_idx] = labels[label_idx];
+                        label_val = buffer[b_idx];
+                    }
+                    else {
+                        buffer[b_idx] = label_val;
+                    }                    
+                }
+            }
+        }
+    }
+
+    barrier(CLK_LOCAL_MEM_FENCE);
     
     // stay in bounds
     if ((x < w) && (y < h)) {
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
-        new_label = old_label;
+        new_label = buffer[buf_y * buf_w + buf_x];
+        if (new_label != w*h) {
+            new_label = min(new_label, buffer[buf_y * buf_w + buf_x + 1]);
+            new_label = min(new_label, buffer[buf_y * buf_w + buf_x - 1]);
+            new_label = min(new_label, buffer[(buf_y - 1) * buf_w + buf_x]);
+            new_label = min(new_label, buffer[(buf_y + 1) * buf_w + buf_x]);
+        }
 
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
@@ -94,6 +128,7 @@ propagate_labels(__global __read_write int *labels,
             // multiple threads might write this.
             *(changed_flag) += 1;
             labels[y * w + x] = new_label;
+            atomic_min(&(labels[old_label]), new_label);
         }
     }
 }

@@ -1,0 +1,50 @@
+Part 1:
+maze1
+Finished after 876 iterations, 557.97264 ms total, 0.636955068493 ms per iteration
+Found 2 regions
+maze2
+Finished after 505 iterations, 313.1156 ms total, 0.620030891089 ms per iteration
+Found 35 regions
+
+Part 2:
+maze1
+Finished after 529 iterations, 314.61312 ms total, 0.594731795841 ms per iteration
+Found 2 regions
+maze2
+Finished after 273 iterations, 173.13376 ms total, 0.63418959707 ms per iteration
+Found 35 regions
+
+Part 3:
+maze1
+Finished after 10 iterations, 8.50992 ms total, 0.850992 ms per iteration
+Found 2 regions
+maze2
+Finished after 9 iterations, 7.48752 ms total, 0.831946666667 ms per iteration
+Found 35 regions
+
+Part 4:
+maze1
+Finished after 10 iterations, 23.53544 ms total, 2.353544 ms per iteration
+Found 2 regions
+maze2
+Finished after 9 iterations, 16.32344 ms total, 1.81371555556 ms per iteration
+Found 35 regions
+
+The use of a single thread was considerably slower as compared to when each thread did the
+grandparent fetch (maybe it's parallelized on my machine?). Unless there are many repeated
+labels on adjacent indices this implementation would have to make as many fetches from 
+global memory as the thread-independent version. Also, the serialized thread-independent
+version should make the fetches faster than in this version even if it is serialized as there
+is compute time to loop through and calculate the index in question whereas this could be done
+in parallel.
+
+Part 5:
+The worry of not using atomic_min is in the scenario where two threads are acting on the same
+old_label with different new_labels. In this scenario, the second thread could read the
+original old_label instead of the updated new_label from the first thread. If the first new_label
+was less than the second new_label (assuming both are less than old_label), then the resulting
+new_label would be incorrect. The outcome should still be correct - this was just an optimization
+to begin with, and the resulting label will still always be less than the original old_label. The
+number of iterations should decrease as compared to without any such optimization, but be greater than
+with the atomic calls. There's a bit of randomness with the timing, in a way this is a less optimal
+path to the solution, but because things are happening in parallel it may be just as fast or faster.
