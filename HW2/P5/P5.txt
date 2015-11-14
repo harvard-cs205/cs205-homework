@@ -1,0 +1,44 @@
+Subproblem 1:
+=============
+There are N^2 pairings of balls we try to consider colliding so this is a significant source of the slowdown. The
+additional threads assist noticeably, but there is likely a lot of memory latency since memory accesses are made all
+throughout the collection of balls so the speed up is not as drastic as 4x between 1 and 4 threads.
+
+N = 4: 18 FPS
+N = 2: 17 FPS
+N = 1: 11 FPS
+
+Subproblem 2:
+=============
+This drastically speeds up the algorithm since it lowers the asymptotic running time by an order of N. Since each
+ball now only has to consider the neighbouring couple of balls, effectively there is around N times less computation
+required.
+
+N = 1: 593 FPS
+N = 4: 981 FPS
+
+Subproblem 3:
+=============
+The sorting offers a noticeable speedup for both 1 and 4 threads. The speedup for 4 threads is not as great. Perhaps
+memory contention is becoming the bottleneck here, so while shifting things closer to take advantage of cache
+accesses is good, ultimately the calculations do require a lot of memory accesses.
+The Hilbert Curve is a simple and efficient way to 2D to 1D coordinates such that closer 2D points are mapped to closer
+points in the 1D space which makes it well-suited for this problem.
+
+N = 1: 982 FPS
+N = 4: 1162 FPS
+
+Subproblem 4:
+=============
+There is another change that needs to happen for the locking to avoid deadlocks: the grid needs to be reset with -1s
+after each iteration, otherwise there is a potential for a ball to be in multiple different grid cells (e.g. if no
+other ball was to occupy the old space.) This update can be done in parallel.
+However, this also breaks the nice assumption needed to avoid deadlocks in my solution. In the previous sub-problems
+this was less of an issue since it was not necessary to ensure correctness of the collisions as we do here. This
+likely contributes to the slow-down observed.
+The other source of the slowdown is the overhead and contention from using locks. However, given the low number of
+threads compared to the size of the grid as well as the sorting strategy in subproblem 3, I suspect most of the
+slowdown is from the overhead of using locks rather than contention for the locks.
+
+N = 1: 545 FPS
+N = 4: 821 FPS
