@@ -5,3 +5,10 @@ Part 1:
 	Maze 2:
 		Finished after 532 iterations, 404.654829 ms total, 0.76062937782 ms per iteration
 		Found 35 regions
+Part 2:
+	Maze 1:
+		Finished after 529 iterations, 841.660941 ms total, 1.59104147637 ms per iteration
+		Found 2 regions
+	Maze 2:
+		Finished after 276 iterations, 441.299037 ms total, 1.59890955435 ms per iteration
+		Found 35 regions

@@ -54,6 +54,7 @@ propagate_labels(__global __read_write int *labels,
     // Local position relative to (0, 0) in workgroup
     const int lx = get_local_id(0);
     const int ly = get_local_id(1);
+	const int local_size = get_local_size(0);
 
     // coordinates of the upper left corner of the buffer in image
     // space, including halo
@@ -65,15 +66,16 @@ propagate_labels(__global __read_write int *labels,
     const int buf_y = ly + halo;
 
     // 1D index of thread within our work-group
-    const int idx_1D = ly * get_local_size(0) + lx;
+    const int idx_1D = ly * local_size + lx;
     
     int old_label;
     // Will store the output value
     int new_label;
     
+	int row;
     // Load the relevant labels to a local buffer with a halo 
     if (idx_1D < buf_w) {
-        for (int row = 0; row < buf_h; row++) {
+        for (row = 0; row < buf_h; row++) {
             buffer[row * buf_w + idx_1D] = 
                 get_clamped_value(labels,
                                   w, h,
@@ -83,13 +85,38 @@ propagate_labels(__global __read_write int *labels,
 
     // Make sure all threads reach the next part after
     // the local buffer is loaded
-    barrier(CLK_LOCAL_MEM_FENCE);
+    //barrier(CLK_LOCAL_MEM_FENCE);
 
     // Fetch the value from the buffer the corresponds to
     // the pixel for this thread
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
+	/* Fetch grandparents
+ 	(i.e. store labels[buffer[offset]] in buffer[offset])
+	*/
+	// global offset, global column, global row, and buffer offset to be used to fetch grandparents
+	int g_offset, g_col, g_row, b_offset;
+	
+	if (idx_1D < buf_w) {
+    	for (row = 0; row < buf_h; row++) {
+			// offset in buffer
+			b_offset = row * buf_w + idx_1D;
+			// get global offset for grandparent
+			g_offset = buffer[b_offset];
+			// calculate parameters for get_clamped_value
+			// row within global labels
+			g_row = g_offset / w; 
+			// column within global labels
+			g_col = g_offset % w; 
+			// fetch grandparent
+	        buffer[b_offset] = get_clamped_value(labels, w, h, g_col, g_row);
+    	}	
+	}
+
+	// Make sure all threads reach the next part after
+	// the grandparents are fetched
+	barrier(CLK_LOCAL_MEM_FENCE);
     
     // stay in bounds
     if ((x < w) && (y < h)) {
