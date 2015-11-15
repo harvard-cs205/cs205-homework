@@ -2,8 +2,10 @@ from __future__ import division
 import pyopencl as cl
 import numpy as np
 import pylab
+import pdb
 
 def round_up(global_size, group_size):
+    #pdb.set_trace()
     r = global_size % group_size
     if r == 0:
         return global_size
@@ -40,7 +42,7 @@ if __name__ == '__main__':
 
     # Create a context with all the devices
     devices = platforms[0].get_devices()
-    context = cl.Context(devices)
+    context = cl.Context(devices[:2])
     print 'This context is associated with ', len(context.devices), 'devices'
 
     # Create a queue for transferring data and launching computations.
@@ -54,13 +56,14 @@ if __name__ == '__main__':
     in_coords, out_counts = make_coords()
     real_coords = np.real(in_coords).copy()
     imag_coords = np.imag(in_coords).copy()
-
+    
     gpu_real = cl.Buffer(context, cl.mem_flags.READ_ONLY, real_coords.size * 4)
     gpu_imag = cl.Buffer(context, cl.mem_flags.READ_ONLY, real_coords.size * 4)
     gpu_counts = cl.Buffer(context, cl.mem_flags.WRITE_ONLY, real_coords.size * 4)
 
     local_size = (8, 8)  # 64 pixels per work group
     global_size = tuple([round_up(g, l) for g, l in zip(in_coords.shape[::-1], local_size)])
+    #pdb.set_trace()
     width = np.int32(in_coords.shape[1])
     height = np.int32(in_coords.shape[0])
     max_iters = np.int32(1024)
@@ -71,7 +74,7 @@ if __name__ == '__main__':
     event = program.mandelbrot(queue, global_size, local_size,
                                gpu_real, gpu_imag, gpu_counts,
                                width, height, max_iters)
-
+    #Copy data from src to dest: queue, dest, src
     cl.enqueue_copy(queue, out_counts, gpu_counts, is_blocking=True)
 
     seconds = (event.profile.end - event.profile.start) / 1e9

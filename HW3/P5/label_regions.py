@@ -3,6 +3,7 @@ import sys
 import pyopencl as cl
 import numpy as np
 import pylab
+import pdb
 
 def round_up(global_size, group_size):
     r = global_size % group_size
@@ -31,7 +32,7 @@ if __name__ == '__main__':
 
     # Create a context with all the devices
     devices = platforms[0].get_devices()
-    context = cl.Context(devices)
+    context = cl.Context(devices[:2])
     print 'This context is associated with ', len(context.devices), 'devices'
 
     # Create a queue for transferring data and launching computations.
@@ -42,14 +43,14 @@ if __name__ == '__main__':
 
     program = cl.Program(context, open('label_regions.cl').read()).build(options='')
 
-    host_image = np.load('maze1.npy')
+    host_image = np.load('maze2.npy')
     host_labels = np.empty_like(host_image)
     host_done_flag = np.zeros(1).astype(np.int32)
 
     gpu_image = cl.Buffer(context, cl.mem_flags.READ_ONLY, host_image.size * 4)
     gpu_labels = cl.Buffer(context, cl.mem_flags.READ_WRITE, host_image.size * 4)
     gpu_done_flag = cl.Buffer(context, cl.mem_flags.READ_WRITE, 4)
-
+    #pdb.set_trace()
     # Send to the device, non-blocking
     cl.enqueue_copy(queue, gpu_image, host_image, is_blocking=False)
 
@@ -59,7 +60,7 @@ if __name__ == '__main__':
     width = np.int32(host_image.shape[1])
     height = np.int32(host_image.shape[0])
     halo = np.int32(1)
-
+    
     # Create a local memory per working group that is
     # the size of an int (4 bytes) * (N+2) * (N+2), where N is the local_size
     buf_size = (np.int32(local_size[0] + 2 * halo), np.int32(local_size[1] + 2 * halo))

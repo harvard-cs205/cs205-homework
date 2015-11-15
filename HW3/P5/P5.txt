@@ -1,0 +1,43 @@
+Part 1: 
+Maze1: Finished after 912 iterations, 193.01664 ms total, 0.211641052632 ms per iteration
+Found 2 regions
+Maze2: Finished after 530 iterations, 112.35224 ms total, 0.211985358491 ms per iteration
+Found 35 regions
+
+Part 2: 
+Maze1: Finished after 529 iterations, 110.03776 ms total, 0.208010888469 ms per iteration
+Found 2 regions
+Maze2: Finished after 273 iterations, 57.91 ms total, 0.212124542125 ms per iteration
+Found 35 regions
+
+Part 3: 
+Maze1: Finished after 11 iterations, 2.29992 ms total, 0.209083636364 ms per iteration
+Found 2 regions
+Maze2: Finished after 10 iterations, 2.22048 ms total, 0.222048 ms per iteration
+Found 35 regions
+
+Part 4: 
+Maze1: Finished after 910 iterations, 340.74616 ms total, 0.37444632967 ms per iteration
+Found 2 regions
+Maze2: Finished after 532 iterations, 202.8976 ms total, 0.381386466165 ms per iteration
+Found 35 regions
+
+I found that avoiding redundant reads from global memory by using one thread
+is slower than each thread updating the local buffer with redundant reads to 
+the global data structure "label". My guess is that although we are doing 
+redundant reads from global memory, this cost is amortized by the 
+parallelization of the updates. As can be seen in the results, having 
+redundant reads is twice as fast as non-redundant reads with one thread.
+
+But the results may differ depending on the hardware. I speculate that a GPU 
+with fewer cores and a faster read/write speed from global memory would 
+benefit more from the implementation in part 4, whereas a GPU with more cores 
+and a slower read/write speed would benefit more from part 2.
+
+Part 5:
+Although I was expecting non-atomic operations to result in abnormal 
+behavior, I found that after switching from atomic_min to min, my program ran 
+as usual. The number of iterations, number of regions found, and total time 
+were all the same. This applied for both mazes. In my opinion, since there is 
+no locking for updates, values in "labels" should have been overwritten by 
+accesses from other threads.

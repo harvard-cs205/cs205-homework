@@ -1,0 +1,3 @@
+The best configuration and time for my hardware:
+configuration ('coalesced', 512, 128): 0.00201656 seconds
+
