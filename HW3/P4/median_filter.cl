@@ -82,18 +82,14 @@ median_3x3(__global __read_only float *in_values,
     // We've given you median9.h, and included it above, so you can
     // use the median9() function.
 	
-	buffer[buf_y * buf_w + buf_x] = 
-	    median9(buffer[(buf_y-1)*buf_w + buf_x-1], buffer[(buf_y-1)*buf_w + buf_x], buffer[(buf_y-1)*buf_w + buf_x+1],
-		        buffer[(buf_y)*  buf_w + buf_x-1], buffer[(buf_y)  *buf_w + buf_x], buffer[(buf_y)  *buf_w + buf_x+1],
-				buffer[(buf_y+1)*buf_w + buf_x-1], buffer[(buf_y+1)*buf_w + buf_x], buffer[(buf_y+1)*buf_w + buf_x+1]);
-
-	barrier(CLK_LOCAL_MEM_FENCE);
-				
     // Each thread in the valid region (x < w, y < h) should write
     // back its 3x3 neighborhood median.
 	
     // Write output
     if ((glob_y < h) && (glob_x < w)) {
-	    out_values[glob_y * w + glob_x] = buffer[buf_y * buf_w + buf_x];	
+	    out_values[glob_y * w + glob_x] = 
+		median9(buffer[(buf_y-1)*buf_w + buf_x-1], buffer[(buf_y-1)*buf_w + buf_x], buffer[(buf_y-1)*buf_w + buf_x+1],
+		        buffer[(buf_y)*  buf_w + buf_x-1], buffer[(buf_y)  *buf_w + buf_x], buffer[(buf_y)  *buf_w + buf_x+1],
+				buffer[(buf_y+1)*buf_w + buf_x-1], buffer[(buf_y+1)*buf_w + buf_x], buffer[(buf_y+1)*buf_w + buf_x+1]);	
 	}
 }

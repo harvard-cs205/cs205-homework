@@ -87,10 +87,5 @@ if __name__ == '__main__':
         gpu_image_a, gpu_image_b = gpu_image_b, gpu_image_a
 
     cl.enqueue_copy(queue, host_image_filtered, gpu_image_a, is_blocking=True)
-	
-    baba = host_image - host_image_filtered
-    pylab.figure()
-    pylab.imshow(baba)
-    pylab.show()
-	
-    #assert np.allclose(host_image_filtered, numpy_median(host_image, num_iters))
+    
+    assert np.allclose(host_image_filtered, numpy_median(host_image, num_iters))
