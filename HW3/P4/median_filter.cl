@@ -1,5 +1,24 @@
 #include "median9.h"
 
+// FETCH function used below
+float FETCH(__global __read_only float *image, int img_w, int img_h, int x, int y)
+{
+    // Pixel value from original image to return
+	float val;
+	
+	// If out of bounds, correct to the edge of the image
+	if (x < 0) x = 0;
+	if (x >= img_w) x = img_w - 1;
+	if (y < 0) y = 0;
+	if (y >= img_h) y = img_h - 1;
+	
+	// Take pixel value from the image
+	val = image[img_w * y + x];	
+	
+    return val;
+}
+
+
 // 3x3 median filter
 __kernel void
 median_3x3(__global __read_only float *in_values,
@@ -12,23 +31,69 @@ median_3x3(__global __read_only float *in_values,
     // Note: It may be easier for you to implement median filtering
     // without using the local buffer, first, then adjust your code to
     // use such a buffer after you have that working.
-
-
-    // Load into buffer (with 1-pixel halo).
+	
+	// The first several lines of code are taken almost directly from load_halo.cl in 
+	//     the harvard-cs205 OpenCL-examples folder
+	
+	// Global position of pixel
+	const int glob_x = get_global_id(0);
+	const int glob_y = get_global_id(1);
+	
+	// Local position of pixel within workgroup
+	const int local_x = get_local_id(0);
+	const int local_y = get_local_id(1);
+	
+	// Global coordinates of upper left corner of buffer in the image space
+	const int buf_corner_x = glob_x - local_x - halo;
+	const int buf_corner_y = glob_y - local_y - halo;
+	
+	// Local coordinates of pixel in the local buffer
+	const int buf_x = local_x + halo;
+	const int buf_y = local_y + halo;
+	
+	// 1D index of thread within work group
+	const int local_index = local_y * get_local_size(0) + local_x;
+	
+	// Row within work group
+    int row;
+	
+	// Load into buffer (with 1-pixel halo).
     //
     // It may be helpful to consult HW3 Problem 5, and
     // https://github.com/harvard-cs205/OpenCL-examples/blob/master/load_halo.cl
     //
     // Note that globally out-of-bounds pixels should be replaced
     // with the nearest valid pixel's value.
+	
+	if (local_index < buf_w) {
+		for (row = 0; row < buf_h; row++) {
+			buffer[row * buf_w + local_index] = 
+			// Use the FETCH() function defined above to pull out the appropriate pixel from the image.
+			FETCH(in_values, w, h, buf_corner_x + local_index,
+				buf_corner_y + row);
+		}
+	}
 
+	// Wait for all the threads to complete this step
+    barrier(CLK_LOCAL_MEM_FENCE);
 
     // Compute 3x3 median for each pixel in core (non-halo) pixels
     //
     // We've given you median9.h, and included it above, so you can
     // use the median9() function.
+	
+	buffer[buf_y * buf_w + buf_x] = 
+	    median9(buffer[(buf_y-1)*buf_w + buf_x-1], buffer[(buf_y-1)*buf_w + buf_x], buffer[(buf_y-1)*buf_w + buf_x+1],
+		        buffer[(buf_y)*  buf_w + buf_x-1], buffer[(buf_y)  *buf_w + buf_x], buffer[(buf_y)  *buf_w + buf_x+1],
+				buffer[(buf_y+1)*buf_w + buf_x-1], buffer[(buf_y+1)*buf_w + buf_x], buffer[(buf_y+1)*buf_w + buf_x+1]);
 
-
+	barrier(CLK_LOCAL_MEM_FENCE);
+				
     // Each thread in the valid region (x < w, y < h) should write
     // back its 3x3 neighborhood median.
+	
+    // Write output
+    if ((glob_y < h) && (glob_x < w)) {
+	    out_values[glob_y * w + glob_x] = buffer[buf_y * buf_w + buf_x];	
+	}
 }
