@@ -1,3 +1,6 @@
+I ran my code in an interactive session on an Odyssey GPU: Tesla K40m on NVIDIA CUDA.
+Best results:
+Coalesced reads, 512 workgroups, 128 workers: 0.000341344 seconds
 
 
 Acknowledgement: Reinier explained the concepts of the global id, group id, local id, etc in a way that I could understand, and explained what the problem was asking for.  
