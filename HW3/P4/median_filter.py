@@ -4,11 +4,13 @@ import numpy as np
 import pylab
 import os.path
 
+
 def round_up(global_size, group_size):
     r = global_size % group_size
     if r == 0:
         return global_size
     return global_size + group_size - r
+
 
 def numpy_median(image, iterations=10):
     ''' filter using numpy '''
