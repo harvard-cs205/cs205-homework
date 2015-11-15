@@ -17,6 +17,16 @@ initialize_labels(__global __read_only int *image,
     }
 }
 
+int min5(int x1, int x2, int x3, int x4, int x5) {
+	// Returns the minimum of the five integer parameters
+	int min_value = x1;
+	if (min_value > x2) min_value = x2;
+	if (min_value > x3) min_value = x3;
+	if (min_value > x4) min_value = x4;
+	if (min_value > x5) min_value = x5;
+	return min_value;
+}
+
 int
 get_clamped_value(__global __read_only int *labels,
                   int w, int h,
@@ -84,9 +94,16 @@ propagate_labels(__global __read_write int *labels,
     // stay in bounds
     if ((x < w) && (y < h)) {
         // CODE FOR PART 1 HERE
-        // We set new_label to the value of old_label, but you will need
-        // to adjust this for correctness.
-        new_label = old_label;
+        // Set new_label as the minimum of old_label and the 4 pixels
+		// adjacent to x,y
+		
+		// check if x,y is foreground pixel
+		if (old_label < w * h)
+		new_label = min5(old_label, 
+						buffer[(buf_y - 1) * buf_w + buf_x],
+						buffer[(buf_y + 1) * buf_w + buf_x],
+						buffer[buf_y * buf_w + buf_x - 1],
+						buffer[buf_y * buf_w + buf_x + 1]);
 
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
