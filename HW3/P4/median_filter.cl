@@ -41,10 +41,13 @@ median_3x3(__global __read_only float *in_values,
     //
     // Note that globally out-of-bounds pixels should be replaced
     // with the nearest valid pixel's value.
+    //Use buf_w number of threads to update values in local buffer
     if (idx_1D < buf_w)
         for (row = 0; row < buf_h; row++) {
             tmpx = buf_corner_x+idx_1D;
             tmpy = buf_corner_y+row;
+            //The first if clause copies from global buffer to local
+            //The rest handle the halo
             if(tmpy >=0 && tmpy < h && tmpx >= 0 && tmpx < w){
               buffer[row * buf_w + idx_1D] = in_values[tmpy * w + tmpx];
             }else if(tmpx == -1 && tmpy == -1){
@@ -68,6 +71,7 @@ median_3x3(__global __read_only float *in_values,
         }
 
     barrier(CLK_LOCAL_MEM_FENCE);
+    //Only compute median for non-halo pixels
     if(x < w && y < h){
       out_values[y * w + x] = median9(buffer[(buf_y-1)*buf_w+buf_x-1],buffer[(buf_y-1)*buf_w+buf_x],buffer[(buf_y-1)*buf_w+buf_x+1], \
                           buffer[buf_y*buf_w+buf_x-1],buffer[buf_y*buf_w+buf_x],buffer[buf_y*buf_w+buf_x+1],\
