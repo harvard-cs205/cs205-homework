@@ -1,3 +1,5 @@
+import os
+os.environ['PYOPENCL_COMPILER_OUTPUT'] = '1'
 import pyopencl as cl
 import numpy as np
 
