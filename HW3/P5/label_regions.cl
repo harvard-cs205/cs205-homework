@@ -1,8 +1,6 @@
-__kernel void
-initialize_labels(__global __read_only int *image,
-                  __global __write_only int *labels,
-                  int w, int h)
-{
+__kernel void initialize_labels(__global __read_only int *image,
+                                __global __write_only int *labels,
+                                int w, int h) {
     const int x = get_global_id(0);
     const int y = get_global_id(1);
 
@@ -17,24 +15,20 @@ initialize_labels(__global __read_only int *image,
     }
 }
 
-int
-get_clamped_value(__global __read_only int *labels,
-                  int w, int h,
-                  int x, int y)
-{
+inline int get_clamped_value(__global __read_only int *labels,
+                             int w, int h,
+                             int x, int y) {
     if ((x < 0) || (x >= w) || (y < 0) || (y >= h))
         return w * h;
     return labels[y * w + x];
 }
 
-__kernel void
-propagate_labels(__global __read_write int *labels,
-                 __global __write_only int *changed_flag,
-                 __local int *buffer,
-                 int w, int h,
-                 int buf_w, int buf_h,
-                 const int halo)
-{
+__kernel void propagate_labels(__global __read_write int *labels,
+                               __global __write_only int *changed_flag,
+                               __local int *buffer,
+                               int w, int h,
+                               int buf_w, int buf_h,
+                               const int halo) {
     // halo is the additional number of cells in one direction
 
     // Global position of output pixel

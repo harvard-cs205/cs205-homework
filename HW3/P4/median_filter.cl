@@ -16,6 +16,11 @@ __kernel void median_3x3(__global __read_only float *in_values,
   const int lx = get_local_id(0);
   const int ly = get_local_id(1);
 
+  // coordinates of the upper left corner of the buffer in image
+  // space, including halo
+  const int buf_corner_x = x - lx - halo;
+  const int buf_corner_y = y - ly - halo;
+
   // coordinates of our pixel in the local buffer
   const int buf_x = lx + halo;
   const int buf_y = ly + halo;
@@ -27,9 +32,23 @@ __kernel void median_3x3(__global __read_only float *in_values,
   if ((y < h) && (x < w)) { 
 
     if (localIndex < buf_w)
-      for (int row = 0; row < buf_h; row++)
-          if (row < buf_h && (row * y) + y < h)
-            buffer[row * buf_w + localIndex] = in_values[(row * y) + y * w + x];
+      for (int row = 0; row < buf_h; row++) {
+        
+        int yIndex = (buf_corner_y + ly) * row;
+        int xIndex = buf_corner_x + localIndex;
+
+        int finalIndex = yIndex + xIndex;
+        
+        if (x < 0 && y < 0) finalIndex = 0;
+        else if (x < 0 && y >= h) finalIndex = (h - 1) * w;
+        else if (x >= w && y < 0) finalIndex = w - 1;
+        else if (x >= w && y >= h) finalIndex = (h - 1) * w + w - 1;
+        else if (x < 0) finalIndex = yIndex;
+        else if (y < 0) finalIndex = xIndex;
+        else if (x >= w) finalIndex = yIndex + w - 1;
+        else if (y >= h) finalIndex = (h - 1) * w + xIndex;
+        buffer[row * buf_w + localIndex] = in_values[finalIndex];
+      }
   }
 
   barrier(CLK_LOCAL_MEM_FENCE);
@@ -53,16 +72,3 @@ __kernel void median_3x3(__global __read_only float *in_values,
   }
 }
 
-  // float pixel0 = buffer[(buf_y - 1) * w + (buf_x + - 1)];
-  // float pixel1 = buffer[(buf_y + - 1) * w + buf_x];
-  // float pixel2 = buffer[(buf_y + - 1) * w + (buf_x + 1)];
-  // float pixel3 = buffer[(buf_y) * w + (buf_x - 1)];
-  // float pixel4 = buffer[(buf_y) * w + (buf_x)];
-  // float pixel5 = buffer[(buf_y) * w + (buf_x + 1)];
-  // float pixel6 = buffer[(buf_y + 1) * w + (buf_x - 1)];
-  // float pixel7 = buffer[(buf_y + 1) * w + (buf_x )];
-  // float pixel8 = buffer[(buf_y + 1) * w + (buf_x + 1)];
-
-  //  out_values[y * w + x] = median9(pixel0, pixel1, pixel2, 
-  //                                  pixel3, pixel4, pixel5, 
-  //                                  pixel6, pixel7, pixel8);
