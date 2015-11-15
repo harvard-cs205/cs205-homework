@@ -68,9 +68,9 @@ median_3x3(__global __read_only float *in_values,
     // Compute 3x3 median for each pixel in core (non-halo) pixels
     // Check that each thread is the valid region (x < w, y < h)
     if ((y < h) && (x < w)) {
-        out_values[y * w + x] = median9(buffer[(buf_y - 1) * buf_w + buf_x - 1], buffer[(buf_y - 1) * buf_w + buf_x], buffer[(buf_y - 1) * buf_w + buf_x + 1],
-                            buffer[buf_y * buf_w + buf_x - 1],       buffer[buf_y * buf_w + buf_x],       buffer[buf_y * buf_w + buf_x + 1],
-                            buffer[(buf_y + 1) * buf_w + buf_x - 1], buffer[(buf_y + 1) * buf_w + buf_x], buffer[(buf_y + 1) * buf_w + buf_x + 1]);
+        out_values[y * w + x] = median9(buffer[(buf_y - 1) * buf_w + buf_x - 1],    buffer[(buf_y - 1) * buf_w + buf_x],    buffer[(buf_y - 1) * buf_w + buf_x + 1],
+                                        buffer[buf_y * buf_w + buf_x - 1],          buffer[buf_y * buf_w + buf_x],          buffer[buf_y * buf_w + buf_x + 1],
+                                        buffer[(buf_y + 1) * buf_w + buf_x - 1],    buffer[(buf_y + 1) * buf_w + buf_x],    buffer[(buf_y + 1) * buf_w + buf_x + 1]);
     }
 
 }
