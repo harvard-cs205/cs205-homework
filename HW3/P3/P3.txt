@@ -1,0 +1,30 @@
+The best configuration and time for my hardware was:
+configuration ('coalesced', 64, 64): 0.00356952 seconds
+
+The graphs P3_coalesced.png and P3_blocked.png present the results for the various configurations.
+
+For reference purposes, my hardware configuration is as follows (from test.py):
+
+The platforms detected are:
+---------------------------
+Apple Apple version: OpenCL 1.2 (May 10 2015 19:38:45)
+The devices detected on platform Apple are:
+---------------------------
+Intel(R) Core(TM) i7-5650U CPU @ 2.20GHz [Type: CPU ]
+Maximum clock Frequency: 2200 MHz
+Maximum allocable memory size: 2147 MB
+Maximum work group size 1024
+Maximum work item dimensions 3
+Maximum work item size [1024, 1, 1]
+---------------------------
+Intel(R) Iris(TM) Graphics 6100 [Type: GPU ]
+Maximum clock Frequency: 1000 MHz
+Maximum allocable memory size: 402 MB
+Maximum work group size 256
+Maximum work item dimensions 3
+Maximum work item size [256, 256, 256]
+---------------------------
+This context is associated with  2 devices
+The queue is using the device: Intel(R) Iris(TM) Graphics 6100
+The device memory bandwidth is 10.2537460352 GB/s
+The host-device bandwidth is 6.92444050521 GB/s
