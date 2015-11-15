@@ -28,12 +28,9 @@ median_3x3(__global __read_only float *in_values,
            int buf_w, int buf_h,
            const int halo)
 {
-    // Note: It may be easier for you to implement median filtering
-    // without using the local buffer, first, then adjust your code to
-    // use such a buffer after you have that working.
-	
 	// The first several lines of code are taken almost directly from load_halo.cl in 
-	//     the harvard-cs205 OpenCL-examples folder
+	//     the harvard-cs205 OpenCL-examples folder:
+    // https://github.com/harvard-cs205/OpenCL-examples/blob/master/load_halo.cl
 	
 	// Global position of pixel
 	const int glob_x = get_global_id(0);
@@ -58,12 +55,7 @@ median_3x3(__global __read_only float *in_values,
     int row;
 	
 	// Load into buffer (with 1-pixel halo).
-    //
-    // It may be helpful to consult HW3 Problem 5, and
-    // https://github.com/harvard-cs205/OpenCL-examples/blob/master/load_halo.cl
-    //
-    // Note that globally out-of-bounds pixels should be replaced
-    // with the nearest valid pixel's value.
+    // Globally out-of-bounds pixels are replaced with the nearest valid pixel's value.
 	
 	if (local_index < buf_w) {
 		for (row = 0; row < buf_h; row++) {
@@ -78,14 +70,8 @@ median_3x3(__global __read_only float *in_values,
     barrier(CLK_LOCAL_MEM_FENCE);
 
     // Compute 3x3 median for each pixel in core (non-halo) pixels
-    //
-    // We've given you median9.h, and included it above, so you can
-    // use the median9() function.
 	
-    // Each thread in the valid region (x < w, y < h) should write
-    // back its 3x3 neighborhood median.
-	
-    // Write output
+    // Each thread in the valid region (x < w, y < h) writes back its 3x3 neighborhood median using the median9 function.
     if ((glob_y < h) && (glob_x < w)) {
 	    out_values[glob_y * w + glob_x] = 
 		median9(buffer[(buf_y-1)*buf_w + buf_x-1], buffer[(buf_y-1)*buf_w + buf_x], buffer[(buf_y-1)*buf_w + buf_x+1],
