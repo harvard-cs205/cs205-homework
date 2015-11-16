@@ -15,6 +15,11 @@ __kernel void initialize_labels(__global __read_only int *image,
     }
 }
 
+inline int lowest(int n, int m) {
+    if (n < m) return n;
+    else return m;
+}
+
 inline int get_clamped_value(__global __read_only int *labels,
                              int w, int h,
                              int x, int y) {
@@ -73,15 +78,37 @@ __kernel void propagate_labels(__global __read_write int *labels,
     // the pixel for this thread
     old_label = buffer[buf_y * buf_w + buf_x];
 
-    // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
+    // Part 2 & 4
+    int offset = buf_y * buf_w + buf_x;
+
+    if (old_label < w * h)
+        buffer[offset] = labels[buffer[offset]];
+    else 
+        buffer[offset] = w * h;
+
+    barrier(CLK_LOCAL_MEM_FENCE);
     
     // stay in bounds
     if ((x < w) && (y < h)) {
-        // CODE FOR PART 1 HERE
-        // We set new_label to the value of old_label, but you will need
-        // to adjust this for correctness.
+        // Find the lowest value
+
+        if (old_label < w * h) { 
+
+        int a = buffer[(buf_y + 1) * buf_w + buf_x];
+        int b = buffer[(buf_y - 1) * buf_w + buf_x];
+        int c = buffer[buf_y * buf_w + buf_x + 1];
+        int d = buffer[buf_y * buf_w + buf_x - 1];
+
+        int i = lowest(a, b);
+        int j = lowest(c, d);
+
+        new_label = lowest(i, j);
+
+    } else {
+
         new_label = old_label;
 
+    }
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
             // indicate there was a change this iteration.
