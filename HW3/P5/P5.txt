@@ -4,18 +4,18 @@ Maze2 - Finished after 510 iterations, 349.438112 ms total, 0.685172768627 ms pe
 
 
 # Part 2
-Maze1 - Finished after 4 iterations, 2.860288 ms total, 0.715072 ms per iteration
-Maze2 - Finished after 4 iterations, 2.856096 ms total, 0.714024 ms per iteration
+Maze1 - Finished after 528 iterations, 1213.470272 ms total, 2.29823915152 ms per iteration
+Maze2 - Finished after 273 iterations, 633.544672 ms total, 2.32067645421 ms per iteration
 
 
 # Part 3
-Maze1 - Finished after 4 iterations, 2.880608 ms total, 0.720152 ms per iteration
-Maze2 - Finished after 4 iterations, 2.88352 ms total, 0.72088 ms per iteration
-
+Maze1 - Finished after 10 iterations, 22.027008 ms total, 2.2027008 ms per iteration
+Maze2 - Finished after 9 iterations, 19.752384 ms total, 2.19470933333 ms per iteration
 
 # Part 4
-Maze1 - Finished after 4 iterations, 8.587776 ms total, 2.146944 ms per iteration
-Maze2 - Finished after 4 iterations, 8.574048 ms total, 2.143512 ms per iteration
+Maze1 - Finished after 10 iterations, 20.882816 ms total, 2.0882816 ms per iteration
+Maze2 - Finished after 9 iterations, 18.877696 ms total, 2.09752177778 ms per iteration
+
 
 Since compute is much, much faster than memory lookups, it is perhaps worth it to only use one thread to avoid repeated lookups of the same value in labels[] depending on the speed of memory lookups on the particular machine you are dealing with.  For my machine, on the maze images, doing this operation with one thread actually slows down the code by a factor of around 3.  If the image was more consistent and had large regions of the same value to start, then this code might be faster.
 
