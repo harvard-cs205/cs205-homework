@@ -43,7 +43,7 @@ median_3x3(__global __read_only float *image,
 
     // Processing code here...
     //
-    // Should only use buffer, buf_x, buf_y.
+    // Should only use buffer, buf_x, buf_y
 
     // write output
     if ((y < img_h) && (x < img_w)) // stay in bounds
