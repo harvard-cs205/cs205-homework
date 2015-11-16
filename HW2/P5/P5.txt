@@ -1,0 +1,87 @@
+Below is a sampling of the FPS for each sub-problem
+
+initial FPS
+6.25496453689 simulation frames per second
+5.77910908415 simulation frames per second
+6.18781322243 simulation frames per second
+6.78030588376 simulation frames per second
+6.76050308424 simulation frames per second
+6.77617621305 simulation frames per second
+
+
+Part 1: With prange 
+11.794010629 simulation frames per second
+11.5461592671 simulation frames per second
+8.64035333476 simulation frames per second
+11.6974066214 simulation frames per second
+11.6953843666 simulation frames per second
+9.19702664182 simulation frames per second
+11.5990354196 simulation frames per second
+
+Part 2. with GRID 1 thread
+773.598813907 simulation frames per second
+956.06205747 simulation frames per second
+957.105160697 simulation frames per second
+1147.19828318 simulation frames per second
+926.693398143 simulation frames per second
+983.962464811 simulation frames per second
+899.068414848 simulation frames per second
+919.595337784 simulation frames per second
+1158.89377258 simulation frames per second
+967.158812678 simulation frames per second
+998.000839795 simulation frames per second
+
+Part 2. With GRID 4 threads
+336.783683957 simulation frames per second
+1017.32945253 simulation frames per second
+1968.17677924 simulation frames per second
+1709.35363892 simulation frames per second
+86.4283705188 simulation frames per second
+357.804532658 simulation frames per second
+1910.13759144 simulation frames per second
+1049.58059857 simulation frames per second
+1525.38634986 simulation frames per second
+
+Part 3 with GRID 1 thread
+518.940034643 simulation frames per second
+522.401549958 simulation frames per second
+530.324119668 simulation frames per second
+530.93202436 simulation frames per second
+535.971432831 simulation frames per second
+537.333257416 simulation frames per second
+
+Part 3 with GRID 4 thread
+1366.59052854 simulation frames per second
+1377.02683567 simulation frames per second
+1381.56178515 simulation frames per second
+1394.15616801 simulation frames per second
+1371.63279612 simulation frames per second
+
+Part 4 with lock 1 thread
+507.969480441 simulation frames per second
+505.527717711 simulation frames per second
+510.042236965 simulation frames per second
+515.274278421 simulation frames per second
+515.795287318 simulation frames per second
+517.375291247 simulation frames per second
+516.568175598 simulation frames per second
+515.686069862 simulation frames per second
+520.841045028 simulation frames per second
+520.005179563 simulation frames per second
+
+Part 4. with lock. 4 threads
+1205.37804382 simulation frames per second
+1178.869874 simulation frames per second
+1228.29679152 simulation frames per second
+1243.34442382 simulation frames per second
+1196.48383623 simulation frames per second
+
+
+Writeup:
+With an initial starting FPS of around 6, adding prange in part 1 increases the FPS to around 11. In Part 2, when the code is converted from O(n^2) to O(n), this resulted in a large speedup to around 700-1100 FPS for 1 thread and 336 to 1900 FPS for 4 theads. Note that there is a huge variance in the FPS, which may result in a jerky animation for the user. In Part 3, sorting is used to reduce the variance drastically. The FPS in part 3 is around 500 for 1 thread, and 1300 for 4 threads. However, note that the FPS here does not account for the sorting overhead. Part 4 adds locks to the prevent double updates. This gives more accurate results, but it comes with a slight overhead. The FPS drops to low 500s for 1 thread, and 1200 for 4 threads
+
+
+Choice of spatial filtering
+As recommended in the homework, I used a morton ordering for my spatial filtering. This code is taken online, with the source cited in morton.py. The morton function takes in a pair of numbers (X, Y) and convert it into one number (Z). Pairs of numbers that are relatively close in either X or Y (ie (X+1,Y) or (X, Y-1)) will map to Z that are also relatively close. Hence, I converted the X and Y coordinates of each ball into a single number. I then apply a argsort to this list of 'Z's, which allows me to sort the original 'positions' and 'velocities' lists. This makes balls that are relatively close in the 2-D to become relatively close in the 1-D lists of 'positions' and 'velocities'   
+
+

@@ -1,0 +1,40 @@
+Run time for N = 10
+Serial uncorrelated: 0.349769830704 seconds
+Fine grained uncorrelated: 3.61705183983 seconds
+Medium grained uncorrelated: 5.71030211449 seconds
+Serial correlated: 0.369374990463 seconds
+Fine grained correlated: 3.02818202972 seconds
+Medium grained correlated: 3.85956192017 seconds
+
+The locked versions take significantly longer time than the serial versions. This may be due to expensive overheads of locking in comparison to the relatively fast tasks that each thread does. 
+
+For N = 10, the medium-grained-uncorrelated took significantly longer time than the fine-grained-uncorrelated version, whereas for the correlated version, the medium-grained version only took slightly longer time than the fine-grained version. For uncorrelated, there is a higher chance that two threads may be accessing the same medium-grained lock for either source or destination. This means that one of the threads will have to wait for the other thread to finish, resulting in huge delays. In the correlated version, as the source and destinations are no more than 10 elements away, there is a high chance that the source and destination is within the same lock, hence there is less chance of one thread waiting for the other. 
+
+The fine-grained-version runs faster as there is even less chance of of two threads accessing the same lock.
+
+Other values of N
+
+N = 2
+Serial uncorrelated: 0.351155042648 seconds
+Fine grained uncorrelated: 3.56346511841 seconds
+Medium grained uncorrelated: 3.99527597427 seconds
+Serial correlated: 0.358654022217 seconds
+Fine grained correlated: 2.96233296394 seconds
+Medium grained correlated: 3.82616901398 seconds
+
+N = 4
+Fine grained uncorrelated: 3.59325098991 seconds
+Medium grained uncorrelated: 4.4700820446 seconds
+Serial correlated: 0.356873989105 seconds
+Fine grained correlated: 2.97724699974 seconds
+Medium grained correlated: 3.78174591064 seconds
+
+N = 8
+Fine grained uncorrelated: 3.60267210007 seconds
+Medium grained uncorrelated: 5.2617418766 seconds
+Serial correlated: 0.365578889847 seconds
+Fine grained correlated: 2.9755051136 seconds
+Medium grained correlated: 3.80973792076 seconds
+
+
+As can be seen for the runtime when N = 2, 4 and 8, the medium grained runtime increases as N increases. Hence, the best value for N is N =1, ie the fine-grained version.

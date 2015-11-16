@@ -13,12 +13,18 @@ from timer import Timer
 from animator import Animator
 from physics import update, preallocate_locks
 
+from morton import *
+
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
 if __name__ == '__main__':
     num_balls = 10000
     radius = 0.002
+
+    #testing data
+    #num_balls = 10
+    #radius = 0.05
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -43,6 +49,7 @@ if __name__ == '__main__':
     # store one of them.
     grid_spacing = radius / np.sqrt(2.0)
     grid_size = int((1.0 / grid_spacing) + 1)
+
     grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
     grid[(positions[:, 0] / grid_spacing).astype(int),
          (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
@@ -77,6 +84,17 @@ if __name__ == '__main__':
             print("{} simulation frames per second".format(frame_count / total_time))
             frame_count = 0
             total_time = 0
+
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+            sorter = morton_sorter(positions, 100000)
+            #print type(positions)
+            positions = np.array([x for (y,x) in sorted(zip(sorter,positions))])
+            #print positionstemp
+            velocities = np.array([x for (y,x) in sorted(zip(sorter,velocities))])
+            for x in range(grid_size):
+                for y in range(grid_size):
+                    Gridval = grid[x,y]
+                    if (Gridval >= 0 and Gridval < len(positions)):
+                        grid[x,y] = sorter[Gridval]
