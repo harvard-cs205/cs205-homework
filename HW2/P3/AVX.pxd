@@ -21,7 +21,7 @@ cdef extern from "AVX.h" nogil:
     float8 div(float8, float8)
     float8 sqrt(float8)
     float8 fmadd(float8 a, float8 b, float8 c)  # a * b + c
-    float8 fmsub(float8 a, float8 b, float8 c)  # a / b + c
+    float8 fmsub(float8 a, float8 b, float8 c)  # a * b - c
 
     # Comparisons:
     #     When comparing to vectors of float, the result is either 0.0 or -1.0,

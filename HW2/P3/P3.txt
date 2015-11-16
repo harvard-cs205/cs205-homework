@@ -1,0 +1,5 @@
+In this problem, we compared the performance of computing the mandelbrot set across different numbers of threads, and between with and without AVX.
+
+P3_mandelbrot_correctness.png shows that the mandelbrot set heatmaps (where hotness = larger number of iterations). Each panel shows an identical heatmap resulting from a different parallel configuration, which shows that the correctness of the algorithm is not compromised through our use of threads or AVX.
+
+P3_mandelbrot_speedimprovement.png shows the speed improvement resulting from our parallelization. Within the non-AVX runs (black line) and within the AVX runs (blue line), more threads results in faster performance. However, there is a much larger speed improvement by using AVX than by using threads, as we can see from the much lower times of the blue line compared to the black. Furthermore, once we use AVX, the improvement from using multiple threads becomes smaller, especially from 2 to 4 threads.

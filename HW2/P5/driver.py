@@ -15,10 +15,32 @@ from physics import update, preallocate_locks
 
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
+    
+def morton_cmp(a, b):
+    j = 0
+    k = 0
+    x = 0
+    for k in range(2):
+        y = a[k] ^ b[k]
+        if less_msb(x, y):
+            j = k
+            x = y
+    return (int)(a[j] - b[j])
 
+def less_msb(x, y):
+    return x < y and x < (x ^ y)
+
+def make_grid(grid_size, grid_spacing, positions):
+    grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
+    grid[(positions[:, 0] / grid_spacing).astype(int),
+         (positions[:, 1] / grid_spacing).astype(int)] = np.arange(positions.shape[0])
+    return grid
+    
 if __name__ == '__main__':
     num_balls = 10000
     radius = 0.002
+ #   num_balls = 500
+  #  radius = 0.01
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -40,12 +62,12 @@ if __name__ == '__main__':
     #
     # Each square in the grid stores the index of the object in that square, or
     # -1 if no object.  We don't worry about overlapping objects, and just
-    # store one of them.
-    grid_spacing = radius / np.sqrt(2.0)
-    grid_size = int((1.0 / grid_spacing) + 1)
-    grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
-    grid[(positions[:, 0] / grid_spacing).astype(int),
-         (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
+    # store one of them.)
+
+    # Typo made by staff, * rather than /:
+    grid_spacing = radius * np.sqrt(2.0)
+    grid_size = int((1.0 / grid_spacing) + 1)         
+    grid = make_grid(grid_size, grid_spacing, positions)
 
     # A matplotlib-based animator object
     animator = Animator(positions, radius * 2)
@@ -73,6 +95,13 @@ if __name__ == '__main__':
 
         frame_count += 1
         if total_time > anim_step:
+            # Use Morton ordering to promote spatial coherence
+            sorted_idx = [i[0] for i in sorted(enumerate((positions/grid_spacing).astype(int)), 
+                          cmp=lambda a, b: morton_cmp(a[1], b[1]))]                          
+            velocities = velocities[sorted_idx]
+            positions = positions[sorted_idx]
+            grid = make_grid(grid_size, grid_spacing, positions)
+            
             animator.update(positions)
             print("{} simulation frames per second".format(frame_count / total_time))
             frame_count = 0
