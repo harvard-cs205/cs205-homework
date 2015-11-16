@@ -1,0 +1,95 @@
+/****** maze1.npy ******/
+
+/****** part 1 ******/
+
+Feifeis-MacBook-Pro:P5-1 feifeipeng$ python label_regions.py
+The platforms detected are:
+---------------------------
+Apple Apple version: OpenCL 1.2 (May 10 2015 19:38:45)
+The devices detected on platform Apple are:
+---------------------------
+Intel(R) Core(TM) i7-4750HQ CPU @ 2.00GHz [Type: CPU ]
+Maximum clock Frequency: 2000 MHz
+Maximum allocable memory size: 2147 MB
+Maximum work group size 1024
+---------------------------
+Iris Pro [Type: GPU ]
+Maximum clock Frequency: 1200 MHz
+Maximum allocable memory size: 402 MB
+Maximum work group size 512
+---------------------------
+This context is associated with  2 devices
+The queue is using the device: Iris Pro
+(256, 256)
+
+iter 885
+Finished after 885 iterations, 210.80872 ms total, 0.238201943503 ms per iteration
+Found 2 regions
+
+/****** part 2 ******/
+
+iter 528
+Finished after 528 iterations, 124.80632 ms total, 0.236375606061 ms per iteration
+Found 2 regions
+
+/****** part 3 ******/
+
+iter 528
+Finished after 528 iterations, 124.59632 ms total, 0.235977878788 ms per iteration
+Found 2 regions
+
+/****** part 4 ******/
+
+iter 528
+Finished after 528 iterations, 245.6968 ms total, 0.465334848485 ms per iteration
+Found 2 regions
+
+
+
+
+
+/****** maze2.npy ******/
+
+/****** part 1 ******/
+
+Feifeis-MacBook-Pro:P5-1 feifeipeng$ python label_regions.py
+The platforms detected are:
+---------------------------
+Apple Apple version: OpenCL 1.2 (May 10 2015 19:38:45)
+The devices detected on platform Apple are:
+---------------------------
+Intel(R) Core(TM) i7-4750HQ CPU @ 2.00GHz [Type: CPU ]
+Maximum clock Frequency: 2000 MHz
+Maximum allocable memory size: 2147 MB
+Maximum work group size 1024
+---------------------------
+Iris Pro [Type: GPU ]
+Maximum clock Frequency: 1200 MHz
+Maximum allocable memory size: 402 MB
+Maximum work group size 512
+---------------------------
+This context is associated with  2 devices
+The queue is using the device: Iris Pro
+(256, 256)
+
+iter 512
+Finished after 512 iterations, 121.8648 ms total, 0.2380171875 ms per iteration
+Found 35 regions
+
+/****** part 2 ******/
+
+iter 273
+Finished after 273 iterations, 66.74344 ms total, 0.244481465201 ms per iteration
+Found 35 regions
+
+/****** part 3 ******/
+
+iter 273
+Finished after 273 iterations, 64.9268 ms total, 0.237827106227 ms per iteration
+Found 35 regions
+
+/****** part 4 ******/
+
+iter 273
+Finished after 273 iterations, 126.68472 ms total, 0.464046593407 ms per iteration
+Found 35 regions
