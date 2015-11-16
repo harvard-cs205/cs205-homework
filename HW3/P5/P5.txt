@@ -1,0 +1,31 @@
+
+Performance details after completing each part (parts 1~5) below:
+
+After part 1.
+Maze 1: Finished after 877 iterations, 606.311872 ms total, 0.691347630559 ms per iteration
+Found 2 regions
+Maze 2: Finished after 510 iterations, 350.829376 ms total, 0.687900737255 ms per iteration
+Found 35 regions
+
+After part 2.
+Maze 1: Finished after 529 iterations, 357.880608 ms total, 0.676522888469 ms per iteration
+Found 2 regions
+Maze 2: Finished after 273 iterations, 186.082208 ms total, 0.681619809524 ms per iteration
+Found 35 regions
+
+After part 3.
+Maze 1: Finished after 10 iterations, 6.978784 ms total, 0.6978784 ms per iteration
+Found 2 regions
+Maze 2: Finished after 10 iterations, 6.944768 ms total, 0.6944768 ms per iteration
+Found 35 regions
+
+After part 4.
+Maze 1: Finished after 10 iterations, 20.785152 ms total, 2.0785152 ms per iteration
+Found 2 regions
+Maze 2: Finished after 9 iterations, 18.76368 ms total, 2.08485333333 ms per iteration
+Found 35 regions
+
+Adding the single-thread computation for part 4 reduces performance speed by about 3-fold. Although this tweak does have the benefit (as motivated by the problem) of reducing redundant global memory reads, it also has the downside that one thread (thus, serially) must check through all pixels in the workgroup (8 x 8 = 64 pixels) in order to get this reduction of redundant global reads. This one-thread strategy might make sense in a case that is more memory-bound, if there were a lot of stuff to read from global memory for each pixel. If the process is more compute-bound, then it might make more sense to use more threads to parallelize the computation at the cost of more memory transfers. 
+
+Part 5.
+If we use min instead of atomic_min, then we can have cases where two threads are trying to write into the same element of labels at once. This would happen only when both threads are trying to push in a smaller value into the spot, so the value in labels would never increase across iterations. But there could be inefficiencies, where labels does not ultimately take the absolute minimum of the values of the competing threads. Suppose labels[old_label] is 10, thread A is trying to write 8 into it, and thread B is trying to write 6. If thread B writes in 6 first, and then thread A writes in 8, then the final value will be 8, and thus labels will see an increase in value, which is not efficient. But the value would still overall decrease from 10, so we will still see some improvement from this step. Thus, even using min instead of atomic_min should speed up the algorithm. And note that this decision should not affect correctness at all, since at no place are we putting in an incorrect value into labels, as the min operation is associative, as in min(min(A, B), C) = min(A, min(B, C)).
