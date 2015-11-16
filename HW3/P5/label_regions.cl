@@ -1,3 +1,5 @@
+#define min(a, b) (((a) < (b)) ? (a) : (b))
+
 __kernel void
 initialize_labels(__global __read_only int *image,
                   __global __write_only int *labels,
@@ -79,6 +81,12 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
+    if (old_label < w*h) {
+        buffer[buf_x + buf_w * buf_y] = labels[old_label];
+    }
+
+    // Make sure local buffer values have finished updating
+    barrier(CLK_LOCAL_MEM_FENCE);
     
     // stay in bounds
     if ((x < w) && (y < h) && (old_label < w*h)) {
@@ -87,13 +95,13 @@ propagate_labels(__global __read_write int *labels,
 
         // check all four directions
         int curr_label = buffer[(buf_x - 1) + buf_w * buf_y];
-        new_label = new_label < curr_label ? new_label : curr_label;
+        new_label = min(new_label, curr_label);
         curr_label = buffer[(buf_x + 1) + buf_w * buf_y];
-        new_label = new_label < curr_label ? new_label : curr_label;
+        new_label = min(new_label, curr_label);
         curr_label = buffer[buf_x + buf_w * (buf_y - 1)];
-        new_label = new_label < curr_label ? new_label : curr_label;
+        new_label = min(new_label, curr_label);
         curr_label = buffer[buf_x + buf_w * (buf_y + 1)];
-        new_label = new_label < curr_label ? new_label : curr_label;
+        new_label = min(new_label, curr_label);
 
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
