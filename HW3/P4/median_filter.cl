@@ -1,4 +1,6 @@
 
+
+//Load in the median function header file
 #include "median9.h"
 
 
@@ -37,6 +39,8 @@ median_3x3(__global __read_only float *in_values,
     // Each thread in the valid region (x < w, y < h) should write
     // back its 3x3 neighborhood median.
 
+
+
     //////////////////////Define Variables///////////////////////
 
     // halo is the additional number of cells in one direction
@@ -54,34 +58,28 @@ median_3x3(__global __read_only float *in_values,
     const int buf_corner_x = x - lx - halo;
     const int buf_corner_y = y - ly - halo;
 
-    // coordinates of our pixel in the local buffer
-    // this shifts the buffer reference to the middle of the buffer
-    // where these pixels actualy exist in the buffer
-    const int buf_x = lx + halo;
-    const int buf_y = ly + halo;
-
     // 1D index of thread within our work-group
     const int idx_1D = ly * get_local_size(0) + lx; //get_local_size = 8
     
 
     //////////////////////loop to build Buffer///////////////////////
 
-
     // Load the relevant labels to a local buffer with a halo 
-    if (idx_1D < buf_w) {
+    if (idx_1D < buf_w) 
+    {
         //Iterate down each colum, using a row iterator
         for (int row = 0; row < buf_h; row++) 
-
        {
-
 
           int max_x = buf_corner_x + idx_1D; // this is column index, add idx_1D
           int max_y = buf_corner_y + row; //stepping by rows adjust y
-          int new_h = h - 1;
-          int new_w = w - 1;
+          int new_h = h - 1; // height index
+          int new_w = w - 1; // width index
 
-
-          buffer[row * buf_w + idx_1D] = in_values[ min(max(0, max_y), new_h) * w + min(max(0, max_x), new_w)];
+          // Load the values into the buffer
+          // This is a read from global memory global read
+          // Each thread is loading values into the buffer down columns
+          buffer[row * buf_w + idx_1D] = in_values[min(max(0, max_y), new_h) * w + min(max(0, max_x), new_w)];
         }
 
     }
@@ -94,22 +92,20 @@ median_3x3(__global __read_only float *in_values,
 
 //////////////////////coniditional statement to smooth///////////////////////
 
-
+    // Conditional with in bounds of the entire image
     if (x < w && y < h)
       {
+        // Create new index, 'idx,' for reference within function call
+        // to median9
+        int idx = (lx + 1) + (2 * halo + get_local_size(0)) * (ly + 1); 
 
+        // calculate and save new median for the appropirate neighbor values
+        float ans = median9(buffer[idx - buf_w - 1], buffer[idx - buf_w], buffer[idx - buf_w + 1], buffer[idx - 1], buffer[idx], buffer[idx + 1], buffer[idx + buf_w - 1], buffer[idx + buf_w], buffer[idx + buf_w + 1]);
+        
+        // Write out the new median value, saved under 'ans'
+        // This is a global write
+        out_values[y * w + x] = ans;
 
-      int idx = (lx + 1) + (2 * halo + get_local_size(0)) * (ly + 1); 
-      //int idx = (lx) + (2 * halo + get_local_size(0)) * (ly); 
-      float ans = median9(buffer[idx - buf_w - 1], buffer[idx - buf_w], buffer[idx - buf_w + 1], buffer[idx - 1], buffer[idx], buffer[idx + 1], buffer[idx + buf_w - 1], buffer[idx + buf_w], buffer[idx + buf_w + 1]);
-      out_values[y * w + x] = ans;
-      //out_values[x, y] = median9(buffer[idx], buffer[idx], buffer[idx], buffer[idx], buffer[idx], buffer[idx], buffer[idx], buffer[idx], buffer[idx]);
-
-      //float local_value = buffer[row * buf_w + idx_1D]
-      //out_values[y * w + x] = buffer[10];
       } 
-
-
-
 
 }
