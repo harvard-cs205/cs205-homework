@@ -1,3 +1,4 @@
+
 #include "median9.h"
 
 
@@ -10,6 +11,9 @@ median_3x3(__global __read_only float *in_values,
            int buf_w, int buf_h,
            const int halo)
 {
+
+    //////////////////////Problem Comentary///////////////////////
+
     // Note: It may be easier for you to implement median filtering
     // without using the local buffer, first, then adjust your code to
     // use such a buffer after you have that working.
@@ -51,6 +55,8 @@ median_3x3(__global __read_only float *in_values,
     const int buf_corner_y = y - ly - halo;
 
     // coordinates of our pixel in the local buffer
+    // this shifts the buffer reference to the middle of the buffer
+    // where these pixels actualy exist in the buffer
     const int buf_x = lx + halo;
     const int buf_y = ly + halo;
 
@@ -63,7 +69,7 @@ median_3x3(__global __read_only float *in_values,
 
     // Load the relevant labels to a local buffer with a halo 
     if (idx_1D < buf_w) {
-
+        //Iterate down each colum, using a row iterator
         for (int row = 0; row < buf_h; row++) 
 
        {
@@ -80,11 +86,13 @@ median_3x3(__global __read_only float *in_values,
 
     }
 
-    //"%"
-
     // Make sure all threads reach the next part after
     // the local buffer is loaded
     barrier(CLK_LOCAL_MEM_FENCE);
+
+
+
+//////////////////////coniditional statement to smooth///////////////////////
 
 
     if (x < w && y < h)
@@ -100,12 +108,6 @@ median_3x3(__global __read_only float *in_values,
       //float local_value = buffer[row * buf_w + idx_1D]
       //out_values[y * w + x] = buffer[10];
       } 
-
-
-    //indexing the one dimensional buffer incorrectly
-
-
-    //////////////////////loop to build Buffer///////////////////////
 
 
 
