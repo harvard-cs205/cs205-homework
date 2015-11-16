@@ -89,7 +89,7 @@ if __name__ == '__main__':
     cl.enqueue_copy(queue, host_image_filtered, gpu_image_a, is_blocking=True)
     
     assert np.allclose(host_image_filtered, numpy_median(host_image, num_iters))
-    
+    print("Congrats! You made it past the assert statement!")
     # To display image
     # pylab.figure()
     # pylab.imshow(host_image_filtered)
