@@ -31,7 +31,7 @@ if __name__ == '__main__':
 
     # Create a context with all the devices
     devices = platforms[0].get_devices()
-    context = cl.Context(devices)
+    context = cl.Context([devices[2]])
     print 'This context is associated with ', len(context.devices), 'devices'
 
     # Create a queue for transferring data and launching computations.
@@ -42,7 +42,7 @@ if __name__ == '__main__':
 
     program = cl.Program(context, open('label_regions.cl').read()).build(options='')
 
-    host_image = np.load('maze1.npy')
+    host_image = np.load('maze2.npy')
     host_labels = np.empty_like(host_image)
     host_done_flag = np.zeros(1).astype(np.int32)
 
@@ -77,7 +77,16 @@ if __name__ == '__main__':
     cl.enqueue_copy(queue, host_labels, gpu_labels, is_blocking=True)
     pylab.imshow(host_labels)
     pylab.title(itercount)
+    pylab.colorbar()
     pylab.show()
+
+#    cl.enqueue_copy(queue, gpu_done_flag, host_done_flag, is_blocking=False)
+#    prop_exec = program.propagate_labels(queue, global_size, local_size,
+#                                             gpu_labels, gpu_done_flag,
+#                                             gpu_local_memory,
+#                                             width, height,
+#                                             buf_size[0], buf_size[1],
+#                                             halo)
 
     show_progress = True
     total_time = 0
