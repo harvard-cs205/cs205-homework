@@ -31,7 +31,7 @@ if __name__ == '__main__':
 
     # Create a context with all the devices
     devices = platforms[0].get_devices()
-    context = cl.Context(devices)
+    context = cl.Context(devices[2:])
     print 'This context is associated with ', len(context.devices), 'devices'
 
     # Create a queue for transferring data and launching computations.
@@ -116,6 +116,7 @@ if __name__ == '__main__':
     # Show final result
     cl.enqueue_copy(queue, host_labels, gpu_labels, is_blocking=True)
     print 'Found {} regions'.format(len(np.unique(host_labels)) - 1)
+    print np.unique(host_labels)
     pylab.imshow(host_labels)
     pylab.title(itercount)
     pylab.show()

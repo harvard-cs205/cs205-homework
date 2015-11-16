@@ -1,0 +1,7 @@
+Best configuration on my hardware:
+----
+configuration ('coalesced', 32, 32): 0.013592032 seconds
+
+Coalesced reads were uniformly better on my machine than blocked reads, across all numbers of workgroups and workers.
+In coalesced.png and blocked.png, you can see that increasing the number of workgroups above 32 makes essentially no difference, although there is a significant difference in performance between 8, 16, and 32 workgroups.
+Increasing the number of workers makes a significant difference as well, although due to system errors as described in Piazza post 501, I could not use local sizes greater than 32, so it is unclear whether the same diminishing returns would apply.

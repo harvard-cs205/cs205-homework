@@ -1,3 +1,5 @@
+#define min(a, b) (((a) < (b)) ? (a) : (b))
+
 __kernel void
 initialize_labels(__global __read_only int *image,
                   __global __write_only int *labels,
@@ -17,10 +19,9 @@ initialize_labels(__global __read_only int *image,
     }
 }
 
-int
-get_clamped_value(__global __read_only int *labels,
-                  int w, int h,
-                  int x, int y)
+int get_clamped_value(__global __read_only int *labels,
+                      int w, int h,
+                      int x, int y)
 {
     if ((x < 0) || (x >= w) || (y < 0) || (y >= h))
         return w * h;
@@ -55,7 +56,9 @@ propagate_labels(__global __read_write int *labels,
     const int buf_y = ly + halo;
 
     // 1D index of thread within our work-group
-    const int idx_1D = ly * get_local_size(0) + lx;
+    const int lsize_x = get_local_size(0);
+    const int lsize_y = get_local_size(1);
+    const int idx_1D = ly * lsize_x + lx;
     
     int old_label;
     // Will store the output value
@@ -64,7 +67,7 @@ propagate_labels(__global __read_write int *labels,
     // Load the relevant labels to a local buffer with a halo 
     if (idx_1D < buf_w) {
         for (int row = 0; row < buf_h; row++) {
-            buffer[row * buf_w + idx_1D] = 
+            buffer[row * buf_w + idx_1D] = \
                 get_clamped_value(labels,
                                   w, h,
                                   buf_corner_x + idx_1D, buf_corner_y + row);
@@ -79,21 +82,53 @@ propagate_labels(__global __read_write int *labels,
     // the pixel for this thread
     old_label = buffer[buf_y * buf_w + buf_x];
 
+    int this_label;
+    int last_label = -1;
+    int last_index = -1;
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
+    if ((lx == 0) && (ly == 0)) {
+        for (int bx = halo; bx < lsize_x + halo; bx++) {
+            for (int by = halo; by < lsize_y + halo; by++) {
+                this_label = buffer[bx + buf_w * by];
+                if (this_label < w*h) {
+                    if (this_label != last_label) {
+                        buffer[bx + buf_w * by] = labels[this_label];
+                        last_label = this_label;
+                    }
+                    else {
+                        buffer[bx + buf_w * by] = buffer[last_index];
+                    }
+                    last_index = bx + buf_w * by;
+                }
+            }
+        }
+    }
+
+    // Make sure local buffer values have finished updating
+    barrier(CLK_LOCAL_MEM_FENCE);
     
     // stay in bounds
-    if ((x < w) && (y < h)) {
+    if ((x < w) && (y < h) && (old_label < w*h)) {
         // CODE FOR PART 1 HERE
-        // We set new_label to the value of old_label, but you will need
-        // to adjust this for correctness.
         new_label = old_label;
+
+        // check all four directions
+        int curr_label = buffer[(buf_x - 1) + buf_w * buf_y];
+        new_label = min(new_label, curr_label);
+        curr_label = buffer[(buf_x + 1) + buf_w * buf_y];
+        new_label = min(new_label, curr_label);
+        curr_label = buffer[buf_x + buf_w * (buf_y - 1)];
+        new_label = min(new_label, curr_label);
+        curr_label = buffer[buf_x + buf_w * (buf_y + 1)];
+        new_label = min(new_label, curr_label);
 
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
+            atomic_min(&(labels[old_label]), new_label); 
             // indicate there was a change this iteration.
             // multiple threads might write this.
             *(changed_flag) += 1;
-            labels[y * w + x] = new_label;
+            atomic_min(&(labels[y * w + x]), new_label);
         }
     }
 }

@@ -1,0 +1,19 @@
+My results for Part 4 were much slower than my results for Part 3, and I believe this is because the memory accesses take enough longer than anything else that any thread has to do that even if we avoid repeating a few accesses, having them all in one thread (and thus requiring all the threads to wait for all the memory accesses consecutively) slows down the computation significantly.
+
+Replacing the atomic_min() operations with regular min() operations might reduce the time per iteration, but it is likely to increase the number of iterations because the value stored at the end of an iteration at a given location may not be the minimum across all threads for that iteration. 
+However, the algorithm will still be correct, because the check for whether something changed (and thus whether the next iteration needs to happen) is independent of what happens in the writing of the minimum.
+A value in labels could increase during an iteration, if two min() operations get interleaved in such a way that the larger of the two values that the two threads try to write sticks, but can't increase between iterations, because anything that gets written in the min() operation would have to at least be less than the value that the location in labels started with at the beginning of that iteration.
+
+Maze 1
+----
+Part 1: Finished after 877 iterations, 603.144256 ms total, 0.687735753706 ms per iteration
+Part 2: Finished after 529 iterations, 369.475328 ms total, 0.698441073724 ms per iteration
+Part 3: Finished after 10 iterations, 6.963904 ms total, 0.6963904 ms per iteration
+Part 4: Finished after 10 iterations, 22.403104 ms total, 2.2403104 ms per iteration
+
+Maze 2
+----
+Part 1: Finished after 511 iterations, 347.220384 ms total, 0.679491945205 ms per iteration
+Part 2: Finished after 273 iterations, 180.51632 ms total, 0.661231941392 ms per iteration
+Part 3: Finished after 9 iterations, 6.269792 ms total, 0.696643555556 ms per iteration
+Part 4: Finished after 9 iterations, 20.133472 ms total, 2.23705244444 ms per iteration
