@@ -1,0 +1,35 @@
+This is the output of the code: 
+
+
+
+UNCORRELATED DATA EXCHANGES:
+
+Serial uncorrelated: 0.222935199738 seconds
+
+Number of locks for fine-grained: 1000
+
+Fine grained uncorrelated: 4.1613509655 seconds
+
+Number of locks for medium-grained: 100
+
+Medium grained uncorrelated: 8.4577999115 seconds
+
+CORRELATED DATA EXCHANGES:
+
+Serial correlated: 0.241045951843 seconds
+
+Number of locks for fine-grained: 1000
+
+Fine grained correlated: 3.88704681396 seconds
+
+Number of locks for medium-grained: 100
+
+Medium grained correlated: 4.08418488503 seconds
+
+
+
+For the uncorrelated data exchanges, the serial (similar to a coarse -grained since serial is equivalent to locking the entire array counts) is way faster than any other method. It is longer with the fine grained because, once one location is locked in one array , the other threads cannot access it if they have the same index. Therefore there are pauses during the run. The worst is the medium-grained, it becomes more frequent that one thread tries to access an index that is locked. Roughly, if we had 2 threads, the second thread would have 1/1000 to have an index that is already locked while it would have 1/100 to have a locked index for the medium-grained.
+
+
+
+For the correlated cased, because the 2 indexes (src[idx] and dest[idx]) are closer to each other, the medium-grained threads usually tries to access an index that is not already locked. Therefore it is faster.

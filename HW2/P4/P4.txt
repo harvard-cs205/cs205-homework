@@ -1,0 +1,20 @@
+# VERSION THAT CREATES NEW THREADS AT EACH ITERATIONS
+
+I create new thread at each iterations. At the end of each iterations, I join them and then swap the matrices.
+
+# VERSION FOR EXTRA CREDIT
+
+
+We launch all the tread with .start()
+
+We create a matrix of size num_thread * iterations to check the status of completion.
+
+If the iterations i-1 of the thread n-1, n and n+1 (located in matrix events_matrix[n-1:n+1,i-1]) are done, then we run the function.
+
+
+# RESULTS FROM THE VERSION THAT CREATES THREADS AT EACH ITERATIONS
+
+For 1 thread it takes: 4.7 s
+For 2 threads it takes 2.7 s 
+For 4 threads it takes 2.5 s
+

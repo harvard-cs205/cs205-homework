@@ -6,7 +6,7 @@ def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
 class Animator(object):
-    def __init__(self, positions, diameter):
+    def __init__(self, positions, diameter , grid_size):
         self.count = positions.shape[0]
 
         plt.ion()
@@ -25,11 +25,20 @@ class Animator(object):
                                          edgecolor='face', facecolor=colors)
         ax.add_collection(self.circles)
 
+        # plot the grid
+        #for i in np.linspace(0,1,grid_size):
+        #    ax.axhline(i)
+        #    ax.axvline(i)
+
+
+
+
         ax.axis([0, 1, 0, 1])
-        ax.get_xaxis().set_visible(False)
-        ax.get_yaxis().set_visible(False)
+        ax.get_xaxis().set_visible(True)
+        ax.get_yaxis().set_visible(True)
         ax.set_axis_bgcolor('black')
         plt.draw()
+        plt.show()
 
     def update(self, positions):
         self.circles.set_offsets(positions)
