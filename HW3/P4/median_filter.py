@@ -42,7 +42,7 @@ if __name__ == '__main__':
 
     # Create a context with all the devices
     devices = platforms[0].get_devices()
-    context = cl.Context(devices)
+    context = cl.Context(devices[2:])
     print 'This context is associated with ', len(context.devices), 'devices'
 
     # Create a queue for transferring data and launching computations.
@@ -88,4 +88,4 @@ if __name__ == '__main__':
 
     cl.enqueue_copy(queue, host_image_filtered, gpu_image_a, is_blocking=True)
 
-    assert np.allclose(host_image_filtered, numpy_median(host_image, num_iters))
+    np.testing.assert_allclose(host_image_filtered, numpy_median(host_image, num_iters))
