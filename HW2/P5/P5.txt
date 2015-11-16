@@ -1,0 +1,6 @@
+# solution to P5
+
+THe performance increases as we finished part 1 (parallelism), part 2 (spacial decomposition), and part 3 (sorting).
+The part 1 help us run the algorithm concurrently, and it reduce the running time. The part 2 enable us to implement an O(N) algorithm instead of the original O(N^2) algorithmm which improved the performance much.
+The part 3 make nearby balls in nearby memory, which reduce the time for the program to access the data. Here we use Morton ordering, which can be defined recursively. The property of Morton ordering allow positions that are geometrically close to each other on a 2D-grid to stay near in 1D-order, with exception of few corner cases.
+The part 4 is a errorproof work by adding locks, which will slow down the program by adding locks.

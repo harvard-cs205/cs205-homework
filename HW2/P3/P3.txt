@@ -1,0 +1,16 @@
+# solution to P3
+
+Instruction-level parallelism outperformed multithreading much (approximately 6 times fast), and the performance is proportional to the number of threads when we choose 1, 2 and 4 threads. The original result can be found below
+
+Multithreading, num_threads = 1
+1074.656613 Million Complex FMAs in 4.29220914841 seconds, 250.373776264 million Complex FMAs / second
+Instruction-level, num_threads = 1
+1074.94829 Million Complex FMAs in 0.709445953369 seconds, 1515.19405375 million Complex FMAs / second
+Multithreading, num_threads = 2
+1074.656613 Million Complex FMAs in 2.17540884018 seconds, 494.002135668 million Complex FMAs / second
+Instruction-level, num_threads = 2
+1074.94829 Million Complex FMAs in 0.351073026657 seconds, 3061.8937041 million Complex FMAs / second
+Multithreading, num_threads = 4
+1074.656613 Million Complex FMAs in 1.11793398857 seconds, 961.288076028 million Complex FMAs / second
+Instruction-level, num_threads = 4
+1074.94829 Million Complex FMAs in 0.178133010864 seconds, 6034.52602516 million Complex FMAs / second

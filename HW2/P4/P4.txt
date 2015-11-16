@@ -1,0 +1,13 @@
+# solution to P4
+
+When the number of threads is 1, the algorithm is equivalent to serial. But it takes some time for parallelism. The speed of multithread calculation is approximately proportional to the number of threads, but generally take longer for the total time because of more communication between threads.
+
+2.80837988853 seconds for serial 10 filter passes.
+num_threads = 1
+2.87450194359 seconds for multithread 10 filter passes.
+num_threads = 2
+1.46647000313 seconds for multithread 10 filter passes.
+num_threads = 4
+0.773344993591 seconds for multithread 10 filter passes.
+
+My approach to parallelism is to devide the jobs into 4 parts corresponding to the index of the row. For the cooperation between threads, we allow iteration i to start only if iteration i-1 has been completed for all threads.

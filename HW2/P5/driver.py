@@ -16,9 +16,29 @@ from physics import update, preallocate_locks
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
+# morton ordering, we do it recursively
+def mortongrid(grid_size):
+    # the basic unit when the size is 2
+    size = 2
+    grid = np.array([[0, 1], [2, 3]]).astype(int)
+    # if we want a larger grid, double the size by put 4 smaller grids together
+    while size < grid_size:
+        newgrid = np.zeros((size * 2, size * 2)).astype(int)
+        newgrid[0:size, 0:size] = grid
+        newgrid[0:size, size:size*2] = grid + size * size
+        newgrid[size:size*2, 0:size] = grid + 2 * size * size
+        newgrid[size:size*2, size:size*2] = grid + 3 * size * size
+        grid = newgrid
+        size = size * 2
+    # take a subgrid if the grid is larger than desired
+    return grid[0:grid_size, 0:grid_size]
+
 if __name__ == '__main__':
+
     num_balls = 10000
     radius = 0.002
+#    num_balls = 20
+#    radius = 0.07
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -64,7 +84,7 @@ if __name__ == '__main__':
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
-                   radius, grid_size, locks_ptr,
+                   radius, grid_spacing, locks_ptr,
                    physics_step)
 
         # udpate our estimate of how fast the simulator runs
@@ -80,3 +100,15 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+            
+            # we use morton ordering, which is implemented above
+            sortgrid = mortongrid(grid_size)
+            # current position -> current cell of grid -> morton order
+            posgrid = sortgrid[(positions[:, 0] / grid_spacing).astype(int),
+                               (positions[:, 1] / grid_spacing).astype(int)]
+            # sort it and use the index to reconstruct the position and velocity arrays, as well as the grid
+            rankgrid = np.argsort(posgrid)
+            positions = positions[rankgrid, :]
+            velocities = velocities[rankgrid, :]
+            grid[(positions[:, 0] / grid_spacing).astype(int),
+                 (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
