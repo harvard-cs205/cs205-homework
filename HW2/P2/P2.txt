@@ -1,0 +1,20 @@
+Serial uncorrelated: 0.28008890152 seconds
+Fine grained uncorrelated: 6.43068599701 seconds
+Medium grained uncorrelated: 7.92938899994 seconds
+Medium grained uncorrelated: 8.08924889565 seconds
+Medium grained uncorrelated: 8.77191615105 seconds
+Medium grained uncorrelated: 9.76782608032 seconds
+Serial correlated: 0.359994888306 seconds
+Fine grained correlated: 5.98724794388 seconds
+Medium grained correlated: 7.52423191071 seconds
+Medium grained correlated: 7.95377993584 seconds
+Medium grained correlated: 8.3985350132 seconds
+Medium grained correlated: 9.82522583008 seconds
+
+Where for Medium grained, N = 10, 25, 50, and 100
+
+For the medium grained threading, the random data seems to work better with the medium grained threading. It seems that when the data is correlated it takes longer to complete probably due to the fact that is using more contention when trying to get locks that are nearby each other vs randomly placed. The lower N is the better the performance is for this data when using medium grained, which unfortunately is still not as good as serial or fine grained.
+
+As for the fine grained threading, whether correlated or uncorrelated, the performance seems to stay about the same, since it the processes of taking a lock at each step comes with the same amount of overhead. 
+
+For the serial data, however, is much faster for both the correlated and uncorrelated data based on the fact that the structure of the data is set so that each task can be easily and quickly completed.
