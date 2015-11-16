@@ -1,0 +1,22 @@
+Experiment results:
+4 threads
+Original
+1074.656613 Million Complex FMAs in 4.06431293488 seconds, 264.412861465 million Complex FMAs / second
+AVX
+1074.694415 Million Complex FMAs in 0.191869974136 seconds, 5601.15995135 million Complex FMAs / second
+
+2 threads 
+Original
+1074.656613 Million Complex FMAs in 4.07380509377 seconds, 263.79676697 million Complex FMAs / second
+AVX
+1075.003706 Million Complex FMAs in 0.285508871078 seconds, 3765.21998052 million Complex FMAs / second
+
+1 thread
+Original
+1074.656613 Million Complex FMAs in 4.19470310211 seconds, 256.193725 million Complex FMAs / second
+AVX
+1074.94829 Million Complex FMAs in 0.570016860962 seconds, 1885.81840928 million Complex FMAs / second
+
+We can see that using AVX dramatically speeds up the code. For example, in the serial (num_threads = 1) case, using AVX gave us greater than a 7x speedup (the theoretical maximum is 8x, which we will always be under due to overhead). Using parallelism seems to increase the performance by almost the optimal amount (i.e. going from 1 to 2 threads about doubles the computation rate, likewise from 2 to 4 threads). In general, it seems that this problem is very amenable to parallelism as each computation is very independent of others. 
+
+

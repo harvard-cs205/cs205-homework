@@ -16,6 +16,21 @@ from physics import update, preallocate_locks
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
+# from wiki on z-order curve
+def less_msb(x, y):
+    return x < y and (x ^ y)
+
+# from wiki on z-order curve
+def morton_order_sort(a, b):
+    # a and b will be tuples, index followed by position tuple 
+    j, x = 0, 0 
+    for k in range(2): 
+        y = a[1][k] ^ b[1][k]
+        if less_msb(x, y):
+            j = k
+            x = y
+    return a[1][j] - b[1][j]
+
 if __name__ == '__main__':
     num_balls = 10000
     radius = 0.002
@@ -80,3 +95,27 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+
+            # the wiki code only gives us relative orderings,
+            # so we need to use pythons built in sort function 
+            # the wiki code also expects integers, so we convert
+            # to grid positions  
+            # SUBPROBLEM 3
+            grid_indices = zip(range(num_balls), (positions/grid_spacing).astype(int).tolist())
+            grid_indices.sort(morton_order_sort)
+            # want to get the sorted indices, don't care about positions 
+            sorted_idx = [x[0] for x in grid_indices]
+            
+            # shuffle positions/velocities to the new oridering
+            positions = positions[sorted_idx]
+            velocities = velocities[sorted_idx]
+            # clear grid as old indices are no longer valid 
+            grid[:, :] = -1
+            # update grid with new positions 
+            for i in range(num_balls):
+                # check fi the position is in bounds 
+                if positions[i, 0] < 1 and positions[i, 0] >= 0:
+                    if positions[i, 1] < 1 and positions[i, 0] >= 0:
+                        ix = int(positions[i, 0]/grid_spacing)
+                        iy = int(positions[i, 1]/grid_spacing)
+                        grid[ix, iy] = i 

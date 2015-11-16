@@ -1,0 +1,44 @@
+Experiment Results: 
+Serial uncorrelated: 0.247981071472 seconds
+Serial uncorrelated: 0.25435090065 seconds
+Serial uncorrelated: 0.24853515625 seconds
+Serial uncorrelated: 0.25 seconds
+
+Fine grained uncorrelated: 5.88172292709 seconds
+Fine grained uncorrelated: 5.88604617119 seconds
+Fine grained uncorrelated: 6.35300707817 seconds
+Fine grained uncorrelated: 6.41476297379 seconds
+
+
+Serial correlated: 0.341382026672 seconds
+Serial correlated: 0.314351081848 seconds
+Serial correlated: 0.313647985458 seconds
+Serial correlated: 0.337734937668 seconds
+
+
+Fine grained correlated: 5.57948303223 seconds
+Fine grained correlated: 5.71018099785 seconds
+Fine grained correlated: 5.73668193817 seconds
+Fine grained correlated: 6.01500082016 seconds
+
+N = 5
+Medium grained uncorrelated: 6.26337885857 seconds
+Medium grained correlated: 5.46136307716 seconds
+
+N = 10
+Medium grained uncorrelated: 6.82125401497 seconds
+Medium grained correlated: 5.24974894524 seconds
+
+N = 50 
+Medium grained uncorrelated: 8.72413897514 seconds
+Medium grained correlated: 4.23398208618 seconds
+
+N = 80
+Medium grained uncorrelated: 10.0822679996 seconds
+Medium grained correlated: 4.63935303688 seconds
+
+N = 100
+Medium grained uncorrelated: 11.7373850346 seconds
+Medium grained correlated: 5.50020599365 seconds
+
+In every case, the serial version of the algorithm performed much faster than the parallel version with locks. This suggests that the overhead of locks is not worth it for the level of parralelism that we are achieving. In the correlated case, it appeared that the level of locking in the medium grained case had no large impact on the runtime (it slightly went down from N=5 to N=50 than went up for every incrase in N through 100). It seemed that uncorrelated scaled poorly as we increased N for medium grained locking. This suggests that we should use a smaller N, perhaps around 10, which gives us a good result in the uncorrelated case and th ecorrelated case. Fine grained locking appeared to perform similarly to the medium grained locking. 
