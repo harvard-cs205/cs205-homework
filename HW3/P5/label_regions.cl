@@ -1,3 +1,5 @@
+
+
 __kernel void
 initialize_labels(__global __read_only int *image,
                   __global __write_only int *labels,
@@ -17,6 +19,9 @@ initialize_labels(__global __read_only int *image,
     }
 }
 
+
+//the function below ensures that the pixels do not go out of bounds of the global 
+// picture
 
 int
 get_clamped_value(__global __read_only int *labels,
@@ -44,6 +49,8 @@ propagate_labels(__global __read_write int *labels,
     const int y = get_global_id(1);
 
     // Local position relative to (0, 0) in workgroup
+    // this position is naive to the fact that the workgroup is actually in the middle
+    // of the buffer with the 'halo' around it
     const int lx = get_local_id(0);
     const int ly = get_local_id(1);
 
@@ -53,6 +60,8 @@ propagate_labels(__global __read_write int *labels,
     const int buf_corner_y = y - ly - halo;
 
     // coordinates of our pixel in the local buffer
+    // this shifts the buffer reference to the middle of the buffer
+    // where these pixels actualy exist in the buffer
     const int buf_x = lx + halo;
     const int buf_y = ly + halo;
 
@@ -65,7 +74,6 @@ propagate_labels(__global __read_write int *labels,
     int neighbor_3;
     int neighbor_4;
     int grandparent;
-    int min_label;
     
     int old_label;
     // Will store the output value
@@ -95,59 +103,91 @@ propagate_labels(__global __read_write int *labels,
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
 
     // for part 4 use an if () statement to pic out one thread to load in the group members grandparents with one thread
-    //need a for () loop to ensure one thread loads in all the proper grandparents
+    // need a for () loop to ensure one thread loads in all the proper grandparents
+    // We want one thread to run through and load in all the proper grandparent labels to limit global reads
+    if ((lx == 0) && (ly == 0)) //Choolsing the first thread in a work group
+        {
 
-    if (old_label < w * h) //Added for part P5.2
-    {
-        buffer[buf_y * buf_w + buf_x] = labels[old_label];
-    }
+        // set the appropriate grandparent value
+        if (old_label < w * h)
+        {
+            grandparent = labels[old_label];
+        }   
+            // Iterate through the rows of the buffer
+            for(int row = halo; row < buf_h - halo; row++)
+            {
+                // Iterate through the columns of the buffer
+                for(int col = halo; col < buf_w - halo; col++)
+                {
+                    // Conditional to make sure you are not on the wall of the maze
+                    if (buffer[(ly + row) * buf_w + (lx + col)] < w * h)
+                    {
+                        // conditional to ensure that this pixel does not already have
+                        // the grandparent value
+                        if (buffer[(ly + row) * buf_w + (lx + col)] != grandparent)
+                        {
+                            // Populate the buffer with the appropriate 
+                            // grandparent value
+                            buffer[(ly + row) * buf_w + (lx + col)] = labels[buffer[(ly + row) * buf_w + (lx + col)]];
+                        }
 
-    
+                    }
+                }
+            }
+        }
+
+    //for part P5.5 it doesnt matter, we still get valid data becasue it is a single integer that is being written into global memory
+
+
+    // barieier here to enesure all threads are synched when loading in the buffer
     barrier(CLK_LOCAL_MEM_FENCE);
 
 
-    // stay in bounds
-    if ((x < w) && (y < h)) {
+    // stay in bounds of the maze
+    if ((x < w) && (y < h)) 
+    {
+
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
-        new_label = buffer[buf_y * buf_w + buf_x];
+
+        // must ensure that you are not on the wall of the maze
         if (old_label < w * h)
         {
-
-            neighbor_1 = buffer[(buf_y + 1) * buf_w + (buf_x)]; //changed for P5.2
+            // must assign variables for all neighbors for comparison
+            neighbor_1 = buffer[(buf_y + 1) * buf_w + (buf_x)]; 
             neighbor_2 = buffer[(buf_y) * buf_w + (buf_x + 1)];
             neighbor_3 = buffer[(buf_y - 1) * buf_w + (buf_x)];
             neighbor_4 = buffer[(buf_y) * buf_w + (buf_x - 1)];
-            min_label = min(old_label, min(min(min(neighbor_1, neighbor_2), neighbor_3), neighbor_4));
-        
+
+            // choose the new label with a nested min() function
+            new_label = min(old_label, min(min(min(neighbor_1, neighbor_2), neighbor_3), neighbor_4));
             
-
-            if (min_label < old_label)
+            // This atomic operation stores the minimum of these two values
+            // with a global memory read
+            if (new_label < old_label)
             {
-              //  atomic_min(&labels[old_label], min_label); //changed for P5.3
-                new_label = min_label; //for P5.2 and before
-                atomic_min(&labels[old_label], min_label); //added for P5.3
-
+                // changed for P5.3, Updates the Local Position
+                // child regions to merge their old and new parent 
+                // whenever they change to a new label
+                atomic_min(&labels[old_label], new_label); 
             }
-
-        //else {
-          //  new_label = old_label;
-        //}
 
         } 
 
 
-
-
-
-        if (new_label != old_label) {
+        if (new_label != old_label) 
+        {
             // CODE FOR PART 3 HERE
             // indicate there was a change this iteration.
             // multiple threads might write this.
             *(changed_flag) += 1;
+
+            // changed for P5.3, updates the Global Position
+            // child regions to merge their old and new parent 
+            // whenever they change to a new label
             atomic_min(&labels[y * w + x], new_label);
-            //labels[y * w + x] = new_label;
+           
         }
     }
 }
