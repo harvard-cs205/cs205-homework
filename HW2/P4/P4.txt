@@ -1,0 +1,30 @@
+No Threading Module (Single Threaded) 
+  3.34195303917 seconds for 10 filter passes.
+
+Sample run is representative of multiple runs
+
+Threading Module
+
+  1 Thread
+  3.34847378731 seconds for 10 filter passes.
+
+  2 Threads
+  1.75988101959 seconds for 10 filter passes.
+
+  4 Threads
+  0.937849998474 seconds for 10 filter passes.
+
+  Sample runs are representative of multiple runs
+
+
+Implementation
+
+  To make sure that threads do not collide with each other, I had a pair of semaphores (lower, upper) for each thread, all initialized with a count of 1.
+
+  When thread (n) is about to start an iteration, it acquires the upper semaphore of the (n-1) thread and the lower semaphore of the (n+1) thread.  Once it finishes the iteration, it increments its own lower and upper semaphores.
+
+  Sematically, the semaphores serve as signals.  Thread (n) checks the (n-1) and (n+1) signals (i.e. acquiring the sempaphores) before performing an itertation.  It then sends signals to the (n-1) and (n+1) threads saying it has completed (i.e. releasings its own semaphores)
+
+  This design also allows threads to begin an iteration of filtering asychronously, since we only wait for the semaphores of the n-1 and n+1 threads to be incremented before starting the next iteration.
+
+

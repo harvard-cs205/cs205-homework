@@ -19,6 +19,8 @@ def randcolor():
 if __name__ == '__main__':
     num_balls = 10000
     radius = 0.002
+    # num_balls = 100
+    # radius = 0.01
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -41,7 +43,10 @@ if __name__ == '__main__':
     # Each square in the grid stores the index of the object in that square, or
     # -1 if no object.  We don't worry about overlapping objects, and just
     # store one of them.
-    grid_spacing = radius / np.sqrt(2.0)
+    
+    # See piazza post for the reason for this change.
+    grid_spacing = radius * np.sqrt(2.0)
+    
     grid_size = int((1.0 / grid_spacing) + 1)
     grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
     grid[(positions[:, 0] / grid_spacing).astype(int),
@@ -57,14 +62,21 @@ if __name__ == '__main__':
 
     frame_count = 0
 
+    # SUBPROBLEM 3 : One time initializations for temp variables
+    ts = np.zeros(num_balls).astype(int)
+    rx = np.zeros(num_balls).astype(int)
+    ry = np.zeros(num_balls).astype(int)
+
+
     # SUBPROBLEM 4: uncomment the code below.
     # preallocate locks for objects
     locks_ptr = preallocate_locks(num_balls)
 
+    data = []
     while True:
         with Timer() as t:
             update(positions, velocities, grid,
-                   radius, grid_size, locks_ptr,
+                   radius, grid_spacing, locks_ptr,
                    physics_step)
 
         # udpate our estimate of how fast the simulator runs
@@ -75,8 +87,54 @@ if __name__ == '__main__':
         if total_time > anim_step:
             animator.update(positions)
             print("{} simulation frames per second".format(frame_count / total_time))
+            data.append(frame_count / total_time)
+            if len(data) == 120 :
+                print("Average : {} simulation frames per second".format(np.mean(data)))
+                print("Standard Deviation : {}".format(np.std(data)))
+                break
             frame_count = 0
             total_time = 0
+
+
+
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+
+            # Get the set of distances by Hilbert curve, sort them, and then
+            # grab the indicies in sorted order.
+            # Adapted from Wikipedia's article about Hilbert space-filling curve
+            # to use numpy operations
+            n = 128
+            xs = (positions[:, 0] * n).astype(int)
+            ys = (positions[:, 1] * n).astype(int)
+            ds = np.zeros(num_balls).astype(int)
+            s = n/2
+            while s > 0 :
+                rx = (xs & s) > 0
+                ry = (ry & s) > 0
+                ds += s * s * ((3 * rx) ^ ry)
+
+                ryi = (ry == 0)
+                rxyi = ryi & (rx == 1)
+                xs[rxyi] = n-1 - xs[rxyi];
+                ys[rxyi] = n-1 - ys[rxyi];
+            
+                # Swap x and y
+                ts[ryi] = xs[ryi]
+                xs[ryi] = ys[ryi]
+                ys[ryi] = ts[ryi]
+
+                s /= 2            
+
+            indices = np.argsort(ds)
+
+            # Update based off the new sorting
+            positions = positions[indices]
+            velocities = velocities[indices]
+
+            # Update grid
+            grid = - np.ones((grid_size, grid_size), dtype=np.uint32)
+            grid[(positions[:, 0] / grid_spacing).astype(int),
+                (positions[:, 1] / grid_spacing).astype(int)] = np.arange(num_balls)
+                

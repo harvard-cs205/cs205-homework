@@ -6,6 +6,9 @@ from libc.stdint cimport uintptr_t
 cimport cython
 from omp_defs cimport omp_lock_t, get_N_locks, free_N_locks, acquire, release
 
+from cython.parallel import prange
+
+
 # Useful types
 ctypedef np.float32_t FLOAT
 ctypedef np.uint32_t UINT
@@ -55,13 +58,22 @@ cdef void sub_update(FLOAT[:, ::1] XY,
                      float R,
                      int i, int count,
                      UINT[:, ::1] Grid,
-                     float grid_spacing) nogil:
+                     float grid_spacing,
+                     omp_lock_t *locks) nogil:
     cdef:
-        FLOAT *XY1, *XY2, *V1, *V2
-        int j, dim
+        FLOAT *XY1
+        FLOAT *XY2
+        FLOAT *V1
+        FLOAT *V2
+        int GXY[25] # maximum 25 balls to check
+        int ii, jj, j, dim, gx, gy
+        int gxy = 0
+        int grid_size = int((1.0 / grid_spacing) + 1)
         float eps = 1e-5
 
     # SUBPROBLEM 4: Add locking
+    # No need to add a lock here yet.  We don't actuallly
+    # check V1 until later.
     XY1 = &(XY[i, 0])
     V1 = &(V[i, 0])
     #############################################################
@@ -69,17 +81,49 @@ cdef void sub_update(FLOAT[:, ::1] XY,
     ############################################################
     # SUBPROBLEM 2: use the grid values to reduce the number of other
     # objects to check for collisions.
-    for j in range(i + 1, count):
+    
+    # Use the Grid to limit the balls we need to check.
+    gx = <int>(XY1[0] / grid_spacing)
+    gy = <int>(XY1[1] / grid_spacing)
+
+    # Search all possible locations for collision
+    # 1 < sqrt(2) < 2, so the other circle can be at max 2 squares away
+    # for the circles to be touching.
+    # To simplify code, we'll slightly expand the search area into a 5 x 5 grid.
+    for ii in range(-2 + gx, 3 + gx) :
+        if ii < 0 or ii >= grid_size :
+            continue
+        for jj in range(-2 + gy, 3 + gy) :
+            if jj < 0 or jj >= grid_size  :
+                continue
+            # -1 is a huge number for a UINT, so we simply check to make sure
+            # we don't get an impossible index
+            # Also, to prevent colliding balls twice, we make sure that ball i
+            # collides only with balls with a larger index
+            if Grid[ii,jj] <= i or Grid[ii,jj] > count :
+                continue
+            GXY[gxy] = Grid[ii,jj]
+            gxy += 1
+
+    for ii in range(gxy):
+        # Grab the index that we found
+        j = GXY[ii]
         XY2 = &(XY[j, 0])
-        V2 = &(V[j, 0])
+        V2 = &(V[j, 0])        
         if overlapping(XY1, XY2, R):
             # SUBPROBLEM 4: Add locking
+            # Implicit Condition: i < j, so this will not deadlock
+            acquire(&locks[i])
+            acquire(&locks[j])
             if not moving_apart(XY1, V1, XY2, V2):
                 collide(XY1, V1, XY2, V2)
 
             # give a slight impulse to help separate them
             for dim in range(2):
                 V2[dim] += eps * (XY2[dim] - XY1[dim])
+
+            release(&locks[j])
+            release(&locks[i])
 
 cpdef update(FLOAT[:, ::1] XY,
              FLOAT[:, ::1] V,
@@ -90,10 +134,14 @@ cpdef update(FLOAT[:, ::1] XY,
              float t):
     cdef:
         int count = XY.shape[0]
-        int i, j, dim
-        FLOAT *XY1, *XY2, *V1, *V2
+        int grid_size = int((1.0 / grid_spacing) + 1)
+        int i, j, dim, gx, gy
+        FLOAT *XY1
+        FLOAT *XY2
+        FLOAT *V1
+        FLOAT *V2
         # SUBPROBLEM 4: uncomment this code.
-        # omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
+        omp_lock_t *locks = <omp_lock_t *> <void *> locks_ptr
 
     assert XY.shape[0] == V.shape[0]
     assert XY.shape[1] == V.shape[1] == 2
@@ -103,7 +151,9 @@ cpdef update(FLOAT[:, ::1] XY,
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
-        for i in range(count):
+        num_threads = 4
+        chunksize = XY.shape[0] / 4
+        for i in prange(count, num_threads=num_threads, schedule='static', chunksize=chunksize) :
             for dim in range(2):
                 if (((XY[i, dim] < R) and (V[i, dim] < 0)) or
                     ((XY[i, dim] > 1.0 - R) and (V[i, dim] > 0))):
@@ -113,17 +163,28 @@ cpdef update(FLOAT[:, ::1] XY,
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads, with static
         # scheduling.
-        for i in range(count):
-            sub_update(XY, V, R, i, count, Grid, grid_spacing)
+        for i in prange(count, num_threads=num_threads, schedule='static', chunksize=chunksize) :
+            sub_update(XY, V, R, i, count, Grid, grid_spacing, locks)
 
         # update positions
         #
         # SUBPROBLEM 1: parallelize this loop over 4 threads (with static
         #    scheduling).
         # SUBPROBLEM 2: update the grid values.
-        for i in range(count):
+
+        # Reset grid values
+        for i in prange(grid_size, num_threads=num_threads, schedule='static', chunksize=chunksize) :
+            for j in range(grid_size) :
+                Grid[i,j] = -1
+
+        for i in prange(count, num_threads=num_threads, schedule='static', chunksize=chunksize) :
             for dim in range(2):
                 XY[i, dim] += V[i, dim] * t
+
+            # Update grid values
+            gx = <int> (XY[i, 0] / grid_spacing)
+            gy = <int> (XY[i, 1] / grid_spacing)
+            Grid[gx,gy] = i
 
 
 def preallocate_locks(num_locks):
