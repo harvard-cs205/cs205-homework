@@ -1,0 +1,24 @@
+# Part 1
+Maze1 - Finished after 877 iterations, 571.544224 ms total, 0.651703790194 ms per iteration
+Maze2 - Finished after 510 iterations, 349.438112 ms total, 0.685172768627 ms per iteration
+
+
+# Part 2
+Maze1 - Finished after 528 iterations, 1213.470272 ms total, 2.29823915152 ms per iteration
+Maze2 - Finished after 273 iterations, 633.544672 ms total, 2.32067645421 ms per iteration
+
+
+# Part 3
+Maze1 - Finished after 10 iterations, 22.027008 ms total, 2.2027008 ms per iteration
+Maze2 - Finished after 9 iterations, 19.752384 ms total, 2.19470933333 ms per iteration
+
+# Part 4
+Maze1 - Finished after 10 iterations, 20.882816 ms total, 2.0882816 ms per iteration
+Maze2 - Finished after 9 iterations, 18.877696 ms total, 2.09752177778 ms per iteration
+
+
+Since compute is much, much faster than memory lookups, it is perhaps worth it to only use one thread to avoid repeated lookups of the same value in labels[] depending on the speed of memory lookups on the particular machine you are dealing with.  For my machine, on the maze images, doing this operation with one thread actually slows down the code by a factor of around 3.  If the image was more consistent and had large regions of the same value to start, then this code might be faster.
+
+
+# Part 5
+If we didn't use the atomic_min(), we might end up with an incorrect solution (if it didn't completely fail during runtime) as multiple kernels attempt to perform min on the same value in labels simultaneously.  This might make our kernels faster as they don't have to wait to access the values in labels, however, having multiple kernels modify the same values could lead to the value being too high at the end of each iteration, which could, in turn, actually cause our code to take more iterations to run.  I don't believe that a value in labels could ever increase between iterations, however, it might not be the true min of that iteration if two kernels come in and are both setting the value in labels to be a new min, but one of the kernels finishes second with a higher value than the kernel that finished first, thus leaving the labels value with a value that is too high (but still lower than the previous iteration).
