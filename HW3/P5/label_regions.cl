@@ -84,6 +84,7 @@ propagate_labels(__global __read_write int *labels,
 
     int this_label;
     int last_label = -1;
+    int last_index = -1;
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
     if ((lx == 0) && (ly == 0)) {
         for (int bx = halo; bx < lsize_x + halo; bx++) {
@@ -94,6 +95,10 @@ propagate_labels(__global __read_write int *labels,
                         buffer[bx + buf_w * by] = labels[this_label];
                         last_label = this_label;
                     }
+                    else {
+                        buffer[bx + buf_w * by] = buffer[last_index];
+                    }
+                    last_index = bx + buf_w * by;
                 }
             }
         }
