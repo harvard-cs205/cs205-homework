@@ -8,6 +8,8 @@ set_compiler.install()
 import pyximport
 pyximport.install()
 
+import matplotlib.pyplot as plt
+
 import numpy as np
 import pylab
 
@@ -15,15 +17,41 @@ import filtering
 from timer import Timer
 import threading
 
+
+def waiter(conds, thread, iteration, num_threads):
+    # Make sure you have waited for necessary pre-processed steps.
+    if iteration == 0:
+        return
+    if thread - 1 >= 0:
+        conds[iteration-1][thread-1].wait()
+    if thread + 1 < num_threads:
+        conds[iteration-1][thread+1].wait()
+    conds[iteration-1][thread].wait()
+
+
+def thread_worker(conds, num_iterations, thread_id, tmpA, tmpB, num_threads):
+    for i in range(num_iterations):
+        waiter(conds, thread_id, i, num_threads)
+        filtering.median_3x3(tmpA, tmpB, thread_id, num_threads)
+        tmpA, tmpB = tmpB, tmpA
+        conds[i][thread_id].set()
+
 def py_median_3x3(image, iterations=10, num_threads=1):
     ''' repeatedly filter with a 3x3 median '''
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
 
-    for i in range(iterations):
-        filtering.median_3x3(tmpA, tmpB, 0, 1)
-        # swap direction of filtering
-        tmpA, tmpB = tmpB, tmpA
+    # There are iterations rows, and num_threads columns
+    # Create an Event() for each of those which will be set() once that (n, i) pair has been done.
+    conditions = [[threading.Event() for j in range(num_threads)] for i in range(iterations)]
+    # Instantiate the threads.
+    threads = [threading.Thread(target=thread_worker, args=(conditions, iterations, t, tmpA, tmpB, num_threads)) for t in range(num_threads)]
+    # Start the threads
+    for t in threads:
+        t.start()
+    # Wait for all of the threads to finish.
+    for t in threads:
+        t.join()
 
     return tmpA
 
@@ -56,12 +84,23 @@ if __name__ == '__main__':
     from_numpy = numpy_median(input_image, 2)
     assert np.all(from_cython == from_numpy)
 
-    with Timer() as t:
-        new_image = py_median_3x3(input_image, 10, 8)
+    x_threads = []
+    y_time = []
+    for nt in [1,2,4]:
+        for _ in range(5):
+            with Timer() as t:
+                new_image = py_median_3x3(input_image, 10, nt)
+            print("Threads: {}. Time: {} seconds for 10 filter passes.".format(nt, t.interval))
+            x_threads.append(nt)
+            y_time.append(t.interval)
+    plt.figure()
+    plt.scatter(x_threads, y_time)
+    plt.xlabel("Number of Threads")
+    plt.ylabel("Time")
+    plt.title("Performance of Algorithm by Number of Threads")
+    plt.show()
 
     pylab.figure()
     pylab.imshow(new_image[1200:1800, 3000:3500])
     pylab.title('after - zoom')
-
-    print("{} seconds for 10 filter passes.".format(t.interval))
     pylab.show()

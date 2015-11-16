@@ -1,0 +1,171 @@
+
+-------------------------------------------------------------
+
+Subproblem 1:
+4 threads:
+17.3175227085 simulation frames per second
+15.6057834696 simulation frames per second
+15.65068005 simulation frames per second
+16.4654913184 simulation frames per second
+17.1868121061 simulation frames per second
+17.0526504094 simulation frames per second
+16.9230247815 simulation frames per second
+16.6867072996 simulation frames per second
+15.6281703995 simulation frames per second
+16.490803721 simulation frames per second
+16.6800049313 simulation frames per second
+16.074071803 simulation frames per second
+16.6666825613 simulation frames per second
+16.7051167163 simulation frames per second
+15.6047383773 simulation frames per second
+16.4687238646 simulation frames per second
+16.4595467478 simulation frames per second
+
+
+
+1 Threads:
+9.23387711071 simulation frames per second
+8.17201686501 simulation frames per second
+8.99993777318 simulation frames per second
+8.32890639893 simulation frames per second
+8.80235383989 simulation frames per second
+9.02999013964 simulation frames per second
+8.39786244441 simulation frames per second
+9.65799720459 simulation frames per second
+9.02894045723 simulation frames per second
+8.0151347798 simulation frames per second
+8.92323468278 simulation frames per second
+9.33411668358 simulation frames per second
+9.39893737409 simulation frames per second
+8.29896260593 simulation frames per second
+
+--------------------------------------------------------------
+
+Subproblem 2:
+ 
+We see a massive speed up with gridding! Compare these results to the ones above.
+
+
+4 Threads with Gridding
+557.008784802 simulation frames per second
+602.646377843 simulation frames per second
+593.316688475 simulation frames per second
+602.209623826 simulation frames per second
+462.32610373 simulation frames per second
+560.578804002 simulation frames per second
+442.804577638 simulation frames per second
+541.152740335 simulation frames per second
+599.199125696 simulation frames per second
+454.310054429 simulation frames per second
+537.95351356 simulation frames per second
+447.468794674 simulation frames per second
+369.845498511 simulation frames per second
+345.103146222 simulation frames per second
+502.591565577 simulation frames per second
+595.401235006 simulation frames per second
+
+
+
+1 Threads with Gridding
+296.601702826 simulation frames per second
+356.795032113 simulation frames per second
+320.369485376 simulation frames per second
+325.826399531 simulation frames per second
+333.970207091 simulation frames per second
+353.209504695 simulation frames per second
+248.998931413 simulation frames per second
+298.776358138 simulation frames per second
+305.983022071 simulation frames per second
+330.724560735 simulation frames per second
+296.120077378 simulation frames per second
+347.186645513 simulation frames per second
+315.163731997 simulation frames per second
+294.256589425 simulation frames per second
+292.896278657 simulation frames per second
+292.974022618 simulation frames per second
+
+-------------------------------------------------------------------
+
+Subproblem 3:
+
+In both cases, special coherence seemed to basically double the performance from subproblem 2. For my choice of spatial sorting, I used the Hilbert ordering. This worked quite well, as it makes sure that elements that are close to eachother in coordinate space are close in memory too. I implemented it in Python by converting the C code on the Wikipedia page to Python.
+
+With 1 threads, we can see that there is a pretty substantial jump in performance by having special coherence.
+
+1 threads: special coherence
+764.53076648 simulation frames per second
+750.70494128 simulation frames per second
+752.035418491 simulation frames per second
+743.143869596 simulation frames per second
+770.777436158 simulation frames per second
+744.843654548 simulation frames per second
+733.680380633 simulation frames per second
+770.79378004 simulation frames per second
+752.829734357 simulation frames per second
+767.69543333 simulation frames per second
+764.997362366 simulation frames per second
+756.354193687 simulation frames per second
+754.047821217 simulation frames per second
+773.719564369 simulation frames per second
+731.836962591 simulation frames per second
+766.438278373 simulation frames per second
+771.562725079 simulation frames per second
+730.018031566 simulation frames per second
+
+
+
+With 4 threads, we can see a big increase in performance with the spacial coherence. You can see the results below:
+
+4 threads: spacial coherence
+1138.52713389 simulation frames per second
+1136.40840772 simulation frames per second
+1162.83993147 simulation frames per second
+1179.89043061 simulation frames per second
+1115.45954117 simulation frames per second
+1132.09802111 simulation frames per second
+1166.97953942 simulation frames per second
+1101.58610997 simulation frames per second
+350.567297245 simulation frames per second
+823.271564868 simulation frames per second
+1108.64508755 simulation frames per second
+1161.09833762 simulation frames per second
+1036.76429252 simulation frames per second
+763.781116271 simulation frames per second
+
+
+
+-----------------------------------------------------------------------------------------------------------
+
+Sub problem 4 (Locking with 4 threads):
+I ran the simulation with the full number of balls and the true radius. Note that I ran this code on a Macbook Air (2013), so these results were a decent amount slower than when I borrowed my friend's Macbook Pro and ran it on there. 
+
+My results were the following. Here is a few seconds of running with locking. We can see that this goes from the the 4 thread performance in sub problem 3.
+
+770.499696186 simulation frames per second
+705.186771 simulation frames per second
+757.773234847 simulation frames per second
+774.477859765 simulation frames per second
+739.511823574 simulation frames per second
+731.178656849 simulation frames per second
+746.274945199 simulation frames per second
+704.072069552 simulation frames per second
+691.815430292 simulation frames per second
+703.476707619 simulation frames per second
+731.556144696 simulation frames per second
+779.342976388 simulation frames per second
+723.649940304 simulation frames per second
+685.860281258 simulation frames per second
+696.241525512 simulation frames per second
+
+
+So, it is pretty clear that locking does appear to slow things down somewhat, but this is entirely expected. The important thing that locking confers is that it mitigates the race conditions that occurs if several balls collide. While this is an unlikely situation in the smaller examples, when there are thousands of balls and there are tons of collisions happening pretty close to one other, that situtaion will actually occur pretty often, so these locks are needed.
+
+
+
+
+
+
+
+
+
+

@@ -26,13 +26,27 @@ def make_coords(center=(-0.575 - 0.575j),
 
 
 if __name__ == '__main__':
-    in_coords, out_counts = make_coords()
-
-    with Timer() as t:
-        mandelbrot.mandelbrot(in_coords, out_counts, 1024)
-    seconds = t.interval
-
-    print("{} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
-
-    plt.imshow(np.log(out_counts))
+    thread_pos = [1,2,4]
+    repetitions = 6
+    x_threads = []
+    FMAs_per_second = []
+    for number_of_threads in thread_pos:
+        for _ in range(repetitions):
+            in_coords, out_counts = make_coords()
+            num_threads = 2
+            with Timer() as t:
+                mandelbrot.mandelbrot(in_coords, out_counts, number_of_threads, 1024)
+            seconds = t.interval
+            x_threads.append(number_of_threads)
+            FMAs_per_second.append((out_counts.sum() / seconds) / 1e6)
+            print("{} Threads: {} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(number_of_threads, out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
+            #plt.imshow(np.log(out_counts))
+            #plt.show()
+    plt.figure(1)
+    plt.scatter(x_threads, FMAs_per_second)
+    plt.xlabel('Number of threads')
+    plt.ylabel('Million Complex FMAs per second')
+    plt.title('Performance With Instruction-Level Parallelism')
     plt.show()
+
+    
