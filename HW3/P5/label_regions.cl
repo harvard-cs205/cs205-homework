@@ -17,10 +17,9 @@ initialize_labels(__global __read_only int *image,
     }
 }
 
-int
-get_clamped_value(__global __read_only int *labels,
-                  int w, int h,
-                  int x, int y)
+int get_clamped_value(__global __read_only int *labels,
+                      int w, int h,
+                      int x, int y)
 {
     if ((x < 0) || (x >= w) || (y < 0) || (y >= h))
         return w * h;
@@ -64,7 +63,7 @@ propagate_labels(__global __read_write int *labels,
     // Load the relevant labels to a local buffer with a halo 
     if (idx_1D < buf_w) {
         for (int row = 0; row < buf_h; row++) {
-            buffer[row * buf_w + idx_1D] = 
+            buffer[row * buf_w + idx_1D] = \
                 get_clamped_value(labels,
                                   w, h,
                                   buf_corner_x + idx_1D, buf_corner_y + row);
@@ -82,11 +81,19 @@ propagate_labels(__global __read_write int *labels,
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
     
     // stay in bounds
-    if ((x < w) && (y < h)) {
+    if ((x < w) && (y < h) && (old_label < w*h)) {
         // CODE FOR PART 1 HERE
-        // We set new_label to the value of old_label, but you will need
-        // to adjust this for correctness.
         new_label = old_label;
+
+        // check all four directions
+        int curr_label = buffer[(buf_x - 1) + buf_w * buf_y];
+        new_label = new_label < curr_label ? new_label : curr_label;
+        curr_label = buffer[(buf_x + 1) + buf_w * buf_y];
+        new_label = new_label < curr_label ? new_label : curr_label;
+        curr_label = buffer[buf_x + buf_w * (buf_y - 1)];
+        new_label = new_label < curr_label ? new_label : curr_label;
+        curr_label = buffer[buf_x + buf_w * (buf_y + 1)];
+        new_label = new_label < curr_label ? new_label : curr_label;
 
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
