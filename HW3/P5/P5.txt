@@ -1,0 +1,40 @@
+Part 1:
+
+Maze1:
+Finished after 877 iterations, 554.75504 ms total, 0.63255990878 ms per iteration
+Found 2 regions
+
+Maze2:
+Finished after 507 iterations, 308.520896 ms total, 0.608522477318 ms per iteration
+Found 35 regions
+
+Part 2:
+
+Maze1:
+Finished after 529 iterations, 345.488448 ms total, 0.653097255198 ms per iteration
+Found 2 regions
+
+Maze2:
+Finished after 273 iterations, 141.870944 ms total, 0.519673787546 ms per iteration
+Found 35 regions
+
+Part 3:
+
+Maze1:
+Finished after 10 iterations, 6.95184 ms total, 0.695184 ms per iteration
+Found 2 regions
+
+Maze2:
+Finished after 9 iterations, 6.220736 ms total, 0.691192888889 ms per iteration
+Found 35 regions
+
+Part 4:
+
+Maze 1:
+Finished after 10 iterations, 19.497792 ms total, 1.9497792 ms per iteration
+Found 2 regions
+
+Maze 2:
+Finished after 9 iterations, 17.632704 ms total, 1.95918933333 ms per iteration
+Found 35 regions
+

@@ -80,6 +80,29 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
+//    if (old_label < w * h)
+//        buffer[buf_y*buf_w + buf_x] = labels[buffer[buf_y*buf_w + buf_x]];
+
+    if (lx == 0 && ly == 0) {
+        int current_label;
+        int previous_label = w * h;
+        for (int row = halo; row < buf_h - halo; row++) {
+            for (int col = halo; col < buf_w - halo; col++) {
+                int index = row*buf_w + col;
+                if (buffer[index] < w*h) {
+                    if (previous_label == buffer[index])
+                        buffer[index] = current_label;
+                    else {
+                        previous_label = buffer[index];
+                        current_label = labels[buffer[index]];
+                        buffer[index] = current_label;
+                    }
+                }
+            }
+        }
+    }
+    
+    barrier(CLK_LOCAL_MEM_FENCE);
     
     // stay in bounds
     if ((x < w) && (y < h)) {
@@ -87,13 +110,21 @@ propagate_labels(__global __read_write int *labels,
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
         new_label = old_label;
-
+        
+        if (old_label < w*h) {
+            int leftright = min(buffer[buf_y*buf_w + buf_x - 1], buffer[buf_y*buf_w + buf_x + 1]);
+            int updown = min(buffer[(buf_y-1)*buf_w + buf_x], buffer[(buf_y+1)*buf_w + buf_x]);
+            int neighbors = min(leftright, updown);
+            new_label = min(new_label, neighbors);
+        }
+        
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
             // indicate there was a change this iteration.
             // multiple threads might write this.
             *(changed_flag) += 1;
-            labels[y * w + x] = new_label;
+            atomic_min(&(labels[y * w + x]), new_label);
+            atomic_min(&(labels[old_label]), new_label);
         }
     }
 }
