@@ -1,0 +1,28 @@
+
+ITERATION COUNTS AND EXECUTION TIMES
+------------------------------------
+
+  Step  |  Iteration count  |  Execution time
+-----------------------------------------------
+	1	|		877		 	|	  1450.61 ms
+	2	|		529		 	|	  896.06 ms
+	3	|		11		 	|	  38.99 ms
+ 	4	|		12		 	|	  65.69 ms
+
+
+PART 4
+------
+Since all is done on on single thread, all computation needs to be serialized. This is not particularly fast. Memory use
+for the thread in question is higher than its waiting counterparts, but not neccesarlily very high. There is a trade-off
+to make between using more threads for this task, whereby parallellizing the computation (speed) in exchange for memory 
+usage and (redundant) memory accesses, which slows things down. Between using one or all threads there must be a middle 
+ground that is optimal in terms of speed.
+
+
+PART 5
+------
+If you would use the min function instead of the atomic_min function, then the value in labels[old_label] could become
+invalid. This is due to the fact that after a min reads, before assigning, another thread could have written a lower 
+into that area, which gets overwritten by assignment of the min() value. In this case the value of its label increases,
+which strictly shouldn't happen, since labels should only stay equal, or lower, according to their neighbors. In additi-
+on, due to overwriting the pixel is now in a different region, which may affect its correctness in the final result.

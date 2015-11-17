@@ -15,6 +15,7 @@ __kernel void initialize_labels(__global __read_only int *image,
     }
 }
 
+// My OpenCL (v1.0) cannot do min(), so have to define it myself
 inline int lowest(int n, int m) {
     if (n < m) return n;
     else return m;
@@ -43,6 +44,8 @@ __kernel void propagate_labels(__global __read_write int *labels,
     // Local position relative to (0, 0) in workgroup
     const int lx = get_local_id(0);
     const int ly = get_local_id(1);
+    const int lw = get_local_size(0);
+    const int lh = get_local_size(1);
 
     // coordinates of the upper left corner of the buffer in image
     // space, including halo
@@ -78,43 +81,70 @@ __kernel void propagate_labels(__global __read_write int *labels,
     // the pixel for this thread
     old_label = buffer[buf_y * buf_w + buf_x];
 
-    // Part 2 & 4
-    int offset = buf_y * buf_w + buf_x;
+    //Make thread 0 responsible for grandparents (Part 4)
+    if (idx_1D == 0) {
+        int lastFetch = -1;  // Region number
+        int lastIndex = -1;
+        for (int row = halo; row < lw; row++) {
+            for (int column = halo; column < lh; column++) {
+                int index = row * buf_w + column;
+                int label = buffer[index];
+                if (label < w * h) {
+                    if (label == lastFetch) {
+                        buffer[index] = buffer[lastIndex];
+                    } else {
+                        lastFetch = buffer[index];
+                        lastIndex = index;
+                        buffer[index] = labels[label];
+                    }
+                }
+            }
+        } 
+    }
 
-    if (old_label < w * h)
-        buffer[offset] = labels[buffer[offset]];
-    else 
-        buffer[offset] = w * h;
+    // Part 2
+    // int offset = buf_y * buf_w + buf_x;
+    // if (old_label < w * h)
+    //     buffer[offset] = labels[buffer[offset]];
 
     barrier(CLK_LOCAL_MEM_FENCE);
     
-    // stay in bounds
+    // Stay in bounds
     if ((x < w) && (y < h)) {
-        // Find the lowest value
 
+        // Find the lowest value
         if (old_label < w * h) { 
 
-        int a = buffer[(buf_y + 1) * buf_w + buf_x];
-        int b = buffer[(buf_y - 1) * buf_w + buf_x];
-        int c = buffer[buf_y * buf_w + buf_x + 1];
-        int d = buffer[buf_y * buf_w + buf_x - 1];
+            // Neighbors
+            int a = buffer[(buf_y + 1) * buf_w + buf_x];
+            int b = buffer[(buf_y - 1) * buf_w + buf_x];
+            int c = buffer[buf_y * buf_w + buf_x + 1];
+            int d = buffer[buf_y * buf_w + buf_x - 1];
 
-        int i = lowest(a, b);
-        int j = lowest(c, d);
+            int i = lowest(a, b);
+            int j = lowest(c, d);
+            int k = lowest(i, j);
+            
+            if (old_label > k)
+                new_label = k;
+            else
+                new_label = old_label;
 
-        new_label = lowest(i, j);
+        } else {
 
-    } else {
-
-        new_label = old_label;
+            new_label = old_label;
 
     }
         if (new_label != old_label) {
-            // CODE FOR PART 3 HERE
-            // indicate there was a change this iteration.
+
+            // indicate there was a change this iteration. 
             // multiple threads might write this.
             *(changed_flag) += 1;
-            labels[y * w + x] = new_label;
+
+            atomic_min(&labels[old_label], new_label); 
+
+            labels[y * w + x] = new_label;         
+
         }
     }
 }
