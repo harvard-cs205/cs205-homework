@@ -1,0 +1,106 @@
+1. Subproblem 1 -- prange
+
+threads = 1
+
+7.89202594358 simulation frames per second
+7.25005877066 simulation frames per second
+6.91219153656 simulation frames per second
+8.28700926639 simulation frames per second
+8.73232997237 simulation frames per second
+7.46552561928 simulation frames per second
+
+threads = 4
+
+12.5111231752 simulation frames per second
+14.333059947 simulation frames per second
+23.361717297 simulation frames per second
+12.226193101 simulation frames per second
+8.417459148 simulation frames per second
+13.244851415 simulation frames per second
+14.552444822 simulation frames per second
+
+Applying multithreading using prange, with threads number = 4 double FPS on average as compared to single thread.
+
+2. Subproblem 2 -- with grid
+
+threads = 1
+
+714.730057299 simulation frames per second
+821.610789219 simulation frames per second
+987.311321249 simulation frames per second
+756.525378114 simulation frames per second
+782.875411079 simulation frames per second
+1021.715313139 simulation frames per second
+983.617315119 simulation frames per second
+
+threads = 4
+
+645.654775912 simulation frames per second
+918.354774231 simulation frames per second
+1034.344574214 simulation frames per second
+1068.152724235 simulation frames per second
+1528.854372131 simulation frames per second
+811.754432235 simulation frames per second
+1205.321574241 simulation frames per second
+
+Applying spatial decomposition increases FPS dramatically, roughly 100 times increase. This is because the key area
+of the algorithn has changed from O(N^2) to O(N).
+
+3. Subproblem 3 -- Sorting
+
+threads = 1
+
+823.231168249 simulation frames per second
+1006.37992733 simulation frames per second
+767.904565084 simulation frames per second
+982.132427844 simulation frames per second
+893.193154937 simulation frames per second
+1002.60367277 simulation frames per second
+1066.22799684 simulation frames per second
+
+threads = 4
+
+984.13609337 simulation frames per second
+935.78505429 simulation frames per second
+1980.909418804 simulation frames per second
+1190.69260413 simulation frames per second
+1286.886814894 simulation frames per second
+1008.94522506 simulation frames per second
+1120.836835946 simulation frames per second
+
+Adding code for spatially Coherent Sorting increase FPS by 100 for 1 thread and 300 for 4 threads on average. Also note
+the variance between each output has decreased a lot compared to using grid alone.
+
+4. Subproblem 4 -- Locking
+
+threads = 1
+
+573.333059947 simulation frames per second
+586.361717297 simulation frames per second
+686.226193101 simulation frames per second
+635.417459148 simulation frames per second
+603.244851415 simulation frames per second
+555.552444822 simulation frames per second
+659.97230646 simulation frames per second
+608.159744806 simulation frames per second
+539.013550755 simulation frames per second
+528.745619318 simulation frames per second
+
+threads = 4
+
+1012.11744583 simulation frames per second
+897.452480975 simulation frames per second
+617.194077541 simulation frames per second
+1074.1695822 simulation frames per second
+941.825918545 simulation frames per second
+875.844806704 simulation frames per second
+638.583574973 simulation frames per second
+910.560061627 simulation frames per second
+891.399910739 simulation frames per second
+
+Explanation of choice for spatial sorting:
+
+As recommended in the problem description, I used Morton ordering to
+maps 2-dimensional data to one dimension while preserving locality of the data points, by doing this, balls that
+have smaller distance in the 2-Dimentional space are also close in the 1-Dimentional list of 'positions' and 'velocities',
+hence resulting in good spacial coherence regarding space and memory, and takes less time to compute.

@@ -6,6 +6,7 @@ set_compiler.install()
 
 import pyximport
 pyximport.install()
+import matplotlib.pyplot as plt
 
 import numpy as np
 from timer import Timer
@@ -40,13 +41,16 @@ if __name__ == '__main__':
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################
-    N = 10
+    N = [5, 10, 20, 30, 50, 100]
     counts[:] = orig_counts
-    with Timer() as t:
-        move_data_medium_grained(counts, src, dest, 100, N)
-    assert counts.sum() == total, "Wrong total after move_data_medium_grained"
-    print("Medium grained uncorrelated: {} seconds".format(t.interval))
 
+    medium_uncorrelated_result = []
+    for i in N:
+        with Timer() as t:
+            move_data_medium_grained(counts, src, dest, 100, i)
+        assert counts.sum() == total, "Wrong total after move_data_medium_grained"
+        print("Medium grained uncorrelated, N = {}: {} seconds".format(i, t.interval))
+        medium_uncorrelated_result.append(t.interval)
     ########################################
     # Now use correlated data movement
     ########################################
@@ -74,9 +78,18 @@ if __name__ == '__main__':
     # You should explore different values for the number of locks in the medium
     # grained locking
     ########################################
-    N = 10
+    # N = 10
     counts[:] = orig_counts
-    with Timer() as t:
-        move_data_medium_grained(counts, src, dest, 100, N)
-    assert counts.sum() == total, "Wrong total after move_data_medium_grained"
-    print("Medium grained correlated: {} seconds".format(t.interval))
+    medium_correlated_result = []
+    for i in N:
+        with Timer() as t:
+            move_data_medium_grained(counts, src, dest, 100, i)
+        assert counts.sum() == total, "Wrong total after move_data_medium_grained"
+        print("Medium grained correlated, N = {}: {} seconds".format(i, t.interval))
+        medium_correlated_result.append(t.interval)
+
+    plt.plot(N, medium_uncorrelated_result, label = 'Medium grained uncorrelated')
+    plt.plot(N, medium_correlated_result, label = 'Medium grained correlated')
+    plt.title('Comparison Between Correlated and Uncorrelated Transfers')
+    plt.legend(loc='upper left')
+    plt.show()
