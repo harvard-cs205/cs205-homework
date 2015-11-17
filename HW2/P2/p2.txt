@@ -1,0 +1,12 @@
+A text file describing your experiments with the three scales of locking, including your suggestions for a good N to choose for medium-grained locking in the two cases explored (uncorrelated and correlated transfers) and your justification for that choice (or why you were unable to find a good value).
+
+As shown in p2.png, when N gets larger, the time to run with medium grained lock generally increases for the uncorrelated move. This increase arises from the decrease in concurrency, because as more elements share the same number of locks, fewer threads would be able to run the mover concurrently. After a while the concurrency stops
+
+On the other hand, the time to run decreases for the correlated move first and then increases as the number of locks gets smaller. This is interesting, and I think there are two effects that are competing with each other:
+1. Overhead: when N is small and the number of locks are large, the overhead cost of acquiring and releasing locks is pretty significant. This effect is not much of an effect for the uncorrelated moves, but for the correlated moves, due to the structure of my code the overhead cost for src and dest using the same lock would be much less. In that sense, when N gets large, the overhead costs decreases significantly. 
+2. Concurrency: Similar to what we discussed for the uncorrelated move, as more elements share the same lock the concurrency of my process drops.
+
+I have also tried N=200, 500 and 1000 for the coarser locks, and they increase the run time significantly for both uncorrelated and correlated moves.
+
+Coarse vs. Medium vs. Fine
+Based on my graph, I would choose N between 20-50, which gives me roughly 50-100 locks. This seems to be a fine balance between overhead and concurrency, especially for the uncorrelated move. However, I may also choose the fine lock because it consistently beats the medium/coarse lock for the uncorrelated, and is around similar levels as the correlated.

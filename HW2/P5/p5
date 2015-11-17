@@ -1,0 +1,86 @@
+First, by using multiple threads, we gained slight speedup from ~12fps to ~16fps.
+
+When we change the data structure by using grid as the index and the ball index as the value, we gaind significant speedup
+(more than 100x). Note that the difference between single and multi-thread is still not significant.
+
+Then, we used Morton Order to re-sort the index, aiming to put balls that are nearby to closeby memory space. However, the
+speedup is not very significant.
+
+Finally, we add fine locks and as a result, it slows down the performance. This is somewhat expected, because now the locks add
+additional overhead costs.
+
+
+Multithreading:
+
+1: ~12 fps
+12.4889203852 simulation frames per second
+12.0560274331 simulation frames per second
+12.5132880652 simulation frames per second
+13.0493749572 simulation frames per second
+12.6815363079 simulation frames per second
+12.6462062623 simulation frames per second
+
+4: ~16 fps
+16.6721812581 simulation frames per second
+16.6513980364 simulation frames per second
+16.8773323354 simulation frames per second
+17.3439468058 simulation frames per second
+15.7993023799 simulation frames per second
+17.0497390286 simulation frames per second
+
+
+Grid:
+
+1: ~ 1400 fps
+1401.19190555 simulation frames per second
+1384.46290093 simulation frames per second
+1391.04948525 simulation frames per second
+1428.99339187 simulation frames per second
+1525.45161773 simulation frames per second
+1432.61338779 simulation frames per second
+
+4: ~1700 fps
+656.166226969 simulation frames per second
+1516.94882032 simulation frames per second
+1736.05298013 simulation frames per second
+1722.05562516 simulation frames per second
+1711.31049425 simulation frames per second
+1841.71764473 simulation frames per second
+
+
+Morton Order:
+
+1: ~ 650 fps
+642.134224078 simulation frames per second
+731.178656849 simulation frames per second
+629.541311682 simulation frames per second
+650.320936494 simulation frames per second
+623.810601605 simulation frames per second
+644.272833274 simulation frames per second
+
+4: ～ 1500 fps
+1627.82147267 simulation frames per second
+1523.61250703 simulation frames per second
+1581.47258188 simulation frames per second
+1605.28177359 simulation frames per second
+1524.76658351 simulation frames per second
+1476.6596254 simulation frames per second
+
+
+
+Locks:
+1: ~ 680 fps
+679.981616973 simulation frames per second
+739.835321842 simulation frames per second
+684.337412302 simulation frames per second
+707.148499132 simulation frames per second
+688.660870062 simulation frames per second
+676.519621869 simulation frames per second
+
+4: ～ 1000 fps
+854.23706721 simulation frames per second
+997.742487529 simulation frames per second
+1015.97515032 simulation frames per second
+956.900451295 simulation frames per second
+1018.11490051 simulation frames per second
+980.255184136 simulation frames per second

@@ -32,7 +32,14 @@ if __name__ == '__main__':
         mandelbrot.mandelbrot(in_coords, out_counts, 1024)
     seconds = t.interval
 
-    print("{} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
+    print("Old, {} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
 
-    plt.imshow(np.log(out_counts))
-    plt.show()
+    with Timer() as t:
+        mandelbrot.mandelbrot2(in_coords, out_counts, 1024)
+    seconds = t.interval
+
+    print("New, {} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
+
+
+    # plt.imshow(np.log(out_counts))
+    # plt.show()
