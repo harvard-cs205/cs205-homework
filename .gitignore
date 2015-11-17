@@ -1,3 +1,15 @@
 *~
 *.pyc
 *.pyxbldc
+*.ipynb
+*.csv
+
+**/.ipynb_checkpoints
+HW1
+HW2
+
+# Ignore visual Studio files
+*.pyproj
+*.user
+*.suo
+*.sln
