@@ -1,0 +1,46 @@
+Part 1:
+Maze1:
+Finished after 885 iterations, 198.8476 ms total, 0.224686553672 ms per iteration
+Found 2 regions
+
+Maze2:
+Finished after 526 iterations, 117.6992 ms total, 0.223762737643 ms per iteration
+Found 35 regions
+
+Part2:
+Maze1:
+Finished after 529 iterations, 119.23528 ms total, 0.225397504726 ms per iteration
+Found 2 regions
+
+Maze2:
+Finished after 273 iterations, 61.456 ms total, 0.225113553114 ms per iteration
+Found 35 regions
+
+Part3:
+Maze1:
+Finished after 10 iterations, 2.33512 ms total, 0.233512 ms per iteration
+Found 2 regions
+
+Maze2:
+Finished after 9 iterations, 2.11864 ms total, 0.235404444444 ms per iteration
+Found 35 regions
+
+Part4:
+Maze1:
+Finished after 10 iterations, 5.43592 ms total, 0.543592 ms per iteration
+Found 2 regions
+
+Maze2:
+Finished after 9 iterations, 4.84272 ms total, 0.53808 ms per iteration
+Found 35 regions
+
+For part4, I encounter a performance drop after changing to single thread. I think it's because although using multithreads we are likely to have duplicate reads, it's still faster than single thread. 
+Maybe when we have many more labels that are the same, or when we have large work group with many threads tend to read the same location, the serialization may turn out to be better. Of course, it also depends on how the GPU works.
+
+
+For part5, the advantage of using atomic_min() is that it combines compare and write in one step thus prevent the possible rewritting of lables[old_lable] by other threads. If using min(), it may result in an incorrect update of labels[old_lable]. But it won't affect the final result, and at last all labels belonging to the same region will be the same. Actually I test this and the result remains the same, also the performance (number of iterations and time) doesn't change.
+
+
+
+
+
