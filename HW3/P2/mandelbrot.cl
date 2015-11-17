@@ -21,8 +21,10 @@ mandelbrot(__global __read_only float *coords_real,
         iter = 0;
         z_real =0;
         z_imag = 0;
-        c_real = coords_real[w*x + y];
-        c_imag = coords_imag[w*x + y];
+        // pixel (x,y) is x*w + y away from (0,0)
+        // because (x,y) are flipped
+        c_real = coords_real[x*w + y];
+        c_imag = coords_imag[x*w + y];
         while((z_real*z_real+ z_imag*z_imag <=4) \
         &&(iter <= max_iter)){
           // Similar to AVX implemtation
