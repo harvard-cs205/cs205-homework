@@ -94,6 +94,7 @@ propagate_labels(__global __read_write int *labels,
     }*/
 
     // part IV: --> single thread version!
+    // Assumption: we do not update halo values
     int previous_val = -1;
     int previous_idx = -1;
     for(int row = halo; row < buf_h - halo; row++)
@@ -136,15 +137,25 @@ propagate_labels(__global __read_write int *labels,
             // multiple threads might write this.
             *(changed_flag) += 1;
             
-            // old version
+            // Part I-II:
             //labels[y * w + x] = new_label;
 
+            // Part III-IV:
             // merge parent regions
             if(old_label < w * h) 
                 atomic_min(&labels[old_label], new_label);
 
             // do writeback also atomized
             atomic_min(&labels[y * w + x], new_label);
+
+
+            /*// Part V:
+            // version using non-atomic min
+            // merge parent regions
+            if(old_label < w * h) 
+                labels[old_label] = min(labels[old_label], new_label);
+            labels[y * w + x] = min(labels[y * w + x], new_label);
+            */
         }
     }
 }
