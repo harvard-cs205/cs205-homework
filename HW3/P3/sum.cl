@@ -8,8 +8,9 @@ __kernel void sum_coalesced(__global float* x,
 
     // thread i (i.e., with i = get_global_id()) should add x[i],
     // x[i + get_global_size()], ... up to N-1, and store in sum.
-    for (;;) { // YOUR CODE HERE
-        ; // YOUR CODE HERE 
+    int k = get_global_size(0);
+    for (int i = get_global_id(0); i <= N - 1; i += k) {
+        sum += x[i];
     }
 
     fast[local_id] = sum;
@@ -24,8 +25,11 @@ __kernel void sum_coalesced(__global float* x,
     // You can assume get_local_size(0) is a power of 2.
     //
     // See http://www.nehalemlabs.net/prototype/blog/2014/06/16/parallel-programming-with-opencl-and-python-parallel-reduce/
-    for (;;) { // YOUR CODE HERE
-        ; // YOUR CODE HERE
+    for (int offset = get_local_size(0) >> 1; offset > 0; offset = offset >> 1) {
+        fast[local_id] = fast[local_id] + fast[local_id + offset];
+
+        // sync to make sure this round of reduction is done
+        barrier(CLK_LOCAL_MEM_FENCE);
     }
 
     if (local_id == 0) partial[get_group_id(0)] = fast[0];
@@ -48,8 +52,13 @@ __kernel void sum_blocked(__global float* x,
     // 
     // Be careful that each thread stays in bounds, both relative to
     // size of x (i.e., N), and the range it's assigned to sum.
-    for (;;) { // YOUR CODE HERE
-        ; // YOUR CODE HERE
+    size_t start = get_global_id(0) * k;
+    for (size_t i = start; i < start + k; i++) { // YOUR CODE HERE
+        if (i >= N)
+        {
+            break;
+        }
+        sum += x[i];
     }
 
     fast[local_id] = sum;
@@ -64,8 +73,11 @@ __kernel void sum_blocked(__global float* x,
     // You can assume get_local_size(0) is a power of 2.
     //
     // See http://www.nehalemlabs.net/prototype/blog/2014/06/16/parallel-programming-with-opencl-and-python-parallel-reduce/
-    for (;;) { // YOUR CODE HERE
-        ; // YOUR CODE HERE
+    for (int offset = get_local_size(0) >> 1; offset > 0; offset = offset >> 1) {
+        fast[local_id] = fast[local_id] + fast[local_id + offset];
+
+        // sync to make sure this round of reduction is done
+        barrier(CLK_LOCAL_MEM_FENCE);
     }
 
     if (local_id == 0) partial[get_group_id(0)] = fast[0];
