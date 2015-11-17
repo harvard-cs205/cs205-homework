@@ -3,6 +3,9 @@ import pyopencl as cl
 import numpy as np
 import pylab
 
+import os
+os.environ['PYOPENCL_COMPILER_OUTPUT'] = '1'
+
 def round_up(global_size, group_size):
     r = global_size % group_size
     if r == 0:
@@ -20,6 +23,7 @@ def make_coords(center=(-0.575 - 0.575j),
 
 
 if __name__ == '__main__':
+    
     # List our platforms
     platforms = cl.get_platforms()
     print 'The platforms detected are:'
@@ -49,6 +53,7 @@ if __name__ == '__main__':
                             properties=cl.command_queue_properties.PROFILING_ENABLE)
     print 'The queue is using the device:', queue.device.name
 
+    # Create program from source code
     program = cl.Program(context, open('mandelbrot.cl').read()).build(options='')
 
     in_coords, out_counts = make_coords()
