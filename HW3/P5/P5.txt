@@ -1,0 +1,45 @@
+Part 1
+maze1.npy
+Finished after 856 iterations, 461.957548 ms total, 0.53967003271 ms per iteration
+Found 2 regions
+maze2.npy
+Finished after 493 iterations, 252.532157 ms total, 0.512235612576 ms per iteration
+Found 35 regions
+
+Part 2
+maze1.npy
+Finished after 516 iterations, 369.22815 ms total, 0.715558430233 ms per iteration
+Found 2 regions
+maze2.npy
+Finished after 263 iterations, 183.422994 ms total, 0.6974258327 ms per iteration
+Found 35 regions
+
+Part 3
+maze1.npy
+Finished after 8 iterations, 11.680598 ms total, 1.46007475 ms per iteration
+Found 2 regions
+maze2.npy
+Finished after 8 iterations, 13.364471 ms total, 1.670558875 ms per iteration
+Found 35 regions
+
+Part 4
+maze1.npy
+Finished after 24 iterations, 24.078919 ms total, 1.00328829167 ms per iteration
+Found 2 regions
+maze2.npy
+Finished after 10 iterations, 14.057295 ms total, 1.4057295 ms per iteration
+Found 35 regions
+
+Part 4 reduces the memory loading time but forsook the parallel buffer updating. Compare to part 3, part 4 has faster memory loading but slower parent updating. It improves per iteration time, which means memory loading accounts for a large proportion time spent in each iteration, but results in more iterations. It ends up the total time consumed is longer for part 4, so using a single thread to perform this step is not a reasonable choice. In my case, since I ran OpenCL on linux platform with intel CPU not GPU, the result turns up a sort of funky. It might be the reason why the number of iterations is very different.
+
+
+Part 5
+maze1.npy
+Finished after 18 iterations, 20.608141 ms total, 1.14489672222 ms per iteration
+Found 2 regions
+maze2.npy
+Finished after 9 iterations, 15.581104 ms total, 1.73123377778 ms per iteration
+Found 35 regions
+
+Part 5 releases the atomic updating of the min, which discards the "virtually serialization" of the buffer update. It achieves a faster per iteration time. However, without atomic updating, the min update of one worker may be over written by another one. The racing condition could happen: A label value z read by both workers, one worker updates to x and another updates to y, where z > y > x. If both workers read z before anyone updated the value, and y is updated later. The value will be updated to the larger y rather than the smaller x. With atomic used, the value will always be updated to x correctly. This racing condition would not result in wrong solution in this problem, but cause more iterations. It is because the values may not be updated to the real min each iteration, so we need more iterations to update it to the real minimum. The label values would never increase between iterations in either case, because the iterations are performed serially. The racing condition could not happen.
+

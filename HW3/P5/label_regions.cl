@@ -27,8 +27,22 @@ get_clamped_value(__global __read_only int *labels,
     return labels[y * w + x];
 }
 
+inline int to1D(int w, int x, int y)
+{
+    return y*w + x;
+}
+
+inline int cuttail(int size, int v)
+{
+    if( v<0 )
+        return 0;
+    if( v >= size )
+        return size-1;
+    return v;
+}
+
 __kernel void
-propagate_labels(__global __read_write int *labels,
+propagate_labels(__global int *labels,
                  __global __write_only int *changed_flag,
                  __local int *buffer,
                  int w, int h,
@@ -61,6 +75,8 @@ propagate_labels(__global __read_write int *labels,
     // Will store the output value
     int new_label;
     
+    int background = w * h;
+    
     // Load the relevant labels to a local buffer with a halo 
     if (idx_1D < buf_w) {
         for (int row = 0; row < buf_h; row++) {
@@ -80,6 +96,32 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
+    // Part 2
+    /*
+    if( old_label != background )
+        buffer[to1D(buf_w, buf_x, buf_y)] = labels[old_label];
+    barrier(CLK_LOCAL_MEM_FENCE);
+    */
+    // Part 4
+    if ( lx == 0 && ly == 0 ){
+        int pre_idx = background;
+        int pre_value;
+        for( int j=halo; j<buf_h-halo; ++j ){
+            for( int i=halo; i<buf_w-halo; ++i ){
+                int index = to1D(buf_w, i, j);
+                if( buffer[index] == background )
+                    continue;
+                if( buffer[index] == pre_idx ){
+                    buffer[index] = pre_value;
+                    continue;
+                }
+                pre_idx = buffer[index];
+                pre_value = labels[pre_idx];
+                buffer[index] = pre_value;
+            }
+        }
+    }
+    barrier(CLK_LOCAL_MEM_FENCE);
     
     // stay in bounds
     if ((x < w) && (y < h)) {
@@ -87,13 +129,26 @@ propagate_labels(__global __read_write int *labels,
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
         new_label = old_label;
+        if( old_label != background ){
+            if( buffer[to1D(buf_w, buf_x, buf_y-1)] < new_label ) new_label = buffer[to1D(buf_w, buf_x, buf_y-1)];
+            if( buffer[to1D(buf_w, buf_x-1, buf_y)] < new_label ) new_label = buffer[to1D(buf_w, buf_x-1, buf_y)];
+            if( buffer[to1D(buf_w, buf_x+1, buf_y)] < new_label ) new_label = buffer[to1D(buf_w, buf_x+1, buf_y)];
+            if( buffer[to1D(buf_w, buf_x, buf_y+1)] < new_label ) new_label = buffer[to1D(buf_w, buf_x, buf_y+1)];
+        }
 
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
+            // Part 3
+            /*
+            atomic_min( &labels[old_label], new_label );
+            */
+            // Part 5
+            labels[old_label] = min(labels[old_label], new_label);
             // indicate there was a change this iteration.
             // multiple threads might write this.
             *(changed_flag) += 1;
             labels[y * w + x] = new_label;
+            
         }
     }
 }
