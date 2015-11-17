@@ -1,0 +1,48 @@
+
+P5.1:
+
+Maze #1:
+Finished after 876 iterations, 612.93712 ms total, 0.699699908676 ms per iteration
+Found 2 regions
+
+Maze #2:
+Finished after 504 iterations, 353.74112 ms total, 0.701867301587 ms per iteration
+Found 35 regions
+
+P5.2:
+
+Maze #1:
+Finished after 529 iterations, 374.42424 ms total, 0.707796294896 ms per iteration
+Found 2 regions
+
+Maze #2:
+Finished after 273 iterations, 193.93104 ms total, 0.71037010989 ms per iteration
+Found 35 regions
+
+
+P5.3:
+
+Maze #1:
+Finished after 10 iterations, 8.80408 ms total, 0.880408 ms per iteration
+Found 2 regions
+
+Maze #2:
+Finished after 9 iterations, 7.72312 ms total, 0.858124444444 ms per iteration
+Found 35 regions
+
+P5.4:
+
+Maze #1:
+Finished after 10 iterations, 20.12216 ms total, 2.012216 ms per iteration
+Found 2 regions
+
+Maze #2:
+Finished after 9 iterations, 17.89456 ms total, 1.98828444444 ms per iteration
+Found 35 regions
+
+My emperical results were that using a single thread to perform the loading of grandparents into the buffer was not as efficent computationally compared to each thread loading in their own grandparents. I believe this is because this operation becomes serialized, as the remainder of the computation depends upon the completion of this single thread completing this task. This could save more time on a different GPU, where global memory reads take siginicantly more time that local memory reads, ie local memory reads are very quick. On my GPU, local to my PC, I believe that the scale between local and global memory reads is smaller, so there is less of a speed up optimizing to minimize global memory reads. 
+
+
+P5.5: 
+I belive, in the context of this specific problem, using a min() operation would be faster than using an atomic_min(). This is because, given the nature of the grandparent data we are storing, we still get valid data becasue it is a single integer that is being written into global memory. In other instances, memory writing contnetion could produce invalid results, which would require atomic operations. This would happen in an instance where we are populating a table of corner data for an image, which may store position and intensity data. This data could be corrupted by threads writing incomplete data to a global memory location, which atomic operations could protect. In the case of this problem, single integer data is being written to memory which will not be corrupted by contentious thread writing. The worst result that could happen with this problem is a higher integer than a minimal grandparent being written to a memory location. 
+
