@@ -1,0 +1,19 @@
+Performance
+
+1 thread:
+  0.922888088226 seconds for 10 filter passes.
+
+2 threads:
+  0.49841784438 seconds for 10 filter passes.
+
+4 threads:
+  0.229358911514 seconds for 10 filter passes.
+There is a increase in speed of roughly 2 from 1-2 threads and 2-4.
+
+There is an event set for each iteration x thread that we initialize.
+Then we start off the first iteration for all the threads at once, because
+there's nothing to check at first. We set the events for the first iteration
+so that the next iterations know that the first iteration is done. Then,
+using basic logic to make sure we stay in bounds of our events array, we wait
+for the previous iteration on thread n-1 and n+1 are finished, and then proceed
+with the filtering.

@@ -1,0 +1,32 @@
+Note: my computer is >4 years old, so performance is not up to par with
+standards.
+
+Multithreading
+1 thread: ~3 sim/second
+4 threads: ~400 sim/second
+
+4 threads is 133 times faster than 1 thread because the computation is easily
+divided up into parallel threads.
+
+Spatial decomposition
+1 thread: ~280 sim/second
+4 threads: ~450 sim/second
+
+There is a significant increase in simulation rate when we employ spatial
+decomposition because we reduce from O(N^2) to O(N), checking a small square
+per ball rather than the entire list of balls.
+
+Spatially Coherent Sorting
+1 thread: ~290 sim/second
+4 thread: ~540 sim/second
+
+There is a small increase here from spatial decomp to spatial sorting, mostly
+because it isn't a huge time commitment to search through the positions to find
+the nearest ball.
+
+Locking
+
+4 threads: ~500 sim/second
+
+Locking actually slows the speed down slightly because we lock a ball down while
+operating on it, increasing the time it takes. 
