@@ -80,6 +80,21 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
+
+    // part II:
+
+    // update each label by its parents (only for non-halo vals)
+    if(idx_1D > 0 && idx_1D < buf_w - 1) {
+        for (int row = 0; row < buf_h; row++) {
+            int offset = row * buf_w + idx_1D;
+
+            // only foreground pixels
+            if(buffer[offset] < w * h)
+                buffer[offset] = labels[buffer[offset]];  
+        }
+    }
+
+    barrier(CLK_LOCAL_MEM_FENCE);
     
     // stay in bounds
     if ((x < w) && (y < h)) {
