@@ -1,5 +1,9 @@
 #include "median9.h"
 
+//define get clamped value to take care of edge cases
+//we look at x < 0, x >= w
+//we look at y < 0, y >= h
+//in these cases we return the closest value in-bounds
 float
 get_clamped_value(__global __read_only float *in_values, int w, int h, int x, int y)
 {
@@ -58,7 +62,7 @@ median_3x3(
     const int ly = get_local_id(1);
 
     // coordinates of the upper left corner of the buffer in image
-    // space, including halo (red corner)
+    // space, including halo (red)
     const int buf_corner_x = x - lx - halo;
     const int buf_corner_y = y - ly - halo;
 
@@ -83,6 +87,7 @@ median_3x3(
     // back its 3x3 neighborhood median.
 
     // write output
+    //define the 9 points fed into median9 in terms of buff_x, buff_y, buff_w
     if ((y < h) && (x < w)) {
         float s0 = buffer[buf_w *(buf_y - 1) + (buf_x - 1)];
         float s1 = buffer[buf_w *(buf_y - 1) + (buf_x)    ];
