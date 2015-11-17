@@ -116,7 +116,16 @@ propagate_labels(__global __read_write int *labels,
             // indicate there was a change this iteration.
             // multiple threads might write this.
             *(changed_flag) += 1;
-            labels[y * w + x] = new_label;
+            
+            // old version
+            //labels[y * w + x] = new_label;
+
+            // merge parent regions
+            if(old_label < w * h) 
+                atomic_min(&labels[old_label], new_label);
+
+            // do writeback also atomized
+            atomic_min(&labels[y * w + x], new_label);
         }
     }
 }
