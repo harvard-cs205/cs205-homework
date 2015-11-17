@@ -2,4 +2,4 @@ P3.
 
 After running the timing code, my best configuration is:
 
-configuration ('coalesced', 256, 128): 0.00218976 seconds
+configuration ('coalesced', 512, 128): 0.00214976 seconds
