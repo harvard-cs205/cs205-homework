@@ -1,3 +1,6 @@
+// Prototype - avoids compiler warning
+int get_clamped_value(__global __read_only int *labels, int w, int h, int x, int y);
+
 __kernel void
 initialize_labels(__global __read_only int *image,
                   __global __write_only int *labels,
@@ -57,10 +60,6 @@ propagate_labels(__global __read_write int *labels,
     // 1D index of thread within our work-group
     const int idx_1D = ly * get_local_size(0) + lx;
     
-    int old_label;
-    // Will store the output value
-    int new_label;
-    
     // Load the relevant labels to a local buffer with a halo 
     if (idx_1D < buf_w) {
         for (int row = 0; row < buf_h; row++) {
@@ -75,21 +74,90 @@ propagate_labels(__global __read_write int *labels,
     // the local buffer is loaded
     barrier(CLK_LOCAL_MEM_FENCE);
 
+    int old_label;
+    int new_label;
+
     // Fetch the value from the buffer the corresponds to
     // the pixel for this thread
     old_label = buffer[buf_y * buf_w + buf_x];
 
-    // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
+    // START: NEW CODE FOR PART 2 -->
+
+    // Only update foreground pixels
+//    if (old_label < (w * h)) {
+//        // Fetch grandparent   
+//        buffer[buf_y * buf_w + buf_x] = labels[buffer[buf_y * buf_w + buf_x]];
+//    }
     
+    // <-- END: NEW CODE FOR PART 2
+
+    // START: NEW CODE FOR PART 4 -->
+
+    // Variables to keep track of last grandparent fetch
+    int last_buf_id = -1;
+    int last_buf_val = -1;
+
+    // Use a single thread in the workgroup
+    if(get_local_id(0) == 0) {
+        // Only update core (non-halo values)
+        for (int row = halo; row < (buf_h - halo); row++) {
+            for (int col = halo; col < (buf_w - halo); col++) {
+                // Check if value is equal to the last fetch performed
+                if (buffer[col * buf_w + row] < (w * h)) { 
+                    // Use same values if it is
+                    if (buffer[col * buf_w + row] == last_buf_id) {
+                        buffer[col * buf_w + row] = last_buf_val;
+                    }
+                    else {
+                        // Update if not
+                        last_buf_id = buffer[col * buf_w + row];
+                        last_buf_val = labels[buffer[col * buf_w + row]];
+                        buffer[col * buf_w + row] = last_buf_val;
+                    }
+                }
+            }
+        }
+    }
+
+    // <-- END: NEW CODE FOR PART 4
+
+    // Wait for local buffer values to finish updating
+    barrier(CLK_LOCAL_MEM_FENCE);
+
     // stay in bounds
     if ((x < w) && (y < h)) {
-        // CODE FOR PART 1 HERE
-        // We set new_label to the value of old_label, but you will need
-        // to adjust this for correctness.
+
         new_label = old_label;
 
+        // START: NEW CODE FOR PART 1 -->
+
+        // Only operate on foreground pixels
+        if (new_label < (w * h)) {
+            // Update label as minimum of pixel's label and its 4 neighbor labels
+            new_label = min(new_label, buffer[buf_y * buf_w + buf_x + 1]);
+            new_label = min(new_label, buffer[buf_y * buf_w + buf_x - 1]);
+            new_label = min(new_label, buffer[(buf_y + 1) * buf_w + buf_x]);
+            new_label = min(new_label, buffer[(buf_y - 1) * buf_w + buf_x]);
+        }
+
+        // <-- END: NEW CODE FOR PART 1
+
         if (new_label != old_label) {
-            // CODE FOR PART 3 HERE
+            
+            // START: NEW CODE FOR PART 3 -->
+
+            // Merge parent regions
+            atomic_min(&labels[old_label], new_label);
+
+            // <-- END: NEW CODE FOR PART 3
+
+            // START: NEW CODE FOR PART 5 (TESTING ONLY) -->
+
+            // Merge parent regions
+//            labels[old_label] = min(labels[old_label], new_label);
+
+            // <-- END: NEW CODE FOR PART 5 (TESTING ONLY)
+
             // indicate there was a change this iteration.
             // multiple threads might write this.
             *(changed_flag) += 1;

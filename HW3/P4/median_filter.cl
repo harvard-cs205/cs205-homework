@@ -1,5 +1,6 @@
 #include "median9.h"
 
+// Prototype - avoids compiler warning
 float FETCH(__global __read_only float *in_values, int w, int h, int x, int y);
 
 float

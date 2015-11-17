@@ -1,0 +1,83 @@
+The results for parts 1-4 are presented graphically in P5_iterations.png and P5_kernel_times.png.
+
+PART 1:
+
+Maze # 1:
+Finished after 915 iterations, 343.97416 ms total, 0.375928043716 ms per iteration
+Found 2 regions
+
+Maze #2:
+Finished after 532 iterations, 198.0404 ms total, 0.372256390977 ms per iteration
+Found 35 regions
+
+########################################################################################
+
+PART 2:
+
+Maze #1:
+Finished after 529 iterations, 193.01624 ms total, 0.364870018904 ms per iteration
+Found 2 regions
+
+Maze #2:
+Finished after 273 iterations, 99.97448 ms total, 0.366206886447 ms per iteration
+Found 35 regions
+
+########################################################################################
+
+PART 3:
+
+Maze #1:
+Finished after 10 iterations, 4.98176 ms total, 0.498176 ms per iteration
+Found 2 regions
+
+Maze #2:
+Finished after 9 iterations, 4.33264 ms total, 0.481404444444 ms per iteration
+Found 35 regions
+
+########################################################################################
+
+PART 4:
+
+Maze #1:
+Finished after 8 iterations, 13.34016 ms total, 1.66752 ms per iteration
+Found 2 regions
+
+Maze #2:
+Finished after 8 iterations, 13.49512 ms total, 1.68689 ms per iteration
+Found 35 regions
+
+The results above show that this change caused the runtime to increase by ~3x on my hardware.  This indicates that the cost of assigning all the work to a single thread offsets the gain from (potentially) reducing the number of reads to global memory. (It is also possible that concurrent reads in the previous implementation were not being serialized on my GPU.)
+
+The motivation for this modification is that compute is much faster than global memory reads. The previous version of the code was memory-intensive, i.e. it carried out 1 memory read for each of n threads in the work-group, with potential redundancies and/or serialization of the memory operations if multiple threads were reading the same label location. The new version of the code is compute-intensive, i.e. 1 thread carries out a maximum of n memory reads, but with lower potential redundancies if there are overlaps across fetch operations.
+
+In order for this new version to be faster, the speed-up from the reduced number of memory reads will need to offset the fact that 1 thread is doing all the work. This will occur in cases where there is significant overlap in the label locations being read across the threads in a work-group. Based on the empirical results, this does not appear to be the case. Intuitively (from looking at the maze layouts), this makes sense: each of the pixels starts out with a different label, meaning that there will initially be no overlap. The benefits of reduced memory reads only comes into effect in later iterations, once there is more overlap in labels. Given the maze layouts, the previous approach seems like the better implementation choice.
+
+########################################################################################
+
+PART 5:
+
+Using the min() function instead of the atomic_min() function leaves the code exposed to multiple threads potentially modifying the same label value. This can occur when multiple threads (pixels) are referencing the same label value, have all identified a new minimum value, and are all trying to update the label value accordingly.
+
+Suppose, for example, that labels[old_label] = 10, that thread 1 has found new_label = 9 and that thread 2 has found new_label = 8.  (This example also works with many more threads operating on the same label value, but the logic is the same). 
+
+Using atomic_min(), if thread 1 reaches the update step first, then it will update labels[old_label] to =9 while thread 2 waits.  Thread 2 will then update labels[old_label] to =8. At this point, assuming no other threads are operating on the same old_label, then the given iteration's updates for this particular label value will be complete and labels[old_label] will have the correct new minimum value.
+
+If, instead, thread 2 reaches the update step first, then it will update labels[old_label] to =8 while thread 1 waits. Thread 1 will then see that its new_label is no longer smaller than labels[old_label], and will leave it unchanged. Again, assuming that no other threads are operating on the same old_label, then the given iteration's updates for this particular label value will be complete and labels[old_label] will have the correct new minimum value.
+
+We are not able to guarantee the same outcome in an individual iteration when using the min() function.  Suppose that thread 1 and thread 2 both reach the update step, and both see that their respective new_label values are smaller than the existing labels[old_label] value. They will both then try to update labels[old_label]. Both of these operations will be happening at the same time, so we have no way of knowing in which order the updates will occur. Once both threads are done, it is equally possible for labels[old_label] = 9 and for labels[old_label] = 8.
+
+The above example shows that we cannot guarantee (or predict) the outcome of individual iterations with min(). This means that the algorithm may not be as optimized as possible; however, min() will still result in the correct output of the overall calculation, once all the iterations have completed. Suppose the example above would have normally been the last iteration; due to the incorrect update, we will now have to carry out additional iteration(s) in order to reach the ultimate result. Put another way, we may need to take more steps to reach the overall minimum value for each position in labels, but we will still reach it eventually. This is the case because min() is guaranteed to continue reducing the value in each position in labels, even if it may not reduce it as much as possible at each step.
+
+For reference, I ran the code with min() instead of atomic_min().  The results are as follows:
+
+Maze #1:
+Finished after 9 iterations, 15.03688 ms total, 1.67076444444 ms per iteration
+Found 2 regions
+
+Maze #2:
+Finished after 8 iterations, 13.1788 ms total, 1.64735 ms per iteration
+Found 35 regions
+
+It is interesting to note that that maze 1 required one additional iteration and a higher runtime, while maze 2 actually ran faster with the same number of iterations!
+
+This brings up another consideration: how likely is it that multiple threads will actually be operating on the same labels value simultaneously? This is more likely to be the case (a) after several iterations, once there is more overlap in labels and (b) for mazes that solve to fewer regions. This explains the increased runtime for maze 1, which solves to fewer regions and is therefore more likely to have multiple threads updating the same label values simultaneously. By comparison, maze 2 has more independent regions, so it actually benefits from the faster runtime of min() compared to atomic_min(), without any increase in the number of iterations.
