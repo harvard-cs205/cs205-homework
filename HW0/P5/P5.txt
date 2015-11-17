@@ -1,1 +1,16 @@
 # Your answers here.
+
+1. It would take him 256 seconds.
+
+2. They can do it in 1/7th of the original time, plus a little overhead of 6 seconds to add up the different piles of
+    pennies.
+
+3. There is one cashier per bag. Therefore it would take 256 plus an overhead of 255 seconds to add up the
+    different bags.
+
+4. See png.
+
+5. I already took that into account in my answers above
+
+6. For 1 bag: 256 (hand to cashiers) + 256 / number of cashiers + 255 second communication time
+    For 2 bags: 128 (hand to cahsiers) + 128 / number of cashiers + 127 seconds communication time
