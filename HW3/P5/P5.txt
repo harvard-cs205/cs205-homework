@@ -1,0 +1,64 @@
+########
+#Part 1#
+########
+
+After adding code to compute, for each foreground pixel, the minimum of its 4 neighboring pixels and itself, I saw the following results.
+
+Maze 1:
+Finished after 883 iterations, 214.56256 ms total, 0.242992706682 ms per iteration
+Found 2 regions
+
+Maze 2:
+Finished after 522 iterations, 126.54344 ms total, 0.242420383142 ms per iteration
+Found 35 regions
+
+########
+#Part 2#
+########
+
+After adding the optimization to replace each label with the label of its label (i.e. ‘grandparent’), I saw the following results:
+
+Maze 1:
+Finished after 529 iterations, 128.33672 ms total, 0.242602495274 ms per iteration
+Found 2 regions
+
+Maze 2:
+Finished after 273 iterations, 63.26896 ms total, 0.231754432234 ms per iteration
+Found 35 regions
+
+########
+#Part 3#
+########
+
+After adding the optimization for child regions to merge their old and new parent whenever they change to a new label, I saw the following results:
+
+Maze 1:
+Finished after 10 iterations, 2.38936 ms total, 0.238936 ms per iteration
+Found 2 regions
+
+Maze 2:
+Finished after 10 iterations, 2.31816 ms total, 0.231816 ms per iteration
+Found 35 regions
+
+########
+#Part 4#
+########
+
+Maze 1:
+Finished after 10 iterations, 11.134 ms total, 1.1134 ms per iteration
+Found 2 regions
+
+Maze 2:
+Finished after 9 iterations, 9.9276 ms total, 1.10306666667 ms per iteration
+Found 35 regions
+
+Explain, in terms of compute vs. memory, why using a single thread to perform this step is or is not a reasonable choice. Note that there is some variation in GPUs, so you may want to discuss your empirical results as well as speculate under what conditions those results might be different.
+
+In this case I think having a single thread performing this step is reasonable since it’s likely that many pixels near each other would have the same grandparent. thus, we are saving time by saving the grandparent to local memory and not having to go to global memory at every step. This assumes that the single thread can save more time by doing this than having many threads work in parallel. It’s possible that if we have a slower GPU to local memory pipe, then this advantage may not be as strong. Similarly, perhaps if our local groups are very big, then a single thread having to work in serial will become a bottleneck for our compute performance.
+
+
+########
+#Part 5#
+########
+
+Explain what would happen if instead of using the atomic min() operation, one would use the min() function. Your explanation should consider whether the final result would still be correct, what might be the impact on the performance of the algorithm (time and iterations), could a value in labels ever increase, and could it increase between iterations?
