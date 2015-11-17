@@ -1,0 +1,28 @@
+1. Iteration counts and average kernel times after each change for Parts 1-4：
+
+Part 1 output:
+
+Maze 1： Finished after 880 iterations, 423.86912 ms total, 0.481669454545 ms per iteration
+Found 2 regions
+Maze 2: Finished after 515 iterations, 248.67392 ms total, 0.482861980583 ms per iteration
+Found 35 regions
+
+Part 2 Output:
+Maze1: Finished after 528 iterations, 254.75696 ms total, 0.482494242424 ms per iteration
+Found 2 regions
+Maze2: Finished after 273 iterations, 132.18424 ms total, 0.484191355311 ms per iteration
+Found 35 regions
+
+Part 3 output:
+
+Maze 1: Finished after 10 iterations, 4.91776 ms total, 0.491776 ms per iteration
+Found 2 regions
+Maze 2: Finished after 9 iterations, 4.39448 ms total, 0.488275555556 ms per iteration
+Found 35 regions
+
+Part 4 result:
+
+Maze1: Finished after 20 iterations, 19.93688 ms total, 0.996844 ms per iteration
+Found 2 regions
+Maze2: Finished after 18 iterations, 17.88368 ms total, 0.993537777778 ms per iteration
+Found 35 regions
