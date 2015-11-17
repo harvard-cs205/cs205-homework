@@ -86,7 +86,15 @@ propagate_labels(__global __read_write int *labels,
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
+
         new_label = old_label;
+        // compute min only for foreground pixel
+        if(old_label < w * h) {
+            int vert = min(buffer[(buf_y + 1) * buf_w + buf_x], buffer[(buf_y - 1) * buf_w + buf_x]);
+            int horz = min(buffer[buf_y * buf_w + buf_x + 1], buffer[buf_y * buf_w + buf_x - 1]);
+            new_label = min(old_label, min(vert, horz));
+        }
+        
 
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
