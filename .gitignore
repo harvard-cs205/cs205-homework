@@ -1,3 +1,6 @@
 *~
 *.pyc
 *.pyxbldc
+*.xml
+HW3/.idea/*
+HW2/.idea/

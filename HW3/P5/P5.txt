@@ -1,0 +1,52 @@
+1. Iteration counts and average kernel times after each change for Parts 1-4：
+
+Part 1 output:
+
+Maze 1： Finished after 880 iterations, 423.86912 ms total, 0.481669454545 ms per iteration
+Found 2 regions
+Maze 2: Finished after 515 iterations, 248.67392 ms total, 0.482861980583 ms per iteration
+Found 35 regions
+
+Part 2 Output:
+Maze1: Finished after 528 iterations, 254.75696 ms total, 0.482494242424 ms per iteration
+Found 2 regions
+Maze2: Finished after 273 iterations, 132.18424 ms total, 0.484191355311 ms per iteration
+Found 35 regions
+
+Part 3 output:
+
+Maze 1: Finished after 10 iterations, 4.91776 ms total, 0.491776 ms per iteration
+Found 2 regions
+Maze 2: Finished after 9 iterations, 4.39448 ms total, 0.488275555556 ms per iteration
+Found 35 regions
+
+Part 4 result:
+
+Maze1: Finished after 20 iterations, 19.93688 ms total, 0.996844 ms per iteration
+Found 2 regions
+Maze2: Finished after 18 iterations, 17.88368 ms total, 0.993537777778 ms per iteration
+Found 35 regions
+
+2. Part 4 discussion
+
+Judging by the number of iterations and the average kernel execution time, the single thread actually slows down the process by doubling the number
+of iterations and reducing half of the execution speed, hence increased the total execution time by 3 folds. My explanation is that though lookup
+is weigh more time-consuming than computation, the time saved by reducing redundant lookup is rather small compared to the decreased efficiency by changing
+parallel implementation to serial. However, depending on the variations of GPUs and specific application scenarios, the results might be different:
+ if 1) the GPU read/write is really slow, and 2) the input image is more "consistant" (majority of pixels within a workgroup have same labels), the seriel implementation
+ might be a nice try; otherwise, if 1) the GUP has relatively large amount of cores (better parallelism) and 2) tolerable read/write speed, plus 3) the task is more
+ compute-intensive or the image is more varied, P4 implementation is very likely to be an slowdown in efficiency.
+
+3. Part 5: no atomic operations
+
+Atomic_min() operation ensures that a target memory address will only be accessed and modified by one thread at a time using locks, which prevent a single memory space
+from being overwritten by a second thread in-between read and write intervals. In our case, this means that the label[old_label] will always get the actual minimum values
+during each iterations, whereas using min() might result in label[old_label] being overwritten twice and having higher values. Consider the following
+scenario using min(): labels[old_label] = 100, thread A gets the old value and computes new label_1 as 80. Before A writes 80 back, thread B gets the the same old value and computes
+new label_2 as 90. Both thread A and B try to write back to label[old_label] since label_1 = 80 < 100 and label_2 = 90 < 100, but thread B writes after A. In the
+end, the label[old_label] are updated as 90 instead of 80, which means that the value in labels actually increases.
+
+The final result should still be correct since after all atomic_min() is just a optimization, however, the performance of the algorithm (time and iterations) will vary.
+The operation using min() will be faster due to parallelism, on the other hand the number of iterations will increase since a single iteration might not get
+the actual "minimum", it will take longer for the algorithm to converge.
+

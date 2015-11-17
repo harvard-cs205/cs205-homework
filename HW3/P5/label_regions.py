@@ -3,6 +3,9 @@ import sys
 import pyopencl as cl
 import numpy as np
 import pylab
+import os
+
+os.environ['PYOPENCL_COMPILER_OUTPUT'] = '1'
 
 def round_up(global_size, group_size):
     r = global_size % group_size
