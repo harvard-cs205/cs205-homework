@@ -1,30 +1,24 @@
 #include "median9.h"
 
 // static gets rid of annoying errors, according to http://blog.yuwang-cg.com/2014/09/opencl-no-previous-prototype-for.html
+// important to make sure x and y are not held constant here
 static float
-FETCH(__global __read_only float *in_values, int w, int h, const int x, const int y)
+FETCH(__global __read_only float *in_values, int w, int h, int x, int y)
 {
-  // initialize temp variables that can be manipulated
-  int tx;
-  int ty;
-  
-  tx = x;
-  ty = y;
-  
   // check out-of-bounds x values
   if (x < 0)
-    tx = 0;
+    x = 0;
   else if (x >= w)
-    tx = w - 1;
+    x = w - 1;
   
   // check out-of-bounds y values
   if (y < 0)
-    ty = 0;
+    y = 0;
   else if (y >= h)
-    ty = h - 1;
+    y = h - 1;
 
   // return nearest pixel value if out of bounds
-  return in_values[ty * w + tx];
+  return in_values[y * w + x];
 }
 
 // 3x3 median filter
