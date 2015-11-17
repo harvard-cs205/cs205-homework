@@ -1,3 +1,4 @@
+#define min(a, b) (((a) < (b)) ? (a) : (b))
 __kernel void
 initialize_labels(__global __read_only int *image,
                   __global __write_only int *labels,
@@ -15,6 +16,18 @@ initialize_labels(__global __read_only int *image,
             labels[y * w + x] = w * h;
         }
     }
+}
+int 
+get_min_value(int v0, int v1, int v2, int v3, int v4)
+{
+    float minV = v0;
+    
+    minV = min(minV, v1);
+    minV = min(minV, v2);
+    minV = min(minV, v3);
+    minV = min(minV, v4);
+    
+    return minV;
 }
 
 int
@@ -86,7 +99,15 @@ propagate_labels(__global __read_write int *labels,
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
-        new_label = old_label;
+        if (buffer[buf_y * buf_w + buf_x] != w * h) 
+            {
+                new_label = get_min_value(buffer[(buf_y + 0) * buf_w + (buf_x + 0)],
+                                          buffer[(buf_y + 1) * buf_w + (buf_x + 0)],
+                                          buffer[(buf_y - 1) * buf_w + (buf_x + 0)],
+                                          buffer[(buf_y + 0) * buf_w + (buf_x + 1)],
+                                          buffer[(buf_y + 0) * buf_w + (buf_x - 1)]);
+            }
+        //new_label = old_label;
 
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
