@@ -87,19 +87,30 @@ propagate_labels(__global __read_write int *labels,
     //}
     
     //PART 4 CODES
+    
+    //Use the thread corresponding to the top-left corner as to execute the seriel implementation
     if(lx == 0 && ly ==0){
         int last_label = buffer[0];
         int current_label;
+        
+        //row: local x index
         for(uint row = 0; row < get_local_size(0); row++){
+            //col: local y index
             for(uint col = 0; col < get_local_size(1); col++){
+                
+                //current_label_id: label index in buffer
                 int current_label_id = (row + halo) * buf_w + (col + halo);
                 current_label = buffer[current_label_id];
                 
+                //if foreground objects
                 if(current_label < w * h){
                     if(current_label == last_label){
+                        //skip lookup, replace within the buffer
                         buffer[current_label_id] = last_label;
                     }else{
+                        //different from last fetch
                         last_label = current_label;
+                        //reading global value.
                         buffer[current_label_id] = labels[current_label];
                     }
                 }
