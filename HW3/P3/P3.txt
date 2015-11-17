@@ -2,6 +2,6 @@
 BEST HARDWARE CONFIGURATION
 ---------------------------
 
- Method     |  Workgroups  |  Workers   |  Execution time
+ Method     |  Workgroups  |  Workers  |  Execution time
 --------------------------------------------------------------
- coalesced  |      8       |     128    |  0.020289472 seconds
+ coalesced  |      8       |    128    |  0.020289472 seconds
