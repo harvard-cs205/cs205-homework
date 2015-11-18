@@ -1,0 +1,41 @@
+Part 1:
+maze1.npy
+Finished after 914 iterations, 403.37568 ms total, 0.441330065646 ms per iteration
+Found 2 regions
+
+maze2.npy
+Finished after 531 iterations, 234.87296 ms total, 0.442321958569 ms per iteration
+Found 35 regions
+
+
+
+Part 2:
+
+maze1.npy
+Finished after 529 iterations, 233.88816 ms total, 0.442132627599 ms per iteration
+Found 2 regions
+
+
+maze2.npy
+Finished after 273 iterations, 120.97224 ms total, 0.443121758242 ms per iteration
+Found 35 regions
+
+part 3:
+
+maze1.npy
+Finished after 10 iterations, 4.59392 ms total, 0.459392 ms per iteration
+Found 2 regions
+
+maze2.npy
+Finished after 9 iterations, 3.99064 ms total, 0.443404444444 ms per iteration
+Found 35 regions
+
+part 4:
+
+maze1.npy
+Finished after 10 iterations, 12.92648 ms total, 1.292648 ms per iteration
+Found 2 regions
+
+maze2.npy
+Finished after 9 iterations, 11.54208 ms total, 1.28245333333 ms per iteration
+Found 35 regions
