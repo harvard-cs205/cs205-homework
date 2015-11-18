@@ -1,0 +1,54 @@
+1. Iteration counts and average kernel times after each change for Parts 1-4
+
+Part 1: 
+
+* Maze 1 *
+Finished after 877 iterations, 481.940256 ms total, 0.549532789054 ms per iteration
+Found 2 regions
+
+Finished after 507 iterations, 287.082752 ms total, 0.566238169625 ms per iteration
+Found 35 regions
+
+Part 2: 
+
+* Maze 1 *
+Finished after 529 iterations, 299.851808 ms total, 0.566827614367 ms per iteration
+Found 2 regions
+
+* Maze 2 *
+Finished after 273 iterations, 145.413728 ms total, 0.532651018315 ms per iteration
+Found 35 regions
+
+Part 3: 
+
+* Maze 1 *
+Finished after 10 iterations, 5.758176 ms total, 0.5758176 ms per iteration
+Found 2 regions
+
+* Maze 2 *
+Finished after 9 iterations, 5.19984 ms total, 0.57776 ms per iteration
+Found 35 regions
+
+Part 4: 
+
+* Maze 1 *
+Finished after 10 iterations, 20.48432 ms total, 2.048432 ms per iteration
+Found 2 regions
+
+* Maze 2 *
+Finished after 9 iterations, 18.293344 ms total, 2.03259377778 ms per iteration
+Found 35 regions
+
+
+2. An explanation for Part 4 as to why a single thread is a good (or bad) choice for this
+operation
+
+Comparing the iteration counts and average kernel times of part 3 and part 4, we see that modifying the code to fetch granparents to use a single thread in the workgroup slows down the performance by close to three times. Even though using a single thread to perform this step will avoid some of the redundant global memory reads as described in the problem, in order for a single thread to remember the last fetch it performed, it has to serially check through all the pixels in the workgroup. Therefore, even though using a single thread might cut down redundant memory usage and thus will benefit from reduced number of memory reads, there is a down side because a single thread is doing all the work, while in part 3, the computation was parallelized over multiple threads. The method taken in part 4 will be faster than the one in part 3 if there are many redundant memory reads across the threads. However, in the case of our two mazes, it did not speed up the performance, in fact it slowed down the performance. Therefore, a single thread is a bad choice for this operation.
+
+3. The explanation of Part 5
+
+When using the min function instead of the atomic_min function, one might obesearve a decrease in time per iteration, but because the min function does not prevent race conditions between threads, multiple threads might modify the same label value. Therefore, we can have more than one thread trying to access the same label. 
+
+For example, let's say labels[old_label] = 3, and thread 1 has found new_label = 2, and thread 2 has found new_label = 1. When using atomic_min, while thread 1 updates labels[old_label] to new_label = 2, it will wait, and as soon thread 1 finishes, bedcause thread 2's new_label is smaller, it will update labels[old_label] to 1. If thread 2 updates first, it will first update labels[old_label] to 1, and thread 1 will not update labels[old_label] because its value is not smaller. Therefore, labels[old_label] will be 1 no matter the order. 
+
+However, when using the min, because the order is not set, the labels[old_label] can end up either 2 or 1, which can increase the number of iterations. The value in labels can increase because there is no strict ordering. For example, thread 2 might start updating labels[old_label] to 1, but because thread 1 does not know that, it might update the 1 to a 2. However, it can not increase between iterations because in the end, we will still get the correct result, because the min function is associative, thus order does not matter. It might increase the number of iterations, but time for iteration can decrease compared to when using the atomic iterations because atomic iterations are inefficient.

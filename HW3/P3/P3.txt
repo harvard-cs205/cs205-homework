@@ -1,0 +1,141 @@
+
+
+1. Machine Setup
+
+The platforms detected are:
+---------------------------
+Apple Apple version: OpenCL 1.2 (Sep 21 2015 19:24:11)
+The devices detected on platform Apple are:
+---------------------------
+Intel(R) Core(TM) i7-3615QM CPU @ 2.30GHz [Type: CPU ]
+Maximum clock Frequency: 2300 MHz
+Maximum allocable memory size: 2147 MB
+Maximum work group size 1024
+Maximum work item dimensions 3
+Maximum work item size [1024L, 1L, 1L]
+---------------------------
+HD Graphics 4000 [Type: GPU ]
+Maximum clock Frequency: 1200 MHz
+Maximum allocable memory size: 402 MB
+Maximum work group size 512
+Maximum work item dimensions 3
+Maximum work item size [512L, 512L, 512L]
+---------------------------
+GeForce GT 650M [Type: GPU ]
+Maximum clock Frequency: 900 MHz
+Maximum allocable memory size: 268 MB
+Maximum work group size 1024
+Maximum work item dimensions 3
+Maximum work item size [1024L, 1024L, 64L]
+---------------------------
+This context is associated with  1 devices
+The queue is using the device: GeForce GT 650M
+The device memory bandwidth is 5.48629012673 GB/s
+The host-device bandwidth is 3.32909871976 GB/s
+
+MacBook Pro (Retina, Mid 2012)
+Processor 2.3 GHz Intel Core i7
+Memory 8 GB 1600 MHz DDR3
+Graphics Intel HD Graphics 4000 1536 MB
+
+2. Best configuration and time for my hardware
+#0: Intel(R) Core(TM) i7-3615QM CPU @ 2.30GHz on Apple
+#1: HD Graphics 4000 on Apple
+#2: GeForce GT 650M on Apple
+
+configuration ('coalesced', 64, 128): 0.004020256 seconds
+
+3. Full Console Report
+
+#0: Intel(R) Core(TM) i7-3615QM CPU @ 2.30GHz on Apple
+#1: HD Graphics 4000 on Apple
+#2: GeForce GT 650M on Apple
+coalesced reads, workgroups: 8, num_workers: 4, 0.337198304 seconds
+coalesced reads, workgroups: 8, num_workers: 8, 0.2030776 seconds
+coalesced reads, workgroups: 8, num_workers: 16, 0.103661888 seconds
+coalesced reads, workgroups: 8, num_workers: 32, 0.052932512 seconds
+coalesced reads, workgroups: 8, num_workers: 64, 0.026444448 seconds
+coalesced reads, workgroups: 8, num_workers: 128, 0.013373856 seconds
+coalesced reads, workgroups: 16, num_workers: 4, 0.172316416 seconds
+coalesced reads, workgroups: 16, num_workers: 8, 0.102379072 seconds
+coalesced reads, workgroups: 16, num_workers: 16, 0.051856352 seconds
+coalesced reads, workgroups: 16, num_workers: 32, 0.026513536 seconds
+coalesced reads, workgroups: 16, num_workers: 64, 0.0132784 seconds
+coalesced reads, workgroups: 16, num_workers: 128, 0.006887584 seconds
+coalesced reads, workgroups: 32, num_workers: 4, 0.102313984 seconds
+coalesced reads, workgroups: 32, num_workers: 8, 0.051387168 seconds
+coalesced reads, workgroups: 32, num_workers: 16, 0.025947168 seconds
+coalesced reads, workgroups: 32, num_workers: 32, 0.013378304 seconds
+coalesced reads, workgroups: 32, num_workers: 64, 0.006906176 seconds
+coalesced reads, workgroups: 32, num_workers: 128, 0.004034656 seconds
+coalesced reads, workgroups: 64, num_workers: 4, 0.1014136 seconds
+coalesced reads, workgroups: 64, num_workers: 8, 0.051301696 seconds
+coalesced reads, workgroups: 64, num_workers: 16, 0.025991424 seconds
+coalesced reads, workgroups: 64, num_workers: 32, 0.0132848 seconds
+coalesced reads, workgroups: 64, num_workers: 64, 0.006937184 seconds
+coalesced reads, workgroups: 64, num_workers: 128, 0.004020256 seconds
+coalesced reads, workgroups: 128, num_workers: 4, 0.10263824 seconds
+coalesced reads, workgroups: 128, num_workers: 8, 0.051338208 seconds
+coalesced reads, workgroups: 128, num_workers: 16, 0.02603776 seconds
+coalesced reads, workgroups: 128, num_workers: 32, 0.013292704 seconds
+coalesced reads, workgroups: 128, num_workers: 64, 0.007029856 seconds
+coalesced reads, workgroups: 128, num_workers: 128, 0.004087488 seconds
+coalesced reads, workgroups: 256, num_workers: 4, 0.101584192 seconds
+coalesced reads, workgroups: 256, num_workers: 8, 0.05129632 seconds
+coalesced reads, workgroups: 256, num_workers: 16, 0.02601808 seconds
+coalesced reads, workgroups: 256, num_workers: 32, 0.013335104 seconds
+coalesced reads, workgroups: 256, num_workers: 64, 0.006995488 seconds
+coalesced reads, workgroups: 256, num_workers: 128, 0.004083264 seconds
+coalesced reads, workgroups: 512, num_workers: 4, 0.102528416 seconds
+coalesced reads, workgroups: 512, num_workers: 8, 0.05141312 seconds
+coalesced reads, workgroups: 512, num_workers: 16, 0.026036832 seconds
+coalesced reads, workgroups: 512, num_workers: 32, 0.013406944 seconds
+coalesced reads, workgroups: 512, num_workers: 64, 0.00704944 seconds
+coalesced reads, workgroups: 512, num_workers: 128, 0.004154496 seconds
+blocked reads, workgroups: 8, num_workers: 4, 0.210542016 seconds
+blocked reads, workgroups: 8, num_workers: 8, 0.260618144 seconds
+blocked reads, workgroups: 8, num_workers: 16, 0.210781248 seconds
+blocked reads, workgroups: 8, num_workers: 32, 0.169268736 seconds
+blocked reads, workgroups: 8, num_workers: 64, 0.08305152 seconds
+blocked reads, workgroups: 8, num_workers: 128, 0.044293536 seconds
+blocked reads, workgroups: 16, num_workers: 4, 0.214758176 seconds
+blocked reads, workgroups: 16, num_workers: 8, 0.146423328 seconds
+blocked reads, workgroups: 16, num_workers: 16, 0.10550768 seconds
+blocked reads, workgroups: 16, num_workers: 32, 0.083082016 seconds
+blocked reads, workgroups: 16, num_workers: 64, 0.044499072 seconds
+blocked reads, workgroups: 16, num_workers: 128, 0.042921664 seconds
+blocked reads, workgroups: 32, num_workers: 4, 0.111585664 seconds
+blocked reads, workgroups: 32, num_workers: 8, 0.073500448 seconds
+blocked reads, workgroups: 32, num_workers: 16, 0.051690304 seconds
+blocked reads, workgroups: 32, num_workers: 32, 0.04440416 seconds
+blocked reads, workgroups: 32, num_workers: 64, 0.043263584 seconds
+blocked reads, workgroups: 32, num_workers: 128, 0.04466 seconds
+blocked reads, workgroups: 64, num_workers: 4, 0.111637952 seconds
+blocked reads, workgroups: 64, num_workers: 8, 0.068962496 seconds
+blocked reads, workgroups: 64, num_workers: 16, 0.052869664 seconds
+blocked reads, workgroups: 64, num_workers: 32, 0.04425696 seconds
+blocked reads, workgroups: 64, num_workers: 64, 0.042833184 seconds
+blocked reads, workgroups: 64, num_workers: 128, 0.04757104 seconds
+blocked reads, workgroups: 128, num_workers: 4, 0.104244128 seconds
+blocked reads, workgroups: 128, num_workers: 8, 0.073109888 seconds
+blocked reads, workgroups: 128, num_workers: 16, 0.053870464 seconds
+blocked reads, workgroups: 128, num_workers: 32, 0.044114912 seconds
+blocked reads, workgroups: 128, num_workers: 64, 0.042631136 seconds
+blocked reads, workgroups: 128, num_workers: 128, 0.045514176 seconds
+blocked reads, workgroups: 256, num_workers: 4, 0.109619744 seconds
+blocked reads, workgroups: 256, num_workers: 8, 0.072439584 seconds
+blocked reads, workgroups: 256, num_workers: 16, 0.052607808 seconds
+blocked reads, workgroups: 256, num_workers: 32, 0.044394208 seconds
+blocked reads, workgroups: 256, num_workers: 64, 0.042319168 seconds
+blocked reads, workgroups: 256, num_workers: 128, 0.045043232 seconds
+blocked reads, workgroups: 512, num_workers: 4, 0.10849376 seconds
+blocked reads, workgroups: 512, num_workers: 8, 0.071026464 seconds
+blocked reads, workgroups: 512, num_workers: 16, 0.05314496 seconds
+blocked reads, workgroups: 512, num_workers: 32, 0.045025568 seconds
+blocked reads, workgroups: 512, num_workers: 64, 0.041809888 seconds
+blocked reads, workgroups: 512, num_workers: 128, 0.0446432 seconds
+configuration ('coalesced', 64, 128): 0.004020256 seconds
+
+
+
+
