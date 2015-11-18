@@ -28,7 +28,7 @@ get_clamped_value(__global __read_only int *labels,
 }
 
 __kernel void
-propagate_labels(__global __read_write int *labels,
+propagate_labels(__global int *labels,
                  __global __write_only int *changed_flag,
                  __local int *buffer,
                  int w, int h,
@@ -80,20 +80,54 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
-    
+    ////// Part 2 Start //////
+    //if(old_label<w*h){
+    //  buffer[buf_y * buf_w + buf_x] = labels[old_label];
+    //}
+    //barrier(CLK_LOCAL_MEM_FENCE);
+    ////// Part 2 End //////
+    ////// Part 4 Start //////
+    // use a single thread in the workgroup
+    if(idx_1D==0){
+    	int curr_label = 0;
+    	int prev_label = 0;
+    	for(int row=halo; row<buf_h-halo; row++){
+            for(int col=halo; col<buf_w-halo; col++){
+	        curr_label = buffer[row*buf_w+col];
+		if(curr_label<w*h){
+	            if(curr_label==prev_label)
+		        buffer[row*buf_w+col] = prev_label;
+		    else{
+			prev_label = curr_label;
+		        buffer[row*buf_w+col] = labels[curr_label];
+		    }
+		}
+	    }
+	}
+    }
+    barrier(CLK_LOCAL_MEM_FENCE);
+
+    ////// Part 4 End //////
     // stay in bounds
     if ((x < w) && (y < h)) {
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
         new_label = old_label;
+        // compute the minimum of its 4 neighboring pixels and itself for foreground pixel
+        if (old_label<w*h){
+	    new_label = min(min(min(buffer[buf_y*buf_w+buf_x-1],buffer[buf_y*buf_w+buf_x+1])
+			   ,min(buffer[(buf_y-1)*buf_w+buf_x],buffer[(buf_y+1)*buf_w+buf_x])),old_label);
+	}
 
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
             // indicate there was a change this iteration.
             // multiple threads might write this.
+	    // Part 3 : Merge parent regions
             *(changed_flag) += 1;
             labels[y * w + x] = new_label;
+            atomic_min(&labels[old_label], new_label);
         }
     }
 }
