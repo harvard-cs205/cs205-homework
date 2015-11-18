@@ -1,0 +1,8 @@
+The best configuration for my hardware
+1st try:configuration ('coalesced', 256, 128): 0.000692936 seconds
+2nd try:configuration ('coalesced', 512, 64): 0.000685684 seconds
+3rd try:configuration ('coalesced', 256, 128): 0.000665112 seconds
+4th try:configuration ('coalesced', 512, 128): 0.000742072 seconds
+5th try:configuration ('coalesced', 256, 128): 0.000688792 seconds
+
+I test serveral times and list 5 results above randomly. I found that coalesced read with 256 work groups and 128 workers per group has the highest probability of being the best configuration.
