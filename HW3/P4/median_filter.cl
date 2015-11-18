@@ -42,10 +42,9 @@ median_3x3(__global __read_only float *in_values,
     // 1D index of thread within our work-group
     const int idx_1D = ly * get_local_size(0) + lx;
 
-    int row;
-
     if (idx_1D < buf_w)
-        for (row = 0; row < buf_h; row++) {
+        for (int row = 0; row < buf_h; row++) {
+            // restrict fetch only to valid values
             buffer[row * buf_w + idx_1D] = \
                 in_values[max(0, min(w-1, buf_corner_x + idx_1D)) + max(0, min(h-1, buf_corner_y + row)) * w];
         }
