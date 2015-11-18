@@ -1,6 +1,8 @@
 
 P5.1:
 
+** see file label_regions_p5_1.cl for full 5.1 code **
+
 Maze #1:
 Finished after 876 iterations, 612.93712 ms total, 0.699699908676 ms per iteration
 Found 2 regions
@@ -11,6 +13,8 @@ Found 35 regions
 
 P5.2:
 
+** see file label_regions_P5_2.cl for full 5.2 code **
+
 Maze #1:
 Finished after 529 iterations, 374.42424 ms total, 0.707796294896 ms per iteration
 Found 2 regions
@@ -19,8 +23,12 @@ Maze #2:
 Finished after 273 iterations, 193.93104 ms total, 0.71037010989 ms per iteration
 Found 35 regions
 
+For this optimization I found a significant speed-up of almost 50%. Marginal iteration time increased, I believe because each thread is executing more work, but obviously less work overall is required due to the fetch grandparents optimization. 
+
 
 P5.3:
+
+** see file label_regions_p5_3.cl for full 5.3 code **
 
 Maze #1:
 Finished after 10 iterations, 8.80408 ms total, 0.880408 ms per iteration
@@ -30,7 +38,11 @@ Maze #2:
 Finished after 9 iterations, 7.72312 ms total, 0.858124444444 ms per iteration
 Found 35 regions
 
+The merge parents optimization implemented in this sub-problem resulted in the most significant speed up of almost 50x. 
+
 P5.4:
+
+** see file label_regions_p5_4.cl for full 5.4 code **
 
 Maze #1:
 Finished after 10 iterations, 20.12216 ms total, 2.012216 ms per iteration
@@ -40,7 +52,7 @@ Maze #2:
 Finished after 9 iterations, 17.89456 ms total, 1.98828444444 ms per iteration
 Found 35 regions
 
-My emperical results were that using a single thread to perform the loading of grandparents into the buffer was not as efficent computationally compared to each thread loading in their own grandparents. I believe this is because this operation becomes serialized, as the remainder of the computation depends upon the completion of this single thread completing this task. This could save more time on a different GPU, where global memory reads take siginicantly more time that local memory reads, ie local memory reads are very quick. On my GPU, local to my PC, I believe that the scale between local and global memory reads is smaller, so there is less of a speed up optimizing to minimize global memory reads. 
+My emperical results were that using a single thread to perform the loading of grandparents into the buffer was not as efficent computationally compared to each thread loading in their own grandparents. I believe this is because this operation becomes serialized, as the remainder of the computation depends upon the completion of this single thread completing this task. This can be seen in the increased iteration times. This could save more time on a different GPU, where global memory reads take siginicantly more time that local memory reads, ie local memory reads are very quick. On my GPU, local to my PC, I believe that the scale between local and global memory reads is smaller, so there is less of a speed up optimizing to minimize global memory reads. 
 
 
 P5.5: 
