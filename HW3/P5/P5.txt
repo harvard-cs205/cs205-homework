@@ -1,0 +1,10 @@
+P5.txt
+
+Part 1
+Maze 1
+Finished after 879 iterations, 408.4472 ms total, 0.46467258248 ms per iteration
+Found 2 regions
+
+Maze 2
+Finished after 512 iterations, 237.8964 ms total, 0.46464140625 ms per iteration
+Found 35 regions

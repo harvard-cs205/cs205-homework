@@ -57,10 +57,13 @@ propagate_labels(__global __read_write int *labels,
     // 1D index of thread within our work-group
     const int idx_1D = ly * get_local_size(0) + lx;
     
-    int old_label;
     // Will store the output value
+    int old_label;
     int new_label;
     
+    // Local Neighbor Variables for checking neighbors
+    int ny_back, ny_forw, nx_up, nx_down;
+
     // Load the relevant labels to a local buffer with a halo 
     if (idx_1D < buf_w) {
         for (int row = 0; row < buf_h; row++) {
@@ -79,14 +82,26 @@ propagate_labels(__global __read_write int *labels,
     // the pixel for this thread
     old_label = buffer[buf_y * buf_w + buf_x];
 
+    // Calculate Pix 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
     
     // stay in bounds
-    if ((x < w) && (y < h)) {
+    // Also check to see if we are within image (exclude halo)
+    if ( (x < w) && (y < h) && (old_label < w*h) ) {
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
-        new_label = old_label;
+
+        // Grab Neighbor Pixels
+        // y = row, x = col 
+        // Referenced [row# * width + col#]
+        ny_forw = buffer[(buf_y+1) * buf_w + buf_x];
+        ny_back = buffer[(buf_y-1) * buf_w + buf_x];
+        nx_up = buffer[buf_y * buf_w + buf_x+1];
+        nx_down = buffer[buf_y * buf_w + buf_x-1];
+        
+        // Find the minimum pixel value from the 4 neighbors
+        new_label = min(old_label, min(ny_forw, min(ny_back, min(nx_down, nx_up))));
 
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
@@ -94,6 +109,6 @@ propagate_labels(__global __read_write int *labels,
             // multiple threads might write this.
             *(changed_flag) += 1;
             labels[y * w + x] = new_label;
-        }
-    }
+        } 
+    } 
 }
