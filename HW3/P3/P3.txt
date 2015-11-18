@@ -1,0 +1,105 @@
+#0: Intel(R) Core(TM) i7-5500U CPU @ 2.40GHz on AMD Accelerated Parallel Processing
+coalesced reads, workgroups: 8, num_workers: 4, 0.028961069 seconds
+coalesced reads, workgroups: 8, num_workers: 8, 0.070500444 seconds
+coalesced reads, workgroups: 8, num_workers: 16, 0.083793081 seconds
+coalesced reads, workgroups: 8, num_workers: 32, 0.09184507 seconds
+coalesced reads, workgroups: 8, num_workers: 64, 0.087685092 seconds
+coalesced reads, workgroups: 8, num_workers: 128, 0.07209195 seconds
+coalesced reads, workgroups: 16, num_workers: 4, 0.057749669 seconds
+coalesced reads, workgroups: 16, num_workers: 8, 0.074753438 seconds
+coalesced reads, workgroups: 16, num_workers: 16, 0.089700256 seconds
+coalesced reads, workgroups: 16, num_workers: 32, 0.085647191 seconds
+coalesced reads, workgroups: 16, num_workers: 64, 0.069944039 seconds
+coalesced reads, workgroups: 16, num_workers: 128, 0.087514319 seconds
+coalesced reads, workgroups: 32, num_workers: 4, 0.056064876 seconds
+coalesced reads, workgroups: 32, num_workers: 8, 0.078659866 seconds
+coalesced reads, workgroups: 32, num_workers: 16, 0.085397553 seconds
+coalesced reads, workgroups: 32, num_workers: 32, 0.070107322 seconds
+coalesced reads, workgroups: 32, num_workers: 64, 0.088413639 seconds
+coalesced reads, workgroups: 32, num_workers: 128, 0.085724056 seconds
+coalesced reads, workgroups: 64, num_workers: 4, 0.058074112 seconds
+coalesced reads, workgroups: 64, num_workers: 8, 0.072276139 seconds
+coalesced reads, workgroups: 64, num_workers: 16, 0.070198391 seconds
+coalesced reads, workgroups: 64, num_workers: 32, 0.087684353 seconds
+coalesced reads, workgroups: 64, num_workers: 64, 0.085409204 seconds
+coalesced reads, workgroups: 64, num_workers: 128, 0.092306834 seconds
+coalesced reads, workgroups: 128, num_workers: 4, 0.049752064 seconds
+coalesced reads, workgroups: 128, num_workers: 8, 0.065058637 seconds
+coalesced reads, workgroups: 128, num_workers: 16, 0.086954385 seconds
+coalesced reads, workgroups: 128, num_workers: 32, 0.085768225 seconds
+coalesced reads, workgroups: 128, num_workers: 64, 0.087594531 seconds
+coalesced reads, workgroups: 128, num_workers: 128, 0.089933219 seconds
+coalesced reads, workgroups: 256, num_workers: 4, 0.053991158 seconds
+coalesced reads, workgroups: 256, num_workers: 8, 0.077410167 seconds
+coalesced reads, workgroups: 256, num_workers: 16, 0.087271508 seconds
+coalesced reads, workgroups: 256, num_workers: 32, 0.087617519 seconds
+coalesced reads, workgroups: 256, num_workers: 64, 0.086265756 seconds
+coalesced reads, workgroups: 256, num_workers: 128, 0.111269425 seconds
+coalesced reads, workgroups: 512, num_workers: 4, 0.060660072 seconds
+coalesced reads, workgroups: 512, num_workers: 8, 0.065991167 seconds
+coalesced reads, workgroups: 512, num_workers: 16, 0.087746609 seconds
+coalesced reads, workgroups: 512, num_workers: 32, 0.085481374 seconds
+coalesced reads, workgroups: 512, num_workers: 64, 0.108550056 seconds
+coalesced reads, workgroups: 512, num_workers: 128, 0.160329297 seconds
+blocked reads, workgroups: 8, num_workers: 4, 0.006605747 seconds
+blocked reads, workgroups: 8, num_workers: 8, 0.006634233 seconds
+blocked reads, workgroups: 8, num_workers: 16, 0.006609749 seconds
+blocked reads, workgroups: 8, num_workers: 32, 0.006610484 seconds
+blocked reads, workgroups: 8, num_workers: 64, 0.006598495 seconds
+blocked reads, workgroups: 8, num_workers: 128, 0.006833816 seconds
+blocked reads, workgroups: 16, num_workers: 4, 0.006656804 seconds
+blocked reads, workgroups: 16, num_workers: 8, 0.006614663 seconds
+blocked reads, workgroups: 16, num_workers: 16, 0.006594944 seconds
+blocked reads, workgroups: 16, num_workers: 32, 0.006591516 seconds
+blocked reads, workgroups: 16, num_workers: 64, 0.006505704 seconds
+blocked reads, workgroups: 16, num_workers: 128, 0.006537259 seconds
+blocked reads, workgroups: 32, num_workers: 4, 0.008109776 seconds
+blocked reads, workgroups: 32, num_workers: 8, 0.007429751 seconds
+blocked reads, workgroups: 32, num_workers: 16, 0.006550911 seconds
+blocked reads, workgroups: 32, num_workers: 32, 0.006420186 seconds
+blocked reads, workgroups: 32, num_workers: 64, 0.006227683 seconds
+blocked reads, workgroups: 32, num_workers: 128, 0.00674089 seconds
+blocked reads, workgroups: 64, num_workers: 4, 0.006602721 seconds
+blocked reads, workgroups: 64, num_workers: 8, 0.006530221 seconds
+blocked reads, workgroups: 64, num_workers: 16, 0.006327755 seconds
+blocked reads, workgroups: 64, num_workers: 32, 0.006093191 seconds
+blocked reads, workgroups: 64, num_workers: 64, 0.006039632 seconds
+blocked reads, workgroups: 64, num_workers: 128, 0.00715184 seconds
+blocked reads, workgroups: 128, num_workers: 4, 0.006513851 seconds
+blocked reads, workgroups: 128, num_workers: 8, 0.006324102 seconds
+blocked reads, workgroups: 128, num_workers: 16, 0.006052152 seconds
+blocked reads, workgroups: 128, num_workers: 32, 0.005918818 seconds
+blocked reads, workgroups: 128, num_workers: 64, 0.006592065 seconds
+blocked reads, workgroups: 128, num_workers: 128, 0.009921348 seconds
+blocked reads, workgroups: 256, num_workers: 4, 0.010566899 seconds
+blocked reads, workgroups: 256, num_workers: 8, 0.006023197 seconds
+blocked reads, workgroups: 256, num_workers: 16, 0.005855394 seconds
+blocked reads, workgroups: 256, num_workers: 32, 0.006254682 seconds
+blocked reads, workgroups: 256, num_workers: 64, 0.00761471 seconds
+blocked reads, workgroups: 256, num_workers: 128, 0.015310779 seconds
+blocked reads, workgroups: 512, num_workers: 4, 0.00605476 seconds
+blocked reads, workgroups: 512, num_workers: 8, 0.005820807 seconds
+blocked reads, workgroups: 512, num_workers: 16, 0.00624461 seconds
+blocked reads, workgroups: 512, num_workers: 32, 0.00699961 seconds
+blocked reads, workgroups: 512, num_workers: 64, 0.010120492 seconds
+blocked reads, workgroups: 512, num_workers: 128, 0.021761701 seconds
+configuration ('blocked', 512, 8): 0.005820807 seconds
+
+
+The platforms detected are:
+---------------------------
+AMD Accelerated Parallel Processing Advanced Micro Devices, Inc. version: OpenCL 2.0 AMD-APP (1800.8)
+The devices detected on platform AMD Accelerated Parallel Processing are:
+---------------------------
+Intel(R) Core(TM) i7-5500U CPU @ 2.40GHz [Type: CPU ]
+Maximum clock Frequency: 2899 MHz
+Maximum allocable memory size: 1073 MB
+Maximum work group size 1024
+Maximum work item dimensions 3
+Maximum work item size [1024, 1024, 1024]
+---------------------------
+This context is associated with  1 devices
+The queue is using the device: Intel(R) Core(TM) i7-5500U CPU @ 2.40GHz
+The device memory bandwidth is 1.99229420448 GB/s
+The host-device bandwidth is 4.79877880677 GB/s
+
