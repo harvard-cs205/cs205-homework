@@ -81,12 +81,31 @@ propagate_labels(__global __read_write int *labels,
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
     
+    // Part 2:
+    if ((x < w) && (y < h) && old_label < w*h) {
+        buffer[buf_y * buf_w + buf_x] = labels[buffer[buf_y * buf_w + buf_x]];
+    }
+    barrier(CLK_LOCAL_MEM_FENCE);
+
     // stay in bounds
     if ((x < w) && (y < h)) {
         // CODE FOR PART 1 HERE
-        // We set new_label to the value of old_label, but you will need
-        // to adjust this for correctness.
-        new_label = old_label;
+
+        // If not a wall pixel:
+        if (old_label < w*h) {
+            // New label is equal to the min of the pixel and its neighbors.
+            new_label = min(min(min(min(buffer[(buf_y-1)*buf_w + (buf_x  )], 
+                                        buffer[(buf_y)  *buf_w + (buf_x-1)]), 
+                                        buffer[(buf_y)  *buf_w + (buf_x  )]), 
+                                        buffer[(buf_y)  *buf_w + (buf_x+1)]), 
+                                        buffer[(buf_y+1)*buf_w + (buf_x  )]);
+        } else { 
+            // For wall pixels, do nothing:
+            new_label = old_label;
+        }
+
+        // Wait for all the threads to finish before updating labels[]
+        barrier(CLK_LOCAL_MEM_FENCE);
 
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE

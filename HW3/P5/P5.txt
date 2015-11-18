@@ -1,0 +1,22 @@
+Part 1
+------
+Maze 1:
+2 regions
+Finished after 915 iterations, 36.31 ms total, 0.03968 ms per iteration
+
+Maze 2:
+35 regions
+Finished after 532 iterations, 20.12 ms total, 0.03783 ms per iteration
+
+Part 2
+------
+Maze 1:
+Finished after 529 iterations, 20.75 ms total, 0.03923 ms per iteration
+
+Maze 2:
+Finished after 276 iterations, 10.73 ms total, 0.03887 ms per iteration
+
+Part 3
+------
+
+
