@@ -61,7 +61,7 @@ propagate_labels(__global __read_write int *labels,
     int old_label;
     int new_label;
     
-    // Local Neighbor Variables for checking neighbors
+    // My Local Neighbor Variables
     int ny_back, ny_forw, nx_up, nx_down;
 
     // Load the relevant labels to a local buffer with a halo 
@@ -84,14 +84,19 @@ propagate_labels(__global __read_write int *labels,
 
     // Calculate Pix 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
+    if (old_label < w*h) {
+        // Fetch the grandparent and store in buffer
+        buffer[buf_y * buf_w + buf_x] = labels[old_label];
+    }
+    //Ensure that all threads are done
+    barrier(CLK_LOCAL_MEM_FENCE);
     
     // stay in bounds
-    // Also check to see if we are within image (exclude halo)
-    if ( (x < w) && (y < h) && (old_label < w*h) ) {
+    if ( (x < w) && (y < h) &&  (old_label < w*h)) {
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
-
+        
         // Grab Neighbor Pixels
         // y = row, x = col 
         // Referenced [row# * width + col#]
