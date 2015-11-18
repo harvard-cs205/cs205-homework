@@ -18,5 +18,17 @@ Finished after 276 iterations, 10.73 ms total, 0.03887 ms per iteration
 
 Part 3
 ------
+Maze 1:
+Finished after 11 iterations, 0.56 ms total, 0.05121 ms per iteration
 
+Maze 2:
+Finished after 10 iterations, 0.51 ms total, 0.05053 ms per iteration
+
+Part 4:
+-------
+Maze 1:
+Finished after 10 iterations, 1.13 ms total, 0.1131 ms per iteration
+
+Maze 2:
+Finished after 10 iterations, 1.12 ms total, 0.1124 ms per iteration
 

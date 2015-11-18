@@ -82,8 +82,45 @@ propagate_labels(__global __read_write int *labels,
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
     
     // Part 2:
-    if ((x < w) && (y < h) && old_label < w*h) {
-        buffer[buf_y * buf_w + buf_x] = labels[buffer[buf_y * buf_w + buf_x]];
+    // if ((x < w) && (y < h) && old_label < w*h) {
+    //     buffer[buf_y * buf_w + buf_x] = labels[buffer[buf_y * buf_w + buf_x]];
+    // }
+    // barrier(CLK_LOCAL_MEM_FENCE);
+
+    // Part 4: 
+
+    // Find dimensions of local work group to iterate over within a single thread.
+    uint local_x_width = get_local_size(0);
+    uint local_y_width = get_local_size(1);
+
+    // // Only operates on the thread with the local index == 0 and stay in bounds
+    if (idx_1D == 0 && (x < w) && (y < h)) {
+        uint old_buf_value = w*h;  
+        uint new_buf_value;
+        uint last_lookup;
+        for (uint i = 0; i < local_x_width; i++) {
+            for (uint j = 0; j < local_y_width; j++) {
+
+                // Create a buffer index for this position in the loops
+                uint buf_idx = (j + halo) * buf_w + (halo + i);
+
+                // Look up the buffer value in this position
+                new_buf_value = buffer[buf_idx];
+                
+                // If it is not a wall:
+                if (new_buf_value < w*h) { 
+
+                    // Check if it is different from the last buffer value
+                    if (new_buf_value != old_buf_value) {
+                        // If so, look up the label value at this position and update the last buffer value
+                        last_lookup = labels[new_buf_value];
+                        old_buf_value = new_buf_value;
+                    }
+                    // Either way, set the beffer value to the last label lookup
+                    buffer[buf_idx] = last_lookup;
+                }
+            }
+        }
     }
     barrier(CLK_LOCAL_MEM_FENCE);
 
@@ -112,7 +149,10 @@ propagate_labels(__global __read_write int *labels,
             // indicate there was a change this iteration.
             // multiple threads might write this.
             *(changed_flag) += 1;
-            labels[y * w + x] = new_label;
+            // Rewrite the local memory at labels[old_label] with the minimum of the two before updating
+            atomic_min(&labels[old_label], new_label);
+            labels[y * w + x] = labels[old_label];
+            //labels[y * w + x] = new_label;
         }
     }
 }
