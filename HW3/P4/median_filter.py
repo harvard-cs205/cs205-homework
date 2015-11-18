@@ -3,6 +3,8 @@ import pyopencl as cl
 import numpy as np
 import pylab
 import os.path
+import os
+os.environ['PYOPENCL_COMPILER_OUTPUT'] = '1'
 
 def round_up(global_size, group_size):
     r = global_size % group_size
@@ -42,7 +44,7 @@ if __name__ == '__main__':
 
     # Create a context with all the devices
     devices = platforms[0].get_devices()
-    context = cl.Context(devices)
+    context = cl.Context(devices[2:])
     print 'This context is associated with ', len(context.devices), 'devices'
 
     # Create a queue for transferring data and launching computations.

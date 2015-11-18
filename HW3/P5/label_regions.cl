@@ -16,8 +16,7 @@ initialize_labels(__global __read_only int *image,
         }
     }
 }
-
-int
+static int
 get_clamped_value(__global __read_only int *labels,
                   int w, int h,
                   int x, int y)
@@ -80,20 +79,83 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
+
+    /* part 2
+    // foreground check
+    if (old_label < w * h) {
+        //replacing each value in buffer (at index offset) with label[buffer[offset]].
+        buffer[buf_y * buf_w + buf_x] = labels[old_label];
+    }
+    */
+
+    // part 4
+    // fetching grandparents to use a single thread in the work group
+    // make sure that it remembers the last fetch it performed, avoding repeatedly reading the same global value repeatedly
+    // Looked at https://piazza.com/class/icqfmi2aryn6yv?cid=524 for help
+
+    // we let the first thread of each work group do the work, which gaurantees one thread per group
+    if (lx == 0 && ly == 0){
+
+        // initialize  the last fetch it performed
+        int last_fetch_index = -1;
+        int last_fetch_label = -1;
+
+        for (uint row = 0; row < get_local_size(0); row++) {
+            for (uint col = 0; col < get_local_size(1); col++){
+                
+                // create buffered index 
+                int current_index = (row + halo) * buf_w + (col + halo);
+                int current_label = buffer[current_index];
+                
+                // foreground check
+                if (current_label < w * h){
+                    // check if same as last fetch
+                    // if same, just use the last fetch
+                    if (current_label == last_fetch_label){
+                        buffer[current_index] = last_fetch_label;
+                    }
+                    else {
+                        // if not, update the last fetch
+                        last_fetch_index = current_label;
+                        last_fetch_label = labels[last_fetch_index];
+                        buffer[current_index] = last_fetch_label;
+                    }
+                }
+
+
+            }
+        }
+    }
+    // Make sure all threads reach the next part after
+    // the local buffer is loaded
+    barrier(CLK_LOCAL_MEM_FENCE);
     
     // stay in bounds
-    if ((x < w) && (y < h)) {
+    // We check whether we are in bounds
+    if ((x < w) && (y < h) && (old_label < w * h)) {
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
-        new_label = old_label;
+
+        // for each foreground pixel, the minimum of its 4 nieghboring piexels and itself
+        int north_neighbor = buffer[(buf_y - 1) * buf_w + buf_x];
+        int south_neighbor = buffer[(buf_y + 1) * buf_w + buf_x];
+        int east_neighbor = buffer[(buf_y) * buf_w + (buf_x - 1)];
+        int west_neighbor = buffer[(buf_y) * buf_w + (buf_x + 1)];
+
+        new_label = min(min(min(min(north_neighbor, south_neighbor),east_neighbor), west_neighbor), old_label);
 
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
             // indicate there was a change this iteration.
             // multiple threads might write this.
+
+            //each time a pixel changes from old label to new label, update the global labels[old label] = new label.
+            atomic_min(&labels[old_label], new_label);
             *(changed_flag) += 1;
-            labels[y * w + x] = new_label;
+
+            //writing back the non-halo portion at the end of the computation
+            atomic_min(&labels[y * w + x], new_label);
         }
     }
 }
