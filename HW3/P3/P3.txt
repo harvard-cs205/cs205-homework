@@ -1,0 +1,30 @@
+### Laptop ###
+
+Intel(R) Core(TM) i7-3537U CPU @ 2.00GHz on Intel(R) OpenCL
+configuration ('blocked', 128, 4): 0.005328328 seconds
+
+The time here was basically independent of the number of workgroups;
+the key value was the number of workers; 4 was the magic number.
+As long as there were 4 workers, the code went very fast, i.e. plus
+or minus 0.001 from the fastest time. Otherwise, the code was
+about 10 times slower.
+
+### Desktop ###
+
+GeForce GTX TITAN Black on NVIDIA CUDA
+configuration ('coalesced', 512, 128): 0.000261856 seconds
+
+I will copy all results that returned quickly and try to draw conclusions from them.
+
+coalesced reads, workgroups: 64, num_workers: 128, 0.000555776 seconds
+coalesced reads, workgroups: 128, num_workers: 64, 0.000555488 seconds
+coalesced reads, workgroups: 128, num_workers: 128, 0.000300896 seconds
+coalesced reads, workgroups: 256, num_workers: 64, 0.000543776 seconds
+coalesced reads, workgroups: 256, num_workers: 128, 0.000319136 seconds
+coalesced reads, workgroups: 512, num_workers: 32, 0.000794432 seconds
+coalesced reads, workgroups: 512, num_workers: 64, 0.000421888 seconds
+coalesced reads, workgroups: 512, num_workers: 128, 0.000261856 seconds
+
+The blocked reads are always much slower. The reads must not be coalesced in this case, vastly slowing down the code.
+It looks like my GPU works best when I have many workgroups which are a multiple of 2^N where N >= 6 and
+the maximum number of workers per workgroup.

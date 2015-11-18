@@ -39,7 +39,7 @@ if __name__ == '__main__':
             print '---------------------------'
 
     # Create a context with all the devices
-    devices = platforms[0].get_devices()
+    devices = platforms[1].get_devices()
     context = cl.Context(devices)
     print 'This context is associated with ', len(context.devices), 'devices'
 

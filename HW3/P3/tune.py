@@ -1,6 +1,9 @@
 import pyopencl as cl
 import numpy as np
 
+import os
+os.environ['PYOPENCL_COMPILER_OUTPUT'] = '1'
+
 def create_data(N):
     return host_x, x
 
@@ -11,6 +14,7 @@ if __name__ == "__main__":
     devices = [d for platform in platforms for d in platform.get_devices()]
     for i, d in enumerate(devices):
         print("#{0}: {1} on {2}".format(i, d.name, d.platform.name))
+
     ctx = cl.Context(devices)
 
     queue = cl.CommandQueue(ctx, properties=cl.command_queue_properties.PROFILING_ENABLE)
@@ -22,6 +26,7 @@ if __name__ == "__main__":
 
     times = {}
 
+    print 'Working on coalesced task...'
     for num_workgroups in 2 ** np.arange(3, 10):
         partial_sums = cl.Buffer(ctx, cl.mem_flags.READ_WRITE, 4 * num_workgroups)
         host_partial = np.empty(num_workgroups).astype(np.float32)
@@ -34,11 +39,13 @@ if __name__ == "__main__":
             sum_gpu = sum(host_partial)
             sum_host = sum(host_x)
             seconds = (event.profile.end - event.profile.start) / 1e9
+
             assert abs((sum_gpu - sum_host) / max(sum_gpu, sum_host)) < 1e-4
             times['coalesced', num_workgroups, num_workers] = seconds
             print("coalesced reads, workgroups: {}, num_workers: {}, {} seconds".
                   format(num_workgroups, num_workers, seconds))
 
+    print 'Working on blocked task...'
     for num_workgroups in 2 ** np.arange(3, 10):
         partial_sums = cl.Buffer(ctx, cl.mem_flags.READ_WRITE, 4 * num_workgroups)
         host_partial = np.empty(num_workgroups).astype(np.float32)

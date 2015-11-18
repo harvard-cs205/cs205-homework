@@ -1,0 +1,139 @@
+These were all tested on my GPU:
+
+GeForce GTX TITAN Black [Type: GPU ]
+Maximum clock Frequency: 980 MHz
+Maximum allocable memory size: 1610 MB
+Maximum work group size 1024
+
+# Part 1
+
+## Maze 1
+Finished after 915 iterations, 28.839424 ms total, 0.0315184961749 ms per iteration
+Found 2 regions
+
+
+## Maze 2
+Finished after 532 iterations, 16.097408 ms total, 0.0302582857143 ms per iteration
+Found 35 regions
+
+# Part 2
+
+## Maze 1
+Finished after 529 iterations, 16.9664 ms total, 0.0320725897921 ms per iteration
+Found 2 regions
+
+## Maze 2
+Finished after 274 iterations, 8.630432 ms total, 0.0314979270073 ms per iteration
+Found 35 regions
+
+It looks like the number of iterations was approximately halved. This makes sense;
+if you look up your grandparents label, information can propagate at a rate of
+two pixels per iteration as opposed to one. This should halve the number
+of iterations.
+
+# Part 3
+
+## Maze 1
+Finished after 10 iterations, 0.386208 ms total, 0.0386208 ms per iteration
+Found 2 regions
+
+## Maze 2
+Finished after 9 iterations, 0.349952 ms total, 0.0388835555556 ms per iteration
+Found 35 regions
+
+This step has a drastic effect; the number of iterations are reduced by about a factor of
+100 while the time per iteration stays about the same! The algorithm likely moved from something like
+O(N) to O(log(N)), drastically increasing its speed.
+
+# Part 4
+
+## Maze 1
+Finished after 10 iterations, 1.091232 ms total, 0.1091232 ms per iteration
+Found 2 regions
+
+## Maze 2
+
+Finished after 9 iterations, 0.983008 ms total, 0.109223111111 ms per iteration
+Found 35 regions
+
+>>Explain, in terms of compute vs. memory, why using a single thread to perform this step is
+or is not a reasonable choice.
+
+In this part, I have a single thread fetch grandparents. The thread saves the last fetch it performed to avoid
+repeatedly reading the same global value within a workgroup. This code takes approximately 4 times longer to run per
+iteration than part 3 where I did this step in parallel (with many threads).
+
+In the parallel case, every thread will try to lookup a position in global memory simultaneously. If there are different
+positions in global memory, they may be read simultaneously via coalesced reads. However, if every thread
+is trying to read the same piece of global memory, the piece will have to be read serially (unless the GPU has
+hardware to handle this). If the GPU can read the memory in parallel regardless of repetition, multiple threads will
+always be faster.
+
+If there are, on average, Q different labels in a workgroup for N threads running in parallel, there will have to be
+something like N/Q global reads in series for the parallel case, so the time elapsed in our algorithm will be
+(N/Q)*T where T is the time of for a single global read.
+
+In contrast, if only one thread is reading and caching its last lookup, there will be something like alpha*Q*T global
+reads in series, where alpha takes into account how often the current fetch differs from the last.
+So, in order for a single thread to be faster, we require
+
+alpha*Q*T < (N/Q)*T
+alpha*Q < (N/Q)
+
+Therefore, if we want the single thread to win, we require, roughly,
+
+(alpha*Q^2)/N < 1
+
+So if Q^2/N is small, we expect the single thread to win, as long as switching between the next fetch (alpha) is not too
+large. If Q^2/N is large, i.e. Qmax = N, we expect that the parallelized code will be faster.
+In our program, Q^2/N must be large enough that the parallelized code still wins. If we could write code to reduce
+alpha, i.e. caching more than one global value, or decreasing the number of labels in a given workgroup while holding the
+number of threads fixed (making Q^2/N smaller), the single thread could potentially win.
+
+# Part 5
+>>Explain what would happen if instead of using the atomic min() operation, one would use
+the min() function.
+
+We use atomic_min to ensure that only one thread at a time assigns a smaller label to labels[old_label] and to
+labels[y*w + x]. Specifically, we have
+
+atomic_min(&labels[old_label], new_label);
+atomic_min(&labels[y*w + x], labels[old_label]);
+
+Without atomics, we would have something like
+
+labels[old_label] = min(labels[old_label], new_label);
+labels[y*w + x] = min(labels[y*w+x], labels[old_label]);
+
+Atomics ensure in a thread-safe manner that labels[old_label] and labels[y*w + x] are assigned the smallest label
+possible. Without atomics, multiple threads can update labels[old_label] and labels[y*w+x] at once, confusing the
+min() calls; it is no longer guaranteed that the labels will be assigned the smallest value possible at the end of
+the iteration. However, they should still be assigned a value smaller than than their original
+at the end of the iteration.
+
+>>Consider whether the final result would still be
+correct, what might be the impact on the performance of the algorithm (time and iterations),
+could a value in labels ever increase, and could it increase between iterations?
+
+Within an entire iteration, it is **still guaranteed** that a label's value will decrease or stay the same.
+Threads will only attempt to change the label if (new_label != old_label), and the minimum call ensures that the
+the label's value will eventually decrease. At the end of the iteration, the label might not have the smallest value
+possible (i.e. it might have a smaller value if atomics were used), but it should have a value smaller than its
+original.
+
+Therefore, the algorithm should still be correct. The algorithm will likely take additional iterations to complete
+as the smallest label will probably not be assigned each generation. However, the increase in the number of iterations
+may be offset by the speedup of not using atomics.
+
+Luckily, we can adjust our code to test if my predictions are correct. Avoiding atomics, we find:
+
+## Maze 1
+Finished after 11 iterations, 1.244192 ms total, 0.113108363636 ms per iteration
+Found 2 regions
+
+## Maze 2
+Finished after 10 iterations, 1.113504 ms total, 0.1113504 ms per iteration
+Found 35 regions
+
+The result is always correct. On average, it looks like more iterations are used, but the time per iteration
+is about the same. It is therefore more advantageous to use atomics on my hardware.
