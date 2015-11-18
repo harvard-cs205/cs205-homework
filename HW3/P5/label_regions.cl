@@ -83,10 +83,36 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
-    if (old_label < w * h)
+    // Only execute for thread index 0
+    if (idx_1D == 0)
     {
-        buffer[buf_y * buf_w + buf_x] = labels[old_label];
+        int current_idx, last_idx = -1;
+        float last_label;
+
+        for (int bx = 0; bx < buf_w; bx++)
+        for (int by = 0; by < buf_h; by++)
+        {
+            current_idx = by * buf_w + bx;
+            if (buffer[current_idx] < w * h)
+            {
+                if (last_idx == current_idx)
+                {
+                    buffer[current_idx] = last_label;
+                }
+                else
+                {
+                    last_label = labels[buffer[current_idx]];
+                    last_idx = current_idx;
+                    buffer[current_idx] = last_label;
+                }
+            }
+        }
     }
+    // Original code for part 2
+    //if (old_label < w * h)
+    //{
+    //    buffer[buf_y * buf_w + buf_x] = labels[old_label];
+    //}
     barrier(CLK_LOCAL_MEM_FENCE);
 
     // stay in bounds

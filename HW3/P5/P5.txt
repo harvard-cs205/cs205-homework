@@ -1,4 +1,4 @@
-Output for Part 1:
+----- Output for Part 1 ----- 
 
 Maze 1
 Finished after 906 iterations, 87.13216 ms total, 0.0961723620309 ms per iteration
@@ -9,7 +9,7 @@ Finished after 528 iterations, 50.483456 ms total, 0.0956126060606 ms per iterat
 Found 35 regions
 
 
-Output for Part 2:
+----- Output for Part 2 ----- 
 
 Maze 1
 Finished after 529 iterations, 52.363232 ms total, 0.09898531569 ms per iteration
@@ -20,7 +20,7 @@ Finished after 276 iterations, 27.243936 ms total, 0.0987099130435 ms per iterat
 Found 35 regions
 
 
-Output for Part 3:
+----- Output for Part 3 ----- 
 
 Maze 1
 Finished after 11 iterations, 1.133664 ms total, 0.103060363636 ms per iteration
@@ -29,3 +29,25 @@ Found 2 regions
 Maze 2
 Finished after 10 iterations, 1.014624 ms total, 0.1014624 ms per iteration
 Found 35 regions
+
+----- Output for Part 4 ----- 
+
+Maze 1
+Finished after 11 iterations, 5.53008 ms total, 0.502734545455 ms per iteration
+Found 2 regions
+
+Maze 2
+Finished after 10 iterations, 4.988704 ms total, 0.4988704 ms per iteration
+Found 35 regions
+
+Single-threaded appears to be slower possibly because:
+- not enough cache hits (global value changes often)
+- cost of global memory read is not high enough that could matter
+
+Part 5:
+
+Using min() took ~ 1.0 ms for Maze 1 and Maze 2 which is slightly faster
+than atomic_min(). The speedup is likely because of the parallel updates
+vs serialized updates via atomic operations. However, min() can create
+race conditions and could cause label values to increase within an 
+iteration, but NOT across iterations. 
