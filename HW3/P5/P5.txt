@@ -1,0 +1,53 @@
+[Part 1: implement updates from neighbors]
+maze1:
+Finished after 862 iterations, 3043.854732 ms total, 3.53115398144 ms per iteration
+Found 2 regions
+
+maze2:
+Finished after 497 iterations, 1774.638916 ms total, 3.57070204427 ms per iteration
+Found 35 regions
+
+
+[Part 2: fetch grandparents]
+maze1:
+Finished after 521 iterations, 2380.17584 ms total, 4.56847570058 ms per iteration
+Found 2 regions
+
+maze2:
+Finished after 258 iterations, 1345.211989 ms total, 5.21399995736 ms per iteration
+Found 35 regions
+
+
+[Part3: merge parent regions]
+maze1:
+Finished after 9 iterations, 58.297507 ms total, 6.47750077778 ms per iteration
+Found 2 regions
+
+maze2:
+Finished after 8 iterations, 50.425083 ms total, 6.303135375 ms per iteration
+Found 35 regions
+
+
+[Part4: efficient grandparents]
+maze1:
+Finished after 15 iterations, 92.672803 ms total, 6.17818686667 ms per iteration
+Found 2 regions
+
+maze2:
+Finished after 14 iterations, 90.824706 ms total, 6.487479 ms per iteration
+Found 35 regions
+
+Discussion:
+In part 4, in order to avoid some of redundant global memory reads, we apply a single thread, leading to the doubled interations and doubled total time. Therefore, using a single thread may not be a reasonable choice here since the time saved by reducing redundant reads is smaller than the time increased by changing parallel into serial processes. Therefore, we can come to a conclusion that computation is faster than global memory reads.
+
+Taking variation in GPUs into consideration, when the hardware has super fast speed for reads and fewer cores for computation, using a single thread may be a good choice. Because in this condition, computation is slower than global memory reads.
+
+
+[Part 5: no atomic operations]
+Using min() function may leads to different threads modify the same label value. However, atomic_min() ensures that one memory address is only be modified by one thread each time.
+
+For example, if thread 1 wants to modify the original labal value j into a small number k, thread 2 wants to modify j into l, and k<l. Using min(), and thread 2 after 1, the label value will finally modified into l, which is not the true minimum k while atomic_min() can make it.
+
+In this problem, when I changed atomic_min() by min(), the results are the same, and the speed of min() is faster than that of atomic_min(). Therefore, we can come to the conclusion: 1) If we don't really care about whether we obtain the true minimum value (like in this problem, we use min/atomic_min for optimalization), min() is a better choice since multiple threads with some redundant computation is faster than using a single thread. 2) If we need to get the true minimum value, we must use atomic_min() to ensure the accuracy regardless of speed.
+ 
+

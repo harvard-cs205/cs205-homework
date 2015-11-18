@@ -28,7 +28,7 @@ get_clamped_value(__global __read_only int *labels,
 }
 
 __kernel void
-propagate_labels(__global __read_write int *labels,
+propagate_labels(__global int *labels,
                  __global __write_only int *changed_flag,
                  __local int *buffer,
                  int w, int h,
@@ -80,13 +80,39 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
-    
+    // Part 2
+    //if (old_label < w * h)
+        //buffer[buf_y * buf_w +buf_x] = labels[old_label];
+    // Part 4
+    if ((lx == get_local_size(0)-1) && (ly == get_local_size(1)-1)) {
+        int this_label = 0;
+        int last_label = 0;
+        for (int i = halo; i < buf_h-halo; i++) {
+            for (int j = halo; j < buf_w-halo; j++) {
+               this_label = buffer[i * buf_w + j];
+               if (this_label < w * h){
+                   if (this_label == last_label)
+                       buffer[i * buf_w + j] = last_label;
+                   else{
+                       last_label = this_label;
+                       buffer[i * buf_w + j] =labels[this_label];
+                   }
+               }
+           }
+       }
+    }
+    barrier(CLK_LOCAL_MEM_FENCE);
+
     // stay in bounds
-    if ((x < w) && (y < h)) {
+    if (((x < w) && (y < h)) && (old_label < w * h)) {
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
-        new_label = old_label;
+        new_label = min(old_label,
+                        min(min(buffer[buf_y * buf_w + buf_x -1],
+                                buffer[buf_y * buf_w + buf_x + 1]),
+                            min(buffer[(buf_y - 1) * buf_w + buf_x],
+                                buffer[(buf_y + 1) * buf_w + buf_x])));
 
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
@@ -94,6 +120,7 @@ propagate_labels(__global __read_write int *labels,
             // multiple threads might write this.
             *(changed_flag) += 1;
             labels[y * w + x] = new_label;
+            atomic_min(&(labels[old_label]),new_label);
         }
     }
 }
