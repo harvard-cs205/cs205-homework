@@ -1,0 +1,2 @@
+# solution to P3
+configuration ('coalesced', 32, 128): 0.00189264 seconds
