@@ -1,0 +1,72 @@
+----- Output for Part 1 ----- 
+
+Maze 1
+Finished after 906 iterations, 87.13216 ms total, 0.0961723620309 ms per iteration
+Found 2 regions
+
+Maze 2
+Finished after 528 iterations, 50.483456 ms total, 0.0956126060606 ms per iteration
+Found 35 regions
+
+
+----- Output for Part 2 ----- 
+
+Maze 1
+Finished after 529 iterations, 52.363232 ms total, 0.09898531569 ms per iteration
+Found 2 regions
+
+Maze 2
+Finished after 276 iterations, 27.243936 ms total, 0.0987099130435 ms per iteration
+Found 35 regions
+
+
+----- Output for Part 3 ----- 
+
+Maze 1
+Finished after 11 iterations, 1.133664 ms total, 0.103060363636 ms per iteration
+Found 2 regions
+
+Maze 2
+Finished after 10 iterations, 1.014624 ms total, 0.1014624 ms per iteration
+Found 35 regions
+
+----- Output for Part 4 ----- 
+
+Maze 1
+Finished after 11 iterations, 5.53008 ms total, 0.502734545455 ms per iteration
+Found 2 regions
+
+Maze 2
+Finished after 10 iterations, 4.988704 ms total, 0.4988704 ms per iteration
+Found 35 regions
+
+Single-threaded appears to be slower possibly because:
+1. Not enough cache hits (global label changes often so opportunities for using the
+   cache are rare).
+2. Cost of global memory read is not high enough. Perhaps when the threads
+   run in parallel, even though memory access is serialized, there is still
+   some decent latency hiding (i.e. when one thread can read from global
+   memory while another is doing work).
+I suspect that on some GPUs, if the cost of global memory access is very high,
+then doing this type of optimization while making sure to minimize cache misses
+will give us some performance boost.
+   
+----- Part 5 -----
+
+Using min() took ~ 1.0 ms for Maze 1 and Maze 2 which is slightly faster
+than atomic_min(). The speedup is likely because of the parallel updates
+vs serialized updates via atomic operations.
+
+However, min() can create race conditions and could cause label values
+to increase within an iteration, but NOT across iterations. Within an
+iteration, two threads can try to update the same label to different
+values. Let's say the current label value is 3 and thread 1 wants to change
+it to 1, while thread 2 wants to change it to 2. Then this event ordering
+is problematic:
+1. Thread 1 loads current value which is 3
+2. Thread 2 loads current value which is 3
+3. Thread 1 sets current value to min(3,1) = 1
+4. Thread 2 sets current value to min(3,2) = 2
+
+Thus, the final value is not the minimum possible value, causing more work
+to be needed in future iterations.

@@ -1,4 +1,4 @@
-import pyopencl as cl
+﻿import pyopencl as cl
 import numpy as np
 
 def create_data(N):
@@ -26,6 +26,11 @@ if __name__ == "__main__":
         partial_sums = cl.Buffer(ctx, cl.mem_flags.READ_WRITE, 4 * num_workgroups)
         host_partial = np.empty(num_workgroups).astype(np.float32)
         for num_workers in 2 ** np.arange(2, 8):
+
+            # For some reasons more than 256 threads causes out of resources problem.
+            if num_workers * num_workgroups > 256:
+                continue
+
             local = cl.LocalMemory(num_workers * 4)
             event = program.sum_coalesced(queue, (num_workgroups * num_workers,), (num_workers,),
                                           x, partial_sums, local, np.uint64(N))
@@ -43,6 +48,11 @@ if __name__ == "__main__":
         partial_sums = cl.Buffer(ctx, cl.mem_flags.READ_WRITE, 4 * num_workgroups)
         host_partial = np.empty(num_workgroups).astype(np.float32)
         for num_workers in 2 ** np.arange(2, 8):
+
+            # For some reasons more than 256 threads causes out of resources problem.
+            if num_workers * num_workgroups > 256:
+                continue
+
             local = cl.LocalMemory(num_workers * 4)
             event = program.sum_blocked(queue, (num_workgroups * num_workers,), (num_workers,),
                                         x, partial_sums, local, np.uint64(N))

@@ -1,0 +1,30 @@
+The best configuration and time is:
+configuration ('blocked', 32, 8): 0.015241888 seconds
+
+However, I seemed to have some configuration issues with OpenCL
+because I get "Out of Resources" error when the total number of
+threads is more than 256. If this weren't a problem, perhaps
+the best configuration might be different (i.e. w/ more threads).
+
+#0: GeForce GTX 460 on NVIDIA CUDA
+coalesced reads, workgroups: 8, num_workers: 4, 0.143653632 seconds
+coalesced reads, workgroups: 8, num_workers: 8, 0.07162 seconds
+coalesced reads, workgroups: 8, num_workers: 16, 0.035843264 seconds
+coalesced reads, workgroups: 8, num_workers: 32, 0.018041408 seconds
+coalesced reads, workgroups: 16, num_workers: 4, 0.071783456 seconds
+coalesced reads, workgroups: 16, num_workers: 8, 0.035724384 seconds
+coalesced reads, workgroups: 16, num_workers: 16, 0.017988448 seconds
+coalesced reads, workgroups: 32, num_workers: 4, 0.03568992 seconds
+coalesced reads, workgroups: 32, num_workers: 8, 0.01780544 seconds
+coalesced reads, workgroups: 64, num_workers: 4, 0.03583696 seconds
+blocked reads, workgroups: 8, num_workers: 4, 0.060144096 seconds
+blocked reads, workgroups: 8, num_workers: 8, 0.050245856 seconds
+blocked reads, workgroups: 8, num_workers: 16, 0.043724192 seconds
+blocked reads, workgroups: 8, num_workers: 32, 0.039720672 seconds
+blocked reads, workgroups: 16, num_workers: 4, 0.030123456 seconds
+blocked reads, workgroups: 16, num_workers: 8, 0.02585104 seconds
+blocked reads, workgroups: 16, num_workers: 16, 0.023117952 seconds
+blocked reads, workgroups: 32, num_workers: 4, 0.015496416 seconds
+blocked reads, workgroups: 32, num_workers: 8, 0.015241888 seconds
+blocked reads, workgroups: 64, num_workers: 4, 0.015794912 seconds
+configuration ('blocked', 32, 8): 0.015241888 seconds
