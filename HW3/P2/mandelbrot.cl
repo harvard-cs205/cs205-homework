@@ -10,10 +10,11 @@ mandelbrot(__global __read_only float *coords_real,
 
     float c_real, c_imag;
     float z_real, z_imag;
-    int iter;
 
     if ((x < w) && (y < h)) {
-        // YOUR CODE HERE
-        ;
+        for(int iter=0; iter < max_iter; iter++){
+
+        }
     }
+    out_counts[x, y] = 0;
 }

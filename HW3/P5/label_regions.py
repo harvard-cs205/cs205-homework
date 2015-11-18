@@ -2,7 +2,12 @@ from __future__ import division
 import sys
 import pyopencl as cl
 import numpy as np
+import matplotlib
+matplotlib.use('TKagg')
 import pylab
+
+import os
+os.environ['PYOPENCL_COMPILER_OUTPUT'] = '1'
 
 def round_up(global_size, group_size):
     r = global_size % group_size
@@ -82,6 +87,10 @@ if __name__ == '__main__':
     show_progress = True
     total_time = 0
 
+    print 'Background value:' , host_labels.shape[0]*host_labels.shape[1]
+
+    #print np.sum(host_labels == host_labels.shape[0]*host_labels.shape[1])
+
     while True:
         itercount += 1
         host_done_flag[0] = 0
@@ -98,6 +107,10 @@ if __name__ == '__main__':
         total_time += elapsed
         # read back done flag, block until it gets here
         cl.enqueue_copy(queue, host_done_flag, gpu_done_flag, is_blocking=True)
+
+        #cl.enqueue_copy(queue, host_labels, gpu_labels, is_blocking=True)
+        #print np.sum(host_labels == host_labels.shape[0]*host_labels.shape[1])
+
         if host_done_flag[0] == 0:
             # no changes
             break
