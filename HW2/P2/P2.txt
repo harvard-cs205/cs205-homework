@@ -1,0 +1,35 @@
+Feifeis-MacBook-Pro:P2copy feifeipeng$ python P2.py
+Compiling with /usr/local/bin/clang-omp
+
+
+
+(data uncorrelated)
+Serial uncorrelated: 0.259629011154 seconds
+Fine grained uncorrelated: 4.9660179615 seconds
+Medium grained uncorrelated: 6.68688082695 seconds (N=10)
+Medium grained uncorrelated: 6.69669103622 seconds (N=20)
+Medium grained uncorrelated: 7.17922496796 seconds (N=50)
+
+For uncorrelated data, paralleling computation and adding locks causes 
+an obviously longer running time than serial case. 
+Fine-grained lock uses less time than medium-grained lock.
+As for the parameter N for medium-grained lock, N=10 seems to be a good choice.
+This is because the two entries exchanging data are not likely to be near each other,
+counts[dest[idx]] and counts[src[idx]] each requires a lock. Letting a lock control
+many entries greatly sacrifices concurrency by blocking other ongoing tasks.
+
+
+(correlated data movement)
+Serial correlated: 0.30086684227 seconds
+Fine grained correlated: 4.56060194969 seconds
+Medium grained correlated: 5.19617390633 seconds   (N=10)
+Medium grained correlated: 4.79181694984 seconds   (N=20)
+Medium grained correlated: 4.78249502182 seconds   (N=50)
+
+For correlated data, paralleling computation and adding locks causes 
+an obviously longer running time than serial case, but not that bad as with uncorrelated data. 
+Fine-grained lock uses slightly less time than medium-grained lock.
+As for the parameter N for medium-grained lock, N=50 seems to be a good choice.
+This is because the two entries exchanging data are near each other,
+counts[dest[idx]] and counts[src[idx]] require a common lock. Letting a lock control
+many entries greatly reduces computational overhead and complexity by acquiring less locks.

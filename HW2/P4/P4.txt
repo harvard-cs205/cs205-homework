@@ -1,0 +1,10 @@
+num_threads=1:
+0.875792980194 seconds for 10 filter passes.
+num_threads=2:
+0.884742021561 seconds for 10 filter passes.
+num_threads=4:
+0.908967018127 seconds for 10 filter passes.
+
+From the experiment results above, 1, 2, and 4-way parallel performance are almost the same. I think this is due to the fact that only one thread can execute Python code at once, that is, each thread actually runs in serial.
+
+As for choices to control cooperation between threads, I used locks. This is to ensure that no two threads can access data in same line simultaneously.

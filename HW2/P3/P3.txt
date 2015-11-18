@@ -1,0 +1,26 @@
+without instruction-level parallelism:
+1 thread:
+1074.656613 Million Complex FMAs in 5.37820911407 seconds, 199.816814521 million Complex FMAs / second
+
+2 threads:
+1074.656613 Million Complex FMAs in 2.5270280838 seconds, 425.265005913 million Complex FMAs / second
+
+4 threads:
+1074.656613 Million Complex FMAs in 1.301623106 seconds, 825.628100826 million Complex FMAs / second
+
+
+
+with instruction-level parallelism:
+1 thread:
+1074.94829 Million Complex FMAs in 0.865680932999 seconds, 1241.73728336 million Complex FMAs / second
+
+2 threads:
+1074.94829 Million Complex FMAs in 0.436459064484 seconds, 2462.88455773 million Complex FMAs / second
+
+4 threads:
+1074.94829 Million Complex FMAs in 0.234488964081 seconds, 4584.21697675 million Complex FMAs / second
+
+
+
+With instruction-level parallelism, the running time is greatly shortened compared to non-AVX case.
+Adding multithreading over rows shortens running time with more threads.

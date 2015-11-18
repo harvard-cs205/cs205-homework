@@ -15,7 +15,8 @@ import filtering
 from timer import Timer
 import threading
 
-def py_median_3x3(image, iterations=10, num_threads=1):
+# original code
+def t_py_median_3x3(image, iterations=10, num_threads=1):
     ''' repeatedly filter with a 3x3 median '''
     tmpA = image.copy()
     tmpB = np.empty_like(tmpA)
@@ -27,6 +28,65 @@ def py_median_3x3(image, iterations=10, num_threads=1):
 
     return tmpA
 
+# my code with parallelize thread
+
+def process_lines(tmpA, tmpB, no_thread,num_threads,locks):
+    # process  no. line 
+    line = no_thread
+    while  line  < tmpA.shape[0] :       
+        # line,line+1,line-1 lock is set. No processing 0th line and last line
+	if line == 0:
+	    locks[line].acquire()
+	    locks[line+1].acquire()
+	elif line == tmpA.shape[0]-1:
+	    locks[line-1].acquire()
+	    locks[line].acquire()		    
+        else:
+	    locks[line-1].acquire()	
+	    locks[line].acquire()
+	    locks[line+1].acquire()	
+        # process no. line	
+        filtering.median_3x3(tmpA, tmpB, line, tmpA.shape[0])
+        # line,line+1,line-1 lock is released. No processing 0th line and last line
+        if line == 0:
+	    locks[line].release()
+	    locks[line+1].release()	
+	elif line == tmpA.shape[0]-1:
+	    locks[line-1].release()	
+	    locks[line].release()			
+	else:
+	    locks[line-1].release()	
+	    locks[line].release()
+	    locks[line+1].release()
+        line = line + num_threads			
+
+def py_median_3x3(image, iterations=10, num_threads=4):
+    ''' repeatedly filter with a 3x3 median '''
+    tmpA = image.copy()
+    tmpB = np.empty_like(tmpA)
+    locks = []
+    #threads = []
+    # locks are ready for the number of line in the 2D image array, 
+    # that is one line to one Lock
+    for l in range(image.shape[0]):
+	locks += [threading.Lock()]
+    #print image.shape[0],len(locks)
+		
+    for i in range(iterations):
+	#generating num_thread threads
+        threads = []
+        for t in range(num_threads):
+	    threads += [threading.Thread(target = process_lines, args = (tmpA,tmpB,t,num_threads,locks))]
+        for t in range(num_threads):
+	    threads[t].start()	
+	#collecting num_thread threads
+        for t in range(num_threads):
+	    threads[t].join()			
+        # swap direction of filtering
+        tmpA, tmpB = tmpB, tmpA
+    return tmpA
+# my code with parallelized thread ends.		
+
 def numpy_median(image, iterations=10):
     ''' filter using numpy '''
     for i in range(iterations):
@@ -35,7 +95,6 @@ def numpy_median(image, iterations=10):
                              padded[1:-1, :-2], padded[1:-1, 1:-1], padded[1:-1, 2:],
                              padded[2:,   :-2], padded[2:,   1:-1], padded[2:,   2:]))
         image = np.median(stacked, axis=2)
-
     return image
 
 

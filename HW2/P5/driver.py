@@ -13,12 +13,27 @@ from timer import Timer
 from animator import Animator
 from physics import update, preallocate_locks
 
+# from the wiki page on z-order curve
+def cmp_zorder(a, b):
+    j = 0
+    k = 0
+    x = 0
+    for k in range(2):
+        y = a[1][k] ^ b[1][k]
+        if less_msb(x, y):
+            j = k
+            x = y
+    return a[1][j] - b[1][j]
+    
+def less_msb(x, y):
+        return x < y and x < (x ^ y)
+
 def randcolor():
     return np.random.uniform(0.0, 0.89, (3,)) + 0.1
 
 if __name__ == '__main__':
-    num_balls = 10000
-    radius = 0.002
+    num_balls = 10000    #10000
+    radius = 0.002      #0.002
     positions = np.random.uniform(0 + radius, 1 - radius,
                                   (num_balls, 2)).astype(np.float32)
 
@@ -52,7 +67,7 @@ if __name__ == '__main__':
 
     # simulation/animation time variablees
     physics_step = 1.0 / 100  # estimate of real-time performance of simulation
-    anim_step = 1.0 / 30  # FPS
+    anim_step = 1.0 / 30  # FPS 30
     total_time = 0
 
     frame_count = 0
@@ -80,3 +95,28 @@ if __name__ == '__main__':
             # SUBPROBLEM 3: sort objects by location.  Be sure to update the
             # grid if objects' indices change!  Also be sure to sort the
             # velocities with their object positions!
+
+            # sort balls by spatial location into positions
+            # update velocities and grid
+            positions_index = zip(range(len(positions)), (positions/grid_spacing).astype(int))
+            positions_index.sort(cmp_zorder)
+            positions_index = map(lambda x: x[0], positions_index)
+            # create temporary positions and velocities array upon location sort
+            positions_temp = positions[positions_index]
+            velocities_temp = velocities[positions_index]
+            # assign to positions/velocities
+            positions = positions_temp
+            velocities = velocities_temp
+            # initialize positions to -1 on grid
+            grid[:, :] = -1
+            # generate new grid by ball positions
+            for i in range(num_balls):
+                if positions[i,0]>=0 and positions[i,1]>=0 and positions[i,0]<=1 and positions[i,1]<=1:
+                    grid[(positions[i,0] / grid_spacing).astype(int),
+                         (positions[i,1] / grid_spacing).astype(int)] = i
+
+
+
+
+
+

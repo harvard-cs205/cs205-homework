@@ -81,11 +81,14 @@ cpdef move_data_fine_grained(np.int32_t[:] counts,
    ##########
    with nogil:
        for r in range(repeat):
-           for idx in range(src.shape[0]):
+           for idx in prange(src.shape[0],num_threads=4):
                if counts[src[idx]] > 0:
+                   acquire(&locks[dest[idx]])  
                    counts[dest[idx]] += 1
+                   release(&locks[dest[idx]]) 
+                   acquire(&locks[src[idx]])                       
                    counts[src[idx]] -= 1
-
+                   release(&locks[src[idx]])
    free_N_locks(counts.shape[0], locks)
 
 
@@ -96,8 +99,9 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
                                int N):
    cdef:
        int idx, r
+       int no_lock_src, no_lock_dest
        int num_locks = (counts.shape[0] + N - 1) / N  # ensure enough locks
-       omp_lock_t *locks = get_N_locks(num_locks)
+       omp_lock_t *locks = get_N_locks(num_locks+1)
 
    ##########
    # Your code here
@@ -107,9 +111,23 @@ cpdef move_data_medium_grained(np.int32_t[:] counts,
    ##########
    with nogil:
        for r in range(repeat):
-           for idx in range(src.shape[0]):
+           for idx in prange(src.shape[0],num_threads=4): 
                if counts[src[idx]] > 0:
-                   counts[dest[idx]] += 1
-                   counts[src[idx]] -= 1
+                   no_lock_src  = ( src[idx]+N-1)/N
+                   no_lock_dest = (dest[idx]+N-1)/N
+                   if no_lock_src == no_lock_dest :
+                      acquire(&locks[no_lock_dest])
+                      counts[dest[idx]] += 1
+                      counts[src[idx]] -= 1
+                      release(&locks[no_lock_dest])
+                   else:
+                      acquire(&locks[no_lock_dest]) 
+                      counts[dest[idx]] += 1
+                      release(&locks[no_lock_dest])
+                      acquire(&locks[no_lock_src])     
+                      counts[src[idx]] -= 1
+                      release(&locks[no_lock_src])
 
    free_N_locks(num_locks, locks)
+
+
