@@ -1,0 +1,47 @@
+Part 1:
+Finished after 915 iterations, 100.845424 ms total, 0.110213578142 ms per iteration
+Found 2 regions
+
+Finished after 532 iterations, 57.634012 ms total, 0.108334609023 ms per iteration
+Found 35 regions
+
+----------------------------------------------------------------------------------
+
+Part 2:
+Finished after 529 iterations, 57.93756 ms total, 0.109522797732 ms per iteration
+Found 2 regions
+
+Finished after 275 iterations, 30.113412 ms total, 0.109503316364 ms per iteration
+Found 35 regions
+
+----------------------------------------------------------------------------------
+
+Part 3:
+Finished after 11 iterations, 1.320012 ms total, 0.120001090909 ms per iteration
+Found 2 regions
+
+Finished after 11 iterations, 1.309356 ms total, 0.119032363636 ms per iteration
+Found 35 regions
+
+----------------------------------------------------------------------------------
+
+Part 4:
+Finished after 11 iterations, 3.756832 ms total, 0.341530181818 ms per iteration
+Found 2 regions
+
+Finished after 10 iterations, 3.40474 ms total, 0.340474 ms per iteration
+Found 35 regions
+
+
+
+Explaination of of part 4:
+
+In Part 4 I found surprisingly that after the optimization in Part 4, the program actually ran slower than expected. I think this is because each thread in a group will wait the ohter threads to finish before it can proceed. So this wait will take some time. Furthurmore, since memeory read in GPU is cheap, so this may also explain why the thread independent version might be faster, since the thread independent version had a faster computation time.
+
+----------------------------------------------------------------------------------
+
+Part 5:
+
+To my surprise that the code runs without atomic since I was expecting some exceptions or errors. Without using atomic_min when write back the new lable, the result will be correct also, but the program drain more iterations and times, with some minor fluctuations in iterations (12-14iterations). 
+Using atomic functions are just an optimization and resolves the race condition inwhich two threads got the same value and trying to update the new label. However, this race condition is not that critical since the new label will always be updated(by the second thread). Hence it also explain why there might be more iterations.
+
