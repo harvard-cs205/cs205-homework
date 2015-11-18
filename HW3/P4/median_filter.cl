@@ -2,13 +2,16 @@
 
 // 3x3 median filter
 __kernel void
-median_3x3(__global __read_only float *image,
-           __global __write_only float *output,
+median_3x3(__global __read_only float *in_values,
+           __global __write_only float *out_values,
            __local float *buffer,
-           int img_w, int img_h,
+           int w, int h,
            int buf_w, int buf_h,
-           const int halo)
-{
+           const int halo){   
+
+    //Initial variable definitions for the problem
+    //this code is obtained from the load halo example done in class
+
     // Global position of output pixel
     const int x = get_global_id(0);
     const int y = get_global_id(1);
@@ -22,22 +25,40 @@ median_3x3(__global __read_only float *image,
     const int buf_corner_x = x - lx - halo;
     const int buf_corner_y = y - ly - halo;
 
-    // coordinates of our pixel in the local buffer
+    // // coordinates of our pixel in the local buffer
     const int buf_x = lx + halo;
     const int buf_y = ly + halo;
 
     // 1D index of thread within our work-group
     const int idx_1D = ly * get_local_size(0) + lx;
 
-    int row;
+    
+    if (idx_1D<buf_w){
 
-    if (idx_1D < buf_w)
-        for (row = 0; row < buf_h; row++) {
-            buffer[row * buf_w + idx_1D] = \
-                FETCH(image, img_w, img_h,
-                      buf_corner_x + idx_1D,
-                      buf_corner_y + row);
+        int row,mXX,mYY,hNew,wNew,mat_index,buf_index;
+
+        for(row=0;row<buf_h;row++){
+
+            mYY=buf_corner_y+row;
+            mXX=buf_corner_x+idx_1D;
+            hNew=h-1;
+            wNew=w-1;
+
+            mat_index=min(max(0, mYY), hNew) * w + min(max(0, mXX), wNew);
+            buf_index=row * buf_w + idx_1D;
+
+            buffer[buf_index] = in_values[mat_index];
         }
+
+    }
+
+    // if (idx_1D < buf_w)
+    //     for (row = 0; row < buf_h; row++) {
+    //         buffer[row * buf_w + idx_1D] = 
+    //             get_clamped_value(labels,
+    //                               w, h,
+    //                               buf_corner_x + idx_1D, buf_corner_y + row);
+    //     }
 
     barrier(CLK_LOCAL_MEM_FENCE);
 
@@ -46,10 +67,17 @@ median_3x3(__global __read_only float *image,
     // Should only use buffer, buf_x, buf_y
 
     // write output
-    if ((y < img_h) && (x < img_w)) // stay in bounds
-        output[y * img_w + x] = \
-            buffer[buf_y * buf_w + buf_x];
+    // if ((y < img_h) && (x < img_w)) // stay in bounds
+    //     output[y * img_w + x] = \
+    //         buffer[buf_y * buf_w + buf_x];
 
+	if ((y < h) && (x < w)) {
+	    out_values[y * w + x] = median9(buffer[(buf_y - 1) * buf_w + (buf_x - 1)], buffer[(buf_y - 1) * buf_w + buf_x], buffer[(buf_y - 1) * buf_w + (buf_x + 1)], 
+	                                    buffer[buf_y * buf_w       + (buf_x - 1)], buffer[buf_y * buf_w       + buf_x], buffer[buf_y * buf_w       + (buf_x + 1)], 
+	                                    buffer[(buf_y + 1) * buf_w + (buf_x - 1)], buffer[(buf_y + 1) * buf_w + buf_x], buffer[(buf_y + 1) * buf_w + (buf_x + 1)]);
+	}
+}
+	
 
 
     // Note: It may be easier for you to implement median filtering
@@ -74,4 +102,4 @@ median_3x3(__global __read_only float *image,
 
     // Each thread in the valid region (x < w, y < h) should write
     // back its 3x3 neighborhood median.
-}
+
