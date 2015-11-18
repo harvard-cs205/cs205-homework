@@ -21,7 +21,7 @@ __kernel void sum_coalesced(__global float* x,
     //
     // thread i should sum fast[i] and fast[i + offset] and store back
     // in fast[i], for offset = (local_size >> j) for j from 1 to
-    // log_2(local_size) WTF lol
+    // log_2(local_size)
     //
     // You can assume get_local_size(0) is a power of 2.
     //
