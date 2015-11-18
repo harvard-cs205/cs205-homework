@@ -1,0 +1,9 @@
+Best Configuration and Timing
+configuration ('blocked', 8, 8): 0.004124784 seconds
+
+
+Hardware:
+Intel(R) Core(TM) i7-2677M CPU @ 1.80GHz [Type: CPU ]
+Maximum clock Frequency: 1801 MHz
+Maximum allocable memory size: 2147 MB
+Maximum work group size 1024
