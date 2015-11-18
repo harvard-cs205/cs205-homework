@@ -1,0 +1,16 @@
+1. Multithreading, the speed is faster.
+
+When I used single thread, typically the number of simulation frame is around 15 per second. When using 4 threads with static scheduling and chunksize = num_particles / 4, the number of simulation frame is around 20 per second. More simulation frames per second is achieved. Because multiple threads work on physics at the same time.
+
+
+2. Spatial Decomposition. With O(N) algorithm, it is much faster than O(N^2)
+
+For single thread, the number of simulation frame is around 540 per second.
+For 4 threads, the number of simulation frame is around 950 per second.
+
+
+3. Spatially Coherent Sorting. Sorting speeds up both 4 threads and 1 thread. Since data is arranged in sequential memory areas, so that data access is accelerated.
+So 4 threads, the effect is more obvious, since all access time for 4 threads all increased.
+
+
+4. Locking. Adding locks increases variability in speed, and it reduced the speed for 4 threads strongly. When using Locking mechanism for correctness, the performance dropped, because locking forces some serial order among concurrent threads.

@@ -1,0 +1,32 @@
+Uncorrelated data: 
+
+Serial uncorrelated: 0.390537977219 seconds
+Fine grained uncorrelated: 3.92425394058 seconds
+Medium grained uncorrelated: 5.04021501541 seconds
+Medium grained uncorrelated: 5.08541989326 seconds
+Medium grained uncorrelated: 5.85250997543 seconds
+Medium grained uncorrelated: 6.62768316269 seconds
+Medium grained uncorrelated: 7.69028496742 seconds
+Medium grained uncorrelated: 8.75902891159 seconds
+Medium grained uncorrelated: 10.0192430019 seconds
+Medium grained uncorrelated: 13.6518981457 seconds
+
+
+We can see from the uncorrelated data, parallel computing time is more and more longer as added more locks. It is much longer running time than serial case. From the vector of N, N = 1, 2, 5, 10, 25, 50, 100, 500. The smaller N might be a good choice of parameter. The two entries exchanging data are not likely to be near each other, counts[dest[idx]] and counts[src[idx]] both need a lock.
+
+Correlated data: 
+
+Serial correlated: 0.489854097366 seconds
+Fine grained correlated: 3.37455201149 seconds
+Medium grained correlated: 4.29865002632 seconds
+Medium grained correlated: 4.38489317894 seconds
+Medium grained correlated: 5.77999901772 seconds
+Medium grained correlated: 5.76631498337 seconds
+Medium grained correlated: 4.6751101017 seconds
+Medium grained correlated: 5.40706014633 seconds
+Medium grained correlated: 5.0810918808 seconds
+Medium grained correlated: 9.12867903709 seconds
+
+We can see from the correlated data, parallel computing time is relatively shorter as added more locks. It is longer running time than serial case, but not that bad as with uncorrelated data. From the vector N = 1, 2, 5, 10, 25, 50, 100, 500. We can see parameter N for medium-grained lock, the running time looks like a U-shape as different number of parameter N added. 
+
+Therefore, fine-grained case is faster than medium-grained case since each job does not need to wait for other jobs to be done as every entry of the array has indivisual lock. However, in Medium-grained case, there are many cases where jobs are stalled because other jobs have locks for memory.  
