@@ -136,8 +136,7 @@ propagate_labels(__global __read_write int *labels,
             }
         }
 
-    //for part P5.5 it doesnt matter, we still get valid data becasue it is a single integer that is being written into global memory
-
+    
 
     // barieier here to enesure all threads are synched when loading in the buffer
     barrier(CLK_LOCAL_MEM_FENCE);
