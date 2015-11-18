@@ -47,7 +47,9 @@ Single-threaded appears to be slower possibly because:
    run in parallel, even though memory access is serialized, there is still
    some decent latency hiding (i.e. when one thread can read from global
    memory while another is doing work).
-
+I suspect that on some GPUs, if the cost of global memory access is very high,
+then doing this type of optimization while making sure to minimize cache misses
+will give us some performance boost.
    
 ----- Part 5 -----
 
