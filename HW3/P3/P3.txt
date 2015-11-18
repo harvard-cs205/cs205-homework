@@ -1,0 +1,5 @@
+
+
+The best configuration and time for your hardware is:
+
+configuration ('coalesced', 16, 128): 0.00505032 seconds
