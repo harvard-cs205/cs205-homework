@@ -1,0 +1,3 @@
+1075.239963 Million Complex FMAs in 1.330044229 seconds, 808.424215944 million Complex FMAs / second
+
+Compared with HW2/P3, it's faster than nprange() method with 4 threads, but it's slower than AVX instruction parallelism. 
