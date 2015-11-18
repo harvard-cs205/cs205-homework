@@ -1,0 +1,28 @@
+Part 1:
+Finished after 915 iterations, 100.59042 ms total, 0.109934885246 ms per iteration
+Found 2 regions
+
+Finished after 532 iterations, 57.634012 ms total, 0.108334609023 ms per iteration
+Found 35 regions
+
+----------------------------------------------------------------------------------
+
+Part 2:
+Finished after 529 iterations, 57.877472 ms total, 0.10940920983 ms per iteration
+
+Finished after 275 iterations, 30.168172 ms total, 0.109702443636 ms per iteration
+Found 35 regions
+
+----------------------------------------------------------------------------------
+
+Part 3:
+Finished after 11 iterations, 1.310392 ms total, 0.119126545455 ms per iteration
+
+Finished after 11 iterations, 1.301068 ms total, 0.118278909091 ms per iteration
+Found 35 regions
+
+----------------------------------------------------------------------------------
+
+Part 4:
+Finished after 11 iterations, 3.753132 ms total, 0.341193818182 ms per iteration
+Finished after 10 iterations, 3.402076 ms total, 0.3402076 ms per iteration
