@@ -1,0 +1,155 @@
+P3.txt
+
+######################
+#
+# Submission by Kendrick Lo (Harvard ID: 70984997) for
+# CS 205 - Computing Foundations for Computational Science (Prof. R. Jones)
+# 
+# Homework 3 - Problem 3
+#
+# I did not colloborate with anyone to complete this problem.
+#
+# Documentation:
+# CS 205 Piazza Posts
+# http://www.nehalemlabs.net/prototype/blog/2014/06/16/parallel-programming-
+#          with-opencl-and-python-parallel-reduce/
+# http://stackoverflow.com/questions/2550774/what-is-size-t-in-c
+# https://en.wikipedia.org/wiki/Bitwise_operation#Bit_shifts
+# http://cs.stackexchange.com/questions/18229/what-is-memory-coalescing
+#
+######################
+
+For my machine with these specs:
+
+The platforms detected are:
+---------------------------
+Apple Apple version: OpenCL 1.2 (May 10 2015 19:38:45)
+The devices detected on platform Apple are:
+---------------------------
+Intel(R) Core(TM) i7-5557U CPU @ 3.10GHz [Type: CPU ]
+Maximum clock Frequency: 3100 MHz
+Maximum allocable memory size: 4294 MB
+Maximum work group size 1024
+---------------------------
+Intel(R) Iris(TM) Graphics 6100 [Type: GPU ]
+Maximum clock Frequency: 1100 MHz
+Maximum allocable memory size: 402 MB
+Maximum work group size 256
+---------------------------
+This context is associated with  2 devices
+The queue is using the device: Intel(R) Iris(TM) Graphics 6100
+The device memory bandwidth is 11.4589540267 GB/s
+The host-device bandwidth is 8.42502569633 GB/s
+
+My best result was:
+
+    configuration ('coalesced', 512, 128): 0.00298688 seconds
+
+
+It is not surprising that the strategy where the reads are "coalesced" 
+produces better results across the board than the "blocked" or "strided"
+strategy. Coalescing means ensure that each of multiple threads that
+are running simultaneously can access memory that is near the others
+concurrently -- most preferably, multiple threads will access adjacent 
+memory cells (stride of 0). The wider the stride, the more memory access
+requests are potentially required to read the same data, thus slowing
+performance.
+
+While there seems to a general trend toward better performance as
+the number of workers and work groups increases, there is a leveling
+off of performance, which is not that surprising given the maximum
+work group size for my GPU is capped at 256.
+
+
+Appendix:  Output
+-----------------
+
+#0: Intel(R) Core(TM) i7-5557U CPU @ 3.10GHz on Apple
+#1: Intel(R) Iris(TM) Graphics 6100 on Apple
+coalesced reads, workgroups: 8, num_workers: 4, 0.14120104 seconds
+coalesced reads, workgroups: 8, num_workers: 8, 0.07426384 seconds
+coalesced reads, workgroups: 8, num_workers: 16, 0.05142184 seconds
+coalesced reads, workgroups: 8, num_workers: 32, 0.02594008 seconds
+coalesced reads, workgroups: 8, num_workers: 64, 0.0147664 seconds
+coalesced reads, workgroups: 8, num_workers: 128, 0.00924392 seconds
+coalesced reads, workgroups: 16, num_workers: 4, 0.0799408 seconds
+coalesced reads, workgroups: 16, num_workers: 8, 0.04214472 seconds
+coalesced reads, workgroups: 16, num_workers: 16, 0.02684792 seconds
+coalesced reads, workgroups: 16, num_workers: 32, 0.01483472 seconds
+coalesced reads, workgroups: 16, num_workers: 64, 0.00921288 seconds
+coalesced reads, workgroups: 16, num_workers: 128, 0.00472648 seconds
+coalesced reads, workgroups: 32, num_workers: 4, 0.04235096 seconds
+coalesced reads, workgroups: 32, num_workers: 8, 0.02346904 seconds
+coalesced reads, workgroups: 32, num_workers: 16, 0.01462224 seconds
+coalesced reads, workgroups: 32, num_workers: 32, 0.00905192 seconds
+coalesced reads, workgroups: 32, num_workers: 64, 0.00474368 seconds
+coalesced reads, workgroups: 32, num_workers: 128, 0.00319936 seconds
+coalesced reads, workgroups: 64, num_workers: 4, 0.02325648 seconds
+coalesced reads, workgroups: 64, num_workers: 8, 0.01371864 seconds
+coalesced reads, workgroups: 64, num_workers: 16, 0.00917216 seconds
+coalesced reads, workgroups: 64, num_workers: 32, 0.0047772 seconds
+coalesced reads, workgroups: 64, num_workers: 64, 0.00339104 seconds
+coalesced reads, workgroups: 64, num_workers: 128, 0.0032704 seconds
+coalesced reads, workgroups: 128, num_workers: 4, 0.02507608 seconds
+coalesced reads, workgroups: 128, num_workers: 8, 0.01618464 seconds
+coalesced reads, workgroups: 128, num_workers: 16, 0.00906968 seconds
+coalesced reads, workgroups: 128, num_workers: 32, 0.00484256 seconds
+coalesced reads, workgroups: 128, num_workers: 64, 0.00333568 seconds
+coalesced reads, workgroups: 128, num_workers: 128, 0.00340568 seconds
+coalesced reads, workgroups: 256, num_workers: 4, 0.022222 seconds
+coalesced reads, workgroups: 256, num_workers: 8, 0.01207304 seconds
+coalesced reads, workgroups: 256, num_workers: 16, 0.00696872 seconds
+coalesced reads, workgroups: 256, num_workers: 32, 0.00366848 seconds
+coalesced reads, workgroups: 256, num_workers: 64, 0.00342048 seconds
+coalesced reads, workgroups: 256, num_workers: 128, 0.0031276 seconds
+coalesced reads, workgroups: 512, num_workers: 4, 0.02225008 seconds
+coalesced reads, workgroups: 512, num_workers: 8, 0.01158944 seconds
+coalesced reads, workgroups: 512, num_workers: 16, 0.00689504 seconds
+coalesced reads, workgroups: 512, num_workers: 32, 0.00375248 seconds
+coalesced reads, workgroups: 512, num_workers: 64, 0.003112 seconds
+coalesced reads, workgroups: 512, num_workers: 128, 0.00298688 seconds
+blocked reads, workgroups: 8, num_workers: 4, 0.1184264 seconds
+blocked reads, workgroups: 8, num_workers: 8, 0.07071048 seconds
+blocked reads, workgroups: 8, num_workers: 16, 0.0481468 seconds
+blocked reads, workgroups: 8, num_workers: 32, 0.02717616 seconds
+blocked reads, workgroups: 8, num_workers: 64, 0.0134288 seconds
+blocked reads, workgroups: 8, num_workers: 128, 0.00909304 seconds
+blocked reads, workgroups: 16, num_workers: 4, 0.06276136 seconds
+blocked reads, workgroups: 16, num_workers: 8, 0.03891688 seconds
+blocked reads, workgroups: 16, num_workers: 16, 0.02727176 seconds
+blocked reads, workgroups: 16, num_workers: 32, 0.0130784 seconds
+blocked reads, workgroups: 16, num_workers: 64, 0.00921 seconds
+blocked reads, workgroups: 16, num_workers: 128, 0.00669976 seconds
+blocked reads, workgroups: 32, num_workers: 4, 0.03546752 seconds
+blocked reads, workgroups: 32, num_workers: 8, 0.02219496 seconds
+blocked reads, workgroups: 32, num_workers: 16, 0.01324232 seconds
+blocked reads, workgroups: 32, num_workers: 32, 0.00892792 seconds
+blocked reads, workgroups: 32, num_workers: 64, 0.00671432 seconds
+blocked reads, workgroups: 32, num_workers: 128, 0.00726176 seconds
+blocked reads, workgroups: 64, num_workers: 4, 0.01997456 seconds
+blocked reads, workgroups: 64, num_workers: 8, 0.01164368 seconds
+blocked reads, workgroups: 64, num_workers: 16, 0.00894864 seconds
+blocked reads, workgroups: 64, num_workers: 32, 0.00662064 seconds
+blocked reads, workgroups: 64, num_workers: 64, 0.00681112 seconds
+blocked reads, workgroups: 64, num_workers: 128, 0.00753552 seconds
+blocked reads, workgroups: 128, num_workers: 4, 0.0200376 seconds
+blocked reads, workgroups: 128, num_workers: 8, 0.01346216 seconds
+blocked reads, workgroups: 128, num_workers: 16, 0.01042512 seconds
+blocked reads, workgroups: 128, num_workers: 32, 0.008002 seconds
+blocked reads, workgroups: 128, num_workers: 64, 0.0075432 seconds
+blocked reads, workgroups: 128, num_workers: 128, 0.00713112 seconds
+blocked reads, workgroups: 256, num_workers: 4, 0.01568496 seconds
+blocked reads, workgroups: 256, num_workers: 8, 0.01106072 seconds
+blocked reads, workgroups: 256, num_workers: 16, 0.0070204 seconds
+blocked reads, workgroups: 256, num_workers: 32, 0.006464 seconds
+blocked reads, workgroups: 256, num_workers: 64, 0.00706096 seconds
+blocked reads, workgroups: 256, num_workers: 128, 0.00659016 seconds
+blocked reads, workgroups: 512, num_workers: 4, 0.0156408 seconds
+blocked reads, workgroups: 512, num_workers: 8, 0.01081088 seconds
+blocked reads, workgroups: 512, num_workers: 16, 0.00870024 seconds
+blocked reads, workgroups: 512, num_workers: 32, 0.00638936 seconds
+blocked reads, workgroups: 512, num_workers: 64, 0.00653328 seconds
+blocked reads, workgroups: 512, num_workers: 128, 0.00607144 seconds
+configuration ('coalesced', 512, 128): 0.00298688 seconds
+
+
