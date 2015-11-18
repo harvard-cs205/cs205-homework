@@ -95,11 +95,13 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)   
-    /*
-    if (buffer[buf_y * buf_w + buf_x] < w * h) {
+    
+    
+    /*if (buffer[buf_y * buf_w + buf_x] < w * h) {
         buffer[buf_y * buf_w + buf_x] = labels[buffer[buf_y * buf_w + buf_x]];
     }
     */
+    
     if (lx == 0 && ly == 0) 
     {
         int lastLocation = -1;
@@ -125,6 +127,7 @@ propagate_labels(__global __read_write int *labels,
             }
         }
     }
+    
     barrier(CLK_LOCAL_MEM_FENCE);
     
     // stay in bounds
@@ -150,6 +153,9 @@ propagate_labels(__global __read_write int *labels,
                 // multiple threads might write this.
                 *(changed_flag) += 1;
                 labels[y * w + x] = new_label;
+                // CODE FOR PART 5 HERE
+                //*(labels + old_label) = min(*(labels+old_label),new_label);
+
                 atomic_min(labels + old_label, new_label);
 
             }
