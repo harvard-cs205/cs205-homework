@@ -1,5 +1,3 @@
-
-
 //from kernel's signature we see it expects to receive pointers to three
 //memory locations. Each processor on GPU will run this code below
 //first we should access thread's unique global id. 

@@ -1,3 +1,5 @@
+For this question, I collaborated with Reinier Matt.
+
 P3.
 
 After running the timing code, my best configuration is:

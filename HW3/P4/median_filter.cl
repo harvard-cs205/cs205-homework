@@ -1,9 +1,12 @@
 #include "median9.h"
 
+//For this question, I collaborated with Virgile Audi.
+
 //define get clamped value to take care of edge cases
 //we look at x < 0, x >= w
 //we look at y < 0, y >= h
 //in these cases we return the closest value in-bounds
+
 float
 get_clamped_value(__global __read_only float *in_values, int w, int h, int x, int y)
 {
