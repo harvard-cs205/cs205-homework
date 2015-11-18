@@ -6,10 +6,13 @@ __kernel void sum_coalesced(__global float* x,
     float sum = 0;
     size_t local_id = get_local_id(0);
 
+
+    const int i = get_global_id(0); 
+
     // thread i (i.e., with i = get_global_id()) should add x[i],
     // x[i + get_global_size()], ... up to N-1, and store in sum.
-    for (;;) { // YOUR CODE HERE
-        ; // YOUR CODE HERE 
+    for (int y = i; y <= N-1; y = y + get_global_size(0)) { // YOUR CODE HERE
+        sum = sum+x[y]; // YOUR CODE HERE 
     }
 
     fast[local_id] = sum;
@@ -24,11 +27,24 @@ __kernel void sum_coalesced(__global float* x,
     // You can assume get_local_size(0) is a power of 2.
     //
     // See http://www.nehalemlabs.net/prototype/blog/2014/06/16/parallel-programming-with-opencl-and-python-parallel-reduce/
-    for (;;) { // YOUR CODE HERE
-        ; // YOUR CODE HERE
-    }
 
+    //
+
+    int offset = get_local_size(0);
+
+     while (offset != 1)
+    {
+        offset = offset >> 1;
+        fast[local_id] = fast[local_id] + fast[local_id+offset];
+
+        barrier(CLK_LOCAL_MEM_FENCE);
+
+    } 
+
+
+    //make sure all local memory is written before doing the next iteration
     if (local_id == 0) partial[get_group_id(0)] = fast[0];
+
 }
 
 __kernel void sum_blocked(__global float* x,
@@ -40,6 +56,8 @@ __kernel void sum_blocked(__global float* x,
     size_t local_id = get_local_id(0);
     int k = ceil((float)N / get_global_size(0));
 
+    const int i = get_global_id(0); 
+
     // thread with global_id 0 should add 0..k-1
     // thread with global_id 1 should add k..2k-1
     // thread with global_id 2 should add 2k..3k-1
@@ -48,8 +66,12 @@ __kernel void sum_blocked(__global float* x,
     // 
     // Be careful that each thread stays in bounds, both relative to
     // size of x (i.e., N), and the range it's assigned to sum.
-    for (;;) { // YOUR CODE HERE
-        ; // YOUR CODE HERE
+    for (int y = i * k; y < i*k +k ;y++) { // YOUR CODE HERE
+
+        if (y < N)
+        {
+            sum = sum+x[y]; // YOUR CODE HERE 
+        }
     }
 
     fast[local_id] = sum;
@@ -64,9 +86,18 @@ __kernel void sum_blocked(__global float* x,
     // You can assume get_local_size(0) is a power of 2.
     //
     // See http://www.nehalemlabs.net/prototype/blog/2014/06/16/parallel-programming-with-opencl-and-python-parallel-reduce/
-    for (;;) { // YOUR CODE HERE
-        ; // YOUR CODE HERE
-    }
+
+    int offset = get_local_size(0);
+
+     while (offset != 1)
+    {
+        offset = offset >> 1;
+        fast[local_id] = fast[local_id] + fast[local_id+offset];
+
+        //make sure all local memory is written before doing the next iteration
+        barrier(CLK_LOCAL_MEM_FENCE);
+
+    } 
 
     if (local_id == 0) partial[get_group_id(0)] = fast[0];
 }

@@ -28,7 +28,7 @@ get_clamped_value(__global __read_only int *labels,
 }
 
 __kernel void
-propagate_labels(__global __read_write int *labels,
+propagate_labels(__global int *labels,
                  __global __write_only int *changed_flag,
                  __local int *buffer,
                  int w, int h,
@@ -81,6 +81,49 @@ propagate_labels(__global __read_write int *labels,
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
     
+    //PART 4
+    barrier(CLK_LOCAL_MEM_FENCE);
+
+
+    //use only one thread
+    if (lx == 0 && ly == 0)
+    {
+        for (int y_iterator = halo; y_iterator < buf_h - halo; y_iterator++)
+        {
+            for (int x_iterator = halo; x_iterator < buf_w - halo; x_iterator++)
+           {
+
+                int temp = buffer[y_iterator * buf_w + x_iterator];
+
+                if (temp < w*h)
+                {
+                    buffer[y_iterator * buf_w + x_iterator] = labels[temp];
+                }
+            }
+        }
+    }
+
+
+    //part 2
+/*
+    if (idx_1D < buf_w - halo || idx_1D >= halo) {
+        for (int row = halo; row < buf_h-halo; row++) {
+
+            int temp = buffer[row * buf_w + idx_1D];
+
+            if (temp < w*h)
+            { 
+                buffer[row * buf_w + idx_1D] = labels[buffer[row * buf_w + idx_1D]];
+            }
+        }
+    }
+*/
+
+
+
+    barrier(CLK_LOCAL_MEM_FENCE);
+
+
     // stay in bounds
     if ((x < w) && (y < h)) {
         // CODE FOR PART 1 HERE
@@ -88,10 +131,33 @@ propagate_labels(__global __read_write int *labels,
         // to adjust this for correctness.
         new_label = old_label;
 
+        int up = buffer[(buf_y+1) * buf_w + buf_x];
+        int down = buffer[(buf_y-1) * buf_w + buf_x];
+        int left = buffer[buf_y * buf_w + buf_x+1];
+        int right = buffer[buf_y * buf_w + buf_x-1];
+
+
+        if (new_label < w*h)
+        {
+            //comparison
+            if (new_label > up)
+                new_label = up;
+            if (new_label > down)
+                new_label = down;
+            if (new_label > left)
+                new_label = left;
+            if (new_label > right)
+                new_label = right;
+        }
+
+
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
             // indicate there was a change this iteration.
             // multiple threads might write this.
+
+            atomic_min(&labels[old_label], new_label);
+
             *(changed_flag) += 1;
             labels[y * w + x] = new_label;
         }

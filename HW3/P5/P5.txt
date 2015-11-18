@@ -1,0 +1,55 @@
+1a:
+Finished after 855 iterations, 5648.189627 ms total, 6.60606973918 ms per iteration
+Found 2 regions
+
+1b:
+Finished after 496 iterations, 3258.315553 ms total, 6.56918458266 ms per iteration
+Found 35 regions
+
+2a:
+Finished after 510 iterations, 4348.747574 ms total, 8.52695602745 ms per iteration
+Found 2 regions
+
+
+2b:
+Finished after 257 iterations, 2247.411281 ms total, 8.74479097665 ms per iteration
+Found 35 regions
+
+3a.
+Finished after 7 iterations, 72.763773 ms total, 10.3948247143 ms per iteration
+Found 2 regions
+
+3b.
+Finished after 6 iterations, 71.002666 ms total, 11.8337776667 ms per iteration
+Found 35 regions
+
+4a.
+Finished after 9 iterations, 76.697681 ms total, 8.52196455556 ms per iteration
+Found 2 regions
+
+4b.
+Finished after 8 iterations, 63.80122 ms total, 7.9751525 ms per iteration
+Found 35 regions
+
+Qn 4 writeup. Why a single thread is good:
+A single thread performs better as pixels in a workgroup are close together in memory, and hence will likely to be read in together (similar to cache lines). In comparison, the multi-threaded version in part 2 reads in individual pixels for each thread, when the IO cost to read a block is essentially the same. Hence, a single thread making the IO call for a block of memory will be faster than multiple threads making IO calls to individual cells of memory. 
+
+Qn 5 writeup:
+Without the atomic_min() function, it is likely that the final result will be wrong. This is because as min is not atomic and the values of "label" are being read/write by multiple threads simultaneously, the minimum value across all threads may not be written to "label". See below for an example.
+
+The performance is likely to be better because it avoids serialization of the atomic operation. However, it may also be slower because the lowest value may be over-written by another value, resulting in more iterations. More testing will be required, but the results are likely to be noisy.
+
+The values in labels may increase if two threads interleave in the following way:
+Initial old_label = 100		Thread_1_new_label = 60		Thread_2_new_label = 80
+
+Interleaving:
+Thread 1 						Thread 2
+min(100, 60) == 60
+								min(100, 80) = 80
+old_label = 60
+								old_label = 80
+
+Hence, the value of label increased from 60 to 80.
+
+
+I don't think it is possible for value of label to increase between iterations, as the value in a new iteration has to be lower than the old value in the previous iteration to pass the initial min conditional check.
