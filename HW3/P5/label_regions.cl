@@ -1,3 +1,6 @@
+// I added in function declarations to avoid the annoying but harmless 
+// warning that there is no function prototype that my compiler gave me.
+
 __kernel void
 initialize_labels(__global __read_only int *image,
                   __global __write_only int *labels,
@@ -39,7 +42,6 @@ int
 get_min(int x, int up, int down, int left, int right)
 {
     // Returns the minimum of its inputs
-    // There is probably a better way to do this
     int min;
     if (up > down) min = down; else min = up;
     if (min > left) min = left;
@@ -100,28 +102,26 @@ propagate_labels(__global __read_write int *labels,
     // the pixel for this thread
     old_label = buffer[buf_y * buf_w + buf_x];
 
-    // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
-    // for (int i = y - ly; i < buf_h; i++) {
-    //     for (int j = x - lx; j < buf_w; j++) {
-    //         buffer[i * buf_w + j] = labels[buffer[i * buf_w + j]];
-    //     }
-    // }
-
+    // Efficient grandparents
     int prev = -1, idx = -1;
+    int lsx = get_local_size(0), lsy = get_local_size(1);
 
-    for (int i = y - ly; i < buf_h; i++) {
-        for (int j = x - lx; j < buf_w; j++) {
-            if (idx == buffer[i * buf_w + j]) {
-                buffer[i * buf_w + j] = prev;
+    if (lx + ly == 0) { // first thread in workgroup
+        for (int i = halo; i < lsy + halo; i++) {
+            for (int j = halo; j < lsx + halo; j++) {
+                if (buffer[i * buf_w + j] < w * h) { // stay in bounds
+                    if (idx == buffer[i * buf_w + j]) {
+                        buffer[i * buf_w + j] = prev;
+                    }
+                    else {
+                        idx = buffer[i * buf_w + j];
+                        prev = labels[idx];
+                        buffer[i * buf_w + j] = prev;
+                    }
+                }
             }
-
-            else {
-                idx = buffer[i * buf_w + j];
-                prev = labels[buffer[i * buf_w + j]];
-                buffer[i * buf_w + j] = prev;
-            }
-        }
-    } 
+        } 
+    }
 
     barrier(CLK_LOCAL_MEM_FENCE);
     

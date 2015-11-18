@@ -12,33 +12,44 @@ Maze 2:
 Part 2
 -----------------------------------------------------------------------------
 Maze 1:
-    Iterations: 912
-    Avg kernel execution time: 0.289 ms
+    Iterations: 529
+    Avg kernel execution time: 0.738 ms
 
 Maze 2:
-    Iterations: 531
-    Avg kernel execution time: 0.289 ms
+    Iterations: 271
+    Avg kernel execution time: 0.736 ms
 
 
 Part 3
 -----------------------------------------------------------------------------
 Maze 1:
-    Iterations: 844
-    Avg kernel execution time: 0.291 ms
+    Iterations: 11
+    Avg kernel execution time: 0.625 ms
 
 Maze 2:
-    Iterations: 530
-    Avg kernel execution time: 0.287 ms
+    Iterations: 10
+    Avg kernel execution time: 0.618 ms
+
+
+Part 4
+-----------------------------------------------------------------------------
+Maze 1:
+    Iterations: 10
+    Avg kernel execution time: 0.648 ms
+
+Maze 2:
+    Iterations: 9
+    Avg kernel execution time: 0.647 ms
+
+Using a single thread, at least in my case, appears to be a bad choice because there is a slight drop in average kernel execution time between parts 3 and 4. However, it is probably a good idea overall because it minimizes bank conflicts. As we learned in lecture, if multiple threads in a workgroup try to access the same parts of local memory, then access is serialized. In part 2, multiple threads could access different parts of the buffer at the same time, which would lead to this problem.
 
 
 
 Part 5
 -----------------------------------------------------------------------------
-Using min() could result in an incorrect result due to the classic “Thread 1 reads a value, Thread 2 reads the same value, and they both write back what are now incorrect values” problem. This would happen when labels[old_label] is updated to new_label, because multiple threads work with the same value for old_label.
+Using min() would not produce an incorrect result, since a value in labels would, at worst, stay the same between iterations. However, a value in labels could increase during an iteration, which would then force the algorithm to run for more iterations to redo the progress that was “erased” by the overwriting.
 
-If this happened, the algorithm would probably take more iterations to finish because at each iteration, some updates would be “lost” and would have to be re-updated at the next iteration. In effect, this would partially render the optimization useless. However, it would probably finish faster per iteration since min() is faster than atomic_min().
-
-A value in labels could increase. Suppose we had the following situation:
+In more detail: A value in labels could increase during an iteration as a result of the classic “Thread 1 reads a value, Thread 2 reads the same value, and they both write back what are now incorrect values” problem. Suppose we had the following situation:
 
 Thread 1: labels[old_label]=10, new_label=5
 Thread 2: labels[old_label]=10, new_label=1
@@ -46,3 +57,5 @@ Thread 2: labels[old_label]=10, new_label=1
 Thread 1 reads labels[old_label]. Then Thread 2 reads labels[old_label] and writes in 1. Finally, Thread 1 gets around to writing in 5. In this case, labels[old_label] has gone 10->1->5.
 
 However, this could not occur between iterations, since it’s always true that min(labels[old_label], new_label) <= labels[old_label]. At worst, labels[old_label] will not decrease as much as it should between iterations.
+
+Even though using min() instead of atomic_min() would increase the iteration count, it would probably speed up each iteration since atomic operations are relatively slow.
