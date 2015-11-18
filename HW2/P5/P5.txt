@@ -1,0 +1,13 @@
+## Subproblem 1: Multithreading
+As one can see from the chart in P5.png, processing the animation in multiple threads allows for a relatively modest speed up of about 33% in this and all subsequent subproblems. This is likely due to the overhead imposed by the extra 3 threads.
+
+## Subproblem 2: Grid
+The addition of the grid allows for an over 100x speedup. This is because the grid allows for the collision-checking algorithm to go from O(n^2) to O(n). Since n = 1000, in theory we might expect up to 1000x speedup, but since the large grid data structure imposes significant overhead, the actual speedup is considerably less.
+
+## Subproblem 3: Sort
+Sorting so that objects nearby are near each other in memory gives a modest speedup, particularly when using multiple threads. This makes sense because when objects are organized intelligently, there will be less contention between threads.
+
+I chose to use [Morton ordering](https://en.wikipedia.org/wiki/Z-order_curve) because of its relatively simple implementation. The ordering function converts the 2-dimensional position of the objects to one dimension, which can then be used to sort the objects in memory.
+
+## Subproblem 4: Locking
+Unsurprisingly, locking objects when making corrections when they collide slows down the processing significantly (by about 33%). This makes sense because threads must now wait when trying to make changes to the same object, leading to a loss of concurrency, but an increase in the integrity of the simulation.

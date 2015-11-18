@@ -1,0 +1,1 @@
+As you can see in the chart (P3.png), both with and without AVX, 2 threads is about twice as fast, and 4 threads is about 4 times as fast as 1 thread. Independent of the number of threads, using AVX gives about a 6.5 - 7x speedup, about what one would expect, since AVX allows for 8 computations be done in parallel.
