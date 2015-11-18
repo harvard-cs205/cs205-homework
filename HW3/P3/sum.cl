@@ -8,9 +8,9 @@ __kernel void sum_coalesced(__global float* x,
 
     // thread i (i.e., with i = get_global_id()) should add x[i],
     // x[i + get_global_size()], ... up to N-1, and store in sum.
-    for (int i = get_global_id(0); i < N; i += get_global_size(0)) { 
+    for (int i = get_global_id(0); i < N; i += get_global_size(0)) 
         sum += x[i]; 
-    }
+    
 
     fast[local_id] = sum;
     barrier(CLK_LOCAL_MEM_FENCE);
@@ -57,9 +57,8 @@ __kernel void sum_blocked(__global float* x,
     // a better design would use N as int (2^32-1 should be sufficient...)
     int end = min((int)(get_global_id(0) * k + k), (int)N);
 
-    for (int i = start; i < end; i++) {
+    for (int i = start; i < end; i++)
         sum += x[i]; 
-    }
 
     fast[local_id] = sum;
     barrier(CLK_LOCAL_MEM_FENCE);
