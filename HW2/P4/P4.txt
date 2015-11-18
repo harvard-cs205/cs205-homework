@@ -1,0 +1,18 @@
+Below are the results for each.
+
+1 Thread:
+3.69582509995 seconds for 10 filter passes.
+
+2 Threads:
+1.88442707062 seconds for 10 filter passes.
+
+4 Threads:
+1.76920986176 seconds for 10 filter passes.
+
+8 Threads:
+1.71401906013 seconds for 10 filter passes.
+
+
+To control cooperation between the threads, I kept a 2D list of threading.Event(), where the [i][j] entry would correspond to the i-th iteration of the jth thread. It is set to Truewhen the corresponding thread finishes processing the image rows in the i-th iteration. This allowed for simple checking: to compute iteration i for thread n, we could simply check if threads n-1, n, and n+1 completed iteration i-1. Note that this is equivalent to checking whether the entries [i-1][n-1], [i-1][n], and [i-1][n+1] are all assigned True. 
+
+From the results, we can see that -- as we expected -- our performance improved with an increased number of threads. Furthermore, you'll notice that from 1 thread to 2 threads, there is a significant improvement (roughly 2x), but from 2 threads to 4 threads, there is less improvement, and 4 threads to 8 threads has an even smaller degree of improvement. This is not surprising though, because there is expected to be some degree of decreasing maginal returns, and my computer only has 1 processor with 2 cores. Moreover, using more threads involves a greater amount of overhead.

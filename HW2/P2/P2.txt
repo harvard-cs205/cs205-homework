@@ -1,0 +1,25 @@
+In my code, I ran it on the uncorrelated as well as correlated sets for the values N = 1, 5, 10, 20, 30, 50, 75, 100. For each value of N, I ran 3 iterations and took the minimum of them to get a more accurate graph. Below are my results.
+
+Serial uncorrelated: 0.266680002213 seconds
+Fine grained uncorrelated N=1: 7.08058619499 seconds
+Medium grained uncorrelated N=5: 7.53730797768 seconds
+Medium grained uncorrelated N=10: 8.06861805916 seconds
+Medium grained uncorrelated N=20: 8.18316292763 seconds
+Medium grained uncorrelated N=30: 8.94241309166 seconds
+Medium grained uncorrelated N=50: 9.79496192932 seconds
+Medium grained uncorrelated N=75: 11.9305889606 seconds
+Medium grained uncorrelated N=100: 17.6697371006 seconds
+
+Serial correlated: 0.349371910095 seconds
+Fine grained correlated N=1: 7.69006896019 seconds
+Medium grained correlated N=5: 7.13174986839 seconds
+Medium grained correlated N=10: 5.92801094055 seconds
+Medium grained correlated N=20: 5.43805003166 seconds
+Medium grained correlated N=30: 5.31649899483 seconds
+Medium grained correlated N=50: 5.43309187889 seconds
+Medium grained correlated N=75: 5.88598299026 seconds
+Medium grained correlated N=100: 6.43171906471 seconds
+
+The graph shows that the serial implementation is the fastest by far. This is probably because there is significant overhead in acquiring and releasing locks. 
+
+As for the optimal choice of N, the best time for correlated transfers with medium-grained locking occurred when N took on the value somewhere from N = 20 to N = 50, and my times above show that it was actually at N = 30. Theoretically, the value should be N = 20 because we know that since no source and destination will be more than 10 elements away, then the maximum distance between any two source and destinations (which is when a lock is required) will be 20. It's a bit strange that this slightly differs with my results, but it is very marginal, and it seemed the case that if we averaged the times instea dof taking the minimum, N = 20 would have been optimal.

@@ -1,0 +1,15 @@
+Subproblem 1: Multithreading
+
+Using a serial implementation gave me ~12-13 simulation fps on average, while 4 threads gave me ~17-19 simulation fps on average. The speedup, while significant in terms of percentage, was not amazing. This could be due to a number of things, including poor spacial locality.
+
+Subproblem 2: Spatial Decomposition
+
+Adding in this part increased the fps significantly. Using a serial implementation gave ~1100-1300 simulation fps on average, while 4 threads gave ~1800-2000 simulation fps. This increase can be attributed to the fact that our checking algorithm went from an O(N^2) to an O(N) algorithm, which increases the efficiency dramatically.
+
+Subproblem 3: Spatially Coherent Sorting
+
+Using a serial implementation gave ~1200-1500 simulation fps on average, while 4 threads gave ~2000-2300 simulation fps. This increased performance was because of the improved space locality. Here, I used Morton ordering (and borrowed code from the Wikipedia page), which results in strong spatial coherence -- when the objects are closer to each other in memory, they will be accessed faster.
+
+Subproblem 4: Locking
+
+Using locks and 4 threads, I had ~1000-1200 simulation fps, while not using locking provided an average of ~2000 simulation fps. This is mostly likely due to the fact that there exists overhead in creating, acquiring, and releasing locks, in addition to waiting for access to pointers.
