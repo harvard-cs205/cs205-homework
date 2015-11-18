@@ -1,0 +1,10 @@
+My hardware:
+
+#0: Intel(R) Core(TM) i7-4558U CPU @ 2.80GHz on Apple
+#1: Iris on Apple
+
+The fastest configurations were:
+* Coalesced: 128 workgroups, 128 workers, 0.00219256 seconds
+* Blocked: 8 workgroups, 128 workers, 0.00876544 seconds
+
+The best overall configuration was (Coalesced, 128 workgroups, 128 workers, 0.00219256 seconds).

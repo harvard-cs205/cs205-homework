@@ -1,0 +1,42 @@
+Results:
+--------
+
+# Part 1
+* Maze 1:
+    * Finished after 878 iterations, 277.924 ms total, 0.31654214123 ms per iteration
+    * Found 2 regions
+* Maze 2:
+    * Finished after 520 iterations, 166.47216 ms total, 0.320138769231 ms per iteration
+    * Found 35 regions
+
+# Part 2
+* Maze 1:
+    * Finished after 528 iterations, 169.33232 ms total, 0.320705151515 ms per iteration
+    * Found 2 regions
+* Maze 2:
+    * Finished after 273 iterations, 87.21232 ms total, 0.319459047619 ms per iteration
+    * Found 35 regions
+
+# Part 3
+* Maze 1:
+    * Finished after 10 iterations, 3.20552 ms total, 0.320552 ms per iteration
+    * Found 2 regions
+* Maze 2:
+    * Finished after 9 iterations, 2.83368 ms total, 0.314853333333 ms per iteration
+    * Found 35 regions
+
+# Part 4
+* Maze 1:
+    * Finished after 10 iterations, 7.39856 ms total, 0.739856 ms per iteration
+    * Found 2 regions
+* Maze 2:
+    * Finished after 9 iterations, 6.62872 ms total, 0.736524444444 ms per iteration
+    * Found 35 regions
+
+
+Answers:
+--------
+
+4. Replacing labels with their grandaprents on one thread slows down the total computation. As one can see in the graphs in maze1.png and maze2.png, performing this in serial does not increase the number of iterations, but increases the average iteration time considerably by about .4 ms. This means that the efficiency gains from eliminating redundant memory reads is outweighed by the slow down of doing all of these reads in serial in one thread.
+
+5. Replacing atomic_min() with min() would result in a modest speedup per iteration. When atomic_min() is called on the same location by multiple threads, these calls are executed in serial. That is, one reads and writes before the next call reads. This ensures that when the current label is x, and two threads call atomic_min on that label with y and z respectively, where x > y > z, the label is always updated to z, the lowest value. By executing these updates in parallel, they run faster, but introduce race conditions. For example, if threads 1 and 2 update at the same index at the same time, but 2 finishes writing before 1, then thread 2 will overwrite x with z, and thread 1 will overwrite z with y, even though z < y. Therefore a value in labels technically could increase, but not from iteration to iteration, since it will never increase relative to its original value (here, x). Ultimately, the program will reach the correct answer under either scheme. However, this race condition means that, when not using atomic_min(), it may take more iterations to complete, since it is possible for a label not to be updated to its "true" min value, and this would have to be fixed in a future iteration. The difference in performance will depend on the difference between the speedup per iteration and the increase in number of iterations.
