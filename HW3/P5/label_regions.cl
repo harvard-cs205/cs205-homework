@@ -112,8 +112,15 @@ propagate_labels(__global __read_write int *labels,
             // CODE FOR PART 3 HERE
             // indicate there was a change this iteration.
             // multiple threads might write this.
+
             *(changed_flag) += 1;
-            labels[y * w + x] = new_label;
+
+            // First, compare global new label with grandparent
+            atomic_min(&labels[old_label], new_label);
+            
+            // Now write back to the non-halo portion
+            atomic_min(&labels[y * w + x], new_label);
+
         } 
     } 
 }
