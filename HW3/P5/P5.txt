@@ -1,3 +1,5 @@
+#### First part of the exercise was discussed with Andrew Petsheck ####
+
 •PART 1•
 Maze 1: Finished after 885 iterations, 285.21048 ms total, 0.322271728814 ms per iteration
 Maze 2:Finished after 519 iterations, 166.55048 ms total, 0.320906512524 ms per iteration
@@ -17,8 +19,8 @@ Maze 2: Finished after 10 iterations, 3.12064 ms total, 0.312064 ms per iteratio
 Maze 1: Finished after 10 iterations, 8.09776 ms total, 0.809776 ms per iteration
 Maze 2: Finished after 10 iterations, 7.96824 ms total, 0.796824 ms per iteration
 
-The first thing we note is that implementing the efficient grandparents methods doesn’t improve the number of iterations necessary to complete the maze and moreover slows down each iteration (more than twice as slow). This, of course, comes from the serialisation of the issue at hand. 
+The first thing we note is that implementing the efficient grandparents methods doesn’t improve the number of iterations necessary to complete the maze and moreover slows down each iteration (more than twice as slow). This, of course, comes from the serialisation of the issue at hand. This seems to indicate that we are loosing some time going back in forth to memory. Maybe if the values contained in the buffer were more similar or at least grouped by identical value, then we would actually go fewer times to read memory and save some time. Overall, for this particular example, implementing this methods doesn’t seem like the optimal choice.
 
 •PART 5•
 
-Switching from atomic_min() to min()
+Switching from atomic_min() to min():

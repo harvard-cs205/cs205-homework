@@ -83,18 +83,19 @@ propagate_labels(__global __read_write int *labels,
     
     //if(buffer[buf_y * buf_w + buf_x]< w*h) buffer[buf_y * buf_w + buf_x] = labels[buffer[buf_y * buf_w + buf_x]];
 
-    // This is to use a single thread:
-    int prev_buff = -1;
+    // initialising the previous buffer and grand parents to be able to cjeck:
+    int prev_buff = -100;
     int prev_gp = 0;
 
-    if ((lx==0) && (ly==0)){
+    if ((lx==0) && (ly==0)){ //making sure we are only using one thread
 
-        for(int i = 0; i<buf_w*buf_h; ++i){
+        for(int i = 0; i<buf_w*buf_h; ++i){ // iterating on the index of the buffer (like mentioned on a post in piazza)
 
-        	int current = buffer[i];
+        	int current = buffer[i]; // s
 
-            if(current<w*h){
-            	if(current != prev_buff){
+            if(current<w*h){ //checking current is not a wall or 
+
+            	if(current != prev_buff){// updating the new buffers and gp if different
 
             		prev_buff = current;
             		prev_gp = labels[current];
@@ -102,17 +103,18 @@ propagate_labels(__global __read_write int *labels,
 
             	}
 
-            	else buffer[i] = prev_gp;
+            	else buffer[i] = prev_gp; //calling the same previous gp if they are equal
                 
             }
 
         }
 
     }
+
     barrier(CLK_LOCAL_MEM_FENCE);
 
-    // stay in bounds
-    if ((x < w) && (y < h)) {
+    
+    if ((x < w) && (y < h)) { // checking that we stayed in bounds
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
