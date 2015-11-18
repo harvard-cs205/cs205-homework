@@ -41,13 +41,30 @@ Finished after 10 iterations, 4.988704 ms total, 0.4988704 ms per iteration
 Found 35 regions
 
 Single-threaded appears to be slower possibly because:
-- not enough cache hits (global value changes often)
-- cost of global memory read is not high enough that could matter
+1. Not enough cache hits (global label changes often so opportunities for using the
+   cache are rare).
+2. Cost of global memory read is not high enough. Perhaps when the threads
+   run in parallel, even though memory access is serialized, there is still
+   some decent latency hiding (i.e. when one thread can read from global
+   memory while another is doing work).
 
-Part 5:
+   
+----- Part 5 -----
 
 Using min() took ~ 1.0 ms for Maze 1 and Maze 2 which is slightly faster
 than atomic_min(). The speedup is likely because of the parallel updates
-vs serialized updates via atomic operations. However, min() can create
-race conditions and could cause label values to increase within an 
-iteration, but NOT across iterations. 
+vs serialized updates via atomic operations.
+
+However, min() can create race conditions and could cause label values
+to increase within an iteration, but NOT across iterations. Within an
+iteration, two threads can try to update the same label to different
+values. Let's say the current label value is 3 and thread 1 wants to change
+it to 1, while thread 2 wants to change it to 2. Then this event ordering
+is problematic:
+1. Thread 1 loads current value which is 3
+2. Thread 2 loads current value which is 3
+3. Thread 1 sets current value to min(3,1) = 1
+4. Thread 2 sets current value to min(3,2) = 2
+
+Thus, the final value is not the minimum possible value, causing more work
+to be needed in future iterations.
