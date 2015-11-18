@@ -1,0 +1,61 @@
+
+Part 1
+1) Maze 1
+Finished after 912 iterations, 404.4984 ms total, 0.443528947368 ms per iteration
+Found 2 regions
+2) Maze 2
+Finished after 529 iterations, 233.29384 ms total, 0.441009149338 ms per iteration
+Found 35 regions
+
+Part 2
+1) Maze 1
+Finished after 529 iterations, 231.18304 ms total, 0.437018979206 ms per iteration
+Found 2 regions
+2) Maze 2
+Finished after 273 iterations, 119.14672 ms total, 0.436434871795 ms per iteration
+Found 35 regions
+
+Part 3
+1) Maze 1
+Finished after 10 iterations, 4.48328 ms total, 0.448328 ms per iteration
+Found 2 regions
+2) Maze 
+Finished after 9 iterations, 3.97928 ms total, 0.442142222222 ms per iteration
+Found 35 regions
+
+Part 4
+Discussion
+We did use a single thread to reduce redundant global memory reads when a current index for
+memory is the same as a previous index. But, the result shows that this techniques is not
+worth because performance gets slower by about 4x for total time and 2.5x for runtime per
+iteration. My guess for this reason is that time saved by avoiding unnecessary global memory
+reads is much smaller than time increased by changing parallel executions to sequential one. 
+I think this technique would perform well if lots of redundant global memory reads happen or
+time taken by reading global memory is too slow. 
+
+1) Maze 1
+Finished after 16 iterations, 16.35752 ms total, 1.022345 ms per iteration
+Found 2 regions
+2) Maze 2
+Finished after 15 iterations, 15.20976 ms total, 1.013984 ms per iteration
+Found 35 regions
+
+Part 5
+Discussion
+if we use standard min function instead of atomic_min, the result end up being wrong from 
+the correct one. This is because multiple threads happen to read and modify values on the 
+same location of shared memory. 
+When the performance is considered, using min() takes shorter than using atomic_min().
+As you can see from the below result, runtime per iteration is smaller for min() case than
+for atomic_min() case. The reason for that is multiple threads do not need to wait for others 
+to finish read and modify values.
+In addition, the number of iterations increase from the result. It might because of the
+possibility where multiple threads try to update the same values at the same time and end
+up updating wrong values and thus the values are not converged quickly. 
+
+I ran the same code using min() instead of atomic_min().
+1) Maze 1
+Finished after 534 iterations, 531.92504 ms total, 0.996114307116 ms per iteration
+Found 2 regions
+Finished after 279 iterations, 277.68728 ms total, 0.995294910394 ms per iteration
+Found 35 regions
