@@ -1,0 +1,203 @@
+P5.txt
+
+######################
+#
+# Submission by Kendrick Lo (Harvard ID: 70984997) for
+# CS 205 - Computing Foundations for Computational Science (Prof. R. Jones)
+# 
+# Homework 3 - Problem 5
+#
+# I did not colloborate with anyone to complete this problem.
+#
+# Documentation:
+# CS 205 Piazza Posts
+# https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/atomic_min.html
+# https://www.cs.princeton.edu/~rs/AlgsDS07/01UnionFind.pdf
+# http://stackoverflow.com/questions/14093692/whats-the-difference-between-
+#           cuda-shared-and-global-memory
+#
+######################
+
+Part 1 - Updates from 4 neighbours, referencing local memory
+=============================================================
+
+maze1:
+
+Finished after 915 iterations, 203.99176 ms total, 0.222941814208 ms per iteration
+Found 2 regions
+
+maze2:
+
+Finished after 532 iterations, 117.48264 ms total, 0.220832030075 ms per iteration
+Found 35 regions
+
+
+Part 2 - Update local buffer with grandparent labels
+===========================================================
+
+maze1:
+
+Finished after 529 iterations, 113.62536 ms total, 0.214792741021 ms per iteration
+Found 2 regions
+
+maze2:
+
+Finished after 275 iterations, 59.45688 ms total, 0.216206836364 ms per iteration
+Found 35 regions
+
+This optimization produced between a 40-50% reduction in both iterations
+and total time. The average time per iteration decreased slightly as well.
+Since we are trying to give all connected components a minimum-valued
+identifier, updating the local buffer with a lower number, which can then
+be used by other work items when finding minimum values for neighbors,
+speeds up the finding of minimum values overall. Although accessing global
+memory to obtain label values can be costly (in terms of access time), the 
+benefits of updating the local buffers in this manner appear to outweigh
+those costs.
+
+
+Part 3 - Update global labels array when labels are changed
+===========================================================
+
+maze1:
+
+Finished after 10 iterations, 3.03232 ms total, 0.303232 ms per iteration
+Found 2 regions
+
+maze2:
+
+Finished after 9 iterations, 2.66048 ms total, 0.295608888889 ms per iteration
+Found 35 regions
+
+This optimization produced between a very significant reduction in both
+iterations and total time. The average time per iteration increased by
+about 50%, likely due to the combination of having to write to global
+memory (which generally takes longer to access than local memory), and
+more notably, the use of the _atomic_min_ functions, which enforce
+serialization of memory access but slows performance. However, the benefits
+of updating the global labels list -- effectively allowing the results of
+the search for minimum IDs to be shared between workgroups -- appear to
+outweigh the per-iteration slowdown for this particular task. 
+
+
+Part 4 - Assign one thread per workgroup to fetch grandparents
+==============================================================
+
+maze1:
+
+Finished after 10 iterations, 3.56504 ms total, 0.356504 ms per iteration
+Found 2 regions
+
+maze2:
+
+Finished after 9 iterations, 3.13056 ms total, 0.34784 ms per iteration
+Found 35 regions
+
+For this particular task, and the particular number of threads and work
+groups employed, it does not seem worthwhile to use a single thread to 
+perform the task completed in Part 2. The number of iterations appeared
+to stay constant, while the time per iteration increased by about 0.05 ms,
+leading to an increase in the total time.
+
+We believe that while we could save some time, in theory, by having to
+access global memory less often, there are a few factors to consider:
+
+* we only remember the last fetch performed, as opposed to having thread 0
+  of each workgroup store all previously loaded values from the global 
+  memory; perhaps we save more time if we "cached" more values in private
+  memory, but...
+
+* we have essentially serialized this part of the algorithm, with only
+  one thread working on fetching grandparents while all other threads in
+  the workgroup sit idle, waiting until the local buffer values have 
+  finished updating
+
+So it seems that the benefits of parallelizing the task outweigh the cost
+of potentially saving accesses to global memory because of redundant reads. 
+
+Furthermore, such savings are not even guaranteed because the labels
+processed by the workgroup may not be the same as assumed. This may well run
+faster if huge continuous blocks of the image shared the same level, but 
+that does not seem to be the case with our images. 
+
+The result might also be different if access to global memory was _much_
+slower compared to private (to work item) memory accesses. For example,
+perhaps if global memory was very small compared to the data required for
+access, and it was necessary to travel off the device (e.g. the host) to
+obtain data, then the results would certainly differ. The tasks being
+performed are not computationally intensive; rather they are bandwidth 
+limited.
+
+As an experiment, we also varied the workgroup size and compared the
+performance results. Interestingly, the total time per iteration does
+not increase or decrease monotonically with workgroup size. There does
+seem to be an intermediate size where a local minimum is reached; all the
+workgroup sizes below performed poorly compared to our 8 x 8 workgroup
+size as given in the skeleton code. 
+
+2 x 2
+Finished after 10 iterations, 25.90912 ms total, 2.590912 ms per iteration
+Found 35 regions
+
+4 x 4
+Finished after 9 iterations, 6.29504 ms total, 0.699448888889 ms per iteration
+Found 35 regions
+
+16 x 16
+Finished after 10 iterations, 5.38416 ms total, 0.538416 ms per iteration
+Found 35 regions
+
+
+Part 5 - Replacing atomic_min() with min()
+==========================================
+
+First, as an experiment, we made the change and checked the performance
+of the algorithm:
+
+maze1:
+
+Finished after 11 iterations, 3.78048 ms total, 0.34368 ms per iteration
+Found 2 regions
+
+maze2:
+
+Finished after 10 iterations, 3.37936 ms total, 0.337936 ms per iteration
+Found 35 regions
+
+We did not obtain any evidence that the code was producing incorrect 
+results, and we did not expect it to. The "sharing" of work results across
+work groups at an intermediate stage by storing grandparent labels in 
+global memory was an optimization. Without the optimization, each thread
+in each workgroup will still eventually be able to calculate their minimum
+label through the computation performed in Part 1. It may just take
+additional iterations to do so.
+
+Therefore, the "locking" mechanisms effectively provided by the atomic_min()
+functions is not as critical here as it may be when computing a sum, or 
+otherwise counting, for example, using parallel threads. In those cases, it
+may be much more important to ensure threads do not overwrite each other. 
+In our algorithm, we believe the worst case is that each thread converges 
+to the minimum value for its pixel more slowly. 
+
+Exploring this theory further: suppose a first thread "in charge" of a given
+pixel determines that a lower value should be written to the label array, but
+when it attempts to do so, it gets overwritten by a higher value by a second
+thread. At first glance, this seems problematic. However, importantly,
+on the next pass the first thread will determine (again) that a lower value
+should be written to the label array (it is still the minimum of its 
+neighbors) and will try again. Now, the other thread will only intervene if
+it is writing a lower value than it did before -- it cannot keep trying to
+overwrite with the same value. That is, note that threads can only execute 
+the section with the atomic_min() functions IF there is a change in label.
+Otherwise, they must allow other threads to continue with their updates.
+
+Therefore, it does not appear there will be a situation where a label will
+repeatedly overwrite values with the same or higher number; so eventually, 
+as each thread executes the code from Part I, all labels will converge to
+minimums.
+
+As far as performance is concerned, it does seem that there is a slight
+performance penalty by using atomic_min based on the above results, but not
+too much. (Given that the performance savings do not seem to be significant,
+it might be safer to use atomic_min, just in case we are wrong in our
+assumptions about correctness). 
