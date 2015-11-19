@@ -3,13 +3,12 @@
 float
 FETCH(__global __read_only float *in_values,
       int img_w, int img_h,
-      int img_x, int img_y,
-      const int halo)
+      int img_x, int img_y)
 {
-    if (img_x < 0) img_x = img_x + halo;
-    if (img_x >= img_w) img_x = img_w - halo;
-    if (img_y < 0) img_y = img_y + halo;
-    if (img_y >= img_h) img_y = img_h - halo;
+    if (img_x < 0) img_x = 0;
+    if (img_x >= img_w) img_x = img_w - 1;
+    if (img_y < 0) img_y = 0;
+    if (img_y >= img_h) img_y = img_h - 1;
     
     return in_values[img_y * img_w + img_x];
 }
@@ -61,8 +60,7 @@ median_3x3(__global __read_only float *in_values,
             buffer[row * buf_w + idx_1D] =
             FETCH(in_values,
                   w, h,
-                  buf_corner_x + idx_1D, buf_corner_y + row,
-                  halo);
+                  buf_corner_x + idx_1D, buf_corner_y + row);
         }
     }
     
