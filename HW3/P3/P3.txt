@@ -1,0 +1,13 @@
+The devices detected on platform AMD Accelerated Parallel Processing are:
+---------------------------
+Intel(R) Core(TM) i5-3337U CPU @ 1.80GHz [Type: CPU ]
+Maximum clock Frequency: 1795 MHz
+Maximum allocable memory size: 1049 MB
+Maximum work group size 1024
+---------------------------
+#0: Intel(R) Core(TM) i5-3337U CPU @ 1.80GHz on AMD Accelerated Parallel Processing
+
+Best configuration and time:
+
+Configuration ('blocked', 256, 4): 0.008350077 seconds
+
