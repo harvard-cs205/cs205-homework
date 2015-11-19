@@ -87,11 +87,12 @@ propagate_labels(__global int *labels,
 	for (uint j = 0; j < get_local_size(1); j++) {
 	  // create appropriate buffered index using iterator variables
 	  uint curr_idx = (j + halo) * buf_w + (i + halo);
+	  uint curr_label = buffer[curr_idx];
 	  // make sure curr_idx is not outside the range
-	  if (buffer[curr_idx] != w * h) {
+	  if (curr_label != w * h) {
 	    // read the global value if new
-	    if (buffer[curr_idx] != last_label) {
-	      buffer[curr_idx] = labels[buffer[curr_idx]];
+	    if (curr_label != last_label) {
+	      buffer[curr_idx] = labels[curr_label];
 	      last_label = buffer[curr_idx];
 	    }
 	    // else do not read the same global value
