@@ -27,6 +27,16 @@ get_clamped_value(__global __read_only int *labels,
     return labels[y * w + x];
 }
 
+int
+minimum(int i1, int i2, int i3, int i4, int i5)
+{
+    i1 = (i1 < i2) ? i1 : i2;
+    i1 = (i1 < i3) ? i1 : i3;
+    i1 = (i1 < i4) ? i1 : i4;
+    i1 = (i1 < i5) ? i1 : i5;
+    return i1;
+}
+
 __kernel void
 propagate_labels(__global __read_write int *labels,
                  __global __write_only int *changed_flag,
@@ -60,6 +70,9 @@ propagate_labels(__global __read_write int *labels,
     int old_label;
     // Will store the output value
     int new_label;
+
+    // Backgound value
+    int BACKGROUND = w*h;
     
     // Load the relevant labels to a local buffer with a halo 
     if (idx_1D < buf_w) {
@@ -79,7 +92,40 @@ propagate_labels(__global __read_write int *labels,
     // the pixel for this thread
     old_label = buffer[buf_y * buf_w + buf_x];
 
-    // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
+    /*    
+    //  part 2
+    if (old_label<BACKGROUND){
+        buffer[buf_y * buf_w + buf_x] = labels[old_label];
+    }
+    */
+    
+
+    // part 4
+    if (idx_1D==0){
+        int last_fetch = BACKGROUND;
+        int last_idx = BACKGROUND;
+
+        for (int row = halo; row < buf_h-halo; ++row){
+            for (int col = halo; col < buf_w-halo; ++col){
+                int cur = buffer[row * buf_w + col];
+                if (cur<BACKGROUND){
+                    
+                    // check whether it is the same as last fetch
+                    if (cur == last_idx){
+                        buffer[row * buf_w + col] = last_fetch;
+                    }
+                    else {
+                        last_idx = row * buf_w + col;
+                        last_fetch = labels[cur];
+                        buffer[row * buf_w + col] = last_fetch;
+                    }
+                }
+                
+            }
+        }
+    }
+
+    barrier(CLK_LOCAL_MEM_FENCE);
     
     // stay in bounds
     if ((x < w) && (y < h)) {
@@ -87,13 +133,21 @@ propagate_labels(__global __read_write int *labels,
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
         new_label = old_label;
+        if (new_label<BACKGROUND)
+            new_label = minimum(buffer[ buf_x + buf_w*buf_y ],     buffer[ buf_x+1 + buf_w*buf_y ],
+                                buffer[ buf_x + buf_w*(buf_y+1) ], buffer[ buf_x-1 + buf_w*buf_y ],
+                                buffer[ buf_x + buf_w*(buf_y-1) ]);
 
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
+            atomic_min(labels+old_label, new_label);
+            //labels[old_label] = min(labels[old_label], new_label);
+
             // indicate there was a change this iteration.
             // multiple threads might write this.
             *(changed_flag) += 1;
             labels[y * w + x] = new_label;
+            
         }
     }
 }
