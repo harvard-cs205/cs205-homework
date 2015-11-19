@@ -1,0 +1,3 @@
+### Best Configuration
+
+configuration ('coalesced', 64, 64): 0.00292928 seconds

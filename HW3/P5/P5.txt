@@ -1,0 +1,79 @@
+## Part 1
+
+maze1.png
+
+Finished after 915 iterations, 203.51408 ms total, 0.222419759563 ms per iteration
+Found 2 regions
+
+maze2.png
+
+Finished after 532 iterations, 116.47992 ms total, 0.218947218045 ms per iteration
+Found 35 regions
+
+
+## Part 2
+
+maze1.png
+
+Finished after 529 iterations, 113.34872 ms total, 0.21426979206 ms per iteration
+Found 2 regions
+
+maze2.png
+
+Finished after 273 iterations, 58.86304 ms total, 0.215615531136 ms per iteration
+Found 35 regions
+
+
+## Part 3
+
+
+maze1.png
+
+Finished after 9 iterations, 2.9132 ms total, 0.323688888889 ms per iteration
+Found 2 regions
+
+maze2.png
+
+Finished after 9 iterations, 2.71016 ms total, 0.301128888889 ms per iteration
+Found 35 regions
+
+
+## Part 4
+
+
+maze1.png
+
+Finished after 10 iterations, 7.53616 ms total, 0.753616 ms per iteration
+Found 2 regions
+
+maze2.png
+
+Finished after 9 iterations, 6.80408 ms total, 0.756008888889 ms per iteration
+Found 35 regions
+
+
+## Part 5
+
+Using min() instead of atomic_min() lead to the same result. It may nevertheless take more iterations (not necessarily more time because the atomic_min() takes more time than the min(), so less time per iteration).
+We would see more iteration because what may happen is the following:
+a thread is about to change the value of a pixel to the min value of its neighbors but in the meantime another thread already changed this value to a lower one (for example through a merge between old and new parent). But the new value added by the current thread could be higher than the one it has just been assigned to. As a result, the label increase but this is only an issue for this iteration because at the next one things will be back in order. That’s why the global result is still the same, only the number of iterations may change.
+
+This has been confirmed through a test, with effect only with maze2
+
+maze1.png
+
+without atomic: 
+	Finished after 10 iterations, 7.73424 ms total, 0.773424 ms per iteration
+
+with atomic:
+	Finished after 10 iterations, 7.78032 ms total, 0.778032 ms per iteration
+
+
+maze2.png
+
+without atomic: 
+	Finished after 10 iterations, 7.6392 ms total, 0.76392 ms per iteration
+
+with atomic:
+	Finished after 9 iterations, 7.03144 ms total, 0.781271111111 ms per iteration
+

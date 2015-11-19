@@ -3,6 +3,7 @@ import pyopencl as cl
 import numpy as np
 import pylab
 import os.path
+import time
 
 def round_up(global_size, group_size):
     r = global_size % group_size
@@ -77,6 +78,7 @@ if __name__ == '__main__':
     cl.enqueue_copy(queue, gpu_image_a, host_image, is_blocking=False)
 
     num_iters = 10
+    start = time.time()
     for iter in range(num_iters):
         program.median_3x3(queue, global_size, local_size,
                            gpu_image_a, gpu_image_b, local_memory,
@@ -87,5 +89,6 @@ if __name__ == '__main__':
         gpu_image_a, gpu_image_b = gpu_image_b, gpu_image_a
 
     cl.enqueue_copy(queue, host_image_filtered, gpu_image_a, is_blocking=True)
-
+    interval = time.time() - start
     assert np.allclose(host_image_filtered, numpy_median(host_image, num_iters))
+    print('Computation time is {}s'.format(interval))
