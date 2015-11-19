@@ -51,9 +51,8 @@ Found 35 regions
 
 Part 5: no atomic operations
 =========================================
-Maze 1:
+Explanation of questions:
 
-Maze 2:
 
 
 

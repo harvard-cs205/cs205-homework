@@ -106,6 +106,7 @@ propagate_labels(__global __read_write int *labels,
     }
     
     barrier(CLK_LOCAL_MEM_FENCE);
+    
 
     // stay in bounds
     if ((x < w) && (y < h)) {
@@ -125,7 +126,6 @@ propagate_labels(__global __read_write int *labels,
 
             new_label=min(minNeighbors,new_label);
         }
-        
         if (new_label != old_label) {
             atomic_min(&labels[old_label],new_label);
             // CODE FOR PART 3 HERE
