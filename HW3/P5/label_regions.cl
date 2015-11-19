@@ -78,7 +78,7 @@ propagate_labels(__global __read_write int *labels,
     // Fetch the value from the buffer the corresponds to
     // the pixel for this thread
     old_label = buffer[buf_y * buf_w + buf_x];
-
+    new_label = old_label;
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
     
     // stay in bounds
@@ -86,8 +86,14 @@ propagate_labels(__global __read_write int *labels,
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
-        new_label = old_label;
 
+        // w*h is the max label, used for background pixels.
+        if (new_label != w * h) {
+            new_label = min(buffer[(buf_y + 1) * buf_w + buf_x], new_label);
+            new_label = min(buffer[(buf_y - 1) * buf_w + buf_x], new_label);
+            new_label = min(buffer[buf_y * buf_w + (buf_x - 1)], new_label);
+            new_label = min(buffer[buf_y * buf_w + (buf_x + 1)], new_label);
+        }
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
             // indicate there was a change this iteration.
