@@ -1,0 +1,47 @@
+
+Part 1: implement updates from neighbors
+maze1:
+Finished after 909 iterations, 511.26832 ms total, 0.56245139714 ms per iteration
+Found 2 regions
+
+maze1:
+Finished after 531 iterations, 274.79448 ms total, 0.517503728814 ms per iteration
+Found 35 regions
+
+
+Part 2: fetch grandparents
+maze1:
+Finished after 529 iterations, 273.25064 ms total, 0.516541852552 ms per iteration
+Found 2 regions
+
+maze2:
+Finished after 273 iterations, 141.9776 ms total, 0.520064468864 ms per iteration
+Found 35 regions
+
+
+Part 3: merge parent regions
+maze1:
+Finished after 10 iterations, 10.10208 ms total, 1.010208 ms per iteration
+Found 2 regions
+
+maze2:
+Finished after 9 iterations, 8.24248 ms total, 0.915831111111 ms per iteration
+Found 35 regions
+
+
+Part 4: efficient grandparents
+maze1:
+Finished after 17 iterations, 25.53992 ms total, 1.50234823529 ms per iteration
+Found 2 regions
+
+maze2:
+Finished after 15 iterations, 22.7004 ms total, 1.51336 ms per iteration
+Found 35 regions
+
+The results above show that using single thread in part 4, the execution time is much slower and number of iterations increase compared to part 3. This is possibly because the global memory access takes much time, especially when there are not many repeated labels. Besides, since we use a single thread in workgroup, the memory accesses have to be done serially. These results might be different if we use multiple threads to access the same piece of memory or we have more repeated labels, the speed will be faster.
+
+Part 5: no atomic operations 
+Unlike atomic_min(), min() could cause overwriting of labels. If we have two threads modifying the same label value, and the second new label is bigger than the first new label where they are both smaller than the old label, the new label value would be wrongly updated, and the label value increases. 
+However, the final result could still be correct. Because any resulting values from the min() operation will still be less than the old label in order to be updated from old value to new one. The number of iterations might be higher than that with atomic_min(), sine min() might output the wrong value that is higher than the minimum during an iteration. The algorithm time might not change much. 
+
+
