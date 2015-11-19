@@ -63,6 +63,7 @@ propagate_labels(__global __read_write int *labels,
     
     int upNeighbor,rightNeighbor,downNeighbor,leftNeighbor,minNeighbors;
 
+    int gpartent
     // Load the relevant labels to a local buffer with a halo 
     if (idx_1D < buf_w) {
         for (int row = 0; row < buf_h; row++) {
@@ -82,18 +83,36 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
+    // This makes sure that we have only the first CPU running 
+    if ((lx==0) && (ly==0)){
+
+        if(old_label<w*h){
+
+            gpartent = labels[old_label];
+        }
+
+        for( xx =halo;row<buf_h-halo; xx++){
+
+            
+
+
+        }
+
+    }
     
+    barrier(CLK_LOCAL_MEM_FENCE);
+    if ((ly == 0) && (ly==0)){
+
+
+
+    }
+
     // stay in bounds
     if ((x < w) && (y < h)) {
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
         new_label = old_label;
-
-        if (old_label < w * h)
-        {
-            buffer[buf_y * buf_w + buf_x] = labels[old_label];
-        }
 
         if (old_label<w*h){
 
