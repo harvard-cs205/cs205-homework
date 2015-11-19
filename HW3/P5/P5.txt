@@ -25,7 +25,7 @@ Finished after 10 iterations, 2.8588 ms total, 0.28588 ms per iteration
 Found 2 regions
 
 maze2:
-Finished after 10 iterations, 2.63024 ms total, 0.263024 ms per iteration
+Finished after 9 iterations, 2.35744 ms total, 0.261937777778 ms per iteration
 Found 35 regions
 
 ***Part 4***
@@ -36,13 +36,18 @@ discuss your empirical results as well as speculate under what conditions those 
 be different.
 
 maze1:
+Finished after 10 iterations, 5.46928 ms total, 0.546928 ms per iteration
+Found 2 regions
 
 maze2:
-
+Finished after 9 iterations, 5.10248 ms total, 0.566942222222 ms per iteration
+Found 35 regions
 
 ***Part 5***
 
-maze1:
+Explain what would happen if instead of using the atomic min() operation, one would use
+the min() function. Your explanation should consider whether the final result would still be
+correct, what might be the impact on the performance of the algorithm (time and iterations),
+could a value in labels ever increase, and could it increase between iterations?
 
-maze2:
 
