@@ -1,0 +1,6 @@
+run 1- configuration ('coalesced', 128, 128): 0.00248136 seconds
+run 2- configuration ('coalesced', 128, 128): 0.00235208 seconds
+run 3 - configuration ('coalesced', 128, 128): 0.0023128 seconds
+
+Coalesced read for 128 workers and 128 workgroups is the most efficient way for
+implemeting sum of vectors in this problem.

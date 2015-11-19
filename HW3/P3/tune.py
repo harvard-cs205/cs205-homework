@@ -33,12 +33,13 @@ if __name__ == "__main__":
 
             sum_gpu = sum(host_partial)
             sum_host = sum(host_x)
-            seconds = (event.profile.end - event.profile.start) / 1e9
+            seconds = (event.profile.end - event.profile.start) / 1e9 
             assert abs((sum_gpu - sum_host) / max(sum_gpu, sum_host)) < 1e-4
             times['coalesced', num_workgroups, num_workers] = seconds
             print("coalesced reads, workgroups: {}, num_workers: {}, {} seconds".
                   format(num_workgroups, num_workers, seconds))
-
+    
+    
     for num_workgroups in 2 ** np.arange(3, 10):
         partial_sums = cl.Buffer(ctx, cl.mem_flags.READ_WRITE, 4 * num_workgroups)
         host_partial = np.empty(num_workgroups).astype(np.float32)
@@ -54,7 +55,8 @@ if __name__ == "__main__":
             assert abs((sum_gpu - sum_host) / max(sum_gpu, sum_host)) < 1e-4
             times['blocked', num_workgroups, num_workers] = seconds
             print("blocked reads, workgroups: {}, num_workers: {}, {} seconds".
-                  format(num_workgroups, num_workers, seconds))
+                  format(num_workgroups, num_workers, seconds)) 
+
 
     best_time = min(times.values())
     best_configuration = [config for config in times if times[config] == best_time]
