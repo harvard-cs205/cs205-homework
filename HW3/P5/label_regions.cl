@@ -81,8 +81,25 @@ propagate_labels(__global __read_write int *labels,
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
 
+    // part 4
+    if (lx == 0 && ly == 0) {
+        int previous_element, previous_label;
+        for (int i = 0; i < buf_w * buf_h; i++){
+            if (buffer[i] < w * h){ // if current element in foreground
+                if (buffer[i] != previous_element) { // reset previous element and label
+                    previous_element = buffer[i];
+                    previous_label = labels[buffer[i]];
+                }
+                buffer[i] = previous_label;
+            }
+        }
+    }
+
+    barrier(CLK_LOCAL_MEM_FENCE);
+
     if (old_label < w * h){
 
+        // part 2
         // buffer[buf_x + buf_w * buf_y] = labels[old_label];
 
         // stay in bounds
@@ -107,10 +124,10 @@ propagate_labels(__global __read_write int *labels,
                 // indicate there was a change this iteration.
                 // multiple threads might write this.
 
-                // atomic_min(&labels[old_label], new_label);
+                atomic_min(&labels[old_label], new_label);
                 *(changed_flag) += 1;
                 labels[y * w + x] = new_label;
-                // atomic_min(&labels[x + w * y], new_label);
+                atomic_min(&labels[x + w * y], new_label);
             }
         }
     }

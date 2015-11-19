@@ -1,0 +1,47 @@
+Part 1
+Maze 1
+Finished after 877 iterations, 512.73536 ms total, 0.584646932725 ms per iteration
+
+Maze 2
+Finished after 507 iterations, 309.379808 ms total, 0.610216583826 ms per iteration
+
+Part 2
+Maze 1
+Finished after 529 iterations, 331.005056 ms total, 0.625718442344 ms per iteration
+Finished after 273 iterations, 175.615936 ms total, 0.64328181685 ms per iteration
+
+Part 3
+Maze 1
+Finished after 11 iterations, 7.505056 ms total, 0.682277818182 ms per iteration
+
+Maze 2
+Finished after 10 iterations, 6.794432 ms total, 0.6794432 ms per iteration
+
+
+Part 4
+Maze 1
+Finished after 11 iterations, 31.206688 ms total, 2.83697163636 ms per iteration
+Maze 2
+Finished after 10 iterations, 28.488096 ms total, 2.8488096 ms per iteration
+
+
+Single thread performance:
+
+The more efficient grandparents didn't affect the number of iterations my implementation took to run, but increased the time each iteration took by a little more than 4x.
+
+The constant number of iterations makes sense because the labels that are being assigned are the same, only the implementation has been changed. Instead of reading each label from the global buffer in parallel, we had one thread do all of the reads and cache the most recent value to help avoid some of the redundant reads. There are two possible reasons that likely combined to make this slower than the version we had in part 2. 
+First, there may have been too few redundant labels to make the optimization worth it. Ideally, each buffer would have several elements with the same label and the local memory caching would save most of the global memory reads. However, in the worst case, none of the elements in a buffer would have the same label as the preceeding cell and we would have to conduct the same amount of global memory reads, now in serial. The images we used may have had too few label redunancy to make the optimization worth it. 
+Second, the global memory reads may not have added too much latency. In this case, the loss of parallelization from serially going through the buffer may have outweighed the benefits of reducing global memory reads, even if lots of redundant reads were prevented. The ratio of global memory access time to local memory access time may not have been high enough on my hardware to make the optimization worth it. 
+
+Part 5
+
+Unlike atomic_min, min does not gurantee serialization of memory access. This means it is possible for the label to be overwritten in a race condition. As an example, let the value of labels[old_label] be 3. Thread A finds a new label of 1 and takes min(3, 1). However, a second thread (B) could read the value of labels[old_label] after thread A does and take min(3, 2). Because the operations aren't atomic, thread B could end up writing after thread A does, giving a final value of 2 instead of 1. 
+
+Note that this will not lead to an increase between iterations because there is still no way for the labels to larger over iterations - the result of each min call is still upper-bounded at the old value (they just might not decrease as much as they would have using atomic operations). 
+In terms of performance, the serialization of atomic_min could slow things down but the race conditions in the non-atomic min could slow things down as well. Since both of these changes seem relatively minor in the context of our program and they act in different directions I imagine performance would not substantially change.
+
+
+
+
+
+
