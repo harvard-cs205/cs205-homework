@@ -76,5 +76,5 @@ if __name__ == '__main__':
 
     seconds = (event.profile.end - event.profile.start) / 1e9
     print("{} Million Complex FMAs in {} seconds, {} million Complex FMAs / second".format(out_counts.sum() / 1e6, seconds, (out_counts.sum() / seconds) / 1e6))
-    pylab.imshow(np.log(out_counts))
-    pylab.show()
+    #pylab.imshow(np.log(out_counts))
+    #pylab.show()

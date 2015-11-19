@@ -1,0 +1,53 @@
+Part 1:
+maze1:
+Finished after 882 iterations, 207.17448 ms total, 0.23489170068 ms per iteration
+Found 2 regions
+maze2:
+Finished after 516 iterations, 120.66816 ms total, 0.233853023256 ms per iteration
+Found 35 regions
+
+
+Part 2:
+maze1:
+Finished after 529 iterations, 122.87896 ms total, 0.23228536862 ms per iteration
+Found 2 regions
+
+maze2:
+Finished after 273 iterations, 63.58104 ms total, 0.232897582418 ms per iteration
+Found 35 regions
+
+
+Part 3:
+maze1:
+Finished after 10 iterations, 2.44472 ms total, 0.244472 ms per iteration
+Found 2 regions
+
+maze2:
+Finished after 9 iterations, 2.18712 ms total, 0.243013333333 ms per iteration
+Found 35 regions
+
+
+Part 4:
+maze1:
+Finished after 10 iterations, 4.8256 ms total, 0.48256 ms per iteration
+Found 2 regions
+
+maze2:
+Finished after 9 iterations, 4.38296 ms total, 0.486995555556 ms per iteration
+Found 35 regions
+
+
+Part 5:
+maze1:
+Finished after 11 iterations, 5.278 ms total, 0.479818181818 ms per iteration
+Found 2 regions
+
+maze2:
+Finished after 10 iterations, 4.73736 ms total, 0.473736 ms per iteration
+Found 35 regions
+
+Explanation for part 4:
+I think a single thread is not a good choice in my computer. It takes longer time than part 3. I think it is because in the beginning, most of the label are different. They still need to do a lot of global memory reads. Therefore, this is not a reasonable choice. I think if labels are similar when they are close, this method will be faster. 
+
+Explanation for part 5:
+From the results above, we can see that if we don't use atomic operation, we may need more iterations. I think it is because if we use min() function, it is possible that the value in labels[old_label] changes by other threads after we call min() function. And it will slow down the process if this situation happens. However, if we use atomic operation, we can calculate the minimum and change the value in the same time. Therefore, we should use atomic operation.  
