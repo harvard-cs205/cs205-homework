@@ -83,7 +83,7 @@ propagate_labels(__global __read_write int *labels,
     
     // Part 2:
     // if ((x < w) && (y < h) && old_label < w*h) {
-    //     buffer[buf_y * buf_w + buf_x] = labels[buffer[buf_y * buf_w + buf_x]];
+    //      buffer[buf_y * buf_w + buf_x] = labels[buffer[buf_y * buf_w + buf_x]];
     // }
     // barrier(CLK_LOCAL_MEM_FENCE);
 
@@ -150,7 +150,7 @@ propagate_labels(__global __read_write int *labels,
             // multiple threads might write this.
             *(changed_flag) += 1;
             // Rewrite the local memory at labels[old_label] with the minimum of the two before updating
-            atomic_min(&labels[old_label], new_label);
+            atomic_min(&labels[old_label], labels[new_label]);
             labels[y * w + x] = labels[old_label];
             //labels[y * w + x] = new_label;
         }
