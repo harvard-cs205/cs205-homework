@@ -93,12 +93,15 @@ propagate_labels(__global __read_write int *labels,
     // Assign the thread 
 	// local_id(0)=get_local_size(0)-1,local_id(1)=get_local_size(1)-1
 	// to merge the pixel grandparents
-    if (lx == (get_local_size(0)-1) && ly == (get_local_size(1)-1)) {
-        for (int i = halo; i < (buf_h - halo); i++) {
-            for (int j=halo; j < (buf_w - halo); j++) {
-                thread_current_label = buffer[i * buf_w + j];
-                if (thread_current_label < w*h) {
-                    if ((i != 0 || j != 0) && thread_current_label == thread_last_label) {
+    if (lx == (get_local_size(0)-1) && ly == (get_local_size(1)-1)) {   // The assigned thread 
+		for (int i = halo; i < (buf_h - halo); i++) {                   // Processing buffer core pixels
+            for (int j=halo; j < (buf_w - halo); j++) {                 // Processing buffer core pixels
+                thread_current_label = buffer[i * buf_w + j];           // save the current label values
+                if (thread_current_label < w*h) {                       // check front pixels
+				    // check if current label vaule is equal to last label values
+					// no, get new label values from global memory labels into buffer
+					// then keep new lable values and current label values into variable for next loop
+                    if ( thread_current_label == thread_last_label) {
                         buffer[i * buf_w + j] = thread_last_grandparent;
                     } else {
                         buffer[i * buf_w + j] = labels[thread_current_label];
@@ -110,7 +113,7 @@ propagate_labels(__global __read_write int *labels,
         }
     }	
     barrier(CLK_LOCAL_MEM_FENCE);	
-    
+    // This is end of part 4.
     // stay in bounds
     if (((x < w) && (y < h)) && (old_label < w*h)) {
         // CODE FOR PART 1 HERE
@@ -130,14 +133,13 @@ propagate_labels(__global __read_write int *labels,
             // CODE FOR PART 3 HERE
             // indicate there was a change this iteration.
             // multiple threads might write this.
+			labels[ y * w + x ] = new_label;
             *(changed_flag) += 1;
-            /* This is part 1.
-            labels[y * w + x] = new_label;
-            */
             // This is part 3.
-			atomic_min( &labels[ y * w + x ], new_label);
+			atomic_min( &labels[ old_label ], new_label); //update parent pixel label value
+            // This is end of part 3.
             /* This is part 5.
-            labels[y * w + x] = min(labels[y * w + x], new_label);
+            labels[old_label] = min(labels[old_label], new_label);
             */
         }
     } 

@@ -2,7 +2,7 @@
 
 /****** part 1 ******/
 
-Feifeis-MacBook-Pro:P5-1 feifeipeng$ python label_regions.py
+Feifeis-MacBook-Pro:P5 feifeipeng$ python label_regions.py
 The platforms detected are:
 ---------------------------
 Apple Apple version: OpenCL 1.2 (May 10 2015 19:38:45)
@@ -20,28 +20,30 @@ Maximum work group size 512
 ---------------------------
 This context is associated with  2 devices
 The queue is using the device: Iris Pro
+/Users/feifeipeng/anaconda/lib/python2.7/site-packages/pyopencl/__init__.py:206: CompilerWarning: Non-empty compiler output encountered. Set the environment variable PYOPENCL_COMPILER_OUTPUT=1 to see more.
+  "to see more.", CompilerWarning)
 (256, 256)
 
-iter 885
-Finished after 885 iterations, 210.80872 ms total, 0.238201943503 ms per iteration
+iter 884
+Finished after 884 iterations, 217.92728 ms total, 0.246524072398 ms per iteration
 Found 2 regions
 
 /****** part 2 ******/
 
-iter 528
-Finished after 528 iterations, 124.80632 ms total, 0.236375606061 ms per iteration
+iter 529
+Finished after 529 iterations, 124.32176 ms total, 0.235012778828 ms per iteration
 Found 2 regions
 
 /****** part 3 ******/
 
-iter 528
-Finished after 528 iterations, 124.59632 ms total, 0.235977878788 ms per iteration
+iter 10
+Finished after 10 iterations, 2.4848 ms total, 0.24848 ms per iteration
 Found 2 regions
 
 /****** part 4 ******/
 
-iter 528
-Finished after 528 iterations, 245.6968 ms total, 0.465334848485 ms per iteration
+iter 10
+Finished after 10 iterations, 4.78832 ms total, 0.478832 ms per iteration
 Found 2 regions
 
 
@@ -52,7 +54,7 @@ Found 2 regions
 
 /****** part 1 ******/
 
-Feifeis-MacBook-Pro:P5-1 feifeipeng$ python label_regions.py
+Feifeis-MacBook-Pro:P5 feifeipeng$ python label_regions.py
 The platforms detected are:
 ---------------------------
 Apple Apple version: OpenCL 1.2 (May 10 2015 19:38:45)
@@ -70,26 +72,51 @@ Maximum work group size 512
 ---------------------------
 This context is associated with  2 devices
 The queue is using the device: Iris Pro
+/Users/feifeipeng/anaconda/lib/python2.7/site-packages/pyopencl/__init__.py:206: CompilerWarning: Non-empty compiler output encountered. Set the environment variable PYOPENCL_COMPILER_OUTPUT=1 to see more.
+  "to see more.", CompilerWarning)
 (256, 256)
 
-iter 512
-Finished after 512 iterations, 121.8648 ms total, 0.2380171875 ms per iteration
+iter 515
+Finished after 515 iterations, 122.36224 ms total, 0.237596582524 ms per iteration
 Found 35 regions
 
 /****** part 2 ******/
 
 iter 273
-Finished after 273 iterations, 66.74344 ms total, 0.244481465201 ms per iteration
+Finished after 273 iterations, 66.98664 ms total, 0.245372307692 ms per iteration
 Found 35 regions
 
 /****** part 3 ******/
 
-iter 273
-Finished after 273 iterations, 64.9268 ms total, 0.237827106227 ms per iteration
+iter 9
+Finished after 9 iterations, 2.2144 ms total, 0.246044444444 ms per iteration
 Found 35 regions
 
 /****** part 4 ******/
 
-iter 273
-Finished after 273 iterations, 126.68472 ms total, 0.464046593407 ms per iteration
+iter 9
+Finished after 9 iterations, 4.20824 ms total, 0.467582222222 ms per iteration
 Found 35 regions
+
+
+
+
+
+	My explanation as follows: 
+	
+	    According to my empirical results, part 4 can hardly provide the speedup over part3.
+		On the one hand, the label_regions performance should be inproved with the increase of the threads.
+		On the other hand, the serialized readings to the GPU global memory in multi-thread condition
+		should also increase with the increase of threads number. So the final performance is up to the tradeoff between the number of threads and the number of GPU global memory readings. The tradeoff result should be decided by the specific problem. 
+		So I speculate that using a single thread is a reasonable choice when the final label_regions number is small. 
+		Just like in the maze1.npy, there are two regions. In this case, the merging thread can find more same label pixels in one iteration. In many region situation, using multi threads may be a good choice.
+
+
+
+
+
+Part 5: no atomic operations
+
+	If one would use the min() function instead of the atomic_min() operation, the algorithm performance may be decreased. Because atomic() operation could guarantee serialization of memory access and getting minimum value between the two label values. But min() function could not guarantee this. 
+	The algorithm performance would be improved if it could find the minimum label values in some region as fast as it can. This is because it is very likely to cost the thread more time to merge grandparents pixels in the local memory (buffer).
+	A value in labels could increase within an iteration, but a value in labels could not increase between iterations, because iterations are run sequentially.		
