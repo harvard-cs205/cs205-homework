@@ -83,7 +83,7 @@ propagate_labels(__global __read_write int *labels,
 
     if (old_label < w * h){
 
-        buffer[buf_x + buf_w * buf_y] = labels[old_label];
+        // buffer[buf_x + buf_w * buf_y] = labels[old_label];
 
         // stay in bounds
         if ((x < w) && (y < h)) {
@@ -107,10 +107,10 @@ propagate_labels(__global __read_write int *labels,
                 // indicate there was a change this iteration.
                 // multiple threads might write this.
 
-                atomic_min(&labels[old_label], new_label);
+                // atomic_min(&labels[old_label], new_label);
                 *(changed_flag) += 1;
                 labels[y * w + x] = new_label;
-                atomic_min(&labels[x + w * y], new_label);
+                // atomic_min(&labels[x + w * y], new_label);
             }
         }
     }
