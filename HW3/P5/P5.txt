@@ -1,0 +1,41 @@
+Part 1:
+
+Finished after 915 iterations, 24.255104 ms total, 0.0265083103825 ms per iteration
+Found 2 regions
+
+===================
+
+Part 2:
+
+Finished after 529 iterations, 14.401664 ms total, 0.0272243175803 ms per iteration
+Found 2 regions
+
+======================
+
+Part 3:
+
+Finished after 11 iterations, 0.345376 ms total, 0.0313978181818 ms per iteration
+Found 2 regions
+
+=======================
+
+Part 4:
+
+Finished after 11 iterations, 1.288832 ms total, 0.117166545455 ms per iteration
+Found 2 regions
+
+In my case, this trick ends up being slower. This is likely hardware-dependent and related to the amount of on-chip memory. It is also possible that my GPU has some sort of optimization built in to prevent serialization of the lookups, but I do not know enough about GPU-memory interaction optimization (or my specific GPU) to say - I am just going off of the fact that the question says "on some GPUs..." Last, the speed will also certainly be related to the data, in that data with significant amounts of repeated lookups will see a more notable speedup than data without any repeats. In fact, data with no-repeats would likely see a slowdown, as the lookups will be entirely serialized (versus potentially only partially serialized as in the multithreaded case) but we will not save any time by storing the last lookup.
+
+In general, I would expect this trick to work out faster. The logic behind this is that GPUs are bandwidth-bound, not computation bound. Although forcing one thread to handle all these lookups reduces the computation time (in theory) by 16 (or, more generally, the size of the workgroup) plus some overhead for the storing/checks to see if the current label is equal to the previous label, this *should* be negligible. The significant portion of the calculation here is the memory lookup, as memory is far from the GPU and is significantly slower than the computation the GPU can handle. Thus, any reduction of lookups (like by storing the previous value we looked up) will incur a significant performance gain. The serialization brought about by using one thread is irrelevant, as lookups to global memory will likely be serialized anyways.
+
+========================
+
+Part 5:
+
+The reason to use atomic_min, despite their inefficiency and guaranteed serialization, is that they ensure that the reading and writing to a given memory location occur simultaneously. Without this guarantee, some pretty terrible things can happen.
+
+If we were to use min alone, the reading to memory and writing to memory are NOT guaranteed to occur simultaneously. What does this mean? Say we have to children with the same parent, and we are going to use min to merge old parents with new parents. Denote the parent by p and the children by c1 and c2. Hence, label[c1] = p and label[c2] = p before the current iteration. Now say the current iteration runs, and c1 and c2 get two new parents, p1, and p2, but assume that p1 < p2. Both children want to update themselves, label[c1] = p1, label[c2] = p2, as well as their parents: label[p] = p1, label[p] = p2. This is where the trouble comes in. When we use atomic min, we ensure that the reads and write occur simultaneously, and these two lookup/write pairs will be serialized, hence, at the end of both atomic_min's, label[p]=p1, as it should be. If we use min, the following situation may happen: c1 looks up its parent first and finds label[p] = a, with a > p1. Now c2 looks up its parent, before c1 has had a chance to write, and finds label[p] = a with a > p2. Because p1 < a, min overwrites label[p] and reassigns label[p] = p1. Now c2's min operation writes, because it looked up label[p] previously (and hence does not see the update of label[p] = p1), and so overwrites: label[p] = p2 in the end. But p1 < p2, so this is incorrect! Thus using min does not guarantee correctness. Depending on the image, an error such as this may or may not be rectified as the updates continue.
+
+Because we are using min, I see no possible way that a label could ever increase, although it can (as seen above) be assigned an incorrect value which is greater than one that it should have. Unless, of course, you interpret the above situation as increasing, because it does have a lower value for a short period of time. I suppose the best way to put it is that a label can never increase value from iteration to iteration, but within an iteration it can increase (exactly as described above).
+
+It is difficult to say whether the time will increase or decrease in switching from atomic_min to min. On the one hand, the lack of serialization from the atomic_min operations will certainly increase the amount of time spent merging old parents with new parents. However, it is difficult to predict what effect an incorrect labeling as described two paragraphs ago could have on the overall calculation. For some images, this labeling scheme might lead to getting the wrong answer faster - but who cares? On other images, it might lead to getting the same answer (if the incorrect updates as described two paragraphs ago later get overwritten) slower or at about the same speed. It could be slower as the need to fix the incorrect might lead to extra iterations, but it could be faster due to the reduction in serialization. On other images, it might even lead to getting the same answer slower. All in all, it's best to use atomic_min operations and take the serialization hit, because what good is an algorithm that might be incorrect (unless we know the probability with which it is incorrect, so that we can amplify the success probability by running it several times and taking the most probable answer... but that's not the point of this question)?

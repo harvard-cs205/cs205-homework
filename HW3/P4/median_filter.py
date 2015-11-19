@@ -1,7 +1,6 @@
 from __future__ import division
 import pyopencl as cl
 import numpy as np
-import imread
 import pylab
 
 def round_up(global_size, group_size):
