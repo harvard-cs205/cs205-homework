@@ -81,7 +81,7 @@ propagate_labels(__global __read_write int *labels,
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
 
-    /*// part II:
+    // part II:
     // update each label by its parents (only for non-halo vals)
     if(idx_1D > halo - 1 && idx_1D < buf_w - halo) {
         for (int row = halo; row < buf_h - halo; row++) {
@@ -91,28 +91,7 @@ propagate_labels(__global __read_write int *labels,
             if(buffer[offset] < w * h)
                 buffer[offset] = labels[buffer[offset]];  
         }
-    }*/
-
-    // part IV: --> single thread version!
-    // Assumption: we do not update halo values
-    int previous_val = -1;
-    int previous_idx = -1;
-    for(int row = halo; row < buf_h - halo; row++)
-        for(int col = halo; col < buf_w - halo; col++) {
-            int offset = row * buf_w + col;
-
-            // only foreground pixels
-            if(buffer[offset] < w * h) 
-                // fetch only global val if index is different from last fetch
-                if(previous_idx != buffer[offset]) {
-                    previous_idx = buffer[offset];
-                    buffer[offset] = labels[buffer[offset]];
-                    previous_val = buffer[offset];
-                }
-                else {
-                    buffer[offset] = previous_val;
-                }
-        }
+    }
 
     barrier(CLK_LOCAL_MEM_FENCE);
     
@@ -136,9 +115,6 @@ propagate_labels(__global __read_write int *labels,
             // indicate there was a change this iteration.
             // multiple threads might write this.
             *(changed_flag) += 1;
-            
-            // Part I-II:
-            //labels[y * w + x] = new_label;
 
             // Part III-IV:
             // merge parent regions
@@ -147,15 +123,6 @@ propagate_labels(__global __read_write int *labels,
 
             // do writeback also atomized
             atomic_min(&labels[y * w + x], new_label);
-
-
-            /*// Part V:
-            // version using non-atomic min
-            // merge parent regions
-            if(old_label < w * h) 
-                labels[old_label] = min(labels[old_label], new_label);
-            labels[y * w + x] = min(labels[y * w + x], new_label);
-            */
         }
     }
 }

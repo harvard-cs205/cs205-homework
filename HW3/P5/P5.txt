@@ -1,0 +1,57 @@
+Problem 5
+=========
+
+Using 25 iterations for each image and per part the averaged statistics are
+
+Maze1.py
+--------
+
+part,	iterations,	total time,			time per iteration
+1,		914.4,		216.45153280000002,	0.23671379890307503
+2,		529.0,		176.57335679999997,	0.33378706389413987
+3,		10.0,		3.7855776,			0.37855775999999997
+4,		8.0,		7.803177600000001,	0.9753972000000001
+5,		8.6,		8.361686399999998,	0.9723567111111112
+
+Maze2.py
+--------
+
+part,	iterations,	total time,			time per iteration
+1,		531.84,		123.18349759999997,	0.23161773419990656
+2,		272.44,		89.4358784,			0.32827711294393347
+3,		9.04,		3.297203199999999,	0.3647444977777778
+4,		7.68,		7.4394912,			0.9687838857142858
+5,		8.04,		7.778752000000001,	0.9676494095238094
+
+
+Note that, the iteration count is also averaged. This is due to the unpredicatble behaviour of the scheduler. I.e. the optimizations sometimes perform better in a run than in another one.
+
+Why is a single thread a good (or bad) decision?
+---
+If we had only few threads, we can achieve with a single thread a further optimization as suggested in part IV with the dynamic programming caching/ memoisation approach. However, this caching is not really parallelizable as the problem is how to remember what the previous fetch was. I.e. one could use locking, but this will slow down everything. Another possibility would be to do the grandparents' optimization only on small local patches s.t. multiple threads access disjoint regions. But this would give up optimization potential.
+
+Looking at the experimental data, we see that in general part IV needed the fewest average iterations. However, each iteration did cost at most. This is clearly due to the single threaded part. Looking at the total time, we see that optimization and iteration cost (due to single threaded part) traded off pretty well. But still, for both test cases the approach of part IV is around 2x slower than the one from part III.
+
+In conclusion, when using many, many threads as provided in a GPU environment, running any single threaded part does not make sense at all as it will block many threads. Single threaded tasks and tasks that need to fetch dependent history are better done on CPUs.
+
+
+Part V:
+-------
+In general, the results for the given algorithm are still correct (i.e. I did not see any difference in the number of identified regions nor was any assert violated). Looking at the statistics we see something very surprising. Though the time per iteration is lower (due to the non-atomicity of the min vs. atomic_min operation), the total time is larger when using non-atomic min. This is due to the increased iteration count necessary. What happened?
+
+When using non-atomic min the following behaviour could occur:
+
+Thread 1: read c=6
+Thread 2: read a=8
+Thread 2: read b=4
+Thread 2: compute min(a, b) and write back a = 4
+Thread 1: compute min(a, c) and write back a = 6
+
+What went wrong? If both threads did use atomic operations, the result of a would be a = 4. However due to the scheduler, the result is a. In some cases, it could even occur that a number actually increases (when a wrong write update is used). These effects cause in part V a higher necessary iteration count. As the time gain for atomic vs. non-atomic is very low merely, it cannot trade off the additional iterations that happen. Thus, part V is slower than part IV.
+
+Conclusion:
+-----------
+Above all, part III performs best. Why? As it does not incorporate any serial part and no 'over-optimization' that takes away parallel speed, the overall time is due to a good balance between time per iteration vs. needed iterations till convergence the lowest. Note that this does not generalize! I.e. for pictures that need a lot of iterations (i.e. asymetric region sizes), part IV should be preferred. For images with many similar-sized regions(i.e. not so many iterations), part III is preferrable.
+
+
+
