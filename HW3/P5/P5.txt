@@ -46,5 +46,6 @@ The outcome will be correct since all we are implementing is only an optimizatio
 The timing for min should be more or less be pretty similar to atomic_min. The
 number of iterations remains the same. This might be a less optimal way of doing
 it but randomess in the numbers, do not allow us to quantify that since all these
-operations are happening parallely.
+operations are happening parallely. Atomic_min is serialized and might be slower
+than min at the cost of inconsistentcy.
 
