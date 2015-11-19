@@ -16,16 +16,25 @@ if __name__ == '__main__':
 
     # Use a variety of wait times
     ratio = []
-    wait_time = []
+    wait_time = [pow(10, -k) for k in xrange(7)]
 
     for t in wait_time:
         # Compute jobs serially and in parallel
         # Use time.time() to compute the elapsed time for each
-        serialTime = 1
-        parallelTime = 1
+        serialTime = 0.
+        parallelTime = 0.
+
+        s_start = time.time()
+        for count in xrange(N):
+            burnTime(t)
+        serialTime = time.time() - s_start
+
+        p_start = time.time()
+        pool.map( burnTime(t), range(N) )
+        parallelTime = time.time() - p_start
 
         # Compute the ratio of these times
-        # ratio.append(serialTime/parallelTime)
+        ratio.append(serialTime/parallelTime)
 
     # Plot the results
     plt.plot(wait_time, ratio, '-ob')
