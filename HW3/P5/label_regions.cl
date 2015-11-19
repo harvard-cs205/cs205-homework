@@ -17,7 +17,7 @@ initialize_labels(__global __read_only int *image,
     }
 }
 
-int
+static int
 get_clamped_value(__global __read_only int *labels,
                   int w, int h,
                   int x, int y)
@@ -60,7 +60,8 @@ propagate_labels(__global __read_write int *labels,
     int old_label;
     // Will store the output value
     int new_label;
-    
+    int tmp_label;
+	
     // Load the relevant labels to a local buffer with a halo 
     if (idx_1D < buf_w) {
         for (int row = 0; row < buf_h; row++) {
@@ -80,20 +81,67 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
-    
+    /* This is part 2.
+	if (old_label < w*h) {
+        buffer[buf_y * buf_w + buf_x] = labels[old_label];
+    }
+    barrier(CLK_LOCAL_MEM_FENCE);	
+	*/
+	// This is part 4.
+
+    int thread_current_label, thread_last_label, thread_last_grandparent;
+    // Assign the thread 
+	// local_id(0)=get_local_size(0)-1,local_id(1)=get_local_size(1)-1
+	// to merge the pixel grandparents
+    if (lx == (get_local_size(0)-1) && ly == (get_local_size(1)-1)) {   // The assigned thread 
+		for (int i = halo; i < (buf_h - halo); i++) {                   // Processing buffer core pixels
+            for (int j=halo; j < (buf_w - halo); j++) {                 // Processing buffer core pixels
+                thread_current_label = buffer[i * buf_w + j];           // save the current label values
+                if (thread_current_label < w*h) {                       // check front pixels
+				    // check if current label vaule is equal to last label values
+					// no, get new label values from global memory labels into buffer
+					// then keep new lable values and current label values into variable for next loop
+                    if ( thread_current_label == thread_last_label) {
+                        buffer[i * buf_w + j] = thread_last_grandparent;
+                    } else {
+                        buffer[i * buf_w + j] = labels[thread_current_label];
+                        thread_last_label = thread_current_label;
+                        thread_last_grandparent = buffer[i * buf_w + j];
+                    }
+                }
+            }
+        }
+    }	
+    barrier(CLK_LOCAL_MEM_FENCE);	
+    // This is end of part 4.
     // stay in bounds
-    if ((x < w) && (y < h)) {
+    if (((x < w) && (y < h)) && (old_label < w*h)) {
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
-        new_label = old_label;
+		
+		tmp_label = min( buffer[buf_y * buf_w + buf_x - 1], buffer[buf_y * buf_w + buf_x + 1] );
+		// find minum between left and right
+		new_label = min( old_label, tmp_label );
+		// find minum between left, right and self
+		tmp_label = min( buffer[(buf_y-1) * buf_w + buf_x], buffer[(buf_y+1) * buf_w + buf_x]);		
+		// find minum between up and down
+		new_label = min( new_label, tmp_label );		
+		// find minum between left, right, up, down and self	
 
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
             // indicate there was a change this iteration.
             // multiple threads might write this.
+			labels[ y * w + x ] = new_label;
             *(changed_flag) += 1;
-            labels[y * w + x] = new_label;
+            // This is part 3.
+			atomic_min( &labels[ old_label ], new_label); //update parent pixel label value
+            // This is end of part 3.
+            /* This is part 5.
+            labels[old_label] = min(labels[old_label], new_label);
+            */
         }
-    }
+    } 
 }
+
