@@ -78,15 +78,56 @@ propagate_labels(__global __read_write int *labels,
     // Fetch the value from the buffer the corresponds to
     // the pixel for this thread
     old_label = buffer[buf_y * buf_w + buf_x];
+    new_label = old_label;
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
-    
+    if(lx+ly == 0){
+        //Setting index out of bounds to begin with
+        int labelIndex = w * h;
+        int labelValue = 0;
+        uint loc_size_x = get_local_size(0);
+        uint loc_size_y = get_local_size(1);
+
+        for(uint i=0; i < loc_size_x; i++){
+            for(uint j=0; j < loc_size_y; j++){
+                int buf_index = (halo + j)*buf_w + (halo + i);
+                if (buffer[buf_index] < w * h){
+                    // Checking if its already read
+                    if(labelIndex != buffer[buf_index]){
+                        // Saving index and value to reduce redundancy
+                        labelIndex = buffer[buf_index];
+                        buffer[buf_index] = labels[labelIndex];
+                        labelValue = buffer[buf_index];
+                    }
+                    //If read, assigning the last possible value
+                    else {
+                        buffer[buf_index] = labelValue;
+                    }
+                }
+            }
+        }
+    }
+
+    if ((x < w)&&(y < h)){
+        if(old_label < w * h){
+        buffer[buf_y * buf_w + buf_x] = labels[buffer[buf_y * buf_w + buf_x]];
+        }
+    }
+    barrier(CLK_LOCAL_MEM_FENCE);
+
     // stay in bounds
     if ((x < w) && (y < h)) {
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
-        new_label = old_label;
+         
+        if(old_label < w * h){
+            int up = buffer[(buf_y - 1) * buf_w + buf_x];
+            up = min(up,buffer[(buf_y + 1) * buf_w + buf_x]);
+            up = min(up,buffer[(buf_y * buf_w) + buf_x - 1]);
+            up = min(up,buffer[(buf_y * buf_w) + buf_x + 1]);
+            new_label = min(up,old_label);
+        } 
 
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
@@ -94,6 +135,9 @@ propagate_labels(__global __read_write int *labels,
             // multiple threads might write this.
             *(changed_flag) += 1;
             labels[y * w + x] = new_label;
+            atomic_min(&(labels[old_label]), new_label);
+            //Testing for Part 5(comment line above)
+            //labels[old_label] = min(new_label,labels[old_label]);
         }
     }
 }

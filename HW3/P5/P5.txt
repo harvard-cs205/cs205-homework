@@ -1,0 +1,51 @@
+Maze1
+Part 1:
+Finished after 877 iterations, 437.06456 ms total, 0.498363238312 ms per iteration
+Found 2 regions
+Part 2:
+Finished after 529 iterations, 157.1748 ms total, 0.297116824197 ms per iteration
+Found 2 regions
+Part 3:
+Finished after 11 iterations, 3.41768 ms total, 0.310698181818 ms per iteration
+Found 2 regions
+Part 4:
+Finished after 9 iterations, 6.69952 ms total, 0.744391111111 ms per iteration
+Found 2 regions
+Part 5:
+Finished after 9 iterations, 6.55576 ms total, 0.728417777778 ms per iteration
+Found 2 regions
+
+Maze2
+Part 1:
+Finished after 507 iterations, 252.25512 ms total, 0.497544615385 ms per iteration
+Found 35 regions
+Part 2:
+Finished after 273 iterations, 80.97488 ms total, 0.296611282051 ms per iteration
+Found 35 regions
+Part 3:
+Finished after 9 iterations, 2.82624 ms total, 0.314026666667 ms per iteration
+Found 35 regions
+Part 4:
+Finished after 8 iterations, 5.9388 ms total, 0.74235 ms per iteration
+Found 35 regions
+Part 5:
+Finished after 8 iterations, 5.84472 ms total, 0.73059 ms per iteration
+Found 35 regions
+
+For part 4, a single thread implementation was slower than the implementation used
+for part 2. Unless there are many repeated fetches on the indices this 
+implementation will not be faster than the thread independent version. The thread
+independent fucntion should make fetches faster than the version in part 4. There
+is time being expended in looping through and calculating index whereas all this
+could be paralellized.
+
+For Part 5, what might go wrong is that a later numbered thread might read the old
+label and might not take the new label being updated by the first thread. If the
+numbers(labels) are very different then the resulting new label would be incorrect.
+The outcome will be correct since all we are implementing is only an optimization.
+The timing for min should be more or less be pretty similar to atomic_min. The
+number of iterations remains the same. This might be a less optimal way of doing
+it but randomess in the numbers, do not allow us to quantify that since all these
+operations are happening parallely. Atomic_min is serialized and might be slower
+than min at the cost of inconsistentcy.
+
