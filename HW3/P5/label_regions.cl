@@ -127,6 +127,7 @@ propagate_labels(__global __read_write int *labels,
                     if (last_label_index != idx)
                     {
                         last_label = labels[buffer[idx]];
+                        last_label_index = buffer[idx];
                     }
                     buffer[idx] = last_label;
                 }
