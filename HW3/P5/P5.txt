@@ -17,19 +17,24 @@ Found 35 regions
 Part 2: fetch grandparents
 =========================================
 Maze 1:
+Finished after 529 iterations, 103.94128 ms total, 0.196486351607 ms per iteration
+Found 2 regions
+
 
 Maze 2:
-
+Finished after 273 iterations, 54.20424 ms total, 0.19855032967 ms per iteration
+Found 35 regions
 
 
 Part 3: merge parent regions 
 =========================================
-Maze 1:
+Maze 1: 
+Finished after 10 iterations, 2.94152 ms total, 0.294152 ms per iteration
+Found 2 regions
 
 Maze 2:
-
-
-
+Finished after 9 iterations, 2.61712 ms total, 0.290791111111 ms per iteration
+Found 35 regions
 
 
 Part 4: effcient grandparents
@@ -37,8 +42,6 @@ Part 4: effcient grandparents
 Maze 1:
 
 Maze 2:
-
-
 
 
 

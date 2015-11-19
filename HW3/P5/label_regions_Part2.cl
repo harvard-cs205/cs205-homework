@@ -107,12 +107,11 @@ propagate_labels(__global __read_write int *labels,
             new_label=min(minNeighbors,new_label);
         }
         if (new_label != old_label) {
-            atomic_min(&labels[old_label],new_label);
             // CODE FOR PART 3 HERE
             // indicate there was a change this iteration.
             // multiple threads might write this.
             *(changed_flag) += 1;
-            atomic_min(&labels[y * w + x], new_label);
+            labels[y * w + x] = new_label;
         }
     }
 }
