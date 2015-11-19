@@ -1,0 +1,59 @@
+Part 1:
+Maze 1:
+Finished after 853 iterations, 10277.837267 ms total, 12.0490472063 ms per iteration
+Found 2 regions
+
+Mazw 2:
+Finished after 490 iterations, 6058.436813 ms total, 12.3641567612 ms per iteration
+Found 35 regions
+
+Part2:
+Maze 1:
+Finished after 512 iterations, 6155.688647 ms total, 12.0228293887 ms per iteration
+Found 2 regions
+
+Maze 2:
+Finished after 258 iterations, 3132.198133 ms total, 12.1403028411 ms per iteration
+Found 35 regions
+
+Part 3:
+Maze 1:
+Finished after 9 iterations, 111.356593 ms total, 12.3729547778 ms per iteration
+Found 2 regions
+
+Maze 2:
+Finished after 7 iterations, 87.804951 ms total, 12.5435644286 ms per iteration
+Found 35 regions
+
+Part 4:
+Maze 1:
+Finished after 9 iterations, 142.316357 ms total, 15.8129285556 ms per iteration
+Found 2 regions
+
+Maze 2:
+Finished after 8 iterations, 109.325117 ms total, 13.665639625 ms per iteration
+Found 35 regions
+
+Discussion:
+We use a single thread in the workgroup to avoid the redundant global memory reads. However, comparing to computing time in Part 3, Part 4 requires more total time. Though there might be redundant global memory reads using multiplue treads, the method is still better than using serial one. 
+
+Part 5:
+Using labels[old_label]=min(labels[old_label], new_label);
+      labels[y * w + x]=min(labels[y * w + x], new_label);
+instead of 
+      atomic_min(&labels[old_label], new_label);
+      atomic_min(&labels[y * w + x], new_label);
+
+Using min might leads to the incorrcetness in labels[], but it takes shorter time than atomic_min and doesn't change the final results.        
+
+Maze 1:
+Finished after 9 iterations, 120.428587 ms total, 13.3809541111 ms per iteration
+Found 2 regions
+
+Maze 2:
+Finished after 8 iterations, 115.192575 ms total, 14.399071875 ms per iteration
+Found 35 regions
+
+
+ 
+
