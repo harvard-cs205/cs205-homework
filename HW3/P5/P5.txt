@@ -21,11 +21,19 @@ Found 35 regions
 ***Part 3***
 
 maze1:
+Finished after 10 iterations, 2.8588 ms total, 0.28588 ms per iteration
+Found 2 regions
 
 maze2:
-
+Finished after 10 iterations, 2.63024 ms total, 0.263024 ms per iteration
+Found 35 regions
 
 ***Part 4***
+
+Explain, in terms of compute vs. memory, why using a single thread to perform this step is
+or is not a reasonable choice. Note that there is some variation in GPUs, so you may want to
+discuss your empirical results as well as speculate under what conditions those results might
+be different.
 
 maze1:
 

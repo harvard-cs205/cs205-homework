@@ -102,6 +102,11 @@ propagate_labels(__global __read_write int *labels,
             // CODE FOR PART 3 HERE
             // indicate there was a change this iteration.
             // multiple threads might write this.
+            // Read the 32-bit value (referred to as old) stored at location pointed
+            // by p. Compute min (old, val) and store result at location pointed by
+            // p. The function returns old.
+            // int atomic_min (volatile __global int *p, int val)
+            atomic_min(&labels[old_label], new_label);
             *(changed_flag) += 1;
             labels[y * w + x] = new_label;
         }
