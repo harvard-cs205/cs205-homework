@@ -80,20 +80,38 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
-    
-    // stay in bounds
-    if ((x < w) && (y < h)) {
-        // CODE FOR PART 1 HERE
-        // We set new_label to the value of old_label, but you will need
-        // to adjust this for correctness.
-        new_label = old_label;
 
-        if (new_label != old_label) {
-            // CODE FOR PART 3 HERE
-            // indicate there was a change this iteration.
-            // multiple threads might write this.
-            *(changed_flag) += 1;
-            labels[y * w + x] = new_label;
+    if (old_label < w * h){
+
+        buffer[buf_x + buf_w * buf_y] = labels[old_label];
+
+        // stay in bounds
+        if ((x < w) && (y < h)) {
+            // CODE FOR PART 1 HERE
+            // We set new_label to the value of old_label, but you will need
+            // to adjust this for correctness.
+            int neighbors[4];
+            neighbors[0] = buffer[(buf_y) * buf_w + (buf_x - 1)];
+            neighbors[1] = buffer[(buf_y) * buf_w + (buf_x + 1)];
+            neighbors[2] = buffer[(buf_y - 1) * buf_w + buf_x];
+            neighbors[3] = buffer[(buf_y + 1) * buf_w + buf_x];
+
+            new_label = old_label;
+            for (int i = 0; i < 4; i++) {
+                new_label = min(new_label, neighbors[i]);
+            }
+            
+
+            if (new_label != old_label) {
+                // CODE FOR PART 3 HERE
+                // indicate there was a change this iteration.
+                // multiple threads might write this.
+
+                atomic_min(&labels[old_label], new_label);
+                *(changed_flag) += 1;
+                labels[y * w + x] = new_label;
+                atomic_min(&labels[x + w * y], new_label);
+            }
         }
     }
 }
