@@ -124,7 +124,7 @@ propagate_labels(__global __read_write int *labels,
                 if (buffer[idx] < w * h)
                 {
                     // only read the label from global memory if we have to
-                    if (last_label_index != idx)
+                    if (last_label_index != buffer[idx])
                     {
                         last_label = labels[buffer[idx]];
                         last_label_index = buffer[idx];
