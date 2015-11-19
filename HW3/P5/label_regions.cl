@@ -1,3 +1,19 @@
+// returns the min of 5 floats
+float minimize(float floats[5])
+{
+    float min = floats[0];
+    for(int i = 1; i < 5; i++)
+    {
+        if (floats[i] < min)
+        {
+            min = floats[i];
+        }
+    }
+    return min;
+
+}
+
+
 __kernel void
 initialize_labels(__global __read_only int *image,
                   __global __write_only int *labels,
@@ -75,25 +91,73 @@ propagate_labels(__global __read_write int *labels,
     // the local buffer is loaded
     barrier(CLK_LOCAL_MEM_FENCE);
 
-    // Fetch the value from the buffer the corresponds to
+    // Fetch the value from the buffer that corresponds to
     // the pixel for this thread
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
     
+    /* Part 2:
+    if (old_label < w * h)
+    {
+        buffer[buf_y * buf_w + buf_x] = labels[old_label];
+    }
+    /*  */
+
+
+    // Part 4:
+    // only do this once per workgroup
+    if ((lx == 0) && (ly == 0))
+    {
+        // initialize variables
+        int last_label = labels[old_label];
+        int last_label_index = old_label;
+
+        // loop through buffer and replace each label with its grandparent
+        for (int j = halo; j < buf_w - halo; j++)
+        {
+            for (int k = halo; k < buf_h - halo; k++)
+            {
+                // k is the "y-coordinate," j is the "x-coordinate"
+                int idx = k * buf_w + j;
+
+                if (buffer[idx] < w * h)
+                {
+                    // only read the label from global memory if we have to
+                    if (last_label_index != buffer[idx])
+                    {
+                        last_label = labels[buffer[idx]];
+                        last_label_index = buffer[idx];
+                    }
+                    buffer[idx] = last_label;
+                }
+            }
+        }
+    }
+
+
+    barrier(CLK_LOCAL_MEM_FENCE);
+    
     // stay in bounds
-    if ((x < w) && (y < h)) {
+    if ((x < w) && (y < h) && (old_label < w * h)) {
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
-        new_label = old_label;
+
+        float pixels[5] = {old_label, buffer[buf_y * buf_w + buf_x + 1], buffer[buf_y * buf_w + buf_x - 1], buffer[(buf_y + 1) * buf_w + buf_x], buffer[(buf_y - 1) * buf_w + buf_x]};
+        
+        new_label = minimize(pixels);
 
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
             // indicate there was a change this iteration.
             // multiple threads might write this.
             *(changed_flag) += 1;
+
             labels[y * w + x] = new_label;
+            
+            // update parent
+            atomic_min(&labels[old_label], new_label);
         }
     }
 }
