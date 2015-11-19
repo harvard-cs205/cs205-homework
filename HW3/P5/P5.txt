@@ -1,0 +1,56 @@
+Part 1:
+
+Maze1.npy
+Finished after 888 iterations, 192.48728 ms total, 0.216764954955 ms per iteration
+
+Maze2.npy
+Finished after 526 iterations, 113.8088 ms total, 0.216366539924 ms per iteration
+
+
+Part 2:
+Maze1.npy
+Finished after 529 iterations, 114.55896 ms total, 0.21655758034 ms per iteration
+
+Maze2.npy
+Finished after 273 iterations, 59.49584 ms total, 0.217933479853 ms per iteration
+
+
+Part 3:
+Maze1.npy
+Finished after 10 iterations, 2.22216 ms total, 0.222216 ms per iteration
+
+Maze2.npy
+Finished after 9 iterations, 1.99392 ms total, 0.221546666667 ms per iteration
+
+
+Part 4:
+Maze1.npy
+Finished after 10 iterations, 5.9264 ms total, 0.59264 ms per iteration
+
+Maze2.npy
+Finished after 9 iterations, 5.39128 ms total, 0.599031111111 ms per iteration
+
+For my particular system, using a single thread is not a reasonable choice.  As shown, we have a roughly 3x slowdown in computation speed.  Very clearly, this is caused by hardware configuration.  Intel Iris Pro 5200 has access to a huge 128MB L4 cache in eDRAM which allows relatively fast (30-32 ns latency) access and 40EUs at 1300 MHz clock speed.  Thus, hardware cache hit rates are extremely high for accessing the global buffer, which means that the loss of parallelism hurts performance.  Thus, memory latency is not large enough to warrant the loss of computing power. 
+
+Furthermore, there doesn't seem to be enough redundancy in labels to make this trick worthwhile.
+
+An immediate case we can think about where this trick would be helpful is if a much more memory and computationally intensive program is running at the same time.  This means the eDRAM is filled and more importantly, we don't want to evict from the eDRAM because we would affect the other program.  
+
+
+Part 5:
+
+Without the atomic version of min, the following mistake can happen.
+
+Suppose old_label = 10, new_label1 = 8, new_label2 = 6
+
+min(old_label, new_label1) = 8 (thread 1)
+min(old_label, new_label2) = 6 (thread 2)
+old_label = new_label2 (thread 2)
+old_label = new_label1 (thread 1)
+
+old_label = 8
+
+Note that this mistake is an inefficiency and does not affect the correctness of the completed algorithm.  Between iterations, it is impossible for old_label to increase (as it is updated if and only if a new label is less than old_lable).
+
+However, this means our algoirthm can randomly take more time to complete (increased number of iterations).  Howevever, I would not imagine this to increase time significantly, so overall, performance shouldn't substantially change.  
+

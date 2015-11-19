@@ -43,7 +43,6 @@ __kernel void sum_blocked(__global float* x,
     float sum = 0;
     size_t local_id = get_local_id(0);
     int k = ceil((float)N / get_global_size(0));
-    int limit = (get_global_id(0) + 1) * k;
 
     // thread with global_id 0 should add 0..k-1
     // thread with global_id 1 should add k..2k-1
@@ -53,6 +52,7 @@ __kernel void sum_blocked(__global float* x,
     // 
     // Be careful that each thread stays in bounds, both relative to
     // size of x (i.e., N), and the range it's assigned to sum.
+    int limit = (get_global_id(0) + 1) * k;
     for (int i = get_global_id(0)*k; i < limit && i < N; i++) {
         sum += x[i];
     }

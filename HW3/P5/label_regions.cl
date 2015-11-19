@@ -17,6 +17,7 @@ initialize_labels(__global __read_only int *image,
     }
 }
 
+static
 int
 get_clamped_value(__global __read_only int *labels,
                   int w, int h,
@@ -81,19 +82,52 @@ propagate_labels(__global __read_write int *labels,
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
     
+    // Part 2 Code
+    // if (old_label < w * h) {
+    //     buffer[buf_y * buf_w + buf_x] = labels[old_label];
+    // }
+
+    // Part 4 Code
+    if ((lx == 0) && (ly == 0)) {
+        int num_iterations = buf_w * buf_h;
+        int temp_label;
+        int last_fetch;
+        int last_label = -1;
+        for (int i = 0; i < num_iterations; i++) {
+            temp_label = buffer[i];
+            if (temp_label < w * h) {
+                if (last_label != temp_label)  {
+                    // Cache miss, load from global memory.
+                    last_label = temp_label;                 
+                    last_fetch = labels[last_label];
+                }
+                buffer[i] = last_fetch;
+            }
+        }
+    }
+
+    barrier(CLK_LOCAL_MEM_FENCE);
+
     // stay in bounds
     if ((x < w) && (y < h)) {
         // CODE FOR PART 1 HERE
-        // We set new_label to the value of old_label, but you will need
-        // to adjust this for correctness.
         new_label = old_label;
+
+        if (new_label < w * h) {
+            new_label = min(new_label, buffer[(buf_y+1) * buf_w + buf_x]);
+            new_label = min(new_label, buffer[(buf_y-1) * buf_w + buf_x]);
+            new_label = min(new_label, buffer[buf_y * buf_w + buf_x + 1]);
+            new_label = min(new_label, buffer[buf_y * buf_w + buf_x - 1]);
+        }
 
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
             // indicate there was a change this iteration.
             // multiple threads might write this.
             *(changed_flag) += 1;
-            labels[y * w + x] = new_label;
+            atomic_min(&labels[old_label], new_label);
+            atomic_min(&labels[y * w + x], new_label);
+            // labels[y*w + x] = new_label;
         }
     }
 }
