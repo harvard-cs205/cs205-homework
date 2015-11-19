@@ -63,7 +63,7 @@ propagate_labels(__global __read_write int *labels,
     
     int upNeighbor,rightNeighbor,downNeighbor,leftNeighbor,minNeighbors;
 
-    int gpartent
+    int gpartent, xx, yy;
     // Load the relevant labels to a local buffer with a halo 
     if (idx_1D < buf_w) {
         for (int row = 0; row < buf_h; row++) {
@@ -91,18 +91,22 @@ propagate_labels(__global __read_write int *labels,
             gpartent = labels[old_label];
         }
 
-        for( xx =halo;row<buf_h-halo; xx++){
+        for( xx =halo;xx < buf_h - halo; xx++){
+            for (yy= halo; yy < buf_w-halo; yy++){
+                if(buffer[(ly+xx)*buf_w+(lx+yy)]<w*h){
+                    if (buffer[(ly+xx)*buf_w +(lx+yy)]!=gpartent){
 
-            
+                        buffer[(ly+xx)*buf_w+(lx+yy)]=labels[buffer[(ly+xx)*buf_w+(lx+yy)]];
+                    }
 
 
+                }
+            }
         }
-
     }
     
     barrier(CLK_LOCAL_MEM_FENCE);
     if ((ly == 0) && (ly==0)){
-
 
 
     }

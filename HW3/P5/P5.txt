@@ -40,8 +40,12 @@ Found 35 regions
 Part 4: effcient grandparents
 =========================================
 Maze 1:
+Finished after 10 iterations, 5.62464 ms total, 0.562464 ms per iteration
+Found 2 regions
 
 Maze 2:
+Finished after 9 iterations, 4.9628 ms total, 0.551422222222 ms per iteration
+Found 35 regions
 
 
 
