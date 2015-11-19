@@ -84,5 +84,6 @@ blocked reads, workgroups: 512, num_workers: 64, 0.0312808 seconds
 blocked reads, workgroups: 512, num_workers: 128, 0.02492872 seconds
 configuration ('coalesced', 256, 64): 0.00263976 seconds
 
-After completing the kernels, I run the timing code and the best configuration for the machine I am using is 0.00263976 seconds.
+
+After completing the kernels, I run the timing code and the best configuration for the machine I am using is 0.00263976 seconds
 

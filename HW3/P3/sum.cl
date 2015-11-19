@@ -61,7 +61,6 @@ __kernel void sum_blocked(__global float* x,
     size_t local_size = get_local_size(0);
     size_t global_id = get_global_id(0);
     size_t global_size = get_global_size(0);
-    
     int k = ceil((float)N / global_size);
 
     // thread with global_id 0 should add 0..k-1
@@ -72,9 +71,9 @@ __kernel void sum_blocked(__global float* x,
     // 
     // Be careful that each thread stays in bounds, both relative to
     // size of x (i.e., N), and the range it's assigned to sum.
-    //for (;;) { // YOUR CODE HERE
-    //    ; // YOUR CODE HERE
-    //}
+    //// YOUR CODE HERE
+    //// YOUR CODE HERE
+    //
     
     //In sum blocked(), when get global size(0) == k, the thread with get global id(0) == ishould be responsible for adding the elements at {L·i,L·i+1,L·i+2,...,L·(i+1) 1}, where L = dN/ke and N is the length of the vector. Be careful not to read past the end of the input vector.
     
@@ -96,9 +95,9 @@ __kernel void sum_blocked(__global float* x,
     // You can assume get_local_size(0) is a power of 2.
     //
     // See http://www.nehalemlabs.net/prototype/blog/2014/06/16/parallel-programming-with-opencl-and-python-parallel-reduce/
-    //for (;;) { // YOUR CODE HERE
-    //    ; // YOUR CODE HERE
-    //}
+    //// YOUR CODE HERE
+    //// YOUR CODE HERE
+    //
     
     for (size_t offset = local_size / 2; offset > 0; offset >>= 1) {
         if (local_id < offset) {
