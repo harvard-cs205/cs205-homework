@@ -1,4 +1,5 @@
 // sum_coalesced()
+
 __kernel void sum_coalesced(__global float* x,
                             __global float* partial,
                             __local  float* fast,
