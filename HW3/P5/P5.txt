@@ -56,7 +56,6 @@ Maze 2:
 Finished after 9 iterations, 9.9276 ms total, 1.10306666667 ms per iteration
 Found 35 regions
 
-
 We see that in this case, our speed is slower than that of Part 3 for both mazes. This means that the serialization of only having one thread do the work takes longer than having multiple threads going to memory to check each label’s grandparent. I don’t think this necessarily means this is an unreasonable choice, but instead it just was not an optimization for this particular problem. 
 
 I can imagine a scenario however, where we either a) have nearly all pixels having the same label/grandparent in a local group so that this process very rarely requires any global memory reads at all for the single thread which remembers its last fetch and that if we had not serialized the process for one thread that the time required would be longer for many threads or b) a GPU that has an incredibly slow GPU to memory speed that in fact the serialization is an optimization and will reduce overall time. 
