@@ -1,0 +1,44 @@
+### Part 1:
+maze1.npy:
+Finished after 892 iterations, 250.14904 ms total, 0.280436143498 ms per iteration
+Found 2 regions
+maze2.npy:
+Finished after 521 iterations, 147.15968 ms total, 0.282456199616 ms per iteration
+Found 35 regions
+
+### Part 2:
+maze1.npy:
+Finished after 529 iterations, 141.84128 ms total, 0.268130964083 ms per iteration
+Found 2 regions
+maze2.npy:
+Finished after 273 iterations, 74.966 ms total, 0.274600732601 ms per iteration
+Found 35 regions
+
+### Part 3:
+maze1.npy:
+Finished after 10 iterations, 2.8228 ms total, 0.28228 ms per iteration
+Found 2 regions
+maze2.npy:
+Finished after 9 iterations, 2.53056 ms total, 0.281173333333 ms per iteration
+Found 35 regions
+
+### Part 4:
+maze1.npy:
+Finished after 10 iterations, 5.99776 ms total, 0.599776 ms per iteration
+Found 2 regions
+maze2.npy:
+Finished after 9 iterations, 5.34112 ms total, 0.593457777778 ms per iteration
+Found 35 regions
+
+Given my hardware setup, I found that in both scenarios, adding the single thread slowed down performance by at least a factor of 2. It would seem empirically that, broadly, the gains in compute from parallelizing this task are greater than the gains in reducing memory reads for these images, although perhaps an image which has a higher percentage of adjacent redundant reads (e.g., potentially fewer fetches) could lead to improved performance with the single thread strategy over the parallelized strategy. Furthermore, it is conceivable that differences in hardware could lead to differences in optimal strategies: slower read/write could lead to a memory-bounded problem, and the optimization in Part 4 may be ideal; a faster read/write could circumvent the memory limitation and make this a compute-bounded problem, making this optimization non-ideal.
+
+### Part 5:
+maze1.npy:
+Finished after 11 iterations, 6.40552 ms total, 0.58232 ms per iteration
+Found 2 regions
+maze2.npy:
+Finished after 9 iterations, 5.25664 ms total, 0.584071111111 ms per iteration
+Found 35 regions
+
+If the min() function were used in place of atomic_min(), time per iteration may decrease, but the number of iterations may increase. This is particularly reflected in the processing of maze1, where an additional iteration is required, but there is a slight decrease in the time per iteration; overall, there is an increase in total time. The minimization step has several steps, including a read, compare, and write steps. If two values from different threads try to write to the same location in an unordered process, it is possible that the final written value is incorrectly higher than it ought to be, thereby leading to a potential increase in the number of iterations. Within an iteration, the value of labels could increase due to an overwrite, but between iterations it should not increase. The final result should still be correct, although efficiency could be affected (as explained previously).
+

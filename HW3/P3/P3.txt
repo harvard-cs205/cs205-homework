@@ -1,0 +1,4 @@
+#0: Intel(R) Core(TM) i7-4578U CPU @ 3.00GHz on Apple
+#1: Iris on Apple
+Fastest:
+configuration ('coalesced', 512, 32): 0.00262288 seconds
