@@ -83,11 +83,30 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // Calculate Pix 
-    // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
-    if (old_label < w*h) {
-        // Fetch the grandparent and store in buffer
-        buffer[buf_y * buf_w + buf_x] = labels[old_label];
-    }
+    // Initialize Grandfather Label
+    int prev_label=0;
+    
+    // Start at the First Pixel (0, 0) location in local buffer
+    if (idx_1D == 0){   
+        
+        // Store grandparent for comparsion
+        if (old_label < w*h)
+            prev_label = labels[old_label];
+
+        // Loop through the local work group minus halo 
+        // ind = [y * buf_w + x]
+        for (int ind=1; ind < ((buf_w-halo) * (buf_h-halo)); ind++) {
+            
+            // Ensure value is within image bounds
+            if (buffer[ind] < w*h) {    
+                // Ensure grandfather label fetch is not equal to current label
+                // If true, update the current label to grandfather
+                if (buffer[ind] != prev_label)
+                    buffer[ind] = labels[buffer[ind]];
+            }
+        }
+    }  
+
     //Ensure that all threads are done
     barrier(CLK_LOCAL_MEM_FENCE);
     
@@ -119,6 +138,7 @@ propagate_labels(__global __read_write int *labels,
             atomic_min(&labels[old_label], new_label);
             
             // Now write back to the non-halo portion
+            // Ensure that a larger value will never be stored
             atomic_min(&labels[y * w + x], new_label);
 
         } 

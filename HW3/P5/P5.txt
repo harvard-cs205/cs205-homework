@@ -4,7 +4,6 @@ Part 1
 Maze 1
 Finished after 879 iterations, 408.4472 ms total, 0.46467258248 ms per iteration
 Found 2 regions
-
 Maze 2
 Finished after 512 iterations, 237.8964 ms total, 0.46464140625 ms per iteration
 Found 35 regions
@@ -13,16 +12,30 @@ Part 2
 Maze 1
 Finished after 529 iterations, 245.60056 ms total, 0.464273270321 ms per iteration
 Found 2 regions
-
 Maze 2
 Finished after 273 iterations, 126.86768 ms total, 0.464716776557 ms per iteration
 Found 35 regions
+
+Implementing a grandfather label realizes a ~2x speedup in performance.
 
 Part 3
 Maze 1
 Finished after 10 iterations, 4.72224 ms total, 0.472224 ms per iteration
 Found 2 regions
-
 Maze 2
 Finished after 9 iterations, 4.27536 ms total, 0.47504 ms per iteration
 Found 35 regions
+
+The merge parent regions optimization step was a real game changer! By finding the min of of the old and new parents before writing back to global memory, we realize a ~50x/25x speedup!
+
+Part 4
+Maze 1
+Finished after 10 iterations, 11.20616 ms total, 1.120616 ms per iteration
+Found 2 regions
+Finished after 9 iterations, 9.93688 ms total, 1.10409777778 ms per iteration
+Found 35 regions
+
+Judging by the empirical results, the single thread approach with no repeated global memory reads is slower than the multi-thread approach (by a factor of ~3-4) and takes more time per iteration. One can imagine that there is a trade off associated with having one thread read the grandparents. This balance of work group re-reads is dependent on the amount of differing grandparent label values within the workgroup. If all labels are in fact the same, then one would expect a speedup as redundant values won't be read from global memory. However, if all the parents are different from one another, then the single thread approach would actually be slower than multiple threads reading in the grandfather labels.
+
+Part 5
+Although atomic operations are inefficient due to their serial nature and memory locks, they are also executed quickly because they are implemented at the hardware level. If we choose to implement this comparison with a min, it would not ensure that label values are not dynamically changed by multiple threads. This would result in some comparisons being performed out of order which would lead to a label values increasing. We should not see an increase at the end of an iteration, as all threads are comparing against the same old label. Wether or not this would take more execution time is dependent on the size of the local work group. If the work group is relative small then there should not be a substantial difference between min and atomic_min. However, if the local group size is large, then the serial nature of the atomic_min would make it slower than the min function.
