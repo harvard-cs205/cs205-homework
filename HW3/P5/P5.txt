@@ -1,0 +1,44 @@
+Part 1:
+Maze 1: 
+Finished after 915 iterations, 193.5856 ms total, 0.211568961749 ms per iteration
+Found 2 regions
+
+Maze 2: 
+Finished after 532 iterations, 110.43184 ms total, 0.207578646617 ms per iteration
+Found 35 regions
+
+Part 2:
+Maze 1: 
+Finished after 529 iterations, 100.60496 ms total, 0.190179508507 ms per iteration
+Found 2 regions
+
+Maze 2: 
+Finished after 272 iterations, 51.23496 ms total, 0.188363823529 ms per iteration
+Found 35 regions
+
+Part 3:
+Maze 1: 
+Finished after 10 iterations, 2.68248 ms total, 0.268248 ms per iteration
+Found 2 regions
+
+Maze 2: 
+Finished after 10 iterations, 2.76896 ms total, 0.276896 ms per iteration
+Found 35 regions
+
+Part 4: 
+Maze 1:
+Finished after 11 iterations, 6.22 ms total, 0.565454545455 ms per iteration
+Found 2 regions
+
+Maze 2: 
+Finished after 9 iterations, 4.53816 ms total, 0.50424 ms per iteration
+Found 35 regions
+
+Above we report runtime of the code on both input mazes after completing each part.
+
+Part 4 answer: 
+Interestingly, adding the Part 4 optimization appeared to slow down the code significiantly (by a factor of 2-3). This might be because, even though using a single thread prevents threads from blocking each other on reads to the same global, it still has to iterate through each pixel in the workgroup and update them serially. So, in this case we do not have any of the benefits of parralelism. These results suggest that in this problem, the overhead of thread communication is outweighed by the benefits of parralelism (having multiple threads work on the same workgroup). 
+
+Part 5 answer: 
+Using atomic_min slows down the code because the operation has to make sure other threads don't access the value while the read/write is being performed (and this adds overhead). Using the min operation would indeed speed up the update step. However, it could result in extra iterations. This is because we can encounter race conditions: for example, suppose we have label 3 stored and two pixels are simulatenously accessing/updateing values with labels 2 and 1 respectively. Depending on the order of the reads/writes, after the iteration 3 could be overwritten to either 1 or 2.The only invariant that we require for the program to produce correct output is that at each iteration labels stay the same or decrease, and this is clearly satisfied here. Hence, we will eventually end up wiht the same labels, we just might require extra iterations to propogate the actual min values. Depending on the frequency of these race conditions, the speed benefit of not using atomic operations might outweigh the extra iterations.
+

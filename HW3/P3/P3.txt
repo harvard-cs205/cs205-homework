@@ -1,0 +1,15 @@
+-------------- BEST RUNS ----------------------
+configuration ('coalesced', 64, 64): 0.00301688 seconds
+configuration ('coalesced', 64, 64): 0.00300056 seconds
+configuration ('coalesced', 512, 64): 0.00267976 seconds
+configuration ('coalesced', 512, 64): 0.00260392 seconds
+
+-------------- GOOD RUNS -----------------------
+coalesced reads, workgroups: 32, num_workers: 128, 0.00300904 seconds
+coalesced reads, workgroups: 64, num_workers: 64, 0.00300056 seconds
+coalesced reads, workgroups: 256, num_workers: 64, 0.00303768 seconds
+coalesced reads, workgroups: 256, num_workers: 128, 0.00358264 seconds
+coalesced reads, workgroups: 512, num_workers: 64, 0.00304208 seconds
+coalesced reads, workgroups: 512, num_workers: 128, 0.00337936 seconds
+
+Above are the best configurations for several runs, along with well performing (but not best) configurations. Coalesced reads performed much better than blocked reads, and the optimal number of workers appeared to be 64 (although 128 came very close, depending on the run).  
