@@ -1,0 +1,2 @@
+Hardware: #1: Iris Pro on Apple
+configuration ('coalesced', 128, 128): 0.00192168 seconds
