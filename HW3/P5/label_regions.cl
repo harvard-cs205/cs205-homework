@@ -80,7 +80,9 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
     new_label = old_label;
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
-    
+    if (new_label != w * h) {
+        buffer[buf_y * buf_w + buf_x] = labels[buffer[buf_y * buf_w + buf_x]];
+    }
     // stay in bounds
     if ((x < w) && (y < h)) {
         // CODE FOR PART 1 HERE
