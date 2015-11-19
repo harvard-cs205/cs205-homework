@@ -57,7 +57,7 @@ __kernel void sum_blocked(__global float* x,
     // 
     // Be careful that each thread stays in bounds, both relative to
     // size of x (i.e., N), and the range it's assigned to sum.
-    for (int i = k * global_id; i < N; i++) { // YOUR CODE HERE
+    for (int  i = k * global_id; i < N; i++) { // YOUR CODE HERE
         sum += x[i];; // YOUR CODE HERE
         if(i == k * (global_id + 1) - 1){
             break;

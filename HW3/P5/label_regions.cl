@@ -60,6 +60,10 @@ propagate_labels(__global __read_write int *labels,
     int old_label;
     // Will store the output value
     int new_label;
+    // in order to avoid multiple reads to memories
+    // the last_id/label will remember last read
+    int current_id,current_label;
+    int last_id, last_label;
     
     // Load the relevant labels to a local buffer with a halo 
     if (idx_1D < buf_w) {
@@ -79,7 +83,52 @@ propagate_labels(__global __read_write int *labels,
     // the pixel for this thread
     old_label = buffer[buf_y * buf_w + buf_x];
 
+
+
+
+    // Part 2:
+    //            if(buffer[row * buf_w + idx_1D] < w * h)
+    //            buffer[row * buf_w + idx_1D] = labels[buffer[row * buf_w + idx_1D]];
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
+
+    // The following is the code for part4
+    // replace each value in buffer with label
+    //load the relevant labels to a local buffer without a halo
+
+
+    // we want to just use 1 thread, so in our
+    // core, check [1,1] index,thread
+    // other thread will be just waiting
+    if(lx == 1 && ly == 1){
+
+        // we need to loop all core part
+        // col/row should be inside the core(no halo)
+        // so we use buf_w/buf_h
+        for(int col = 0; col < buf_w; col++){
+            for(int row = 0; row < buf_h; row ++) {
+                current_id = row * buf_w + col;
+                //check if we have read the same id before, so to avoid repetitive reads
+                if(current_id == last_id){
+                    buffer[current_id] == last_label;
+                }
+                else{
+                    // if no, make sure the current_id is inside the boundary
+                    // and update everything
+                    if(buffer[current_id] < w * h){
+                        current_label = labels[buffer[current_id]];
+                        buffer[current_id] = current_label;
+                        last_label = current_label;
+                        last_id = current_id;
+                    }
+                }
+            }
+        }
+    }
+
+    //put a barrier here
+
+    barrier(CLK_LOCAL_MEM_FENCE);
+
     
     // stay in bounds
     if ((x < w) && (y < h)) {
@@ -87,13 +136,23 @@ propagate_labels(__global __read_write int *labels,
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
         new_label = old_label;
+        //we only change the foreground pixels,
+        //all outbounds/background will keep the same
+        if(new_label < (w * h)){
+        //now we will find the minimum values out of the four(campared to itself)
+            new_label = min(new_label,buffer[buf_x+1 + buf_y * buf_w]);
+            new_label = min(new_label,buffer[buf_x-1 + buf_y * buf_w]);
+            new_label = min(new_label,buffer[buf_x + (buf_y+1) * buf_w]);
+            new_label = min(new_label,buffer[buf_x + (buf_y-1) * buf_w]);
+        }
 
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
+            atomic_min(&labels[old_label],new_label);
             // indicate there was a change this iteration.
             // multiple threads might write this.
             *(changed_flag) += 1;
-            labels[y * w + x] = new_label;
+            atomic_min(&labels[y * w + x], new_label);
         }
     }
 }
