@@ -1,0 +1,8 @@
+Hardware
+
+Intel(R) Core(TM) i7-3537 CPU @2.00GHz
+
+
+Performance:
+
+configuration ('coalesced', 128, 128): 0.00205134 seconds

@@ -5,11 +5,12 @@ __kernel void sum_coalesced(__global float* x,
 {
     float sum = 0;
     size_t local_id = get_local_id(0);
+    unsigned int global_size = get_global_size(0);
 
     // thread i (i.e., with i = get_global_id()) should add x[i],
     // x[i + get_global_size()], ... up to N-1, and store in sum.
-    for (;;) { // YOUR CODE HERE
-        ; // YOUR CODE HERE 
+    for (int i = get_global_id(0); i < N; i += global_size) {
+        sum += x[i];
     }
 
     fast[local_id] = sum;
@@ -24,8 +25,11 @@ __kernel void sum_coalesced(__global float* x,
     // You can assume get_local_size(0) is a power of 2.
     //
     // See http://www.nehalemlabs.net/prototype/blog/2014/06/16/parallel-programming-with-opencl-and-python-parallel-reduce/
-    for (;;) { // YOUR CODE HERE
-        ; // YOUR CODE HERE
+    for (int i = get_local_size(0) / 2; i > 0; i /= 2) {
+        if (local_id < i) {
+            fast[local_id] += fast[local_id + i]
+        }
+        barrier(CLK_LOCAL_MEM_FENCE);
     }
 
     if (local_id == 0) partial[get_group_id(0)] = fast[0];
@@ -48,8 +52,9 @@ __kernel void sum_blocked(__global float* x,
     // 
     // Be careful that each thread stays in bounds, both relative to
     // size of x (i.e., N), and the range it's assigned to sum.
-    for (;;) { // YOUR CODE HERE
-        ; // YOUR CODE HERE
+    for (int i = get_global_id(0) * k; i < (get_global_id(0) + 1) * k &&
+                                           i < N; ++i) {
+        sum += x[i];
     }
 
     fast[local_id] = sum;
@@ -64,8 +69,11 @@ __kernel void sum_blocked(__global float* x,
     // You can assume get_local_size(0) is a power of 2.
     //
     // See http://www.nehalemlabs.net/prototype/blog/2014/06/16/parallel-programming-with-opencl-and-python-parallel-reduce/
-    for (;;) { // YOUR CODE HERE
-        ; // YOUR CODE HERE
+    for (int i = get_local_size(0) / 2; i > 0; i /= 2) {
+        if (local_id < i) {
+            fast[local_id] += fast[local_id + i]
+        }
+        barrier(CLK_LOCAL_MEM_FENCE);
     }
 
     if (local_id == 0) partial[get_group_id(0)] = fast[0];
