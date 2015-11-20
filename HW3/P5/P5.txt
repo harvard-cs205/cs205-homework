@@ -1,0 +1,62 @@
+-- PART 1
+
+Finished after 915 iterations, 213.29096 ms total, 0.233104874317 ms per iteration
+Found 2 regions
+
+Maze 2:
+Finished after 531 iterations, 122.0564 ms total, 0.229861393597 ms per iteration
+Found 35 regions
+
+
+-- PART 2
+
+Maze 1:
+Finished after 529 iterations, 121.61456 ms total, 0.229895198488 ms per iteration
+Found 2 regions
+
+Maze 2:
+Finished after 272 iterations, 62.71688 ms total, 0.230576764706 ms per iteration
+Found 35 regions
+
+
+-- PART 3 
+
+Maze 1:
+Finished after 10 iterations, 2.81728 ms total, 0.281728 ms per iteration
+Found 2 regions
+
+Maze 2:
+Finished after 9 iterations, 2.19712 ms total, 0.244124444444 ms per iteration
+Found 35 regions
+
+
+-- PART 4
+
+Maze 1:
+Finished after 10 iterations, 8.49528 ms total, 0.849528 ms per iteration
+Found 2 regions
+
+Maze 2:
+Finished after 9 iterations, 7.49304 ms total, 0.83256 ms per iteration
+Found 35 regions
+
+A graph of my results from Parts 1-4 can be found under "maze_1.png" and "maze_2.png".
+
+From my results above, it is clear that -- given the architecture of my computer -- using a single thread is not a reasonable choice, as the performance is roughly 3-4x worse. Further note that the single thread does not increase the number of iterations but only the amount of time per iteration. In general, the motivation behind using a single thread is to avoid some redundant global memory leads, but we lose the benefits of computing in parallel. 
+
+In this case, it is clear that the efficiency gained from eliminating these memory redundancies does not dominate the slow down caused from having to perform all the work serially (e.g. having to remember the last fetch). If there the labels of pixels were more similar (i.e. more redundancy in the labels), then this optimization would have yielded better results due to reduced latency costs associated with going to global memory.
+
+This implies that we are compute bound in that computation is faster than global memory reads. Therefore, if the GPU were memory bound (i.e. were biased towards read speed as opposed to computation speed), then it could be possible that a single thread would be a good choice. This could include factors such as latency costs of accessing global memory, the number of iterations that we could reduce the problem to in the single thread case, and so on.
+
+
+-- PART 5
+
+First of all, the atomic_min(*p, val) takes the 32-bit value stored at the location pointed by p, computes the minimum of that value and val, and then stores the answer at the location pointed to by p. 
+
+Now given this, if we used min instead of atomic_min(), then a thread could write over the correct answer of another thread. 
+
+This is probably best described with an example. Say we have a current label X3, and two other labels that both a smaller label number, X1 and X2, are both comparing to it. Our order in this case is X1 < X2 < X3. What should happen (and what does happen in the case of atomic updates), is that all three labels will result in the minimum of the three, or X1.
+
+In the case of using min(), however, both threads would perform comparisons at the same time. One thread might overwrite X3 with X1 while another thread might then overwrite it again with X2, which is higher than X2. In this example, X3 was unintentionally increased from X1 to X2, forcing us to perform at least one more iteration to completely decrease it. Thus, after a given iteration, the result may be wrong, but at the very end, we will still have a correct result (it may just more iterations to reach it).
+
+As a result of the above analysis, we have an increased number of iterations, which could make total computation time longer. In general though, min() is faster than atomic_min(), so it is unclear which will provide superior performance -- it really boils down to what hurts more: the extra iterations, or the slower atomic_min() function.
