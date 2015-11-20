@@ -1,0 +1,63 @@
+Part 1:
+
+Maze 1:
+Finished after 914 iterations, 204.70632 ms total, 0.223967527352 ms per iteration
+Found 2 regions
+Maze 2:
+Finished after 532 iterations, 118.44736 ms total, 0.222645413534 ms per iteration
+Found 35 regions
+
+
+Part 2:
+
+Maze 1:
+Finished after 529 iterations, 114.21496 ms total, 0.215907296786 ms per iteration
+Found 2 regions
+Maze 2:
+Finished after 273 iterations, 59.77376 ms total, 0.218951501832 ms per iteration
+Found 35 regions
+
+
+Part 3:
+
+Maze 1:
+Finished after 10 iterations, 3.06184 ms total, 0.306184 ms per iteration
+Found 2 regions
+Maze 2:
+Finished after 9 iterations, 2.65912 ms total, 0.295457777778 ms per iteration
+Found 35 regions
+
+Part 4:
+
+Maze 1:
+Finished after 13 iterations, 10.22584 ms total, 0.786603076923 ms per iteration
+Found 2 regions
+Maze 2:
+Finished after 12 iterations, 9.34432 ms total, 0.778693333333 ms per iteration
+Found 35 regions
+
+Discussion: Using the single thread replacement slows down the performance in my case. I kind of expect this drop in
+performance because we now look up the value with a single thread, even though we are skipping some memory reads. I
+think the memory read in GPU is relatively cheap, whose savings here would probably not override the loss from single-
+threading.
+Therefore, it is not a reasonable choice here. If the computation is even more intensive, or we have more cores, then we
+should be even more willing to use the old version instead of the single-threaded version.
+On the other hand, there are scenarios where the serialization would be much more beneficial:
+1) if we have labels that are more likely to be same: we would be able to skip over much more memory reads;
+2) if the GPU read is much slower: similar to 1), we would get better speedup if we read much fewer
+3) if a large number of threads are trying to access the same part of the local memory.
+
+Part 5:
+
+Similar to a lock, the atomic operations would ensure that when multiple threads are accessing the same old label, the
+label would be updated before being as the input for the second new label calculation. My understanding is that atomic
+operations are able to do this because the calculation and write are in one step, hence preventing intervention from
+other threads in the middle of the process.
+
+I think the result would still be correct, because eventually the label of the same region would still be the same, but
+it may hurt the performance because it introduces the race condition and thus redundent updating. In that way the
+iteration numbers should increase and have some fluctuation due to the race condition. I don't think the values in labels
+would increase between iterations.
+
+I tested the min() instead of teh atomic_min() with the code, and confirmed that the iteration is larger. However, the
+performance did not change (even slightly faster), which I find very interesting.
