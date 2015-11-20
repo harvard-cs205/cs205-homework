@@ -1,0 +1,58 @@
+***Part 1***
+
+maze1:
+Finished after 875 iterations, 182.42808 ms total, 0.208489234286 ms per iteration
+Found 2 regions
+
+maze2:
+Finished after 507 iterations, 105.83096 ms total, 0.208739566075 ms per iteration
+Found 35 regions
+
+***Part 2***
+
+maze1:
+Finished after 529 iterations, 109.4868 ms total, 0.206969376181 ms per iteration
+Found 2 regions
+
+maze2:
+Finished after 273 iterations, 56.38032 ms total, 0.206521318681 ms per iteration
+Found 35 regions
+
+***Part 3***
+
+maze1:
+Finished after 10 iterations, 2.8588 ms total, 0.28588 ms per iteration
+Found 2 regions
+
+maze2:
+Finished after 9 iterations, 2.35744 ms total, 0.261937777778 ms per iteration
+Found 35 regions
+
+***Part 4***
+
+It seems that on my architecture using a single thread to perform this step is
+pretty slow.  This implies that we are compute bound, because speeding up
+the memory accesses was not helpful.  This makes sense because my GPU (an intel 4000) is
+pretty slow: on a significantly faster GPU, possibly with many more cores, this effect
+may reverse.  Fundamentally, the fact that using a single thread would allow
+more efficient memory accesses should be helpful on certain architectures. If there
+were more redundancy in labels, this would also make our optimization more worthwhile.
+
+maze1:
+Finished after 10 iterations, 5.46928 ms total, 0.546928 ms per iteration
+Found 2 regions
+
+maze2:
+Finished after 9 iterations, 5.10248 ms total, 0.566942222222 ms per iteration
+Found 35 regions
+
+***Part 5***
+
+If we instead used the non-atomic standard min function, we would run into the following
+problem.  If we are trying to replace a with b in one thread and a with c in another
+thread, and b < c, we could replace a with b and then replace a with c because a was
+read into memory by both threads and then swapped out of order by both.  Thus, labels
+could increase, but not between iterations (because my code never tries to swap something
+with something bigger than it).  This would
+not result in incorrect results, but it might take more iterations than it should.
+

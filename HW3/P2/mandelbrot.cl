@@ -11,9 +11,30 @@ mandelbrot(__global __read_only float *coords_real,
     float c_real, c_imag;
     float z_real, z_imag;
     int iter;
+    float z_new_r = 0;
+    float z_new_i = 0;
+    z_real = 0;
+    z_imag = 0;
+
+    c_real = coords_real[w*y + x];
+    c_imag = coords_imag[w*y + x];
 
     if ((x < w) && (y < h)) {
         // YOUR CODE HERE
-        ;
-    }
+        iter = 0;
+    	for (int i = 0; i < max_iter; ++i) {
+    		if (z_real*z_real + z_imag * z_imag > 4.0) {
+    			break;
+    		}
+    		iter++;
+    		// z = z * z + c
+    		z_new_r = z_real * z_real - z_imag * z_imag;
+    		z_new_i = 2.0 * z_real * z_imag;
+    		z_new_i += c_imag;
+    		z_new_r += c_real;
+    		z_real = z_new_r;
+    		z_imag = z_new_i;
+    	}
+    	out_counts[w * y + x] = iter;
+  	}
 }

@@ -78,20 +78,60 @@ propagate_labels(__global __read_write int *labels,
     // Fetch the value from the buffer the corresponds to
     // the pixel for this thread
     old_label = buffer[buf_y * buf_w + buf_x];
+    new_label = old_label;
+    // Part 2 Grandparents checking
+    // if (new_label != w * h) {
+    //     buffer[buf_y * buf_w + buf_x] = labels[buffer[buf_y * buf_w + buf_x]];
+    // }
+    // barrier(CLK_LOCAL_MEM_FENCE);
+    // Part 4
+    // This if condition guarantees one thread per work group.
+    int cur_label;
+    if (lx == 0 && ly == 0) {
+        // Loop over the whole buffer and get grandparents
+        int last_fetched_ind = w*h;
+        int last_val = -1;
+        for (int i = halo; i < buf_h - halo; ++i) {
+            for (int j = halo; j < buf_w - halo; ++j) {
+                cur_label = buffer[buf_w * i + j];
+                if (cur_label == w * h)
+                    continue;
+                if (cur_label == last_fetched_ind) {
+                    buffer[buf_w * i + j] = last_val;
+                }
+                else {
+                    last_fetched_ind = cur_label;
+                    last_val = labels[cur_label];
+                    buffer[buf_w * i + j] = last_val;
+                }
+            }
+        }
+    }
+    barrier(CLK_LOCAL_MEM_FENCE);
 
-    // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
-    
     // stay in bounds
     if ((x < w) && (y < h)) {
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
-        new_label = old_label;
 
+        // w*h is the max label, used for background pixels.
+        if (new_label != w * h) {
+            new_label = min(buffer[(buf_y + 1) * buf_w + buf_x], new_label);
+            new_label = min(buffer[(buf_y - 1) * buf_w + buf_x], new_label);
+            new_label = min(buffer[buf_y * buf_w + (buf_x - 1)], new_label);
+            new_label = min(buffer[buf_y * buf_w + (buf_x + 1)], new_label);
+        }
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
             // indicate there was a change this iteration.
             // multiple threads might write this.
+            // Read the 32-bit value (referred to as old) stored at location pointed
+            // by p. Compute min (old, val) and store result at location pointed by
+            // p. The function returns old.
+            // int atomic_min (volatile __global int *p, int val)
+            atomic_min(&labels[old_label], new_label);
+            //labels[old_label] = min(labels[old_label], new_label);
             *(changed_flag) += 1;
             labels[y * w + x] = new_label;
         }
