@@ -1,0 +1,75 @@
+Results
+--------------------------------------------------------------------------------
+
+Part 1 maze1
+Finished after 850 iterations, 12028.872755 ms total, 14.1516150059 ms per iteration
+Found 2 regions
+Part 1 maze2
+Finished after 492 iterations, 6819.17514 ms total, 13.8601120732 ms per iteration
+Found 35 regions
+
+
+part2 maze1
+Finished after 512 iterations, 6689.243443 ms total, 13.0649285996 ms per iteration
+Found 2 regions
+part2 maze2
+Finished after 257 iterations, 3878.969242 ms total, 15.0932655331 ms per iteration
+Found 35 regions
+
+part3 maze1
+Finished after 9 iterations, 217.090742 ms total, 24.1211935556 ms per iteration
+Found 2 regions
+(I also sometimes get 10 iterations)
+part3 maze2
+Finished after 9 iterations, 245.400128 ms total, 27.2666808889 ms per iteration
+Found 35 regions
+(I also sometimes get 8 iterations)
+
+Merging parents regions seems to be the best optimization done!
+It is 15 times faster for maze2 and 30 times faster for maze1!
+
+part4 maze1
+Finished after 8 iterations, 326.621874 ms total, 40.82773425 ms per iteration
+Found 2 regions
+part4 naze2
+Finished after 7 iterations, 278.692479 ms total, 39.8132112857 ms per iteration
+Found 35 regions
+
+Part4 Discussion: Why one thread doing all the work? Is it better?
+It is not obvious that having one thread fetching grandparents is better.
+In my case (which is a cpu running openCL), it takes longer time per iteration.
+But there is also one iteration less to get to the result.
+The total time is still longer. So it is actually worse.
+
+Personally I thought it would be a huge improvement.
+A minor reason is that having only one thread doing the job avoids locks.
+A major reason is that reusing the fetched grandparent avoids some fetch in the global memory which is very costly!
+I guess that in an io-bound algorithm this would prove useful.
+
+Maybe here we're not io-bound enough, that is why we don't see a performance increase.
+
+
+Part 5: no atomic operation discussion
+
+Would the final result still be correct?
+I would say yes.
+My guess is that the result would still be correct.
+Though. I can think of a theoretical situation where the result would not be correct.
+For example, if two threads try to write the minimum at the same time for each iteration.
+And if the higher minimum is always the one that ends up being written, then it can lead to a wrong result.
+
+Impact on performance in time?
+Good impact. min is very likely to be faster that atomic_min
+atomic_min is enforcing a serialization in memory access.
+The time per iteration actually almost doubles once I use atomic_min on my machine.
+
+Impact on performance in iteration?
+Bad impact. The min does not make sure that we get to best minimum of the iteration.
+While atomic_min makes it sure with serialization.
+
+Can the label value increase within an iteration?
+Yes. If different label change the value at the same time. The value may increase within an iteration.
+
+Can the label value increase per iteration?
+No. If we don't use atomic_min, the value at the end will not be the smallest across the threads.
+However it is guaranteed to be smaller per iteration and will eventually converge to the correct result.

@@ -42,7 +42,7 @@ if __name__ == '__main__':
 
     program = cl.Program(context, open('label_regions.cl').read()).build(options='')
 
-    host_image = np.load('maze1.npy')
+    host_image = np.load('maze2.npy')
     host_labels = np.empty_like(host_image)
     host_done_flag = np.zeros(1).astype(np.int32)
 
@@ -85,7 +85,7 @@ if __name__ == '__main__':
     while True:
         itercount += 1
         host_done_flag[0] = 0
-        print 'iter', itercount
+        # print 'iter', itercount
         cl.enqueue_copy(queue, gpu_done_flag, host_done_flag, is_blocking=False)
         prop_exec = program.propagate_labels(queue, global_size, local_size,
                                              gpu_labels, gpu_done_flag,
@@ -102,7 +102,7 @@ if __name__ == '__main__':
             # no changes
             break
         # there were changes, so continue running
-        print host_done_flag
+        # print host_done_flag
         if itercount % 100 == 0 and show_progress:
             cl.enqueue_copy(queue, host_labels, gpu_labels, is_blocking=True)
             pylab.imshow(host_labels)

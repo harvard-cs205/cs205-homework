@@ -1,0 +1,2 @@
+The queue is using the device: Pentium(R) Dual-Core CPU       T4300  @ 2.10GHz
+1075.239963 Million Complex FMAs in 11.069342478 seconds, 97.1367509079 million Complex FMAs / second
