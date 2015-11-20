@@ -4,19 +4,19 @@ __kernel void sum_coalesced(__global float* x,
                             long N)
 {
     
-    //float sum = 0;
-    //size_t local_id = get_local_id(0);
-    //int i = get_global_id(0);
-    //int k = get_global_size(0);
+    float sum = 0;
+    size_t local_id = get_local_id(0);
+    int i = get_global_id(0);
+    int k = get_global_size(0);
 
     // // thread i (i.e., with i = get_global_id()) should add x[i],
     // // x[i + get_global_size()], ... up to N-1, and store in sum.
-    // for (int counter = i; counter < N; counter += k) {
-    //     sum += x[counter];
-    // }
+    for (int counter = i; counter < N; counter += k) {
+        sum += x[counter];
+    }
 
-    // fast[local_id] = sum;
-    // barrier(CLK_LOCAL_MEM_FENCE);
+    fast[local_id] = sum;
+    barrier(CLK_LOCAL_MEM_FENCE);
 
     // // binary reduction
     // //
@@ -27,14 +27,14 @@ __kernel void sum_coalesced(__global float* x,
     // // You can assume get_local_size(0) is a power of 2.
     // //
     // // See http://www.nehalemlabs.net/prototype/blog/2014/06/16/parallel-programming-with-opencl-and-python-parallel-reduce/
-    // for (size_t offset = get_local_size(0); offset > 0; offset = offset >> 1) { 
-    //     if(local_id < offset){
-    //         fast[local_id] = fast[local_id] + fast[local_id+offset];
-    //     }
-    //     barrier(CLK_LOCAL_MEM_FENCE);
-    // }
+    for (size_t offset = get_local_size(0) >> 1; offset > 0; offset = offset >> 1) { 
+        if(local_id < offset){
+            fast[local_id] = fast[local_id] + fast[local_id+offset];
+        }
+        barrier(CLK_LOCAL_MEM_FENCE);
+    }
 
-    //if (local_id == 0) partial[get_group_id(0)] = fast[0];
+    if (local_id == 0) partial[get_group_id(0)] = fast[0];
 }
 
 __kernel void sum_blocked(__global float* x,
