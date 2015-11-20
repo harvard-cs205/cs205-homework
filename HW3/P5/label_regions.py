@@ -93,7 +93,7 @@ if __name__ == '__main__':
                                              width, height,
                                              buf_size[0], buf_size[1],
                                              halo)
-        prop_exec.wait()
+        prop_exec.wait( )
         elapsed = 1e-6 * (prop_exec.profile.end - prop_exec.profile.start)
         total_time += elapsed
         # read back done flag, block until it gets here
