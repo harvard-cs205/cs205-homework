@@ -27,7 +27,7 @@ Part 4:
 		Finished after 272 iterations, 1375.530648 ms total, 5.05709797059 ms per iteration
 		Found 35 regions
 		
-	Explanation: By using a single thread to fetch grandparents, we hopefully perform fewer global reads because we can hopefully reduce the number of repeated global reads.  However, the region labeling takes much longer to run because the global reads are no longer performed in parallel.  Hence, we reduce the number of global memory reads, but we also reduce speed.  The single thread approach would be a good idea when memory is under extreme use by other processes.  Using a single thread would reduce the load of global memory.
+	Explanation: By using a single thread to fetch grandparents, we perform fewer global memory reads because we can hopefully reduce the number of repeated global memory reads.  However, the region labeling takes much longer to run because the global memory reads are no longer performed in parallel.  Hence, we reduce the number of global memory reads, but we also reduce speed.  The single thread approach would be a good idea when memory is under extreme use by other processes.  Using a single thread would reduce the load of global memory.
 	
 Part 5:
 	If we do not use atomic operations, we will still get a correct answer, but it will take longer.  We are guaranteed a correct answer because in a single iteration, we only store new_value if new_value is less than old_value.  Even if multiple threads write to labels[old_value],  labels [old_value] will be less at the end of the iteration than the original labels[old_value] at the beginning of the iteration.  
