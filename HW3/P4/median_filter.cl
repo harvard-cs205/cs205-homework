@@ -70,20 +70,20 @@ median_3x3(__global __read_only float *in_values,
       }
     }
         
-    //# Make sure all threads reach the next part after the local buffer is loaded
+    // now write the output
     barrier(CLK_LOCAL_MEM_FENCE);
 
     if((x < w) && (y < h)){
       out_values[y * w + x] =\
-        median9(buffer[(buf_y-1) * buf_w + buf_x -1],\
-        buffer[(buf_y-1) * buf_w + buf_x],\
-        buffer[(buf_y-1) * buf_w + buf_x +1],\
-        buffer[buf_y * buf_w + buf_x -1],  \ 
-        buffer[buf_y * buf_w + buf_x], \    
-        buffer[buf_y * buf_w + buf_x +1],\
-        buffer[(buf_y+1) * buf_w + buf_x -1],\
-        buffer[(buf_y+1) * buf_w + buf_x],\
-        buffer[(buf_y+1) * buf_w + buf_x +1]);
+        median9( buffer[ (buf_y-1) * buf_w + buf_x -1],\
+        buffer[ (buf_y-1) * buf_w + buf_x],\
+        buffer[ (buf_y-1) * buf_w + buf_x +1],\
+        buffer[ buf_y * buf_w + buf_x -1],  \ 
+        buffer[ buf_y * buf_w + buf_x], \    
+        buffer[ buf_y * buf_w + buf_x +1],\
+        buffer[ (buf_y+1) * buf_w + buf_x -1],\
+        buffer[ (buf_y+1) * buf_w + buf_x],\
+        buffer[ (buf_y+1) * buf_w + buf_x +1]);
 
     }
 
