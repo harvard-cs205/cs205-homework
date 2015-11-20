@@ -1,0 +1,43 @@
+
+——————————————— Part 1 ———————————————————-
+
+i) Maze 1
+- Finished after 914 iterations, 222.05546 ms total, 0.242949080963 ms per iteration.
+- Found 2 regions.
+ii) Maze 2
+- Finished after 532 iterations, 132.33624 ms total, 0.248752348352 ms per iteration.
+- Found 35 regions.
+
+——————————————— Part 2 ———————————————————-
+
+i) Maze 1
+- Finished after 529 iterations, 128.96085 ms total, 0.243782340345ms per iteration.
+- Found 2 regions.
+ii) Maze 2
+- Finished after 273 iterations, 65.91784 ms total, 0.241457293493 ms per iteration.
+- Found 35 regions.
+
+——————————————— Part 3 ———————————————————-
+
+i) Maze 1
+- Finished after 10 iterations, 2.48348 ms total, 0. 248348 ms per iteration.
+- Found 2 regions.
+ii) Maze 
+- Finished after 9 iterations, 2.18921 ms total, 0.243246534875 ms per iteration.
+- Found 35 regions.
+
+——————————————— Part 4 ———————————————————-
+i) Maze 1
+- Finished after 10 iterations, 4.87712 ms total, 0. 487712 ms per iteration.
+- Found 2 regions.
+ii) Maze 2
+- Finished after 9 iterations, 4.34102 ms total, 0.482336 ms per iteration.
+- Found 35 regions.
+
+In this part, we used a single thread so that redundant global memory reads could be partly reduced. However, from the results we can see that a single thread is actually not a good choice. I think that’s because most of the labels are different which at the beginning which may require global memory reads. Thus, the time saved by avoiding unnecessary global memory reads is not as much as we expected.
+
+——————————————— Part 5 ———————————————————-
+From the results of this part, I found that min() and atomic_min don’t have much difference on the correctness of the algorithm. However, atomic_min() requires less iterations. I think the reason is that the value in labels will be changed by other threads if we called min(). On the other hand, atomic_min() can guarantee that only one thread could update the label at one time. Thus, I think atomic_min() is a better choice.
+
+
+
