@@ -17,6 +17,20 @@ initialize_labels(__global __read_only int *image,
     }
 }
 
+int minn(int x, int y) {
+  return (x > y) ? y : x;
+}
+
+int maxx(int x, int y) {
+  return (x > y) ? x : y;
+}
+
+int
+update_label(int old, int l, int r, int t, int b)
+{
+    return minn(minn(minn(minn(old, l), r), t), b);
+}
+
 int
 get_clamped_value(__global __read_only int *labels,
                   int w, int h,
@@ -80,18 +94,50 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
-    
+    // Part 2, update buffer for those within the threshold only.
+    /*
+    if (old_label < w*h) {
+        buffer[buf_y * buf_w + buf_x] = labels[old_label];
+    }
+    */
+
+    if (idx_1D == 0) {
+        int last_fetch = -1;
+        int last_idx = -1;
+        for (int yiter = halo; yiter < buf_h - halo; ++yiter) {
+            for (int xiter = halo; xiter < buf_w - halo; ++xiter) {
+                int cur_idx = yiter * buf_h + xiter;
+                if (buffer[cur_idx] >= w*h) continue;
+                if (buffer[cur_idx] != last_idx) {
+                    last_idx = cur_idx;
+                    last_fetch = labels[buffer[cur_idx]];
+                }
+                buffer[cur_idx] = last_fetch;
+            }
+        }
+    }
+
+    barrier(CLK_LOCAL_MEM_FENCE);
+
     // stay in bounds
     if ((x < w) && (y < h)) {
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
-        new_label = old_label;
+        if (old_label >= w * h) new_label = old_label;
+        else new_label = update_label(
+                            old_label,
+                            buffer[(buf_y-1)*buf_w + buf_x],
+                            buffer[(buf_y+1)*buf_w + buf_x],
+                            buffer[buf_y * buf_w + buf_x - 1],
+                            buffer[buf_y * buf_w + buf_x + 1]);
 
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
             // indicate there was a change this iteration.
             // multiple threads might write this.
+            atomic_min(old_label + labels, new_label);
+            //labels[old_label] = min(labels[old_label], new_label);
             *(changed_flag) += 1;
             labels[y * w + x] = new_label;
         }
