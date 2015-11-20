@@ -39,3 +39,16 @@ Found 2 regions
 maze2.npy
 Finished after 9 iterations, 11.54208 ms total, 1.28245333333 ms per iteration
 Found 35 regions
+
+In this case, it seems that for the architecture I am using meant that this was less effective with a single thread. This suggests that there was a tradeoff in compute versus memory where, in this case, I ended up being compute bound, and making more memory lookups in exchange for doing less compute would have resulted in a faster environment. This makes sense given that my GPU is pretty slow (Intel HD Graphics, not a dedicated graphics chip). So, in this case, using a single thread is not a reasonable choice. However, if there is a GPU that is much less compute bound and instead is going to be memory bound, then the single thread method reduces memory access and will be better.
+
+
+part 5:
+
+Using min would mean that we could have race conditions.
+Consider the situation were in reality, a < b < c
+If (a, c) are compared around the same time as (b, c), it is possible that a would be selected since it is less than c, and then b would overwrite it, since b < c as well. This is bad, because even though it doesn't increase between interactions, it may not decrease as much as it can. 
+
+The final result would still be correct, but it would take more iterations. min is faster than atomic_min, so there may be a speed up, but the extra iterations may make it not worth it.
+
+

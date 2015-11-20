@@ -2,6 +2,10 @@ These are the results for Problem 3:
 
 #0: Intel(R) Core(TM) i5-4250U CPU @ 1.30GHz on Apple
 #1: HD Graphics 5000 on Apple
+
+
+best: configuration ('coalesced', 32, 128): 0.00277784 seconds
+
 coalesced reads, workgroups: 8, num_workers: 4, 0.16591496 seconds
 coalesced reads, workgroups: 8, num_workers: 8, 0.09515896 seconds
 coalesced reads, workgroups: 8, num_workers: 16, 0.05528776 seconds
