@@ -30,10 +30,13 @@ Found 35 regions
 
 ***Part 4***
 
-Explain, in terms of compute vs. memory, why using a single thread to perform this step is
-or is not a reasonable choice. Note that there is some variation in GPUs, so you may want to
-discuss your empirical results as well as speculate under what conditions those results might
-be different.
+It seems that on my architecture using a single thread to perform this step is
+pretty slow.  This implies that we are compute bound, because speeding up
+the memory accesses was not helpful.  This makes sense because my GPU (an intel 4000) is
+pretty slow: on a significantly faster GPU, possibly with many more cores, this effect
+may reverse.  Fundamentally, the fact that using a single thread would allow
+more efficient memory accesses should be helpful on certain architectures. If there
+were more redundancy in labels, this would also make our optimization more worthwhile.
 
 maze1:
 Finished after 10 iterations, 5.46928 ms total, 0.546928 ms per iteration
@@ -45,9 +48,11 @@ Found 35 regions
 
 ***Part 5***
 
-Explain what would happen if instead of using the atomic min() operation, one would use
-the min() function. Your explanation should consider whether the final result would still be
-correct, what might be the impact on the performance of the algorithm (time and iterations),
-could a value in labels ever increase, and could it increase between iterations?
-
+If we instead used the non-atomic standard min function, we would run into the following
+problem.  If we are trying to replace a with b in one thread and a with c in another
+thread, and b < c, we could replace a with b and then replace a with c because a was
+read into memory by both threads and then swapped out of order by both.  Thus, labels
+could increase, but not between iterations (because my code never tries to swap something
+with something bigger than it).  This would
+not result in incorrect results, but it might take more iterations than it should.
 
