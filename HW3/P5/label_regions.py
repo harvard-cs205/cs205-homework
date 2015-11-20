@@ -2,7 +2,7 @@ from __future__ import division
 import sys
 import pyopencl as cl
 import numpy as np
-import pylab
+import matplotlib.pyplot as pylab
 
 def round_up(global_size, group_size):
     r = global_size % group_size
@@ -42,7 +42,7 @@ if __name__ == '__main__':
 
     program = cl.Program(context, open('label_regions.cl').read()).build(options='')
 
-    host_image = np.load('maze1.npy')
+    host_image = np.load('maze2.npy')
     host_labels = np.empty_like(host_image)
     host_done_flag = np.zeros(1).astype(np.int32)
 
