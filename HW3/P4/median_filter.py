@@ -51,7 +51,7 @@ if __name__ == '__main__':
                             properties=cl.command_queue_properties.PROFILING_ENABLE)
     print 'The queue is using the device:', queue.device.name
 
-    curdir = os.path.dirname(os.path.realpath(__file__))
+    curdir = os.path.dirname(os.path.realpath(__file__)).replace(" ", "\ ")
     program = cl.Program(context, open('median_filter.cl').read()).build(options=['-I', curdir])
 
     host_image = np.load('image.npz')['image'].astype(np.float32)[::2, ::2].copy()
