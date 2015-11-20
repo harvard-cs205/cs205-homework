@@ -1,0 +1,42 @@
+P5.txt
+
+### SUBPROBLEM 1: multithreading ###
+
+# Original Implementation
+10 frame update average ~ 8.4886844904079997 simulation frames per second
+# 1 Thread
+10 frame update average ~ 8.9781141036150025 simulation frames per second
+# 4 threads
+10 frame update average ~ 13.478761244959998 simulation frames per second
+
+For subproblem 1, we updated the physics engine with multithreading (via a prange in update function). We can see from the average simulation frames per second that adding additional threads for computation slightly increases the performance of the program. However, these updates are not substantial and as we discovered later in the problem, there is room for improvement.
+
+### SUBPROBLEM 2: Spatial decomposition ###
+
+# 1 Thread
+10 frame update average ~ 327.77711671729998 simulation frames per second
+# 4 Threads
+10 frame update average ~ 488.2193716649 simulation frames per second
+
+For subproblem 2, we see a huge increase in performance due to the spatial decomposition. The SD was achieved by finding the position of the balls in the grid and only searching in a small box around the ball of interest instead of searching all balls in space. This significantly cuts down the amount of comparisons needed to see if balls collide and there are performance benefits from doing so.
+
+### SUBPROBLEM 3: Spatially Coherent Sorting ###
+
+# 1 Thread
+10 frame update average ~ 539.95193751989996 simulation frames per second
+# 4 Threads
+10 frame update average ~ 728.73026065850001 simulation frames per second
+
+In subproblem 3, we were asked to arrange the balls in to Morton/Zorder or Hilbert spacing in order for balls that are near each other in the grid to be located near each in memory. I choose to implement a morton curve as I wasn't familiar with either Morton or Hilbert and the Morton/Zorder curve seemed easier to implement. The Zorder is calculated by interleaving bits for 2 positions together (e.g. [0,1] and [1,0] would become [0110]) then sorting based on this new representation. We see a performance increase due to the fact that the balls are closer together in memory and therefore we don't have to go as far in memory for the comparison.
+
+I used the following website as a reference and collaborated with Patrick Kupier on this subproblem:
+http://www.thejach.com/view/2011/9/playing_with_morton_numbers
+
+### SUBPROBLEM 4: Locks ###
+
+# 1 Thread
+10 frame update average ~ 404.76805630230001 simulation frames per second
+# 4 Threads
+10 frame update average ~ 644.6591968916 simulation frames per second
+
+In subproblem 4, we were tasked to implement locks in order to ensure that the multiple threads weren't altering the positions of the balls. Since the threads are implementing locks in a fine grain fashion, we actually realize degraded performance. Although the performance of the program is decreased, our program actually becomes more realistic as we are not updating collisions multiple times for the same collision. In the end, our parallel implementation is approx. 90x faster than the serial implementation. Parallel coding is the way to go!

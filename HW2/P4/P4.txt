@@ -1,0 +1,14 @@
+I referenced the following webpage for this problem and collaborated with Patrick Kuiper:
+https://pymotw.com/2/threading/
+
+Original Run
+5.32677793503 seconds for 10 filter passes.
+
+Threaded Code Runs
+5.90390110016 seconds for 10 filter passes and 1 threads
+3.10576891899 seconds for 10 filter passes and 2 threads
+2.29144191742 seconds for 10 filter passes and 4 threads
+
+In this problem we discovered how to implement python threads using events objects. I used the events object call to keep track of each thread’s progress for every iteration of the image filter. Events allow for threads to keep track of one another and to sync up between iterations. I found the "set()" logic to be counter intuitive as you set the current processing thread, then alert it's neighbor threads that they must "wait()" until each other have completed their calculation. I originally thought that this syntax would be the other way around, which led to many hours of python event fun!
+
+Based on my results, one can see that adding more threads does speed the median filter algorithm up. However, there is an overhead associated with establishing threads as the single thread execution took longer than the no thread original test.
