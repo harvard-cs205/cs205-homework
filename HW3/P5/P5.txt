@@ -19,11 +19,18 @@ Found 35 regions
 
 
 [Maze1]
-Finished after 529 iterations, 164.57728 ms total, 0.311110170132 ms per iteration
+Finished after 10 iterations, 3.08848 ms total, 0.308848 ms per iteration
 Found 2 regions
 
 [Maze2]
-Finished after 273 iterations, 84.98736 ms total, 0.311309010989 ms per iteration
+Finished after 9 iterations, 2.77736 ms total, 0.308595555556 ms per iteration
 Found 35 regions
 
 
+[Maze1]
+Finished after 884 iterations, 273.95088 ms total, 0.30989918552 ms per iteration
+Found 2 regions
+
+[Maze2]
+Finished after 517 iterations, 161.49896 ms total, 0.312377098646 ms per iteration
+Found 35 regions
