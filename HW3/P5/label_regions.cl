@@ -81,7 +81,7 @@ propagate_labels(__global __read_write int *labels,
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
     // if(old_label < w * h){
-    //     location = buf_y * buf_w + buf_x;
+    //     int location = buf_y * buf_w + buf_x;
     //     buffer[location] = labels[buffer[location]];
     // }
 
@@ -91,7 +91,7 @@ propagate_labels(__global __read_write int *labels,
         int previous_label = -1;
         for(int i = 0; i < buf_x * buf_y; i ++){
             if(buffer[i] < w * h && previous_label != buffer[i]){
-                previous_label == labels[buffer[i]];
+                previous_label = labels[buffer[i]];
             }
             buffer[i] = previous_label;
         }
@@ -99,20 +99,20 @@ propagate_labels(__global __read_write int *labels,
     }
 
 
-    barrier(CLK_LOCAL_MEM_FENCE);
+    // barrier(CLK_LOCAL_MEM_FENCE);
     // stay in bounds
     if ((x < w) && (y < h)) {
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
         new_label = old_label;
-        if (new_label < w*h){
+        if (old_label < w*h){
             new_label = min(
-                new_label,
-                min(buffer[(buf_y -1) * h + buf_x],
-                    min(buffer[buf_y * h + buf_x - 1],
-                        min(buffer[buf_y * h + buf_x + 1], 
-                            buffer[(buf_y - 1) * h + buf_x]))));
+                old_label,
+                min(buffer[(buf_y -1) * buf_w + buf_x],
+                    min(buffer[buf_y * buf_w + buf_x - 1],
+                        min(buffer[buf_y * buf_w + buf_x + 1], 
+                            buffer[(buf_y + 1) * buf_w + buf_x]))));
         }
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
@@ -121,9 +121,9 @@ propagate_labels(__global __read_write int *labels,
             *(changed_flag) += 1;
             labels[y * w + x] = new_label;
             // Call atomic mean to put new_label in labels[old_label], and make sure it didn't increase
-            // atomic_min(&labels[old_label], new_label);
-            // // Call atomic min when writing the non halo portion
-            // atomic_min(&labels[y * w + x], new_label
+            atomic_min(&labels[old_label], new_label);
+            // Call atomic min when writing the non halo portion
+            atomic_min(&labels[y * w + x], new_label);
         }
     }
 }

@@ -33,11 +33,9 @@ if __name__ == "__main__":
             event = program.sum_coalesced(queue, (num_workgroups * num_workers,), (num_workers,),
                                           x, partial_sums, local, np.uint64(N))
             cl.enqueue_copy(queue, host_partial, partial_sums, is_blocking=True)
-            print partial_sums;
             sum_gpu = sum(host_partial)
             sum_host = sum(host_x)
             seconds = (event.profile.end - event.profile.start) / 1e9
-            print sum_gpu
             assert abs((sum_gpu - sum_host) / max(sum_gpu, sum_host)) < 1e-4
             times['coalesced', num_workgroups, num_workers] = seconds
             print("coalesced reads, workgroups: {}, num_workers: {}, {} seconds".
