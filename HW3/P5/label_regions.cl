@@ -1,3 +1,6 @@
+
+//function below just initializes labels to their linear index
+
 __kernel void
 initialize_labels(__global __read_only int *image,
                   __global __write_only int *labels,
@@ -16,6 +19,10 @@ initialize_labels(__global __read_only int *image,
         }
     }
 }
+
+// This just takes in a particular x, y and either returns
+// the MAX value for it (w*h) or the value in labels for the
+// given x, y
 
 int
 get_clamped_value(__global __read_only int *labels,
@@ -81,19 +88,89 @@ propagate_labels(__global __read_write int *labels,
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
     
+    //This is the old code for Part 2 below
+    // if (old_label < w*h){
+    //     buffer[buf_y*buf_w + buf_x] = labels[buffer[buf_y*buf_w + buf_x]];
+    // }
+
+
+    int wg_w = get_local_size(0);
+    int wg_h = get_local_size(1);
+
+    //have only the first thread do anything
+    if((lx == 0) && (ly == 0)) {
+        //initialize a bunch of variables we'll need later
+        int bufIDX;
+        int labBuf;
+        int prev;
+        int prev_label;
+        int row;
+        int col;
+        //go through every pixel in your workgroup
+        for (row=0; row < wg_w; row++){
+            for(col=0; col<wg_h; col++){
+                //get the index in the buffer we are looking at
+                //from the row,col we know in the workgroup
+                bufIDX = (row+halo)*buf_w + col + halo;
+                //get the label that's stored in the buffer
+                labBuf = buffer[bufIDX];
+                //make sure you are still in bounds
+                if(labBuf < w*h){
+                    //check if you've seen this Label before
+                    //because then we have it in the local buffer
+                    if (labBuf == prev){
+                        buffer[bufIDX] = prev_label;
+                    }
+                    //otherwise, make the call to global memory
+                    else{
+                        prev = labBuf;
+                        prev_label = labels[labBuf];
+                        buffer[bufIDX] = prev_label;
+                    }
+            }
+
+            }
+
+        }
+
+
+    }
+
+    barrier(CLK_LOCAL_MEM_FENCE);
+
+
+
+
+    int minRow;
+    int minCol;
     // stay in bounds
     if ((x < w) && (y < h)) {
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
-        new_label = old_label;
+        
+        if(old_label < w*h){
+        //Make sure that you don't accidentally try to update one of the values on the bounds.
+            //Grr..in C the min function can only take the min of 2 arguments. But that's fine,
+            //just take the min of up down, right left.
+            minRow = min(buffer[buf_y*buf_w + buf_x - 1], buffer[buf_y*buf_w + buf_x + 1]);
+            minCol = min(buffer[buf_y*buf_w - buf_w + buf_x], buffer[buf_y*buf_w +buf_w + buf_x]);
+            new_label = min(old_label, min(minRow, minCol)); 
 
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
             // indicate there was a change this iteration.
             // multiple threads might write this.
+
+            //atomic_min(p, int val) where p is a pointer to the old value and val is compared.
+            //value in memory address of p is updated to the min of the old and val.
+
+            atomic_min(&labels[old_label], new_label);
+
             *(changed_flag) += 1;
-            labels[y * w + x] = new_label;
+            // labels[y * w + x] = new_label;
+            atomic_min(&labels[y*w + x], new_label);
         }
+    }
     }
 }

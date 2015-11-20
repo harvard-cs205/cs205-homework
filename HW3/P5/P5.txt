@@ -1,0 +1,53 @@
+
+##Part 1##
+
+Maze 1: Finished after 874 iterations, 600.65464 ms total, 0.687247871854 ms per iteration
+Found 2 regions
+
+Maze 2: Finished after 508 iterations, 351.24504 ms total, 0.691427244094 ms per iteration
+Found 35 regions
+
+
+
+
+## PART 2 ##
+
+Maze 1: Finished after 528 iterations, 360.49096 ms total, 0.682748030303 ms per iteration
+Found 2 regions
+
+Maze 2: Finished after 273 iterations, 186.83664 ms total, 0.684383296703 ms per iteration
+Found 35 regions
+
+
+
+
+## PART 3 ##
+
+Maze 1: Finished after 10 iterations, 8.68072 ms total, 0.868072 ms per iteration
+Found 2 regions
+
+Maze 2: Finished after 9 iterations, 7.56552 ms total, 0.840613333333 ms per iteration
+Found 35 regions
+
+
+
+## PART 4 ##
+
+Maze-1: Finished after 10 iterations, 19.3888 ms total, 1.93888 ms per iteration
+Found 2 regions
+
+Maze 2: Finished after 9 iterations, 17.336 ms total, 1.92622222222 ms per iteration
+Found 35 regions
+
+
+Part 4 Analysis:
+
+Overall, our empirical results seem to indicate that having a single thread simply perform the step is perhaps not a reasonable choice as it took the single threaded version more than twice as long to complete as the version we had created in Part 3 (merge parent regions). This perhaps makes some sense -- even though we are saving time on our reads from memory by accessing the local buffer instead of the local memory, we are doing so at the expense of making all of our computation within a workgroup serial (only one thread in the workgroup actually does the work now, the rest are more or less useless). So, it is clear that in this instance the benefit in saving time from reading from memory in a certain set of cases does not outweigh the cost of having to make part of our computation serial. Perhaps if the nature of the problem was different (i.e. you have many more repeated values so you can make the read from the local buffer much more often or each workgroup is relatively small so you are serializing over only a small bit) or if the reads from memory were much more costly (becoming more of a memory-constrained problem), then it may make sense to take the single-threaded approach. Also, if for some reason your GPU had an extremely limited number of threads whereby pixel in the workgroup would not already have a thread that could be dedicated to it, then this may also make sense because you wouldn't be cutting out parallelized efficiency as much. 
+
+
+Part 5: 
+
+Atomic operations become efficient as now we are locking access to certain resources, thus incurring the overhead we saw at times last pset, and are also serializing much of our memory access. However, if we use the min() function rather than atomic_min(), perhaps we can imagine scenarios in which different threads may run at different speeds, and thus inadvertently over-write some of our labels. 
+So, if we had label[old_label] = min(old_label, new_label) and two threads that both access the same initial old_value but run at different speeds afterwards, we can imagine a situation in which the first thread updates label[old_label] with a very low new_label, but a second thread is in the same update step before it noticed the update to label[old_label] and has a higher new_label than the first thread did. In this case, the second thread would over-write the label[old_label] with this higher value (or perhaps keep the old value if this new_value is too high), which is not desired behavior at all and sets us back. 
+Fortunately, because our algorithm continues until it finds the minimum value that any pixel can take based on its neighbors, our final answer wouldn't actually change. However, it is possible that the number of iterations we require would increase granted the fact that we are potentially overwriting correct values a thread writes due to race conditions. On the other hand, we also get a performance boost because we are now able to parallelize our code more efficiently since we don't have serial access to memory or the overhead of locks. So, as long as our threads don't collide too often in a manner that increases the number of iterations we require, our algorithm could actually be sped up by switching to min() instead of atomic_min().
+

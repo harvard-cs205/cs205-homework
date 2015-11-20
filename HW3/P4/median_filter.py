@@ -4,6 +4,8 @@ import numpy as np
 import pylab
 import os.path
 
+
+
 def round_up(global_size, group_size):
     r = global_size % group_size
     if r == 0:
@@ -52,7 +54,9 @@ if __name__ == '__main__':
     print 'The queue is using the device:', queue.device.name
 
     curdir = os.path.dirname(os.path.realpath(__file__))
-    program = cl.Program(context, open('median_filter.cl').read()).build(options=['-I', curdir])
+
+    curdir2 = '/Users/devvret/Desktop/Senior\ Year/CS205/cs205-homework/HW3/P4'
+    program = cl.Program(context, open('median_filter.cl').read()).build(options=['-I', curdir2])
 
     host_image = np.load('image.npz')['image'].astype(np.float32)[::2, ::2].copy()
     host_image_filtered = np.zeros_like(host_image)
