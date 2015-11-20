@@ -1,0 +1,53 @@
+Part 1:
+
+Maze1:
+Finished after 877 iterations, 554.75504 ms total, 0.63255990878 ms per iteration
+Found 2 regions
+
+Maze2:
+Finished after 507 iterations, 308.520896 ms total, 0.608522477318 ms per iteration
+Found 35 regions
+
+Part 2:
+
+Maze1:
+Finished after 529 iterations, 345.488448 ms total, 0.653097255198 ms per iteration
+Found 2 regions
+
+Maze2:
+Finished after 273 iterations, 141.870944 ms total, 0.519673787546 ms per iteration
+Found 35 regions
+
+Part 3:
+
+Maze1:
+Finished after 10 iterations, 6.95184 ms total, 0.695184 ms per iteration
+Found 2 regions
+
+Maze2:
+Finished after 9 iterations, 6.220736 ms total, 0.691192888889 ms per iteration
+Found 35 regions
+
+Part 4:
+
+Maze 1:
+Finished after 10 iterations, 19.497792 ms total, 1.9497792 ms per iteration
+Found 2 regions
+
+Maze 2:
+Finished after 9 iterations, 17.632704 ms total, 1.95918933333 ms per iteration
+Found 35 regions
+
+On my machine, there was a 3x slowdown between part 3 and part 4. In general, when using a single thread, we lose the parallelism of the computation, which means we become slower. On the other hand, when using a single thread, if the labels of pixels in the same workgroup are indeed very similar, then we wouldn’t have to deal with the latency of every thread going to global memory anymore, which means we become faster. In this case, it turns out that the labels are not repeated enough times to warrant the loss in computational speed due to loss of parallelism. On some GPUs, this might be more or less pronounced, depending on how high the latency of going to global memory is, and how many ALUs there are (how good threads are at hiding latency), etc. 
+
+
+Part 5:
+
+If we used min instead of atomic min, then one thread might overwrite the answer of another thread. For example, if two threads are comparing the same old_label to two values v1, v2 such that v1 < v2 < old_label.
+Both threads would do the comparison at the same time, but thread 1 might overwrite old_label with v1, and then thread 2 overwrites it with v2, which is higher than v1. So in this instance, the value for old_label actually increased between the time that thread 1 and thread 2 were done, but it can never increase between iterations, since it only gets updated when one thread finds a lower value and takes the min. 
+At the end 
+
+At the end of each iteration, the result might be wrong, but at the end of the program, the result is the same, it will just take more iterations to get there.
+
+On the one hand, using atomic_min instead of min slows us down to almost serial speed. On the other hand, min slows us down because we will have to do more iterations to finish the program. So it’s not entirely clear how overall performance will be affected.
+ 
