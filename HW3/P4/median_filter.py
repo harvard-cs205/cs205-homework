@@ -69,6 +69,7 @@ if __name__ == '__main__':
     # +2 for 1-pixel halo on all sides, 4 bytes for float.
     local_memory = cl.LocalMemory(4 * (local_size[0] + 2) * (local_size[1] + 2))
     # Each work group will have its own private buffer.
+    # Each work group will have its own private buffer.
     buf_width = np.int32(local_size[0] + 2)
     buf_height = np.int32(local_size[1] + 2)
     halo = np.int32(1)
