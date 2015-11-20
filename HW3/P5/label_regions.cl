@@ -109,6 +109,7 @@ propagate_labels(__global __read_write int *labels,
             // multiple threads might write this.
             *(changed_flag) += 1;
             labels[y * w + x] = new_label;
+            atomic_min(&labels[old_label], new_label);
         }
     }
 }
