@@ -85,6 +85,20 @@ propagate_labels(__global __read_write int *labels,
     //     buffer[location] = labels[buffer[location]];
     // }
 
+    // Make sure we only use one thread per work group
+    // Use the first element
+    if (ly + lx == 0){
+        int previous_label = -1;
+        for(int i = 0; i < buf_x * buf_y; i ++){
+            if(buffer[i] < w * h && previous_label != buffer[i]){
+                previous_label == labels[buffer[i]];
+            }
+            buffer[i] = previous_label;
+        }
+
+    }
+
+
     barrier(CLK_LOCAL_MEM_FENCE);
     // stay in bounds
     if ((x < w) && (y < h)) {
