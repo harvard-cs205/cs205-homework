@@ -27,6 +27,28 @@ get_clamped_value(__global __read_only int *labels,
     return labels[y * w + x];
 }
 
+int 
+find_min(__local int *buffer,
+         int buf_x, int buf_y, 
+         int buf_w,
+         int w, int h){
+    int i,j;
+    //set min_val intially to center value
+    int min_val=buffer[buf_y * buf_w + buf_x];
+    // if not a wall point
+    if (min_val!=w*h){
+        for (i = -1; i <= 1; i++){
+            for (j = -1; j <= 1; j++){
+                //only check on off-diagonals, not corners or center point, or maze walls (=0).
+                if  (i!=j){
+                    min_val=min(min_val,buffer[(buf_y+j)*buf_w+(buf_x+i)]);
+                }
+            }
+        }
+    }
+    return min_val;
+}
+
 __kernel void
 propagate_labels(__global __read_write int *labels,
                  __global __write_only int *changed_flag,
@@ -80,16 +102,26 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
-    
+
+    //if current pixel is not a wall
+    if (buffer[buf_y * buf_w + buf_x]!=h*w){
+        buffer[buf_y * buf_w + buf_x]=labels[buffer[buf_y * buf_w + buf_x]];
+    }
+    barrier(CLK_LOCAL_MEM_FENCE);
     // stay in bounds
     if ((x < w) && (y < h)) {
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
-        new_label = old_label;
+        new_label = find_min(buffer, 
+                             buf_x, buf_y, 
+                             buf_w,
+                             w, h);
 
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
+            atomic_min(&labels[old_label],new_label);
+
             // indicate there was a change this iteration.
             // multiple threads might write this.
             *(changed_flag) += 1;

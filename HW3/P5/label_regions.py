@@ -3,7 +3,9 @@ import sys
 import pyopencl as cl
 import numpy as np
 import pylab
-
+import pdb
+import os
+os.environ['PYOPENCL_COMPILER_OUTPUT'] = '1'
 def round_up(global_size, group_size):
     r = global_size % group_size
     if r == 0:
@@ -36,13 +38,13 @@ if __name__ == '__main__':
 
     # Create a queue for transferring data and launching computations.
     # Turn on profiling to allow us to check event times.
-    queue = cl.CommandQueue(context, context.devices[0],
+    queue = cl.CommandQueue(context, context.devices[1],
                             properties=cl.command_queue_properties.PROFILING_ENABLE)
     print 'The queue is using the device:', queue.device.name
 
     program = cl.Program(context, open('label_regions.cl').read()).build(options='')
 
-    host_image = np.load('maze1.npy')
+    host_image = np.load('maze2.npy')
     host_labels = np.empty_like(host_image)
     host_done_flag = np.zeros(1).astype(np.int32)
 
@@ -103,6 +105,7 @@ if __name__ == '__main__':
             break
         # there were changes, so continue running
         print host_done_flag
+
         if itercount % 100 == 0 and show_progress:
             cl.enqueue_copy(queue, host_labels, gpu_labels, is_blocking=True)
             pylab.imshow(host_labels)
