@@ -1,0 +1,36 @@
+Part 1:
+Maze 1: Finished after 888 iterations, 450.07784 ms total, 0.506844414414 ms per iteration
+Found 2 regions
+
+Maze 2: Finished after 516 iterations, 258.12848 ms total, 0.500248992248 ms per iteration
+Found 35 regions
+
+Part 2:
+Maze 1: Finished after 529 iterations, 262.70208 ms total, 0.496601285444 ms per iteration
+Found 2 regions
+
+Maze 2: Finished after 273 iterations, 137.47456 ms total, 0.50356981685 ms per iteration
+Found 35 regions
+
+Part 3:
+Maze 1: Finished after 10 iterations, 4.89648 ms total, 0.489648 ms per iteration
+Found 2 regions
+
+Maze 2: Finished after 9 iterations, 4.50248 ms total, 0.500275555556 ms per iteration
+Found 35 regions
+
+Part 4:
+Maze 1: Finished after 19 iterations, 19.07336 ms total, 1.00386105263 ms per iteration
+Found 2 regions
+
+Maze 2: Finished after 17 iterations, 17.0408 ms total, 1.0024 ms per iteration
+Found 35 regions
+
+Discussion:
+Despite avoiding repeating global memory reads in the single threaded sequential scan, the single thread workgroup labeling resulted in double the time to label the maze. This is because we are updating the labels in parallel. Empirically, we are bottlenecked by computation. We don't achieve much speedup given we are reducing global memory reads, so reading is not the issue. Thus, for my hardware, single thread is not a good option.
+
+There are two general factors that can impact the speed. 1) If the pixels are similar, then there would be more speedup in part 4 since there would be fewer updates. 2) If a GPU can has more core and can perform reads and writes much more quickly, then the speedup in part 4 would also be much more. 
+
+Part 5:
+Discussion:
+Using atomic_min is useful because it treats reading and writing as one task in our OS scheduler. However, it causes serialized reads and writes. The issue with min instead of atomic_min is that we can run into race conditions. One thread can write a value that is not necessarily the min value after another thread has written the min value. As a result, we would significantly decrease our perfomance since it would take longer to label the entire region.

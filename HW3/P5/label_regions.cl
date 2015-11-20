@@ -45,6 +45,10 @@ propagate_labels(__global __read_write int *labels,
     const int lx = get_local_id(0);
     const int ly = get_local_id(1);
 
+    // Local workgroup sizes
+    const int wgx = get_local_size(1);
+    const int wgy = get_local_size(0);
+
     // coordinates of the upper left corner of the buffer in image
     // space, including halo
     const int buf_corner_x = x - lx - halo;
@@ -80,20 +84,54 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
+    // grab the grandparent label
+    // if (old_label < w*h) {
+    //     buffer[buf_y * buf_w + buf_x] = labels[old_label];
+    // }
+    // if we are at the top left corner of the work group, we propogate grandparent
+    // labels across the group in a serialized fashion
+    if (lx == 0 && ly == 0) {
+        int prev, curr;
+        for (int i = 0; i < wgy; i++) {
+            for (int j = 0; j < wgx; j++) {
+                int id = (i + halo)*buf_w + (j + halo);
+                curr = buffer[id];
+
+                if (curr < w*h) {
+                    if (curr != prev) {
+                        prev = curr;
+                        buffer[id] = labels[curr];
+                    }
+                }
+            }
+        }
+    }
+
+    // grandparent labels have been propogated
+    barrier(CLK_LOCAL_MEM_FENCE);
+
     
     // stay in bounds
-    if ((x < w) && (y < h)) {
+    // we must check if old_label is less than w*h since the foreground pixels are bounded by 
+    // w*h and we don't want to blend the background pixels with foreground pixels
+    if ((x < w) && (y < h) && (old_label < w*h)) {
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
-        new_label = old_label;
+        // grab the smallest pixel amoung the current and surrounding pixels
+        new_label = min(old_label, 
+                        min(buffer[buf_y*buf_w+buf_x+1], 
+                            min(buffer[buf_y*buf_w+buf_x-1], 
+                                min(buffer[(buf_y-1)*buf_w+buf_x], buffer[(buf_y+1)*buf_w+buf_x]))));
 
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
             // indicate there was a change this iteration.
             // multiple threads might write this.
+            // merging old and new parent with same new_label
+            atomic_min(&labels[old_label], new_label);
             *(changed_flag) += 1;
-            labels[y * w + x] = new_label;
+            atomic_min(&labels[y * w + x], new_label);
         }
     }
 }

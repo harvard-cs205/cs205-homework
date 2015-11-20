@@ -1,0 +1,129 @@
+For coalesced reads I got the following data: It seems that for coalesced reads 64 workgroups at 128 workers gives the best time of .0024 seconds
+
+
+
+5000153.3125
+coalesced reads, workgroups: 8, num_workers: 4, 0.16036008 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57510>
+5000160.3125
+coalesced reads, workgroups: 8, num_workers: 8, 0.08918312 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57510>
+5000151.75
+coalesced reads, workgroups: 8, num_workers: 16, 0.05170184 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57510>
+5000152.5
+coalesced reads, workgroups: 8, num_workers: 32, 0.02803776 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57510>
+5000153.875
+coalesced reads, workgroups: 8, num_workers: 64, 0.0140196 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57510>
+5000153.375
+coalesced reads, workgroups: 8, num_workers: 128, 0.00762976 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57590>
+5000160.34375
+coalesced reads, workgroups: 16, num_workers: 4, 0.09207176 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57590>
+5000151.71875
+coalesced reads, workgroups: 16, num_workers: 8, 0.05598272 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57590>
+5000152.65625
+coalesced reads, workgroups: 16, num_workers: 16, 0.0280048 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57590>
+5000153.9375
+coalesced reads, workgroups: 16, num_workers: 32, 0.01415656 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57590>
+5000153.28125
+coalesced reads, workgroups: 16, num_workers: 64, 0.00719744 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57590>
+5000153.28125
+coalesced reads, workgroups: 16, num_workers: 128, 0.00399504 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57510>
+5000151.73438
+coalesced reads, workgroups: 32, num_workers: 4, 0.05799328 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57510>
+5000152.65625
+coalesced reads, workgroups: 32, num_workers: 8, 0.02760288 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57510>
+5000154.0
+coalesced reads, workgroups: 32, num_workers: 16, 0.01413456 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57510>
+5000153.34375
+coalesced reads, workgroups: 32, num_workers: 32, 0.00713032 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57510>
+5000153.34375
+coalesced reads, workgroups: 32, num_workers: 64, 0.00372464 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57510>
+5000153.26562
+coalesced reads, workgroups: 32, num_workers: 128, 0.0026336 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57590>
+5000152.61719
+coalesced reads, workgroups: 64, num_workers: 4, 0.02696808 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57590>
+5000154.01562
+coalesced reads, workgroups: 64, num_workers: 8, 0.01386544 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57590>
+5000153.32031
+coalesced reads, workgroups: 64, num_workers: 16, 0.007178 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57590>
+5000153.375
+coalesced reads, workgroups: 64, num_workers: 32, 0.00390184 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57590>
+5000153.33594
+coalesced reads, workgroups: 64, num_workers: 64, 0.00275184 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57590>
+5000153.36719
+coalesced reads, workgroups: 64, num_workers: 128, 0.00248552 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57510>
+5000154.01562
+coalesced reads, workgroups: 128, num_workers: 4, 0.02766432 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57510>
+5000153.29297
+coalesced reads, workgroups: 128, num_workers: 8, 0.01399096 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57510>
+5000153.39844
+coalesced reads, workgroups: 128, num_workers: 16, 0.00782096 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57510>
+5000153.30469
+coalesced reads, workgroups: 128, num_workers: 32, 0.00377976 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57510>
+5000153.33984
+coalesced reads, workgroups: 128, num_workers: 64, 0.00254232 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57510>
+5000153.30859
+coalesced reads, workgroups: 128, num_workers: 128, 0.00252368 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57590>
+5000153.31445
+coalesced reads, workgroups: 256, num_workers: 4, 0.02999856 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57590>
+5000153.38086
+coalesced reads, workgroups: 256, num_workers: 8, 0.0142652 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57590>
+5000153.29102
+coalesced reads, workgroups: 256, num_workers: 16, 0.0075244 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57590>
+5000153.35352
+coalesced reads, workgroups: 256, num_workers: 32, 0.00397056 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57590>
+5000153.36523
+coalesced reads, workgroups: 256, num_workers: 64, 0.00257784 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57590>
+5000153.31641
+coalesced reads, workgroups: 256, num_workers: 128, 0.00277344 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57510>
+5000153.37109
+coalesced reads, workgroups: 512, num_workers: 4, 0.02859184 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57510>
+5000153.30176
+coalesced reads, workgroups: 512, num_workers: 8, 0.014304 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57510>
+5000153.36328
+coalesced reads, workgroups: 512, num_workers: 16, 0.00809184 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57510>
+5000153.35547
+coalesced reads, workgroups: 512, num_workers: 32, 0.00424744 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57510>
+5000153.32617
+coalesced reads, workgroups: 512, num_workers: 64, 0.00255136 seconds
+<pyopencl.cffi_cl.Buffer object at 0x109f57510>
+5000153.3457
+coalesced reads, workgroups: 512, num_workers: 128, 0.0030888 seconds
