@@ -1,4 +1,4 @@
-
+Part 1. implement updates from neighbors
 [Maze1]
 Finished after 880 iterations, 277.56768 ms total, 0.315417818182 ms per iteration
 Found 2 regions
@@ -7,8 +7,8 @@ Found 2 regions
 Finished after 516 iterations, 162.2668 ms total, 0.314470542636 ms per iteration
 Found 35 regions
 
-
-
+--------------------
+Part 2. fetch grandparents
 [Maze1]
 Finished after 529 iterations, 166.75776 ms total, 0.315232060491 ms per iteration
 Found 2 regions
@@ -17,7 +17,8 @@ Found 2 regions
 Finished after 273 iterations, 85.42904 ms total, 0.312926886447 ms per iteration
 Found 35 regions
 
-
+--------------------
+Part 3. merge parent regions
 [Maze1]
 Finished after 10 iterations, 3.08848 ms total, 0.308848 ms per iteration
 Found 2 regions
@@ -26,7 +27,8 @@ Found 2 regions
 Finished after 9 iterations, 2.77736 ms total, 0.308595555556 ms per iteration
 Found 35 regions
 
-
+--------------------
+Part 4. efficient grandparents
 [Maze1]
 Finished after 884 iterations, 273.95088 ms total, 0.30989918552 ms per iteration
 Found 2 regions
@@ -34,3 +36,12 @@ Found 2 regions
 [Maze2]
 Finished after 517 iterations, 161.49896 ms total, 0.312377098646 ms per iteration
 Found 35 regions
+
+Using efficient grandparents, the program runs about 60% slower than part 2, suggesting the serialization to avoid redundant memory reads does not optimize as we think it to be. The possible reason is the memory reads are not so inefficient comparing to other operations such as assignments and therefore the time efficiency is not bound by memory reads. In other words, comparing to the increase in time from serialized label propagating, the time saved from memory reads is trivial. Using single thread and loop over all elements in the local group makes the program inaccessible to the advantages of parallel propagating, and therefore results in more iterations. And the iteration speed is now bound by the single thread (in my program the first one), but is not significant in this case.
+
+This happens on my laptop with Intel Iris 1536 MB it is the case. Things might be different for other graphics cards where memory reads is really slow and this kind of serialization will help.
+
+--------------------
+Part5. no atomic operations
+
+The advantage of using atomic operation is that it contains comparison and writing in one step and therefore serializes memory access and avoids writing conflicts. Using min will not have this effect: we are not sure which thread last writes the label when they access to the same element together. However, since labeling is not a one-time process, it takes multiple iterations and propagating the labels until not change flag. Therefore, using min() will not affect the final labeled result, but may take slightly more iterations.

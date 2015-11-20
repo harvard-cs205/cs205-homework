@@ -91,7 +91,7 @@ propagate_labels(__global __read_write int *labels,
             int temp_pos_lab = labels[old_label];
             int size = buf_w*buf_h;
             for(int i = 0;i<size;i++){
-                if(buffer[i]!=temp_pos){
+                if(buffer[i]!=temp_pos){    //update
                     temp_pos = buffer[i];
                     temp_pos_lab = labels[buffer[i]];
                 }
@@ -107,6 +107,7 @@ propagate_labels(__global __read_write int *labels,
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
+        // set new label to the minimum neighboring label
         new_label = min(old_label,
                         min(buffer[buf_y * buf_w + buf_x-1],
                             min(buffer[buf_y * buf_w + buf_x+1],
@@ -119,6 +120,8 @@ propagate_labels(__global __read_write int *labels,
             // multiple threads might write this.
             *(changed_flag) += 1;
             //labels[y * w + x] = new_label;
+
+            //Using atomic_min to avoid writing conflicts
             atomic_min(&labels[old_label],new_label);
             atomic_min(&labels[y * w + x], new_label);
         
