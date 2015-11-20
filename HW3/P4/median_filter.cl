@@ -62,9 +62,15 @@ median_3x3(__global __read_only float *in_values,
     // We've given you median9.h, and included it above, so you can
     // use the median9() function.
     
-    float median = median9(buffer[(buf_y-1)*buf_w+buf_x-1], buffer[(buf_y-1)*buf_w+buf_x], buffer[(buf_y-1)*buf_w+buf_x+1],
-                           buffer[(buf_y)*buf_w+buf_x-1], buffer[(buf_y)*buf_w+buf_x], buffer[(buf_y)*buf_w+buf_x+1],
-                           buffer[(buf_y+1)*buf_w+buf_x-1], buffer[(buf_y+1)*buf_w+buf_x], buffer[(buf_y+1)*buf_w+buf_x+1]);
+    float median = median9(buffer[(buf_y-1)*buf_w+buf_x-1], 
+			   buffer[(buf_y-1)*buf_w+buf_x], 
+			   buffer[(buf_y-1)*buf_w+buf_x+1],
+                           buffer[(buf_y)*buf_w+buf_x-1], 
+			   buffer[(buf_y)*buf_w+buf_x], 
+		       	   buffer[(buf_y)*buf_w+buf_x+1],
+                           buffer[(buf_y+1)*buf_w+buf_x-1], 
+		           buffer[(buf_y+1)*buf_w+buf_x], 
+			   buffer[(buf_y+1)*buf_w+buf_x+1]);
 
     // Each thread in the valid region (x < w, y < h) should write
     // back its 3x3 neighborhood median.
