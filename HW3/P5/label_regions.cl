@@ -80,20 +80,75 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
+    // Part 2:
+    //if (old_label < w * h) 
+    //{
+    //    buffer[buf_y * buf_w + buf_x] = labels[old_label];
+    //}
     
+    // Part 4:
+    // once per local group
+    if (lx == 0 && ly == 0)
+    {
+        int cur_label;
+        int prev_label = -25;
+        int prev_grand_label;
+        int pixels = buf_w * buf_h;
+        int i;
+        // iterate over pixels
+        for(i = 0; i < pixels; i++)
+        {
+            cur_label = buffer[i];
+
+            // within pic
+            if (cur_label < w * h)
+            {
+                // if labels on same value, use the already found grand label
+                if (cur_label == prev_label)
+                {
+                    buffer[i] = prev_grand_label;
+                }
+                // otherwise update the grand label then use
+                else
+                {
+                    prev_label = cur_label;
+                    prev_grand_label = labels[prev_label];
+                    buffer[i] = prev_grand_label;
+                }
+            } 
+        }
+
+    }
+    barrier(CLK_LOCAL_MEM_FENCE);
+
     // stay in bounds
+    new_label = old_label;
     if ((x < w) && (y < h)) {
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
         new_label = old_label;
+        if (new_label < w * h) 
+        {
+            // min of adjacents
+            new_label = min(new_label,
+                            min(buffer[(buf_y - 1) * buf_w + buf_x],
+                            min(buffer[(buf_y) * buf_w + buf_x - 1],
+                            min(buffer[(buf_y) * buf_w + buf_x + 1],
+                                buffer[(buf_y + 1) * buf_w + buf_x]))));
+        }
 
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
             // indicate there was a change this iteration.
             // multiple threads might write this.
+            // atomic update
+            atomic_min(&labels[old_label], new_label);
+            atomic_min(&labels[y * w + x], new_label);
+
             *(changed_flag) += 1;
             labels[y * w + x] = new_label;
+
         }
     }
 }

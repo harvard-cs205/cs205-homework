@@ -1,0 +1,17 @@
+Using VM on Windows set up for CS205:
+
+best:
+configuration ('blocked', 16, 4): 0.004673046 seconds
+
+
+The platforms detected are:
+---------------------------
+AMD Accelerated Parallel Processing Advanced Micro Devices, Inc. version: OpenCL 2.0 AMD-APP (1800.8)
+The devices detected on platform AMD Accelerated Parallel Processing are:
+---------------------------
+Intel(R) Core(TM) i7-3632QM CPU @ 2.20GHz [Type: CPU ]
+Maximum clock Frequency: 2195 MHz
+Maximum allocable memory size: 1049 MB
+Maximum work group size 1024
+---------------------------
+This context is associated with  1 devices
