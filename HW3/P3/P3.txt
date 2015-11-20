@@ -1,0 +1,5 @@
+For my machine, any configurations with >32 workers resulted in an error. It also seems that when the gloabl size>4096, then the computation does not complete correctly in the blocked reads case (I see an assertion error). 
+
+With that in mind, the best performance was achieved with the greatest number of workgroups and workers
+coalesced reads, workgroups: 512, num_workers: 32, 0.013397824 seconds
+blocked reads, workgroups: 128, num_workers: 16, 0.03992816 seconds
