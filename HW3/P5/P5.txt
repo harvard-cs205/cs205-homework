@@ -40,5 +40,8 @@ Maze 2:
 Finished after 10 iterations, 8.00088 ms total, 0.800088 ms per iteration
 Found 35 regions
 
-accesing global mem already fast
+For part 4, the optimization of reducing global memory reads by using a single thread to do that action only once per group actually slowed down the speed of the program. This is because that action was serialized over the whole group so the read and update could only be done one at a time rather than with the faster GPU memory access. The global memory access is not the limiting factor. This implementation would work if the memory access was much slower, perhaps if it was using the GPU of an old command line computer.
 
+
+Part 5:
+If we replace atomic_min() with min(), the memory updates are no longer serial but we lose the guarantee that the update occurs on a given iteration. So there are the two factors of increased speed yet lost accuracy, and it is hard to tell which one would win out. The increased speed due to parallelization is great when the threads are working on updating different labels. On the other hand, it is more difficult to understand the behavior when the min updates are no longer atomic. What may happen is that one update could be decreasing a label to 5, but another is decreasing it to 2. Depending on when the write occurs, either one can occur, so if the label should be 2, it can still be stalling at 5 until the write of 2 occurs. So I do not think an increase in label can ever occur from one iteration to another, but a decrease could be postponed or not done in time. Eventually, however, we should be able to see that the min values converge to the state they were meant to go to, it is just that the time to get there would not be consistent from one run to the next.

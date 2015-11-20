@@ -1,5 +1,6 @@
 #include "median9.h"
 
+// returns value within the picture
 float get_in(__global __read_only float *in_values, int w, int h, int x, int y)
 {
   if (x < 0)

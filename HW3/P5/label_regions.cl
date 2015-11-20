@@ -103,11 +103,12 @@ propagate_labels(__global __read_write int *labels,
             // within pic
             if (cur_label < w * h)
             {
-                // if 
+                // if labels on same value, use the already found grand label
                 if (cur_label == prev_label)
                 {
                     buffer[i] = prev_grand_label;
                 }
+                // otherwise update the grand label then use
                 else
                 {
                     prev_label = cur_label;
