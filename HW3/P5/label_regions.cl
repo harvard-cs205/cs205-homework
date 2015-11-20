@@ -97,7 +97,34 @@ propagate_labels(__global __read_write int *labels,
 	*/
 	// global offset, global column, global row, and buffer offset to be used to fetch grandparents
 	int g_offset, g_col, g_row, b_offset;
+	int last_g_offset = -1;
+	int last_b_offset = -1;
 	
+	
+	if (idx_1D == 0) {
+    	for (row = 0; row < buf_h; row++) {
+			for (int idx = 0; idx < buf_w; idx++){
+				// offset in buffer
+				b_offset = row * buf_w + idx;
+				// get global offset for grandparent
+				g_offset = buffer[b_offset];
+				if (last_g_offset == g_offset) {
+					buffer[b_offset] = buffer[last_b_offset];
+				} else {
+					// calculate parameters for get_clamped_value
+					// row within global labels
+					g_row = g_offset / w; 
+					// column within global labels
+					g_col = g_offset % w; 
+					// fetch grandparent
+			        buffer[b_offset] = get_clamped_value(labels, w, h, g_col, g_row);
+					last_g_offset = g_offset;
+					last_b_offset = b_offset;
+				}
+			}
+    	}	
+	}
+	/*
 	if (idx_1D < buf_w) {
     	for (row = 0; row < buf_h; row++) {
 			// offset in buffer
@@ -113,7 +140,7 @@ propagate_labels(__global __read_write int *labels,
 	        buffer[b_offset] = get_clamped_value(labels, w, h, g_col, g_row);
     	}	
 	}
-
+	*/
 	// Make sure all threads reach the next part after
 	// the grandparents are fetched
 	barrier(CLK_LOCAL_MEM_FENCE);
@@ -126,18 +153,24 @@ propagate_labels(__global __read_write int *labels,
 		
 		// check if x,y is foreground pixel
 		if (old_label < w * h)
+		//if (old_label <= y * w + x)
 		new_label = min5(old_label, 
 						buffer[(buf_y - 1) * buf_w + buf_x],
 						buffer[(buf_y + 1) * buf_w + buf_x],
 						buffer[buf_y * buf_w + buf_x - 1],
 						buffer[buf_y * buf_w + buf_x + 1]);
 
-        if (new_label != old_label) {
-            // CODE FOR PART 3 HERE
-            // indicate there was a change this iteration.
-            // multiple threads might write this.
-            *(changed_flag) += 1;
-            labels[y * w + x] = new_label;
-        }
+	        if (new_label < old_label) {
+	            // CODE FOR PART 3 HERE
+	            // indicate there was a change this iteration.
+	            // multiple threads might write this.
+	            *(changed_flag) += 1;
+				//labels[y * w + x] = new_label;
+				//atomic_min(&labels[y * w + x], new_label);
+					if ((0 <= buf_corner_y + buf_y) && (buf_corner_y + buf_y < h) && (buf_corner_x + buf_x >= 0) && (buf_corner_x + buf_x < w)) {
+						atomic_min(&labels[(buf_corner_y + buf_y) * w + buf_corner_x + buf_x], new_label);
+					}
+					
+	        }
     }
 }

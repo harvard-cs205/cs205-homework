@@ -12,3 +12,25 @@ Part 2:
 	Maze 2:
 		Finished after 276 iterations, 441.299037 ms total, 1.59890955435 ms per iteration
 		Found 35 regions
+Part 3:
+	Maze 1:
+		Finished after 529 iterations, 843.47568 ms total, 1.59447198488 ms per iteration
+		Found 2 regions
+	Maze 2:
+		Finished after 273 iterations, 431.994906 ms total, 1.58239892308 ms per iteration
+		Found 35 region
+Part 4:
+	Maze 1:
+		Finished after 529 iterations, 2666.87046 ms total, 5.04134302457 ms per iteration
+		Found 2 regions
+	Maze 2:
+		Finished after 272 iterations, 1375.530648 ms total, 5.05709797059 ms per iteration
+		Found 35 regions
+		
+	Explanation: By using a single thread to fetch grandparents, we hopefully perform fewer global reads because we can hopefully reduce the number of repeated global reads.  However, the region labeling takes much longer to run because the global reads are no longer performed in parallel.  Hence, we reduce the number of global memory reads, but we also reduce speed.  The single thread approach would be a good idea when memory is under extreme use by other processes.  Using a single thread would reduce the load of global memory.
+	
+Part 5:
+	If we do not use atomic operations, we will still get a correct answer, but it will take longer.  We are guaranteed a correct answer because in a single iteration, we only store new_value if new_value is less than old_value.  Even if multiple threads write to labels[old_value],  labels [old_value] will be less at the end of the iteration than the original labels[old_value] at the beginning of the iteration.  
+	We use a single thread to fetch grandparents in Part 4 to reduce the number of repeated fetches.  This implies that sometimes multiple pixels have the same grandparents.  Multiple threads' pixels can have the same grandparents since grandparents quick permeate across columns, so overwriting is possible.  All atomic operations do is guarantee the min operation (i.e. we always finish an iteration with the minimum possible new_value, for a given old value, across all threads).  We are not guaranteed this without atomic operations.  
+	
+	Hence, using non-atomic operations can sometimes require more iterations to complete region labeling.  Suppose we have two threads updating the same labels[old_value] to new_value1, new_value2, respectively.  Suppose new_value1 > new_value2.  Suppose new_value1 enters first and computes min(new_value1, old_value), but there is an interrupt before new_value1 is stored.  Then thread2 comes in and takes min(new_value2, old_value) and stores it.  Then interrupt, and thread1 runs again.  Now thread1 stores new_value1 in labels[old_value].  Hence, labels[old_value] is not the smallest value that it could have been using atomic operations, and it will take addition time and iterations to lower labels[old_value].
