@@ -80,20 +80,51 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
-    
+    // if (old_label < w*h){
+    //     int offset = buf_y * buf_w + buf_x;
+    //     buffer[offset] = labels[buffer[offset]];
+    // }
+
+    if(lx==0 && ly==0){  // only perform when it is the first thread
+        int temp_pos = old_label;
+        if(temp_pos<w*h){
+            int temp_pos_lab = labels[old_label];
+            int size = buf_w*buf_h;
+            for(int i = 0;i<size;i++){
+                if(buffer[i]!=temp_pos){    //update
+                    temp_pos = buffer[i];
+                    temp_pos_lab = labels[buffer[i]];
+                }
+            }
+        }
+    }
+
+
+    barrier(CLK_LOCAL_MEM_FENCE);
+
     // stay in bounds
-    if ((x < w) && (y < h)) {
+    if ((x < w) && (y < h) && (old_label < w*h)) {
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
-        new_label = old_label;
+        // set new label to the minimum neighboring label
+        new_label = min(old_label,
+                        min(buffer[buf_y * buf_w + buf_x-1],
+                            min(buffer[buf_y * buf_w + buf_x+1],
+                                min(buffer[(buf_y-1) * buf_w + buf_x],
+                                    buffer[(buf_y+1) * buf_w + buf_x]))));
 
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
             // indicate there was a change this iteration.
             // multiple threads might write this.
             *(changed_flag) += 1;
-            labels[y * w + x] = new_label;
+            //labels[y * w + x] = new_label;
+
+            //Using atomic_min to avoid writing conflicts
+            atomic_min(&labels[old_label],new_label);
+            atomic_min(&labels[y * w + x], new_label);
+        
         }
     }
 }
