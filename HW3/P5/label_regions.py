@@ -116,6 +116,7 @@ if __name__ == '__main__':
     # Show final result
     cl.enqueue_copy(queue, host_labels, gpu_labels, is_blocking=True)
     print 'Found {} regions'.format(len(np.unique(host_labels)) - 1)
+    print width, height
     pylab.imshow(host_labels)
     pylab.title(itercount)
     pylab.show()

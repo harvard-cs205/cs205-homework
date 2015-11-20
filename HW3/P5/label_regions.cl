@@ -86,15 +86,20 @@ propagate_labels(__global int *labels,
     old_label = buffer[offset];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
+    // Below 3 lines are part 2
     // if (old_label < w * h) {
     //     buffer[offset] = labels[buffer[offset]];
     // }
 
-    if (lx == szx-1 && ly == szy-1) {
+    // Part 4
+    if (lx == szx-1 && ly == szy-1) { // Get last thread
         int prev_label, prev_grandparent;
+        // Disregard halo as we loop through
         for (int i = buf_w * halo; i < buf_w * (buf_h - halo); i++) {
+            // Ignore halo and check only foreground pixels
             if ((i % (buf_h - halo) > halo) && (i % buf_h) > halo && buffer[i] < w * h) {
                 if (buffer[i] != prev_label) {
+                    // Pull from label and store prev values
                     prev_label = buffer[i];
                     buffer[i] = labels[buffer[i]];
                     prev_grandparent = buffer[i];
@@ -104,25 +109,6 @@ propagate_labels(__global int *labels,
         }
     }
     barrier(CLK_LOCAL_MEM_FENCE);
-
-    // if (lx == wg_size_x && ly == wg_size_y) {
-    //     int prev_label, prev_grandparent;
-    //     for (int i = halo; i < (buf_w - halo); i++) {
-    //         for (int j = halo; j < (buf_h - halo); j++) {
-    //             offset = j * buf_w + i;
-    //             // prev_label = buffer[offset];
-    //             if (buffer[offset] < w * h) {
-    //                 if (buffer[offset] != prev_label) {
-    //                     prev_label = buffer[offset];
-    //                     buffer[offset] = labels[buffer[offset]];
-    //                     prev_grandparent = buffer[offset];
-    //                 }
-    //                 buffer[offset] = prev_grandparent;
-    //             }
-    //         }
-    //     }
-    // }
-    // barrier(CLK_LOCAL_MEM_FENCE);
 
     // stay in bounds
     if ((x < w) && (y < h) && (old_label < w * h)) {
@@ -143,6 +129,13 @@ propagate_labels(__global int *labels,
             // multiple threads might write this.
             *(changed_flag) += 1;
             atomic_min(&labels[y * w + x], new_label);
+
+            // Part 5
+            // if (old_label < w * h)
+            //     labels[old_label] = min(labels[old_label], new_label);
+            // *(changed_flag) += 1;
+            // if (y * w + x < w * h)
+            //     labels[y * w + x] = min(labels[y * w + x], new_label);
         }
     }
 }

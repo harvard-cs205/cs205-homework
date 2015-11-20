@@ -1,0 +1,49 @@
+Results
+~~~~~~~~~~
+Maze 1
+-------
+Part 1
+Finished after 850 iterations, 2253.568551 ms total, 2.65125711882 ms per iteration
+
+Part 2
+Finished after 511 iterations, 1173.792587 ms total, 2.29705007241 ms per iteration
+
+Part 3
+Finished after 9 iterations, 22.443474 ms total, 2.49371933333 ms per iteration
+
+Part 4
+Finished after 8 iterations, 27.4660512 ms total, 3.4332519 ms per iteration
+
+Part 5
+Finished after 10 iterations, 33.3015846 ms total, 3.301584625 ms per iteration
+
+Maze 2
+-------
+Part 1
+Finished after 492 iterations, 1161.545879 ms total, 2.36086560772 ms per iteration
+
+Part 2
+Finished after 259 iterations, 541.252902 ms total, 2.0897795444 ms per iteration
+
+Part 3
+Finished after 8 iterations, 20.534067 ms total, 2.566758375 ms per iteration
+
+Part 4
+Finished after 10 iterations, 37.834121 ms total, 3.7834121 ms per iteration
+
+Part 5
+Finished after 10 iterations, 36.934535 ms total, 3.6934535 ms per iteration
+
+Analysis
+~~~~~~~~~~
+Part 4
+It appears, from the results above, that using a single threead to perform the step created in part 4 is not a reasonable choice. The iterations have changed very slightly (though the above result represent a single run of the code, and it is important to note that multiple runs resulted in +/-1 iterations relative to the above results), but more importantly, the runtime increased by about 1.2x and 1.5x (for mazes 1 and 2 respectively) between parts 3 and 4. Again, these values are dependent upon the specific run recorded, but it suffices to say that part 4 was slower than part 3 in nearly every run.
+Consider now, why this could be the case. In the original implementation of Parts 2 and 3, we implemented an optimization that assigned each label to its grandparent instead. In Part 4, this grandparent optimization was altered to try and stop reading the same location from the global labels array accross multiple workgroup threads, reducing serialized and repeated reads. However, in implementing this optimization to try and reduce serialization, it was necessary to introduce serialized code of another kind - that of sequentially reading and writing through the buffer in the single thread. In terms of compute, then, it appears this trade-off was likely not worth it. On the contrary, this likely explains most of the slowdown described above.
+In terms of memory, we have certainly reduced global memory reads. However, this improvement is only worthwhile if same-location reads from the gloabl labels array happened frequently in a row. Since we are only checking the previous label and grandparent, this could easily be a useless optimization if we end up in a situation where we are reading alternate labels and not taking advantage of this optimization at all. This means that the memory improvement we get is inconsistent and again reaffirms the above that this single-thread optimization may not have been worthwhile.
+One way to improve this would be perhaps to reproduce the labels array in local memory based on an at-need system. That is initialize an empty array or hash table where the indeces or keys are the label and the value at that index/key is the grandparent. This local data structure could be filled in as we went along and checked on every iteration. That way, the memory improvement would not be based on whether the previous label accessed was the same as the one needed in any given iteration and might outweigh the overhead costs of the serialization described above. I did not implement this for the simple reason that the global labels array is large and sparse, such that optimizing a local array to replicate it would have been very difficult and possibly not worthwhile.
+Thus, in terms of compute, we don't gain much, and in terms of memory, we miss the full potential of what could be achieved. It is clear then, that this single-thread optimization is not quite the ideal reasonable choice for this particular problem, and the results presented above support this conclusion.
+
+Part 5
+As presented in the problem statement, atomic_min() guarantees serial access to memory. While this can perhaps slow down the code, it avoids certain race conditions that could potentially require more work and therefore ultimately more iterations for the program to get to a correct solution. Since the region labeling code depends entirely on computing the min value of a pixel and its neighbors, if memory is not accessed atomically, multiple threads could very well compare different values, meaning the final result would depend on the order of the threads exiting rather than on the min() function itself.
+Luckily for us, the program maintains an invariant that labels must decrease or remain equal to their previous values on every iteration. With this in place, the program is bound to converge to the correct min value regardless of mistakes made in the min() calls from such race conditions as outlined above. Thus, though we will arrive at the same solution, more iteration could potentially be needed to find it. Given the removal of serialization of memry access however, each iteration would take less time. Thus, on more complicated problems, replacing atomic_min() with min() would likely take many more iterations and the improvements in speed per iteration would not be able to make up for it. 
+The above conclusions are consistent with the results presented at the start of this document. Note how for maze 1, 2 extra iterations were necessary making the overall time for Part 5 to complete longer, despite an improvement on a per-iteration basis. For maze 2 on the other hand, the recorded result shows a small improvement in runtime per iteration again, but because of the lucky circumstance that no extra iterations were needed, the overall performance is alos improved. 
