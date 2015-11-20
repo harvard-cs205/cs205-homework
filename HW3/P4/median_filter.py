@@ -1,8 +1,8 @@
 from __future__ import division
 import pyopencl as cl
 import numpy as np
-import imread
 import pylab
+import os.path
 
 def round_up(global_size, group_size):
     r = global_size % group_size
@@ -51,7 +51,8 @@ if __name__ == '__main__':
                             properties=cl.command_queue_properties.PROFILING_ENABLE)
     print 'The queue is using the device:', queue.device.name
 
-    program = cl.Program(context, open('median_filter.cl').read()).build(options='')
+    curdir = os.path.dirname(os.path.realpath(__file__))
+    program = cl.Program(context, open('median_filter.cl').read()).build(options=['-I', curdir])
 
     host_image = np.load('image.npz')['image'].astype(np.float32)[::2, ::2].copy()
     host_image_filtered = np.zeros_like(host_image)

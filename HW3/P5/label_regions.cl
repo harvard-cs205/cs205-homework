@@ -81,19 +81,54 @@ propagate_labels(__global __read_write int *labels,
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
     
+    // Part 2
+    //
+    // if (old_label < w * h) {
+    //     buffer[buf_y * buf_w + buf_x] = labels[old_label];
+    // }
+
+    // Part 4
+    
+    // Update workgroup labels
+    if (lx == 0 && ly == 0) {
+        int max_iter = buf_w * buf_h;
+        int temp, last;
+        int prev = -1;
+        for (int i = 0; i < max_iter; ++i) {
+            temp = buffer[i];
+            if (temp < w * h) {
+                // if current label is not the same as previous, reset
+                if (prev != temp) {
+                    prev = temp;
+                    last = labels[prev];
+                }
+                buffer[i] = last;
+            }
+        }
+    }
+
     // stay in bounds
     if ((x < w) && (y < h)) {
         // CODE FOR PART 1 HERE
-        // We set new_label to the value of old_label, but you will need
-        // to adjust this for correctness.
+
+        // min over all possible values
         new_label = old_label;
+        if (new_label < w * h) {
+            int row_min = min(buffer[buf_y * buf_w + buf_x - 1],
+                              buffer[buf_y * buf_w + buf_x + 1]);
+            int col_min = min(buffer[buf_x + (buf_y - 1) * buf_w],
+                              buffer[buf_x + (buf_y + 1) * buf_w]);
+            new_label = min(row_min, col_min);
+        }
 
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
             // indicate there was a change this iteration.
             // multiple threads might write this.
             *(changed_flag) += 1;
-            labels[y * w + x] = new_label;
+            // labels[y * w + x] = new_label;
+            atomic_min(&labels[old_label], new_label);
+            atomic_min(&labels[x + y * w], new_label);
         }
     }
 }
