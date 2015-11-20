@@ -1,0 +1,13 @@
+Part 1:
+Finished after 911 iterations, 214.33168 ms total, 0.235270779363 ms per iteration
+Found 2 regions
+
+Finished after 531 iterations, 124.05312 ms total, 0.233621694915 ms per iteration
+Found 35 regions
+
+Part 2:
+Finished after 529 iterations, 133.35928 ms total, 0.252096937618 ms per iteration
+Found 2 regions
+
+Finished after 269 iterations, 68.04856 ms total, 0.252968624535 ms per iteration
+Found 35 regions

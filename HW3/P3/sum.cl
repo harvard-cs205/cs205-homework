@@ -11,6 +11,7 @@ __kernel void sum_coalesced(__global float* x,
 
     unsigned int thread_id = get_global_id(0);
     unsigned int step_size = get_global_size(0);
+
     for (unsigned int i = thread_id; i < N; i += step_size) { // YOUR CODE HERE
         sum += x[i]; // YOUR CODE HERE
     }
@@ -30,9 +31,11 @@ __kernel void sum_coalesced(__global float* x,
 
     unsigned int local_size = get_local_size(0);
 
-    for (unsigned int j = 1; (1 << j) <= local_size; j++) { // YOUR CODE HERE
-        unsigned int offset = (local_size >> j);
-        fast[thread_id] += fast[thread_id + offset]; // YOUR CODE HERE
+    for (unsigned int j = local_size/2; j > 0; j >>= 1) { // YOUR CODE HERE
+        if( local_id < j) {
+            fast[local_id] += fast[local_id + j]; // YOUR CODE HERE
+         }
+        barrier(CLK_LOCAL_MEM_FENCE);
     }
 
     if (local_id == 0) partial[get_group_id(0)] = fast[0];
@@ -78,9 +81,11 @@ __kernel void sum_blocked(__global float* x,
 
     unsigned int local_size = get_local_size(0);
 
-    for (unsigned int j = 1; (1 << j) <= local_size; j++) { // YOUR CODE HERE
-        unsigned int offset = (local_size >> j);
-        fast[thread_id] += fast[thread_id + offset]; // YOUR CODE HERE
+    for (unsigned int j = local_size/2; j > 0; j >>= 1) { // YOUR CODE HERE
+        if( local_id < j) {
+            fast[local_id] += fast[local_id + j]; // YOUR CODE HERE
+         }
+        barrier(CLK_LOCAL_MEM_FENCE);
     }
 
     if (local_id == 0) partial[get_group_id(0)] = fast[0];

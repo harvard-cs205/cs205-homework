@@ -35,6 +35,8 @@ propagate_labels(__global __read_write int *labels,
                  int buf_w, int buf_h,
                  const int halo)
 {
+
+    const int dx[4] = {-1, 0, 1, 0}, dy[4] = {0, -1, 0, 1};
     // halo is the additional number of cells in one direction
 
     // Global position of output pixel
@@ -80,13 +82,26 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
-    
+
+    for( int i=0; i<4; i++ ) {
+        if( buffer[(buf_y+dy[i])*buf_w + (buf_x + dx[i])] < w * h ) {
+            buffer[(buf_y+dy[i])*buf_w + (buf_x + dx[i])] = labels[ buffer[(buf_y+dy[i])*buf_w + (buf_x + dx[i])] ];
+         }
+    }
+
+    barrier(CLK_LOCAL_MEM_FENCE);
+
     // stay in bounds
     if ((x < w) && (y < h)) {
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
         new_label = old_label;
+        if( new_label != w * h ) { // See Piazza @486
+            for( int i=0; i<4; i++ ) {
+                new_label = min( new_label, buffer[(buf_y+dy[i])*buf_w + (buf_x + dx[i])] );
+            }
+         }
 
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
