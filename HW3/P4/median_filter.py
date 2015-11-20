@@ -1,9 +1,10 @@
 from __future__ import division
 import pyopencl as cl
 import numpy as np
-import imread
+#import imread
 import pylab
-
+# import os
+# os.environ['PYOPENCL_COMPILER_OUTPUT'] = '1'
 def round_up(global_size, group_size):
     r = global_size % group_size
     if r == 0:
@@ -47,13 +48,18 @@ if __name__ == '__main__':
 
     # Create a queue for transferring data and launching computations.
     # Turn on profiling to allow us to check event times.
-    queue = cl.CommandQueue(context, context.devices[0],
+    queue = cl.CommandQueue(context, context.devices[1],
                             properties=cl.command_queue_properties.PROFILING_ENABLE)
     print 'The queue is using the device:', queue.device.name
 
     program = cl.Program(context, open('median_filter.cl').read()).build(options='')
 
     host_image = np.load('image.npz')['image'].astype(np.float32)[::2, ::2].copy()
+    pylab.gray()
+
+    pylab.imshow(host_image)
+    pylab.title('original image')
+
     host_image_filtered = np.zeros_like(host_image)
 
     gpu_image_a = cl.Buffer(context, cl.mem_flags.READ_WRITE, host_image.size * 4)
@@ -74,17 +80,24 @@ if __name__ == '__main__':
 
     # Send image to the device, non-blocking
     cl.enqueue_copy(queue, gpu_image_a, host_image, is_blocking=False)
-
+    #seconds=[]
     num_iters = 10
     for iter in range(num_iters):
-        program.median_3x3(queue, global_size, local_size,
+        event=program.median_3x3(queue, global_size, local_size,
                            gpu_image_a, gpu_image_b, local_memory,
                            width, height,
                            buf_width, buf_height, halo)
-
+     #   seconds.append((event.profile.end - event.profile.start) / 1e9)
         # swap filtering direction
         gpu_image_a, gpu_image_b = gpu_image_b, gpu_image_a
 
     cl.enqueue_copy(queue, host_image_filtered, gpu_image_a, is_blocking=True)
-
+    seconds=(event.profile.end - event.profile.start) / 1e9
+    pylab.figure()
+    pylab.imshow(host_image_filtered)
+    pylab.title('after - zoom')
     assert np.allclose(host_image_filtered, numpy_median(host_image, num_iters))
+    
+    print("took {} seconds".format(seconds))
+
+    pylab.show()
