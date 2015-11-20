@@ -83,7 +83,7 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
-    // This makes sure that we have only the first CPU running 
+    // This makes sure that we have only the first thread running 
     if ((lx==0) && (ly==0)){
         //OBTAIN RELATIVE GRANDPARENT
         if(old_label<w*h){
