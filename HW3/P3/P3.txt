@@ -1,0 +1,2 @@
+The best configuration I found was 
+	configuration ('coalesced', 512, 128): 0.00507 seconds

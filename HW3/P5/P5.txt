@@ -1,0 +1,49 @@
+Part 1
+	Maze 1:
+		Finished after 876 iterations, 604.11816 ms total, 0.68963260274 ms per iteration
+		Found 2 regions
+
+	Maze 2:
+		Finished after 508 iterations, 346.16 ms total, 0.681417322835 ms per iteration
+		Found 35 regions
+
+Part 2
+	Maze 1:
+		Finished after 529 iterations, 369.31608 ms total, 0.698140037807 ms per iteration
+		Found 2 regions
+
+	Maze 2:
+		Finished after 273 iterations, 191.31648 ms total, 0.700792967033 ms per iteration
+		Found 35 regions
+
+Part 3
+	Maze 1:
+		Finished after 10 iterations, 6.76304 ms total, 0.676304 ms per iteration
+		Found 2 regions
+
+	Maze 2:
+		Finished after 9 iterations, 7.50128 ms total, 0.833475555556 ms per iteration
+		Found 35 regions
+
+Part 4
+	Maze 1:
+		Finished after 10 iterations, 21.2444 ms total, 2.12444 ms per iteration
+		Found 2 regions
+
+	Maze 2:
+		Finished after 9 iterations, 20.65048 ms total, 2.29449777778 ms per iteration
+		Found 35 regions
+
+	On my machine, having a single thread caused longer compute times. These results may be different depending on the compute resources versus memory resources you have in a system; if you are working on larger images, you may need more memory resources. Being single threaded can lead to a more efficient memory access pattern. This way, we won't have conflicts between threads in a group accessing the buffer in local memory.
+
+Part 5
+	If we used min() instead of atomic_min(), the final result would still be correct, but the performance of the algorithm would be lower because we could potentially go through more iterations.
+
+	The issue with min() instead of atomic_min() is that if two threads access the label for an index at the same time, and both try decreasing it, the label may not hold the absolute lowest value. For example:
+		Thread 1 and Thread 2 both read labels[x]=500 at the same time
+		
+		Thread 1 calculates that the new label value should be 1, while Thread 2 calculates that the new label value should be 2
+
+		If Thread 1 writes the output first, followed by Thread 2, then the final label value will be 2, which is not the minimum. Therefore the label value did not decrease by as much as it could have; we knew that there was a better minimum at 1, but we threw away that result, leading to wasted computation. On the next iteration, the label value will be set correctly to 1, but this increases the total time it takes.
+	
+	While atomic_min() may be slower to compute, using min() is probably slower overall because we won't exit until running extra iterations.

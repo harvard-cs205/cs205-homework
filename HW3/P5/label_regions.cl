@@ -45,6 +45,10 @@ propagate_labels(__global __read_write int *labels,
     const int lx = get_local_id(0);
     const int ly = get_local_id(1);
 
+    //sizes
+    const int sizex = get_local_size(0);
+    const int sizey = get_local_size(1);
+
     // coordinates of the upper left corner of the buffer in image
     // space, including halo
     const int buf_corner_x = x - lx - halo;
@@ -80,7 +84,40 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
-    
+    //if the old label is not the max, replace the current index in 
+    //buffer with the label value of old_label (its 'grandparent')
+    /**
+    if (old_label < h * w) {
+        buffer[buf_y * buf_w + buf_x] = labels[old_label];
+    }
+    */
+
+    //if we're the first thread in the workgroup
+    int previous_label, previous_index;
+    if(lx + ly == 0) {
+        //for every pixel in the range of (halo, halo) to (halo + local_size(0), halo + local_size(1))
+        for (int curx = 0; curx < sizex; curx++) {
+            for (int cury = 0; cury < sizey; cury++) {
+                int cur_index = (cury*halo) * buf_w + (curx + halo);
+
+                //as in part two, if the old label is within the max
+                if (buffer[cur_index] < h*w) {
+                    if (buffer[cur_index] == previous_index) {
+                        buffer[cur_index] = previous_label;
+                    }
+                    else {
+                        previous_index = buffer[cur_index];
+                        previous_label = labels[previous_index];
+                        buffer[cur_index] = previous_label;
+                    }
+                }
+            }
+        }
+    }
+
+    barrier(CLK_LOCAL_MEM_FENCE);
+
+
     // stay in bounds
     if ((x < w) && (y < h)) {
         // CODE FOR PART 1 HERE
@@ -88,12 +125,27 @@ propagate_labels(__global __read_write int *labels,
         // to adjust this for correctness.
         new_label = old_label;
 
+        //compute the minimum if the label is still within range     
+        if (new_label < h * w) {
+            //we will get the minimum of old label and our 4 neighbors
+            //our neighbors in buffer will be + and - 1 from each of x and y
+            new_label = min(new_label, buffer[(buf_y+1) * buf_w + (buf_x)]);
+            new_label = min(new_label, buffer[(buf_y-1) * buf_w + (buf_x)]);
+            new_label = min(new_label, buffer[(buf_y) * buf_w + (buf_x+1)]);
+            new_label = min(new_label, buffer[(buf_y) * buf_w + (buf_x-1)]);
+        }
+
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
             // indicate there was a change this iteration.
             // multiple threads might write this.
             *(changed_flag) += 1;
-            labels[y * w + x] = new_label;
+            //labels[y * w + x] = new_label;
+            atomic_min(&(labels[y * w + x]), new_label);
+
+            //takes the minimum of the value at &(labels[old_label]) and new_label
+            //and puts it in &(labels[old_label])
+            atomic_min(&(labels[old_label]), new_label);
         }
     }
 }
