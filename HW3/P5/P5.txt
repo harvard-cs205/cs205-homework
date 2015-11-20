@@ -26,3 +26,11 @@ Found 2 regions
 Maze 2: Finished after 520 iterations, 257.42656 ms total, 0.495051076923 ms per iteration
 Found 35 regions
 
+This is clearly much worse. Running it as a single thread is worse than reading multiple times from global memory. Only if the GPU had much slower read times, and the multithreaded version was running with few threads in the workgroup might the result be faster. `s
+_____________________
+Part 5
+Atomic_min is guaranteed to caclulate the minimum and write it into memory simultaneously. This has the effect of avoiding race conditions with min()
+where you might read in the the memory and calculate it's minimum, but before you write it back you were descheduled and another thread modified the same 
+memory. Now when you write your min, it might no longer be the correct min. So labels could increase within an iteration, but not between iterations because
+we have barrier() that guarentees an entire iteration finishes. The final answer will also be correct because if two labels could be written in the wrong order by min() then they are guaranteed to be in the same connected component. The only catch is that you might have an infinite loop where the min always gets scheduled in the wrong order, but that is unlikely. 
+

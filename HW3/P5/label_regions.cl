@@ -99,7 +99,7 @@ propagate_labels(__global __read_write int *labels,
     }
 
 
-    // barrier(CLK_LOCAL_MEM_FENCE);
+    barrier(CLK_LOCAL_MEM_FENCE);
     // stay in bounds
     if ((x < w) && (y < h)) {
         // CODE FOR PART 1 HERE
