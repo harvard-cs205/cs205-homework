@@ -1,0 +1,62 @@
+Part 1
+
+Maze 1:
+Finished after 878 iterations, 261.55712 ms total, 0.297901047836 ms per iteration
+Found 2 regions
+
+Maze 2:
+Finished after 517 iterations, 153.9384 ms total, 0.297753191489 ms per iteration
+Found 35 regions
+
+
+Part 2
+
+Maze 1: 
+Finished after 529 iterations, 158.00224 ms total, 0.298680982987 ms per iteration
+Found 2 regions
+
+Maze 2: 
+Finished after 273 iterations, 81.45792 ms total, 0.298380659341 ms per iteration
+Found 35 regions
+
+
+Part 3 
+
+Maze 1:
+Finished after 11 iterations, 3.37152 ms total, 0.306501818182 ms per iteration
+Found 2 regions 
+
+Maze 2:
+Finished after 9 iterations, 2.7204 ms total, 0.302266666667 ms per iteration
+Found 35 regions
+
+
+Part 4
+
+Maze 1: 
+Finished after 70 iterations, 52.56808 ms total, 0.750972571429 ms per iteration
+Found 2 regions
+
+Maze 2: 
+Finished after 103 iterations, 76.77008 ms total, 0.745340582524 ms per iteration
+Found 35 regions
+
+
+It seems like in my case, serialization of the "finding grandparents" process
+is not the best as it leads to a 2.5 time increase in time per iteration. 
+
+
+Part 5 
+
+Suppose that our current label sees 2 other labels, both of which have a
+smaller label number than our current one. In that case, if we did atomic
+updates, all 3 labels will become the minimum of these 3 labels. However, 
+it is possible that if we did "min" first, then "reassignment", the order 
+of the 2 mins and the 2 reassignments can make a difference. For example: 
+
+Suppose our current label at a square is 3, and there are two neighbors 
+with labels 2 and 1. We would like to update 3 -> 2. However, when two 
+different threads compute the min of (3,2) and (3,1), they will get 1 and 2. 
+Now, assume that we assign that label to be 1, and THEN assign it to be 2. 
+UH OH! Now we have a problem and will have to run for at least another iteration 
+to fix it. 

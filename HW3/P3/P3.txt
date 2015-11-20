@@ -1,0 +1,1 @@
+The best configuration and time for me was: configuration ('coalesced', 128, 128): 0.00291864 seconds

@@ -75,12 +75,50 @@ propagate_labels(__global __read_write int *labels,
     // the local buffer is loaded
     barrier(CLK_LOCAL_MEM_FENCE);
 
+    int current = buf_y * buf_w + buf_x; 
     // Fetch the value from the buffer the corresponds to
     // the pixel for this thread
-    old_label = buffer[buf_y * buf_w + buf_x];
+    old_label = buffer[current];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
+
+    /*
+    if (old_label < w * h)
+    {
+        buffer[current] = labels[old_label]; // grab grandparent
+    }
+    */
+
     
+    if ((lx == 0) && (ly == 0))
+    {
+        int prev_key = -1000;
+        int prev_result;  
+
+        for (int i = 0; i < buf_w * buf_h; i++)
+        {
+            int this_label = buffer[i]; 
+
+            if (this_label >= w * h)
+                continue; 
+
+            if (prev_key == this_label)
+            {
+                buffer[i] = prev_result; 
+            }
+
+            else
+            {
+                prev_key = this_label; 
+                prev_result = labels[prev_key];
+            }
+        }
+    }
+    
+
+    
+    barrier(CLK_LOCAL_MEM_FENCE);
+
     // stay in bounds
     if ((x < w) && (y < h)) {
         // CODE FOR PART 1 HERE
@@ -88,10 +126,27 @@ propagate_labels(__global __read_write int *labels,
         // to adjust this for correctness.
         new_label = old_label;
 
+        if (new_label < w * h)
+        {
+            int this = buf_y * buf_w + buf_x; 
+            new_label = 
+                min(buffer[(buf_y + 1) * buf_w + buf_x], 
+                min(buffer[(buf_y - 1) * buf_w + buf_x], 
+                min(buffer[this + 1], 
+                min(buffer[this - 1], new_label
+                )))); 
+        }
+
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
             // indicate there was a change this iteration.
             // multiple threads might write this.
+
+            // 
+            atomic_min(&labels[old_label], new_label);
+
+            atomic_min(&labels[y * w + x], new_label);
+
             *(changed_flag) += 1;
             labels[y * w + x] = new_label;
         }
