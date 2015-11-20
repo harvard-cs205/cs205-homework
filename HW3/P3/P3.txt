@@ -1,3 +1,5 @@
+Best configuration:
+configuration ('coalesced', 128, 128): 0.0022836 seconds
 
 ----------------------
 #0: Intel(R) Core(TM) i5-4258U CPU @ 2.40GHz on Apple
