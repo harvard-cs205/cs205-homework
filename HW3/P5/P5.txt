@@ -1,0 +1,28 @@
+
+Part 1:
+Maze 1: Finished after 915 iterations, 207.802 ms total, 0.227106010929 ms per iteration
+Maze 1: Finished after 532 iterations, 120.78392 ms total, 0.227037443609 ms per iteration
+
+Part 2:
+Maze 1: Finished after 529 iterations, 116.80128 ms total, 0.22079637051 ms per iteration
+Maze 2: Finished after 273 iterations, 61.12912 ms total, 0.223916190476 ms per iteration
+
+Part 3:
+Maze 1: Finished after 10 iterations, 3.0388 ms total, 0.30388 ms per iteration
+Maze 2: Finished after 10 iterations, 2.88184 ms total, 0.288184 ms per iteration
+
+Part 4:
+Maze 1: Finished after 10 iterations, 7.55592 ms total, 0.755592 ms per iteration
+Maze 2: Finished after 9 iterations, 6.84968 ms total, 0.761075555556 ms per iteration
+
+Justification:
+3.1 GHz Intel Core i7
+Intel Iris Graphics 6100 1536 MB
+
+My computer shows that using single thread slows down the program. This can be justified by claiming for this particular problem, one will benefit more from the parallelization than reduce in memory read / write given my hardware configuration. However, this may vary if the hardware changes.
+
+Part 5:
+Maze 1: Finished after 10 iterations, 7.94048 ms total, 0.794048 ms per iteration
+Maze 2: Finished after 9 iterations, 7.23608 ms total, 0.804008888889 ms per iteration
+
+The use of min instead of atomic_min increases the total time and keeps the number of iterations unchanged, thus increases the time per iterations. However, this might vary across machines.
