@@ -27,6 +27,7 @@ __kernel void sum_coalesced(__global float* x,
     // You can assume get_local_size(0) is a power of 2.
     //
     // See http://www.nehalemlabs.net/prototype/blog/2014/06/16/parallel-programming-with-opencl-and-python-parallel-reduce/
+    
     for (uint s = local_size / 2; s > 0; s >>= 1) {
         if (local_id < s) {
             fast[local_id] += fast[local_id + s];
@@ -57,6 +58,7 @@ __kernel void sum_blocked(__global float* x,
     // 
     // Be careful that each thread stays in bounds, both relative to
     // size of x (i.e., N), and the range it's assigned to sum.
+
     for (int i = global_id * k; i < (global_id + 1) * k; i++ ) {
         // check bounds
         if (i < N) {
@@ -76,6 +78,7 @@ __kernel void sum_blocked(__global float* x,
     // You can assume get_local_size(0) is a power of 2.
     //
     // See http://www.nehalemlabs.net/prototype/blog/2014/06/16/parallel-programming-with-opencl-and-python-parallel-reduce/
+    
     for (uint s = local_size / 2; s > 0; s >>= 1) { 
         if (local_id < s) {
             fast[local_id] += fast[local_id + s];

@@ -86,9 +86,12 @@ propagate_labels(__global __read_write int *labels,
     // }
 
     // Part 4
+
+    // initialize variables
     int temp, temp_idx;
     int last_label = -1;
     int last_location = - 1;
+
     if ((lx == 0) && (ly == 0)) {
 
         // iterate through the entire buffer
@@ -98,6 +101,7 @@ propagate_labels(__global __read_write int *labels,
                 temp = buffer[temp_idx];
 
                 if (temp < w * h) {
+                    // read from global memory if necessary
                     if (temp != last_label) {
                         last_label = labels[temp];
                         last_location = temp;
@@ -112,11 +116,11 @@ propagate_labels(__global __read_write int *labels,
 
     // stay in bounds
     if ((x < w) && (y < h)) {
-        // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
         new_label = old_label;
 
+        // update new_label
         if (new_label < w * h) {
             new_label = min(new_label, buffer[(buf_y + 1) * buf_w + buf_x]);
             new_label = min(new_label, buffer[(buf_y - 1) * buf_w + buf_x]);
@@ -125,14 +129,12 @@ propagate_labels(__global __read_write int *labels,
         }
 
         if (new_label != old_label) {
-            // CODE FOR PART 3 HERE
             // indicate there was a change this iteration.
             // multiple threads might write this.
             *(changed_flag) += 1;
 
             atomic_min(&labels[old_label], new_label);
             atomic_min(&labels[y * w + x], new_label);
-            // labels[y * w + x] = new_label;
         }
     }
 }

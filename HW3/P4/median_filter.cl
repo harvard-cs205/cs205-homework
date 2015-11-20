@@ -1,5 +1,6 @@
 #include "median9.h"
 
+// returns pixel value at x, y
 float FETCH(__global __read_only float *in_values,
             int w, int h,
             int x, int y)
@@ -61,6 +62,7 @@ median_3x3(__global __read_only float *in_values,
     // 1D index of thread within our work-group
     const int idx_1D = ly * get_local_size(0) + lx;
 
+    // load buffer
     if (idx_1D < buf_w) {
         for (int row = 0; row < buf_h; row++) {
             buffer[row * buf_w + 1dx_1D] = \
@@ -79,7 +81,10 @@ median_3x3(__global __read_only float *in_values,
 
     // Each thread in the valid region (x < w, y < h) should write
     // back its 3x3 neighborhood median.
+
+    // stay within bounds
     if ((y < h) && (x < w)) {
+        // median9 with all combinations of y-1, y, y+1 with x-1, x, x+1
         out_values[y * w + x] = median9(buffer[(buf_y-1)*buf_w + buf_x - 1],
                                         buffer[(buf_y-1)*buf_w + buf_x],
                                         buffer[(buf_y-1)*buf_w + buf_x + 1],
