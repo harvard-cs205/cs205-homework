@@ -1,0 +1,44 @@
+Part 1:
+
+Maze 1:
+Finished after 879 iterations, 261.9836 ms total, 0.298047326507 ms per iteration
+Found 2 regions
+
+Maze 2:
+Finished after 514 iterations, 152.45928 ms total, 0.296613385214 ms per iteration
+Found 35 regions
+
+
+Part 2:
+
+Maze 1:
+Finished after 529 iterations, 157.65824 ms total, 0.298030699433 ms per iteration
+Found 2 regions
+
+Maze 2:
+Finished after 273 iterations, 81.33136 ms total, 0.297917069597 ms per iteration
+Found 35 regions
+
+
+Part 3:
+
+Maze 1:
+Finished after 10 iterations, 3.07216 ms total, 0.307216 ms per iteration
+Found 2 regions
+
+Maze 2:
+Finished after 10 iterations, 3.03024 ms total, 0.303024 ms per iteration
+Found 35 regions
+
+Part 4:
+
+Maze 1:
+Finished after 11 iterations, 8.83696 ms total, 0.80336 ms per iteration
+Found 2 regions
+
+Maze 2:
+Finished after 10 iterations, 8.00088 ms total, 0.800088 ms per iteration
+Found 35 regions
+
+accesing global mem already fast
+
