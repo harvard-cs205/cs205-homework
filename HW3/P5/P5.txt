@@ -16,8 +16,23 @@ Found 35 regions
 
 Part 3:
 Maze1:
-Finished after 11 iterations, 7.73648 ms total, 0.703316363636 ms per iteration
+Finished after 10 iterations, 6.055488 ms total, 0.6055488 ms per iteration
 Found 2 regions
 Maze2:
-Finished after 10 iterations, 7.002848 ms total, 0.7002848 ms per iteration
+Finished after 9 iterations, 5.425952 ms total, 0.602883555556 ms per iteration
 Found 35 regions
+
+Part 4:
+Maze1:
+Finished after 10 iterations, 18.7112 ms total, 1.87112 ms per iteration
+Found 2 regions
+Maze2:
+Finished after 9 iterations, 16.863136 ms total, 1.87368177778 ms per iteration
+Found 35 regions
+
+
+
+I see that by serializing the grandparenting, the computation takes one fewer iteration to complete, but takes > 2x longer per iteration. It appears that the decreased number of reads to global memory does not balance out the increased serialization. Perhaps if my GPU had a greater number of cores the serialization wouldn't be as noticible. Additionally this would potentially be a better idea if there was some way to begin iterating over parts of the workgroup that had already been grandparented -- since the other threads in the workgroup are just waiting. 
+
+Part 5: 
+In this case, atomic operations prevent race conditions -- access to specific memory locations by multiple threads at once. Using min() instead of atomic_min() still results in the correct answer, and results in a slightly shorter time per iteration, but requires more iterations to complete, since values can get updated redundantly. I found that, on my machine, the difference between using min() and atomic_min() is negligible. 

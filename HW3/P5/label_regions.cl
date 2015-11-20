@@ -103,11 +103,40 @@ propagate_labels(__global __read_write int *labels,
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
 
+    //part 4
+    //if current thread is first in workgroup
+/*    if (lx==0 && ly==0){
+        int current,idx, row, col;;
+        int previous=w*h;
+        for (row=halo; row< (buf_h-halo); row++){
+            for (col=halo; col< (buf_w-halo);col++){
+                idx=row*buf_w+col;
+
+                //not a wall
+                if (buffer[idx]!=h*w){
+                    //don't look into global memory if not necessary
+                    if (previous == buffer[idx]){
+                        buffer[idx]=current;
+                    }
+                    //otherwise, do grandparenting
+                    else{
+                        previous = buffer[idx];
+                        buffer[idx]=labels[buffer[idx]];
+                        current=buffer[idx];
+                    }
+                }
+            }
+        }   
+    }*/
+    //Part 2
     //if current pixel is not a wall
     if (buffer[buf_y * buf_w + buf_x]!=h*w){
+
         buffer[buf_y * buf_w + buf_x]=labels[buffer[buf_y * buf_w + buf_x]];
     }
     barrier(CLK_LOCAL_MEM_FENCE);
+
+
     // stay in bounds
     if ((x < w) && (y < h)) {
         // CODE FOR PART 1 HERE
@@ -121,11 +150,12 @@ propagate_labels(__global __read_write int *labels,
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
             atomic_min(&labels[old_label],new_label);
-
+            atomic_min(&labels[y * w + x],new_label);
             // indicate there was a change this iteration.
             // multiple threads might write this.
             *(changed_flag) += 1;
-            labels[y * w + x] = new_label;
+            /*labels[old_label]=min(labels[old_label],new_label);
+            labels[y * w + x] = new_label;*/
         }
     }
 }
