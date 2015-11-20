@@ -1,0 +1,59 @@
+Part 1: implement updates from neighbors
+
+Maze 1
+Finished after 894 iterations, 197.5328 ms total, 0.222069508197 ms per iteration
+Found 2 regions
+
+Maze 2
+Finished after 528 iterations, 116.40336 ms total, 0.220460909091 ms per iteration
+Found 35 regions
+
+===============================================================================
+
+Part 2: fetch grandparents
+
+Maze 1
+Finished after 529 iterations, 116.8076 ms total, 0.220808317580 ms per iteration
+
+Maze 2
+Finished after 274 iterations, 62.08362 ms total, 0.226582554745 ms per iteration
+
+===============================================================================
+
+Part 3: merge parent regions
+
+Maze 1
+Finished after 10 iterations, 2.4026 ms total, 0.24026 ms per iteration
+
+Maze 2
+Finished after 9 iterations, 2.17255 ms total, 0.241394444444 ms per iteration
+
+===============================================================================
+
+Part 4: efficient grandparents
+
+Maze 1
+Finished after 10 iterations, 4.59674 ms total, 0.459674 ms per iteration
+
+Maze 2
+Finished after 9 iterations, 4.1608 ms total, 0.462311111111 ms per iteration
+
+It is quite apparent that using a single thread to check the labels in its
+workgroup caused performance to worsen. I think this has to do with the
+overhead associated with accessing global memory we are trying to avoid, and
+the speedup we gain from parallelism. Here, we can see that using only one
+thread, i.e. serializing this part of the algorithm, takes away much of the
+benefit we gained in the parallel approach, even though it decreased number of
+accesses to global memory.
+
+===============================================================================
+
+Part 5: no atomic operations
+
+Without atomic operations, we introduce the possibility of running into the
+race condition in which our old_label is updated redundantly, such that while
+the output of the algorithm is not incorrect, we can increase the number of
+iterations. This is dangerous because it happens basically
+nondeterministically, so in the (very unlikely) worst case it could cause our
+algorithm to perform relatively slowly, just because more work (with no 
+progress) is being done.
