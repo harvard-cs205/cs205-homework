@@ -76,16 +76,23 @@ if __name__ == '__main__':
     # Send image to the device, non-blocking
     cl.enqueue_copy(queue, gpu_image_a, host_image, is_blocking=False)
 
-    num_iters = 10
+    num_iters = 10 
     for iter in range(num_iters):
         program.median_3x3(queue, global_size, local_size,
                            gpu_image_a, gpu_image_b, local_memory,
                            width, height,
                            buf_width, buf_height, halo)
-
+        
         # swap filtering direction
         gpu_image_a, gpu_image_b = gpu_image_b, gpu_image_a
 
     cl.enqueue_copy(queue, host_image_filtered, gpu_image_a, is_blocking=True)
-
+    
     assert np.allclose(host_image_filtered, numpy_median(host_image, num_iters))
+    print("Congrats! You made it past the assert statement!")
+    # To display image
+    # pylab.figure()
+    # pylab.imshow(host_image_filtered)
+    # pylab.title("After filtering")
+    # pylab.show()
+    

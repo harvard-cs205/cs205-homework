@@ -32,8 +32,10 @@ if __name__ == "__main__":
             cl.enqueue_copy(queue, host_partial, partial_sums, is_blocking=True)
 
             sum_gpu = sum(host_partial)
-            sum_host = sum(host_x)
+            sum_host = sum(host_x)			
+    		
             seconds = (event.profile.end - event.profile.start) / 1e9
+			
             assert abs((sum_gpu - sum_host) / max(sum_gpu, sum_host)) < 1e-4
             times['coalesced', num_workgroups, num_workers] = seconds
             print("coalesced reads, workgroups: {}, num_workers: {}, {} seconds".
@@ -50,6 +52,7 @@ if __name__ == "__main__":
 
             sum_gpu = sum(host_partial)
             sum_host = sum(host_x)
+            
             seconds = (event.profile.end - event.profile.start) / 1e9
             assert abs((sum_gpu - sum_host) / max(sum_gpu, sum_host)) < 1e-4
             times['blocked', num_workgroups, num_workers] = seconds
