@@ -1,4 +1,4 @@
 The best configuration for my hardware was the following:
-
+GeForce GT 650M on Apple:
 configuration ('coalesced', 32, 128): 0.0023312 seconds
 

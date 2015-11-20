@@ -83,6 +83,7 @@ propagate_labels(__global __read_write int *labels,
 //    if (old_label < w * h)
 //        buffer[buf_y*buf_w + buf_x] = labels[buffer[buf_y*buf_w + buf_x]];
 
+    // Part 4 code
     if (lx == 0 && ly == 0) {
         int current_label;
         int previous_label = w * h;
@@ -92,6 +93,7 @@ propagate_labels(__global __read_write int *labels,
                 if (buffer[index] < w*h) {
                     if (previous_label == buffer[index])
                         buffer[index] = current_label;
+                    // otherwise, have to look into global memory
                     else {
                         previous_label = buffer[index];
                         current_label = labels[buffer[index]];
@@ -112,6 +114,7 @@ propagate_labels(__global __read_write int *labels,
         new_label = old_label;
         
         if (old_label < w*h) {
+            // take min of neighbors and old label
             int leftright = min(buffer[buf_y*buf_w + buf_x - 1], buffer[buf_y*buf_w + buf_x + 1]);
             int updown = min(buffer[(buf_y-1)*buf_w + buf_x], buffer[(buf_y+1)*buf_w + buf_x]);
             int neighbors = min(leftright, updown);
@@ -123,8 +126,9 @@ propagate_labels(__global __read_write int *labels,
             // indicate there was a change this iteration.
             // multiple threads might write this.
             *(changed_flag) += 1;
-            atomic_min(&(labels[y * w + x]), new_label);
             atomic_min(&(labels[old_label]), new_label);
+            atomic_min(&(labels[y * w + x]), new_label);
+            
         }
     }
 }

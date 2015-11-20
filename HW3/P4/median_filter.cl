@@ -8,7 +8,7 @@ float FETCH(__global __read_only float *in_values,
     if (x < 0) x = 0;
     else if (x >= w) x = w-1;
     
-    if (y<0) y = 0;
+    if (y < 0) y = 0;
     else if (y >= h) y = h-1;
     
     return in_values[y * w + x];
