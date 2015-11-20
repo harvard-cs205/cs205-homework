@@ -1,5 +1,7 @@
 import pyopencl as cl
 import numpy as np
+import os
+os.environ['PYOPENCL_COMPILER_OUTPUT'] = '1'
 
 def create_data(N):
     return host_x, x
