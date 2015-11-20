@@ -1,10 +1,12 @@
 Problem 5 Write Up 
 By: Matheus C. Fernandes
 
-Code outputs:
+Code Outputs and Questions Explanations:
 
 Part 1: implement updates from neighbors
 =========================================
+Code Outputs:
+-----------------------------------------
 Maze 1:
 Finished after 915 iterations, 187.40696 ms total, 0.204816349727 ms per iteration
 Found 2 regions
@@ -16,6 +18,8 @@ Found 35 regions
 
 Part 2: fetch grandparents
 =========================================
+Code Outputs:
+-----------------------------------------
 Maze 1:
 Finished after 529 iterations, 103.94128 ms total, 0.196486351607 ms per iteration
 Found 2 regions
@@ -28,6 +32,8 @@ Found 35 regions
 
 Part 3: merge parent regions 
 =========================================
+Code Outputs:
+-----------------------------------------
 Maze 1: 
 Finished after 10 iterations, 2.94152 ms total, 0.294152 ms per iteration
 Found 2 regions
@@ -37,8 +43,10 @@ Finished after 9 iterations, 2.61712 ms total, 0.290791111111 ms per iteration
 Found 35 regions
 
 
-Part 4: effcient grandparents
+Part 4: efficient grandparents
 =========================================
+Code Outputs:
+-----------------------------------------
 Maze 1:
 Finished after 10 iterations, 5.62464 ms total, 0.562464 ms per iteration
 Found 2 regions
@@ -47,12 +55,23 @@ Maze 2:
 Finished after 9 iterations, 4.9628 ms total, 0.551422222222 ms per iteration
 Found 35 regions
 
+Explanation of questions:
+-----------------------------------------
+Questions Statement:
+Explain, in terms of compute vs. memory, why using a single thread to perform this step is or is not a reasonable choice. Note that there is some variation in GPUs, so you may want to discuss your empirical results as well as speculate under what conditions those results might be different.
+
+-----------------------------------------
+Answer:
+I found that using one thread to perform this step did not improve the overall performance of the computation. The results of my GPU showed that there is a significant slowdown on the performance. I believe that even though we decrease the number of accesses to global memory, serializing the part of the algorithm gives away a large benefit in the compute through parallelism. Thus, I don’t think the compute vs. memory access here is worth doing, as the balance is much skewed on the direction of the overhead. Perhaps it would be beneficial to serialize such a task if the memory read overhead cost is much larger than the compute or the compute for one of these iterations is much less expensive than the memory. Thus, for this particular problem, I do not think it is worth this balance as the compute portion is too expensive over the read.   
 
 
 Part 5: no atomic operations
 =========================================
 Explanation of questions:
+-----------------------------------------
+Questions Statment:
+Atomic operations are also inefficient, and virtually guarantee serialization of memory access. Explain what would happen if instead of using the atomic min() operation, one would use the min() function. Your explanation should consider whether the final result would still be correct, what might be the impact on the performance of the algorithm (time and iterations), could a value in labels ever increase, and could it increase between iterations?
 
-
-
-
+-----------------------------------------
+Answer:
+I believe that using the regular min() function would have a positive impact on the performance of the code because the atomic min() function will serialize (by essentially locking the memory location) to make sure everything is loaded properly. This serialization would likely make the computation slower. Thus, the computation with regular min() functions can greatly benefit of the parallelization although you may run a risk of getting incorrect answers. If we used the min() function over the atomic min() function, we would potentially introduce the possibility of updating out old_able redundantly, while two functions could be updating the output function at the same time. This could introduce error into our calculations by overusing a particular variable (while not necessarily always happening, the error could be introduced). In any case, if min() is used over the atomic min() then we could potentially see an increase in the value of labels[]. This can be done if one thread attempts to make a change over over the other thread who is altering the same location in memory, and one threads writes on to the location, and the other thread does not see the new value and puts back the older value. This essentially means that the thread who picked the memory location in the first place will be completely ignored in the calculation. 
