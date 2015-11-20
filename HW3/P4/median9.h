@@ -1,4 +1,4 @@
-// median9.h - branchless median 
+// median9.h - branchless median
 
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 #define max(a, b) (((a) < (b)) ? (b) : (a))
@@ -11,7 +11,7 @@ inline float median9(float s0, float s1, float s2,
 {
     // http://a-hackers-craic.blogspot.com/2011/05/3x3-median-filter-or-branchless.html
     float tmp;
-        
+
     cas(s1, s2);
     cas(s4, s5);
     cas(s7, s8);

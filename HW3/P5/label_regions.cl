@@ -1,6 +1,6 @@
 __kernel void
-initialize_labels(__global __read_only int *image,
-                  __global __write_only int *labels,
+initialize_labels(__global  int *image,
+                  __global  int *labels,
                   int w, int h)
 {
     const int x = get_global_id(0);
@@ -18,7 +18,7 @@ initialize_labels(__global __read_only int *image,
 }
 
 int
-get_clamped_value(__global __read_only int *labels,
+get_clamped_value(__global  int *labels,
                   int w, int h,
                   int x, int y)
 {
@@ -28,8 +28,8 @@ get_clamped_value(__global __read_only int *labels,
 }
 
 __kernel void
-propagate_labels(__global __read_write int *labels,
-                 __global __write_only int *changed_flag,
+propagate_labels(__global  int *labels,
+                 __global  int *changed_flag,
                  __local int *buffer,
                  int w, int h,
                  int buf_w, int buf_h,
@@ -56,15 +56,15 @@ propagate_labels(__global __read_write int *labels,
 
     // 1D index of thread within our work-group
     const int idx_1D = ly * get_local_size(0) + lx;
-    
+
     int old_label;
     // Will store the output value
     int new_label;
-    
-    // Load the relevant labels to a local buffer with a halo 
+
+    // Load the relevant labels to a local buffer with a halo
     if (idx_1D < buf_w) {
         for (int row = 0; row < buf_h; row++) {
-            buffer[row * buf_w + idx_1D] = 
+            buffer[row * buf_w + idx_1D] =
                 get_clamped_value(labels,
                                   w, h,
                                   buf_corner_x + idx_1D, buf_corner_y + row);
@@ -80,20 +80,73 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
-    
+
+    // part2
+    // replace each label with the label of its label
+    if (old_label < w*h) {
+        buffer[buf_y * buf_w + buf_x] = labels[old_label];
+    }
+
+
+    // // part4
+    // // Make sure everybody's there (it took me a while to realize that it was needed!)
+    // barrier(CLK_LOCAL_MEM_FENCE);
+    // // I make the first worker work here
+    // if((lx==0)&&(ly==0)){
+    //     // value we check if buffer[i] is equal to
+    //     int temp_old = -1;
+    //     // value to put in in the case buffer[i] is the same
+    //     int temp_lab = -1;
+    //     // current label seen
+    //     int temp = -1;
+    //     // get local sizes
+    //     int loc_size_x = get_local_size(0);
+    //     int loc_size_y = get_local_size(1);
+    //     // go through the buffer corresponding to local id
+    //     for(int ix=0; ix<loc_size_x; ix++){
+    //         for(int iy=0; iy<loc_size_y; iy++){
+    //             // create equivalent of local id in buffer
+    //             int loc_buf_idx = (ix+halo)+(iy+halo)*buf_w;
+    //             // avoid accessing buffer too much (even if it is quite cheap)
+    //             temp = buffer[loc_buf_idx];
+    //             // don't consider the wall
+    //             if(buffer[loc_buf_idx]<h*w){
+    //                 // if the value has changed
+    //                 if(temp_old != temp){
+    //                     temp_old = temp;
+    //                     temp_lab = labels[temp_old];
+    //                 }
+    //                 // replace by grandparent
+    //                 buffer[loc_buf_idx] = temp_lab;
+    //             }
+    //         }
+    //     }
+    // }
+
     // stay in bounds
-    if ((x < w) && (y < h)) {
+    // also check that it is not a wall
+    if ((x < w) && (y < h) && (old_label < w*h)) {
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
-        new_label = old_label;
+
+
+        new_label = min(old_label,  min(buffer[buf_y * buf_w + buf_x+1],
+                                    min(buffer[buf_y * buf_w + buf_x-1],
+                                    min(buffer[(buf_y+1) * buf_w + buf_x], buffer[(buf_y-1) * buf_w + buf_x])
+                                    )
+                                    )
+                                    );
+
 
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
             // indicate there was a change this iteration.
             // multiple threads might write this.
             *(changed_flag) += 1;
-            labels[y * w + x] = new_label;
+            // labels[y * w + x] = new_label;
+            atomic_min(&labels[old_label], new_label);
+            atomic_min(&labels[y*w + x], labels[old_label]);
         }
     }
 }

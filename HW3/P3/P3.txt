@@ -1,0 +1,2 @@
+#0: Pentium(R) Dual-Core CPU       T4300  @ 2.10GHz on AMD Accelerated Parallel Processing
+configuration ('blocked', 256, 16): 0.015340428 seconds
