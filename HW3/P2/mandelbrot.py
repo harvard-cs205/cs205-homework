@@ -64,10 +64,10 @@ if __name__ == '__main__':
 
     local_size = (8, 8)  # 64 pixels per work group
     global_size = tuple([round_up(g, l) for g, l in zip(in_coords.shape[::-1], local_size)])
+    pdb.set_trace()
     width = np.int32(in_coords.shape[1])
     height = np.int32(in_coords.shape[0])
     max_iters = np.int32(1024)
-    #pdb.set_trace()
     cl.enqueue_copy(queue, gpu_real, real_coords, is_blocking=False)
     cl.enqueue_copy(queue, gpu_imag, imag_coords, is_blocking=False)
 
