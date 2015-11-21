@@ -1,0 +1,9 @@
+Part 5:
+
+The benefit of atomic_min is that it performs the calculation and swap
+into a single step, writing the min value directly into memory. What this allows
+is the elimination of a race condition, because another thread will not be
+able to interrupt. Although technically min is faster than atomic_min, iterations
+will likely be fewer with atomic_min, because it would be redundant to access
+the same spot in memory again to compare, when that value in memory was updated
+by another thread.
