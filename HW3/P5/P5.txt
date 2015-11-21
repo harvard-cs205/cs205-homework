@@ -1,0 +1,51 @@
+Christian Junge helped me with this problem.
+
+###Part 1
+
+- Maze 1:
+Finished after 875 iterations, 574.0908 ms total, 0.656103771429 ms per iteration
+Found 2 regions
+
+- Maze 2:
+Finished after 507 iterations, 345.4796 ms total, 0.681419329389 ms per iteration
+Found 35 regions
+
+###Part 2
+
+- Maze 1:
+Finished after 529 iterations, 337.87184 ms total, 0.638699130435 ms per iteration
+Found 2 regions
+
+- Maze 2:
+Finished after 272 iterations, 180.02288 ms total, 0.661848823529 ms per iteration
+Found 35 regions
+
+###Part 3:
+
+- Maze 1:
+Finished after 8 iterations, 6.87728 ms total, 0.85966 ms per iteration
+Found 2 regions
+
+- Maze 2:
+Finished after 8 iterations, 6.70104 ms total, 0.83763 ms per iteration
+Found 35 regions
+
+###Part 4:
+
+- Maze 1:
+
+- Maze 2:
+
+###Part 5:
+
+If instead of using the atomic_min() operation, we used the min() function the final result would be still correct. 
+Nevertheless, in the case where two threads are trying to change the same "old_label" for different "new_label", the performance of the algorithm would be affected. Let's say create an example: 
+thread1: old_label1 = 15    new_label1 = 10
+thread2: old_label2 = 15	new_label2 = 8
+In the first step Thread1 is comparing old_label1 to new_label1, it calculates the minimum and chooses new_label1 (10).
+Parallely, Thread2 is comparing old_label2 to new_label2, it calculates the minimum and chooses new_label2 (8).
+For memory reasons, Thread2 is faster and swaps the labels before Thread1. Thread1 swaps next, for its already selected 
+value (10). 
+As we can see this is not the optimum and we would probably end up doing more iterations. Nevertheless, a value in labels
+will never increase.
+
