@@ -90,7 +90,7 @@ propagate_labels(__global __read_write int *labels,
             gpartent = labels[old_label];
         }
         // ITERATE OVER THE ROWS--XX AND COLUMNS--YY
-        for(xx =halo;xx < buf_h - halo; xx++){
+        for(xx = halo;xx < buf_h - halo; xx++){
             for (yy= halo; yy < buf_w-halo; yy++){
                 // STATEMENT DOES NOT ALLOW IF THE YOU ARE NOT ON THE WALL OF THE MAZE
                 if(buffer[(ly+xx)*buf_w+(lx+yy)]<w*h){
