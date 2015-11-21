@@ -82,11 +82,38 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
-
+    // Part 2
+    /*
     for( int i=0; i<4; i++ ) {
         if( buffer[(buf_y+dy[i])*buf_w + (buf_x + dx[i])] < w * h ) {
             buffer[(buf_y+dy[i])*buf_w + (buf_x + dx[i])] = labels[ buffer[(buf_y+dy[i])*buf_w + (buf_x + dx[i])] ];
          }
+    }
+    */
+
+    // Part 4
+    // Reference: Piazza @524
+    unsigned int ls0 = get_local_size(0), ls1 = get_local_size(1);
+
+    if( lx == 0 && ly == 0 ) { //Use the first thread
+        unsigned int prev = -1, gparent = -1; // 1 variable cache
+        for( int c_lx = 0; c_lx < ls0; c_lx++ ) { // Update the entire local buffer
+            for( int c_ly = 0; c_ly < ls1; c_ly++ ) {
+                unsigned int cur_idx = (c_ly + halo) * buf_w + (c_lx + halo);
+                unsigned int parent = buffer[cur_idx];
+
+                if( parent == w * h ) continue; // Background pixel
+
+                if( parent == prev ) { // 1 variable cache success!
+                    buffer[cur_idx] = gparent;
+                }
+                else { // Update the cache
+                    buffer[cur_idx] = labels[parent];
+                    prev = parent;
+                    gparent = buffer[cur_idx];
+                }
+            }
+        }
     }
 
     barrier(CLK_LOCAL_MEM_FENCE);

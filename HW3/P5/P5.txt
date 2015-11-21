@@ -1,4 +1,5 @@
 Part 1:
+========================
 Finished after 911 iterations, 214.33168 ms total, 0.235270779363 ms per iteration
 Found 2 regions
 
@@ -6,6 +7,7 @@ Finished after 531 iterations, 124.05312 ms total, 0.233621694915 ms per iterati
 Found 35 regions
 
 Part 2:
+========================
 Finished after 529 iterations, 133.35928 ms total, 0.252096937618 ms per iteration
 Found 2 regions
 
@@ -13,13 +15,36 @@ Finished after 269 iterations, 68.04856 ms total, 0.252968624535 ms per iteratio
 Found 35 regions
 
 Part 3:
+========================
 Finished after 8 iterations, 2.59184 ms total, 0.32398 ms per iteration
 Found 2 regions
 
 Finished after 8 iterations, 2.4332 ms total, 0.30415 ms per iteration
 Found 35 regions
 
+Part 4:
+========================
+Finished after 10 iterations, 7.37784 ms total, 0.737784 ms per iteration
+Found 2 regions
+
+Finished after 9 iterations, 6.66816 ms total, 0.740906666667 ms per iteration
+Found 35 regions
+
+Using a single-thread for caching seems to have made the running time much slower (looking at the time per iteration
+.) Computation is serialized during this caching process, so there is a big upfront cost that needs to be weighed
+against the ongoing cost of expensive, potentially serialized, main memory accesses.
+
+I suspect the worst case memory access scenario where neighbouring nodes all try to access main memory for a single
+cached value only happens quite late in the process. Earlier iterations are probably facing more diversity of memory
+accesses since there's a greater range of values still remaining. It follows then, that perhaps with much more
+complex mazes, there could be scenarios where the overall iteration count will be high, but parts of the maze will
+have already "stabilized" early in the process. Therefore, these "stabilized" parts are repeatedly drawing on the same
+cached values. It seems there aren't enough iterations in these examples for it to be worth the upfront cost (at
+least on my hardware setup.) Potentially, other setups that have different computation and memory access speeds might
+reveal differences in the results since the trade-off is weighed differently.
+
 Part 5:
+========================
 If instead of atomic_min() we use min(), then the update step is not done in a single transaction, meaning between
 the min() check and the subsequent update, a different thread could update the reference value. Suppose this
 different thread actually updated the reference to an even lower value than what we had intended. Now, if we go ahead
