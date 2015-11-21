@@ -61,3 +61,27 @@ Found 106 regions
 Looks like using only one thread did not improve anything. Worse, I now have more iterations. I don't have time to find out what happened.
 While we have decreased the fetches into the global memory by serializing, the run time is bigger.
 
+
+********
+Part 5
+********
+
+Changing atomic_min() to a simple min() ?
+
+For now we have :
+
+atomic_min(&labels[old_label],new_label);
+atomic_min(&labels[y * w + x], new_label);
+
+and we are asking ourselves the questions what would happen with
+
+min(labels[old_label], new_label);
+min(labels[y * w + x], new_label); 
+
+The atomic operation ensure that only one thread assigns to labels[old_label] and  labels[y * w + x] the smallest label at a time. If multiple threads do this at the same time in parallel, there is no reason to believe that it will correctly assign the smallest value of the label anymore. 
+
+However, this operation will be faster per iteration because now done via multithreading. 
+
+Also we may expect more iterations because the minimum value stored at the end of one iteration may not be the minimum value for all the threads.
+
+
