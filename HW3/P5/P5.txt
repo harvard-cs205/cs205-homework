@@ -1,0 +1,71 @@
+Author: Xingchi Dai Harvard University
+CS205: Computing foundation
+HW3 Problem 5: OpenCl labeling 2d Image
+
+
+
+Problem 5
+part1:
+maze1:
+Finished after 875 iterations, 610.46504 ms total, 0.697674331429 ms per iteration
+Found 2 regions
+
+maze2:
+Finished after 506 iterations, 355.24616 ms total, 0.702067509881 ms per iteration
+Found 35 regions
+
+part2: add grandparents
+maze1:
+Finished after 529 iterations, 542.99272 ms total, 1.02645126654 ms per iteration
+Found 2 regions
+maze2:
+Finished after 273 iterations, 280.75744 ms total, 1.02841553114 ms per iteration
+Found 35 regions
+
+
+part3: use atomic_min
+maze1:
+Finished after 10 iterations, 11.33896 ms total, 1.133896 ms per iteration
+Found 2 regions
+maze2:
+Finished after 9 iterations, 10.05912 ms total, 1.11768 ms per iteration
+Found 35 regions
+
+
+part4: use single thread
+maze1:
+Finished after 10 iterations, 32.8688 ms total, 3.28688 ms per iteration
+Found 2 regions
+maze2:
+Finished after 9 iterations, 29.41992 ms total, 3.26888 ms per iteration
+Found 35 regions
+
+Analysis: The performance has dropped significantly after we changed to the single thread read. There is
+trade-off between choosing the parallel computing or single-thread. In this part, we try to
+avoid the global memory read. As in many GPUs, when we require same location read across in different work groups, the
+GPU will serialize the reading, which will lower our performance.
+As such, if our image contains many/a large amount of similar labels, which will have many requests to read the same
+location in global memory. In this case, storing the previous read’s information will increase our performance. 
+Part5: no atomic operation
+
+Analysis:
+An atomic operation is a sequence of one or more machine instructions that are executed sequentially, without
+any interruption.
+In our code,  some threads will read the location at the same time, but when they overwrite the number back, we cannot
+make sure the label is always decrease. Thus, if the label increases, it would take more iterations to finish the program.
+However, the performance shouldn't change much, as the atomic function makes sure no label increase in return of performance decrease.
+In order to make sure the grader understand how the fetch value gets increases, here is a quick example:
+
+thread1:  label -> 5, 4
+
+thread2:  label -> 5, 3
+
+here, thread 1 and thread 2 read the label at the same time, and compare the second number. However, after some cycles, thread 2 overwrote the label first:
+
+label -> 3,
+
+after some cycles, thread1 also finished, and rewrite the label again.
+
+label -> 4
+
+during this time, the value of label is increased. This will result in having more iterations. 

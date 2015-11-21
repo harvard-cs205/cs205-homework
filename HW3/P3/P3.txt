@@ -1,0 +1,14 @@
+Author: Xingchi Dai    Harvard University
+CS 205 Computing foundation
+HW3: Autotuning Kernels
+
+
+The hardware spec:
+#0: Intel(R) Core(TM) i7-3720QM CPU @ 2.60GHz on Apple
+#1: HD Graphics 4000 on Apple
+#2: GeForce GT 650M on Apple
+
+The performance result:
+configuration ('coalesced', 16, 128): 0.00288016 seconds
+
+
