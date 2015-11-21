@@ -1,0 +1,64 @@
+#solutions for HW3 - P5
+
+Devices used - 
+The platforms detected are:
+---------------------------
+Apple Apple version: OpenCL 1.2 (Sep 21 2015 19:24:11)
+The devices detected on platform Apple are:
+---------------------------
+Intel(R) Core(TM) i5-5257U CPU @ 2.70GHz [Type: CPU ]
+Maximum clock Frequency: 2700 MHz
+Maximum allocable memory size: 4294 MB
+Maximum work group size 1024
+---------------------------
+Intel(R) Iris(TM) Graphics 6100 [Type: GPU ]
+Maximum clock Frequency: 1050 MHz
+Maximum allocable memory size: 402 MB
+Maximum work group size 256
+---------------------------
+This context is associated with  2 devices
+The queue is using the device: Intel(R) Iris(TM) Graphics 6100
+
+Results - 
+
+1) Maze 1 - 
+Finished after 912 iterations, 190.44896 ms total, 0.208825614035 ms per iteration
+Found 2 regions
+Maze 2 - 
+Finished after 532 iterations, 109.73248 ms total, 0.20626406015 ms per iteration
+Found 35 regions
+
+2) Maze 1 - 
+Finished after 529 iterations, 106.09848 ms total, 0.200564234405 ms per iteration
+Found 2 regions
+Maze 2 - 
+Finished after 273 iterations, 54.7588 ms total, 0.200581684982 ms per iteration
+Found 35 regions
+
+3) Maze 1 - 
+Finished after 11 iterations, 3.24648 ms total, 0.295134545455 ms per iteration
+Found 2 regions
+Maze 2 - 
+Finished after 9 iterations, 2.61312 ms total, 0.290346666667 ms per iteration
+Found 35 regions
+
+4) Maze 1 - 
+Finished after 10 iterations, 6.9416 ms total, 0.69416 ms per iteration
+Found 2 regions
+Maze 2 - 
+Finished after 9 iterations, 6.24304 ms total, 0.693671111111 ms per iteration
+Found 35 regions
+
+Explanation - This task is memory-bound and so avoiding duplicate calls to global memory (all of which are serialized) will help improve runtime. When using multiple threads to perform grandparent fetching from global memory, chances are that we are making such duplicate calls and so theoretically, forcing just one single thread per work-group to perform this task for the entire work-group could potentially help. However as can be seen in the runtimes above, for this problem and the GPU used here, the performance actually degrades. 
+I would hypothesize that this may have to do with the nature of our problem itself. Given that each workgroup only has 64 threads and that only a fraction of these (only the foreground pixels) need to make calls to global memory, there isnt much to be gained from explicitly serializing on one thread. In fact, we might be losing time due to the required administrataive overhead.
+
+5) Using min - Maze 1 - 
+Finished after 10 iterations, 6.92656 ms total, 0.692656 ms per iteration
+Found 2 regions
+Using min - Maze 2 - 
+Finished after 9 iterations, 6.20176 ms total, 0.689084444444 ms per iteration
+Found 35 regions
+
+As can be seen from the results above, using "min" instead of "atomic_min" speeds things up just a tiny bit after averaging over a few runs while still producing correct results. 
+The values in labels can increase due to race conditions (including between iterations), however, this will self-correct over time as the algorithm converges towards minimization of all connected foreground pixels. Thus, this is the reason for the final correct results.
+
