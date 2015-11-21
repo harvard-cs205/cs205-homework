@@ -1,0 +1,44 @@
+I failed to run P5 on my ubuntu virtual machine. (Other problems work fine)
+So I ran my code on other people's Macbook.
+
+Part 1:
+maze1:
+Finished after 876 iterations, 612.37928 ms total, 0.699063105023 ms per iteration
+Found 2 regions
+maze2:
+Finished after 506 iterations, 355.05848 ms total, 0.701696600791 ms per iteration
+Found 35 regions
+
+Part 2:
+Finished after 528 iterations, 375.64456 ms total, 0.711448030303 ms per iteration
+Found 2 regions
+maze2:
+Finished after 272 iterations, 193.80496 ms total, 0.712518235294 ms per iteration
+Found 35 regions
+
+Part 3:
+Finished after 10 iterations, 8.67944 ms total, 0.867944 ms per iteration
+Found 2 regions
+maze2:
+Finished after 9 iterations, 7.70608 ms total, 0.856231111111 ms per iteration
+Found 35 regions
+
+Part 4:
+Maze 1:
+Finished after 10 iterations, 29.2644 ms total, 2.92644 ms per iteration
+Found 2 regions
+Maze 2:
+Finished after 9 iterations, 26.15008 ms total, 2.90556444444 ms per iteration
+
+According to my results, using the single thread makes the program slower.
+At first, I expected the performance would be improved because in part 4, we avoided some of the redundant global memory
+reads. However, I get a different result. I think it's because the memory read in GPU is relatively cheap. And since we
+now use a single thread in workgroup to look up the value, the memory access have to be done serially.
+The result might be different if we hae more repeated labels.
+
+Part 5:
+The atomic optimization works similarly to a lock. If we only use min instead of atomic_min, the values of label would
+be read/writen by multiple threads simultaneously. However, in this case, the result might still be correct even if we
+use min instead of atomic_min because the label of the same region would still be the same. But the disadvantage of min
+is that the performance might be decreased because of the redundant updating caused by race condition.
+
