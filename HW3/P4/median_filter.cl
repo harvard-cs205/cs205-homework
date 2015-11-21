@@ -1,6 +1,6 @@
 #include "median9.h"
 
-// From WH3 P5
+// From HW3 P5
 float
 get_clamped_value(__global __read_only float *labels,
                   int w, int h,
