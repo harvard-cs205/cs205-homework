@@ -1,0 +1,39 @@
+NOTE: Because my computer does not have a GPU, I ran my code on
+Isadora Nun's computer, so the results I have here will be near identical
+to hers.
+
+PART 1
+MAZE1:  Finished after 871 iterations, 567.5693 ms total, 0.610802777422 ms per iteration
+        Found 2 regions
+
+MAZE 2: Finished after 509 iterations, 341.0643 ms total, 0.683404097784 ms per iteration
+        Found 35 regions
+
+
+PART 2
+
+MAZE 1: Finished after 531 iterations, 333.93277 ms total, 0.638699130435 ms per iteration
+        Found 2 regions
+
+
+MAZE 2: Finished after 266 iterations, 188.24075 ms total, 0.639058300322 ms per iteration
+        Found 35 regions
+
+PART 3
+MAZE 3: Finished after 9 iterations, 6.11306 ms total, 0.82901 ms per iteration
+        Found 2 regions
+
+
+MAZE 2: Finished after 8 iterations, 6.73873 ms total, 0.83655 ms per iteration
+        Found 35 regions
+
+
+Part 5:
+
+The benefit of atomic_min is that it performs the calculation and swap
+into a single step, writing the min value directly into memory. What this allows
+is the elimination of a race condition, because another thread will not be
+able to interrupt. Although technically min is faster than atomic_min, iterations
+will likely be fewer with atomic_min, because it would be redundant to access
+the same spot in memory again to compare, when that value in memory was updated
+by another thread.
