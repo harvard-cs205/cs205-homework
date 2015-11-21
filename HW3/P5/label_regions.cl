@@ -80,7 +80,43 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
+
+    // PART 2
+    // if (old_label < w * h) { // to check if it's background pixel
+    //     buffer[buf_y * buf_w + buf_x] = labels[buffer[buf_y * buf_w + buf_x]];
+    // }
     
+    // PART 4
+    // only thread for lx, ly = (0, 0) will be used to fetching the data
+    if (lx == 0 && ly == 0) {
+        int current_label, current_label_index, last_label;
+        int work_group_size_x = get_local_size(0);
+        int work_group_size_y = get_local_size(1);
+
+        for (int row = 0; row < work_group_size_x; row++) {
+            for (int col = 0; col < work_group_size_y; col++) {
+
+                current_label_index = (row + halo) * buf_w + (col + halo);
+                current_label = buffer[current_label_index];
+
+                if (current_label < w * h) { // not background
+                    if (current_label == last_label) {
+                        buffer[current_label_index] = last_label;
+                    }
+                    else {
+                        last_label = current_label;
+                        buffer[current_label_index] = labels[current_label];
+                    }
+                }
+
+            }
+        }
+    }
+
+    // Make sure all threads reach the next part after
+    // the local buffer is loaded
+    barrier(CLK_LOCAL_MEM_FENCE);
+
     // stay in bounds
     if ((x < w) && (y < h)) {
         // CODE FOR PART 1 HERE
@@ -88,12 +124,24 @@ propagate_labels(__global __read_write int *labels,
         // to adjust this for correctness.
         new_label = old_label;
 
+        if (new_label < w * h) { // to check if it's background pixel
+
+            int up_pixel = buffer[(buf_y - 1) * buf_w + buf_x];
+            int left_pixel = buffer[buf_y * buf_w + buf_x -1];
+            int down_pixel = buffer[(buf_y + 1) * buf_w + buf_x];
+            int right_pixel = buffer[buf_y * buf_w + buf_x + 1];
+
+            new_label = min(min(min(min(old_label, up_pixel), left_pixel), down_pixel), right_pixel);
+        }
+
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
             // indicate there was a change this iteration.
             // multiple threads might write this.
             *(changed_flag) += 1;
-            labels[y * w + x] = new_label;
+            atomic_min(&labels[old_label], new_label);
+            // labels[y * w + x] = new_label;
+            atomic_min(&labels[y * w + x], new_label);
         }
     }
 }
