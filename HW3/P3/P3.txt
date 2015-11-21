@@ -1,0 +1,4 @@
+#0: Intel(R) Core(TM) i5-5257U CPU @ 2.70GHz on Apple
+#1: Intel(R) Iris(TM) Graphics 6100 on Apple
+
+configuration ('coalesced', 64, 64): 0.0027708 seconds

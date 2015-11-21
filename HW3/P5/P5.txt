@@ -1,0 +1,38 @@
+1. Iteration counts and average kernel times after each part
+
+(1) Part 1
+- Maze 1 : Finished after 915 iterations, 194.06176 ms total, 0.212089355191 ms per iteration
+Found 2 regions
+- Maze 2 : Finished after 532 iterations, 111.65112 ms total, 0.209870526316 ms per iteration
+Found 35 regions
+
+(2) Part 2
+- Maze 1 : Finished after 529 iterations, 109.62104 ms total, 0.207223137996 ms per iteration
+Found 2 regions
+- Maze 2 : Finished after 273 iterations, 56.87648 ms total, 0.208338754579 ms per iteration
+Found 35 regions
+
+(3) Part 3
+- Maze 1 : Finished after 10 iterations, 3.1164 ms total, 0.31164 ms per iteration
+Found 2 regions
+- Maze 2 : Finished after 9 iterations, 2.72808 ms total, 0.30312 ms per iteration
+Found 35 regions
+
+(4) Part 4
+- Maze 1 : Finished after 16 iterations, 8.2236 ms total, 0.513975 ms per iteration
+Found 2 regions
+- Maze 2 : Finished after 15 iterations, 7.52448 ms total, 0.501632 ms per iteration
+Found 35 regions
+
+
+2. Part 4 discussion
+Based on my empirical result, using a single thread to reduce redundant memory access rather made it more slower than part 3 codes did. Number of terations has increased 2 times and execution speed decreased to half. 
+I think even though part 3 code makes redundant memory access and it might take some time, but still using multiple threads override the advantage of serial access. Therefore, in my machine, the time saved by lessening redundant lookup is smaller than the time saved by parallel implementation.
+But this might depend on different conditions or environment of GPUs. For example, if the speed of GPU access is very slow, and the input image mostly has the same labels within a workgroup, then seriel implementation (code of part 4) will be better. 
+On the other hand, if the GPU access speed is not bottleneck anymore and the image has label that varies a lot even within a same group, code for P4 will work better in efficiency.
+
+
+3. Part 5 explanation
+atomic_min() makes sure that a certain memory address will be only accessed by one thread at a time. So in our code, it makes the label[old_label] always gets the actual minimum values when we use atomic_min(). However, if we use min() instead of atomic_min(), it might cause label[old_label] to be overwritten so that it has different value, resulting a value in label to increase.
+The final result will still be correct since once the minimum value is taken, this value is keep used. However, the performance of the algorithm (time and iterations) might vary.
+The operation using min() will be faster since it allows parallelism, however, the # of iterations will increase since a single thread will take more computation until it converge to get the actual minimum value. 
