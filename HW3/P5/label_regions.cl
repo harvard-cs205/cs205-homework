@@ -56,7 +56,7 @@ propagate_labels(__global __read_write int *labels,
 
     // 1D index of thread within our work-group
     const int idx_1D = ly * get_local_size(0) + lx;
-    
+
     int old_label;
     // Will store the output value
     int new_label;
@@ -80,20 +80,57 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
-    
+    // Overwritten code for PART 2
+    // if (old_label < w * h) {
+    //     // Grab grandparent
+    //     buffer[buf_y * buf_w + buf_x] = labels[old_label];
+    // }
+
+    // PART 4
+    // Update workgroup labels using single thread
+    if (lx == 0 && ly == 0) {
+        // Keeps track of previous key and result
+        int prev_label = -1;
+        int prev_result;
+
+        // Iterate through entire buffer
+        for (int i = 0; i < buf_w * buf_h; i++) {
+            int temp_label = buffer[i];
+
+            if (temp_label < w * h) {
+                // Reset if previous is not the same as current label
+                if (prev_label != temp_label) {
+                    prev_label = temp_label;
+                    prev_result = labels[prev_label];
+                }
+                buffer[i] = prev_result;
+            }
+        }
+    }
+
     // stay in bounds
-    if ((x < w) && (y < h)) {
+    if ((x < w) && (y < h) && (old_label < w * h)) {
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
+        
+        // Update new label
         new_label = old_label;
-
+        if (new_label < w * h) {
+            // Take minimum of minimums over rows and columns
+            int row_min = min(buffer[buf_y * buf_w + buf_x - 1], buffer[buf_y * buf_w + buf_x + 1]);
+            int col_min = min(buffer[(buf_y - 1) * buf_w + buf_x], buffer[(buf_y + 1) * buf_w + buf_x]);
+            new_label = min(row_min, col_min);
+        }
+        
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
             // indicate there was a change this iteration.
             // multiple threads might write this.
             *(changed_flag) += 1;
-            labels[y * w + x] = new_label;
+
+            atomic_min(&labels[old_label], new_label);
+            atomic_min(&labels[y * w + x], new_label);
         }
     }
 }

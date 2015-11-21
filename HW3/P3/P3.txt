@@ -1,0 +1,22 @@
+After running the timing code, the best configuration is as follows:
+
+configuration ('coalesced',256,128): 0.00301426 seconds
+
+I am running the code on my 2012 MacBook Pro 13" with the following specs:
+
+---------------------------
+Apple Apple version: OpenCL 1.2 (May 10 2015 19:38:45)
+The devices detected on platform Apple are:
+---------------------------
+Intel(R) Core(TM) i5-3210M CPU @ 2.50GHz [Type: CPU ]
+Maximum clock Frequency: 2500 MHz
+Maximum allocable memory size: 2147 MB
+Maximum work group size 1024
+---------------------------
+HD Graphics 4000 [Type: GPU ]
+Maximum clock Frequency: 1100 MHz
+Maximum allocable memory size: 268 MB
+Maximum work group size 512
+---------------------------
+This context is associated with  2 devices
+The queue is using the device: HD Graphics 4000
