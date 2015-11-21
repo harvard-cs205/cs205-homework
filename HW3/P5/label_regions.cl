@@ -75,20 +75,19 @@ propagate_labels(__global __read_write int *labels,
     // Make sure all threads reach the next part after
     // the local buffer is loaded
     barrier(CLK_LOCAL_MEM_FENCE);
-
+ 
     // Fetch the value from the buffer the corresponds to
     // the pixel for this thread
-
-    /*
+    /* 
     old_label = buffer[buf_y * buf_w + buf_x];
     if (old_label < w*h){
-        buffer[buf_y * buf_w + buf_x] = labels[old_label];
+        buffer[buf_y * buf_w + buf_x] = labels[old_label]; // grandparent update
     }
     barrier(CLK_LOCAL_MEM_FENCE); 
     */
-   
-    old_label = buffer[buf_y * buf_w + buf_x];
-    if ((buf_y*buf_w + buf_x) == 0){
+      
+    old_label = buffer[buf_y * buf_w + buf_x]; // use the first thread in the upper left corner to update the buffer values with grandparents
+    if ((buf_y + buf_x) == 2*halo){            // keeps track of last buffer value read to avoid reading from memory (labels array) more than necessary
         old_label0 = buffer[buf_y * buf_w + buf_x];
         if (old_label0 < w*h){
             prev = labels[old_label0];
@@ -118,7 +117,7 @@ propagate_labels(__global __read_write int *labels,
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
         minT = buffer[buf_y * buf_w + buf_x];
-     
+        // Check neighbors to update minimum
         if (buffer[(buf_y-1)*buf_w + buf_x] < minT){
             minT = buffer[(buf_y-1)*buf_w + buf_x];
         }
@@ -140,7 +139,7 @@ propagate_labels(__global __read_write int *labels,
             // multiple threads might write this.
             *(changed_flag) += 1;
             labels[y * w + x] = new_label;
-            atomic_min(&(labels[old_label]),new_label);
+            atomic_min(&(labels[old_label]),new_label); // Use atomic min to update grandparent value if necessary
         }
     }
 }
