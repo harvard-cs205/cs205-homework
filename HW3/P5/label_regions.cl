@@ -91,33 +91,32 @@ propagate_labels(__global __read_write int *labels,
 
     // CODE FOR PART 4
 
-    barrier(CLK_LOCAL_MEM_FENCE);
+
     // when we have the first thread
     if ((lx == 0) && (ly == 0)) {
 
         // initialize variables to use
-        int last_label;
+        int last_label = -1 ;
         int my_label_new;
-        int my_last_idx;
+
+        // get grandparent
+        if (old_label < w*h){
+            last_label = labels[old_label];
+        }
 
         // loop over rows and columns of the buffer
         for (int x_i = halo; x_i < get_local_size(0) + halo; x_i++) {
             for (int y_i = halo; y_i < get_local_size(1) + halo; y_i++) {
 
-                my_label_new = buffer[x_i + buf_w * y_i];
-                // obtain grand parent
-                if (old_label < w*h) {
+                my_label_new = buffer[(ly+x_i)*buf_w+(lx+y_i)];
+                
+                if (buffer[(ly+x_i)*buf_w+(lx+y_i)] < w*h) {
                     // avoid having the same value as the previous one
                     if (my_label_new != last_label) {
                         // update the buffer
-                        buffer[x_i + buf_w * y_i] = labels[my_label_new];
-                        // update the last label
-                        last_label = my_label_new;
-                    } else {
-                        buffer[x_i + buf_w * y_i ] = labels[buffer[my_last_idx]];
-                    }
+                        buffer[(ly+x_i)*buf_w+(lx+y_i)] = labels[my_label_new];
+                    } 
                 }
-                my_last_idx = x_i + buf_w * y_i ;
             }
         }
     }

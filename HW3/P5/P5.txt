@@ -50,3 +50,14 @@ Part 4
 
 --- Maze 1 ---
 
+Finished after 71 iterations, 96.0672 ms total, 1.35305915493 ms per iteration
+Found 66 regions
+
+--- Maze 2 ---
+
+Finished after 49 iterations, 66.29168 ms total, 1.35289142857 ms per iteration
+Found 106 regions
+
+Looks like using only one thread did not improve anything. Worse, I now have more iterations. I don't have time to find out what happened.
+While we have decreased the fetches into the global memory by serializing, the run time is bigger.
+
