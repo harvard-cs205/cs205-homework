@@ -1,0 +1,29 @@
+PROBLEM 3
+
+The best configuration and time for my hardware is:
+configuration ('coalesced', 512, 64): 0.0030328 seconds
+
+This is my computer information:
+
+---------------------------
+Apple Apple version: OpenCL 1.2 (Feb 27 2015 01:29:10)
+The devices detected on platform Apple are:
+---------------------------
+Intel(R) Core(TM) i7-3540M CPU @ 3.00GHz [Type: CPU ]
+Maximum clock Frequency: 3000 MHz
+Maximum allocable memory size: 2147 MB
+Maximum work group size 1024
+Maximum work item dimensions 3
+Maximum work item size [1024, 1, 1]
+---------------------------
+HD Graphics 4000 [Type: GPU ]
+Maximum clock Frequency: 1300 MHz
+Maximum allocable memory size: 268 MB
+Maximum work group size 512
+Maximum work item dimensions 3
+Maximum work item size [512, 512, 512]
+---------------------------
+This context is associated with  2 devices
+The queue is using the device: HD Graphics 4000
+The device memory bandwidth is 11.0345233454 GB/s
+The host-device bandwidth is 5.02189546422 GB/s
