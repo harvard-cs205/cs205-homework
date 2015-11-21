@@ -63,7 +63,6 @@ propagate_labels(__global __read_write int *labels,
     
     int upNeighbor,rightNeighbor,downNeighbor,leftNeighbor,minNeighbors;
 
-    int gpartent, xx, yy;
     // Load the relevant labels to a local buffer with a halo 
     if (idx_1D < buf_w) {
         for (int row = 0; row < buf_h; row++) {
@@ -83,31 +82,7 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
-    // This makes sure that we have only the first thread running 
-    if ((lx==0) && (ly==0)){
-        //OBTAIN RELATIVE GRANDPARENT
-        if(old_label<w*h){
-            gpartent = labels[old_label];
-        }
-        // ITERATE OVER THE ROWS--XX AND COLUMNS--YY
-        for(xx = halo;xx < buf_h - halo; xx++){
-            for (yy= halo; yy < buf_w-halo; yy++){
-                // STATEMENT DOES NOT ALLOW IF THE YOU ARE NOT ON THE WALL OF THE MAZE
-                if(buffer[(ly+xx)*buf_w+(lx+yy)]<w*h){
-                    // STATEMENT TO NOT ALLOW IF NODE ALREADY HAS A GRANDPARENT
-                    if (buffer[(ly+xx)*buf_w +(lx+yy)]!=gpartent){
-                        //GIVE BUFFER THE DESIRED GRANDPARENT 
-                        buffer[(ly+xx)*buf_w+(lx+yy)]=labels[buffer[(ly+xx)*buf_w+(lx+yy)]];
-                    }
-
-
-                }
-            }
-        }
-    }
     
-    barrier(CLK_LOCAL_MEM_FENCE);
-
     // stay in bounds
     if ((x < w) && (y < h)) {
         // CODE FOR PART 1 HERE
@@ -115,28 +90,27 @@ propagate_labels(__global __read_write int *labels,
         // to adjust this for correctness.
         new_label = old_label;
 
+        if (old_label < w * h)
+        {
+            buffer[buf_y * buf_w + buf_x] = labels[old_label];
+        }
+
         if (old_label<w*h){
 
-            //OBTAIN THE BUFFERS FOR THE NEIGHTBORS IN EACH OF THE 4 SIDES
             upNeighbor = buffer[(buf_y + 1) * buf_w + (buf_x)]; 
             rightNeighbor = buffer[(buf_y) * buf_w + (buf_x + 1)];
             downNeighbor = buffer[(buf_y - 1) * buf_w + (buf_x)];
             leftNeighbor = buffer[(buf_y) * buf_w + (buf_x - 1)];
-            //OBTAIN THE LABEL OF THE NEIGHTBOUR WITH THE SMALLEST VALUE OF THE BUFFER
+
             minNeighbors=min(old_label,(min(upNeighbor,min(rightNeighbor,min(downNeighbor,leftNeighbor)))));
-            //COMPARE THE MINIMUM OF THE NEIGHBORS TO THE PREVIOUS LABEL
+
             new_label=min(minNeighbors,new_label);
         }
-
         if (new_label != old_label) {
             atomic_min(&labels[old_label],new_label);
             // CODE FOR PART 3 HERE
             // indicate there was a change this iteration.
             // multiple threads might write this.
-
-            //UPDATING GLOBAL POSITION OF THE CHILD REGIONS 
-            //THIS ENABLES MERGE OF OLD AND NEW PARENTS WITH THEY 
-            //CHANGE THE LABELS FROM OLD TO NEW LABELS
             *(changed_flag) += 1;
             atomic_min(&labels[y * w + x], new_label);
         }
