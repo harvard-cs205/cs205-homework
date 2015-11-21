@@ -1,0 +1,39 @@
+maze1
+
+Part 1:
+Finished after 877 iterations, 1440.750688 ms total, 1.6428172041 ms per iteration
+Found 2 regions
+
+Part 2:
+Finished after 498 iterations, 803.04366 ms total, 1.6125374873 ms per iteration
+Found 2 regions
+
+Part 3:
+Finished after 10 iterations, 16.68932 ms total, 1.6689321632 ms per iteration
+Found 2 regions
+
+Part 4:
+Finished after 10 iterations, 67.087168 ms total, 6.7087168 ms per iteration
+Found 2 regions
+
+maze2
+
+Part 1:
+Finished after 507 iterations, 829.065664 ms total, 1.63523799606 ms per iteration
+Found 35 regions
+
+Part 2:
+Finished after 261 iterations, 422.07181 ms total, 1.617133374853 ms per iteration
+Found 35 regions
+
+Part 3:
+Finished after 9 iterations, 14.77993 ms total, 1.642214345484 ms per iteration
+Found 35 regions
+
+Part 4:
+Finished after 9 iterations, 55.402368 ms total, 6.15581866667 ms per iteration
+Found 35 regions
+
+In part 4 there is a very strong slow down. Using a single thread is clearly not a good choice on my system. Using multiple threads however increases access rates to the global memory. On my system the execution seems to be strongly compute bound rather than I/O bound so the speed up due to parallelism makes up for the slow down due to more golbal memory access.
+
+If min() instead of atomic_min() is used the algorithm will still finish correctly. The performace of the algorithm should not change significantly. Using min() would allow each iteration to be finish faster since there is no forced serialization. However, the number of iteration might increase because two or more threads might try to read and write a value at the same time, result in an incorrect value that needs to be corrected by running additional iterations.
