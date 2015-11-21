@@ -120,14 +120,14 @@ propagate_labels(__global __read_write int *labels,
             // indicate there was a change this iteration.
             // multiple threads might write this.
 
-            // Code to test PART 5
+            // Commented code to test PART 5
             //int min_value;
             //min_value = min( labels[old_label], new_label );
             //labels[old_label] = min_value;
             atomic_min( &labels[old_label], new_label );
 
             *(changed_flag) += 1;
-            // Code to test PART 5
+            // Commented code to test PART 5
             //min_value = min( labels[old_label], new_label );
             //labels[y * w + x] = min_value;
             atomic_min( &labels[y * w + x], new_label );
