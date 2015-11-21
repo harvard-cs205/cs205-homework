@@ -80,7 +80,39 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
-    
+
+
+    // CODE FOR PART 2
+
+    if (old_label < w*h) {
+        buffer[ buf_y * buf_w + buf_x ] = labels[old_label];
+    }
+
+
+    // CODE FOR PART 4
+
+    // when we have the first thread
+    //if ((lx == 0) && (ly == 0)) {
+//
+        //// loop over rows and columns
+        //for (int x_i = halo; x_i < buf_h - halo; x_i++) {
+            //for (int y_i = halo; y_i < buf_w - halo; y_i++) {
+//
+                //// obtain grand parent
+                //if (old_label < w*h) {
+                    //if (this_label != last_label) {
+                        //buffer[x_i + buf_w * y_i] = labels[buffer[x_i + buf_w * y_i]];
+                        //last_label = this_label;
+                    //}
+                    //else {
+                        //buffer[x_i + buf_w * y_i] = buffer[last_index];
+                    //}
+                    //last_index = x_i + buf_w * y_i;
+                //}
+            //}
+        //}
+    //}
+       
     // stay in bounds
     if (((x < w) && (y < h)) && (old_label < w*h)) {
         // CODE FOR PART 1 HERE
