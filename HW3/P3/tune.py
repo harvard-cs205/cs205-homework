@@ -23,7 +23,7 @@ if __name__ == "__main__":
     times = {}
 
     for num_workgroups in 2 ** np.arange(3, 10):
-        partial_sums = cl.Buffer(ctx, cl.mem_flags.READ_WRITE, 4 * num_workgroups + 4)
+        partial_sums = cl.Buffer(ctx, cl.mem_flags.READ_WRITE, 4 * num_workgroups)
         host_partial = np.empty(num_workgroups).astype(np.float32)
         for num_workers in 2 ** np.arange(2, 8):
             local = cl.LocalMemory(num_workers * 4)
@@ -40,7 +40,7 @@ if __name__ == "__main__":
                   format(num_workgroups, num_workers, seconds))
 
     for num_workgroups in 2 ** np.arange(3, 10):
-        partial_sums = cl.Buffer(ctx, cl.mem_flags.READ_WRITE, 4 * num_workgroups + 4)
+        partial_sums = cl.Buffer(ctx, cl.mem_flags.READ_WRITE, 4 * num_workgroups)
         host_partial = np.empty(num_workgroups).astype(np.float32)
         for num_workers in 2 ** np.arange(2, 8):
             local = cl.LocalMemory(num_workers * 4)
