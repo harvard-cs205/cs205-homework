@@ -35,6 +35,8 @@ propagate_labels(__global __read_write int *labels,
                  int buf_w, int buf_h,
                  const int halo)
 {
+
+    const int dx[4] = {-1, 0, 1, 0}, dy[4] = {0, -1, 0, 1};
     // halo is the additional number of cells in one direction
 
     // Global position of output pixel
@@ -80,13 +82,53 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
-    
+    // Part 2
+    /*
+    for( int i=0; i<4; i++ ) {
+        if( buffer[(buf_y+dy[i])*buf_w + (buf_x + dx[i])] < w * h ) {
+            buffer[(buf_y+dy[i])*buf_w + (buf_x + dx[i])] = labels[ buffer[(buf_y+dy[i])*buf_w + (buf_x + dx[i])] ];
+         }
+    }
+    */
+
+    // Part 4
+    // Reference: Piazza @524
+    unsigned int ls0 = get_local_size(0), ls1 = get_local_size(1);
+
+    if( lx == 0 && ly == 0 ) { //Use the first thread
+        unsigned int prev = -1, gparent = -1; // 1 variable cache
+        for( int c_lx = 0; c_lx < ls0; c_lx++ ) { // Update the entire local buffer
+            for( int c_ly = 0; c_ly < ls1; c_ly++ ) {
+                unsigned int cur_idx = (c_ly + halo) * buf_w + (c_lx + halo);
+                unsigned int parent = buffer[cur_idx];
+
+                if( parent == w * h ) continue; // Background pixel
+
+                if( parent == prev ) { // 1 variable cache success!
+                    buffer[cur_idx] = gparent;
+                }
+                else { // Update the cache
+                    buffer[cur_idx] = labels[parent];
+                    prev = parent;
+                    gparent = buffer[cur_idx];
+                }
+            }
+        }
+    }
+
+    barrier(CLK_LOCAL_MEM_FENCE);
+
     // stay in bounds
     if ((x < w) && (y < h)) {
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
         new_label = old_label;
+        if( new_label != w * h ) { // See Piazza @486
+            for( int i=0; i<4; i++ ) {
+                new_label = min( new_label, buffer[(buf_y+dy[i])*buf_w + (buf_x + dx[i])] );
+            }
+         }
 
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
@@ -94,6 +136,7 @@ propagate_labels(__global __read_write int *labels,
             // multiple threads might write this.
             *(changed_flag) += 1;
             labels[y * w + x] = new_label;
+            atomic_min(&labels[old_label], new_label);
         }
     }
 }

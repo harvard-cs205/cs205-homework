@@ -1,0 +1,2 @@
+The fastest configuration was the coaslesced setup with a workgroup size of 512, and 128 workers.
+This configuration completed the task in 0.00309848 seconds.
