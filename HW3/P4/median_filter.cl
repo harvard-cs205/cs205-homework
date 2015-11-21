@@ -16,7 +16,7 @@ median_3x3(__global __read_only float *in_values,
     int gID, lID, x, y, lx, ly, gSizeX, gSizeY, 
         lSizeX, lSizeY, xTemp, yTemp, xUse, yUse,
         buf_corner_x, buf_corner_y, buf_x, buf_y, row;
-
+    // the code below is adapted from the lecture code on halos
     x = get_global_id(0);
     y = get_global_id(1);
     lx = get_local_id(0);
@@ -37,12 +37,12 @@ median_3x3(__global __read_only float *in_values,
     buf_y = ly + halo;
 
     if ((y < h) && (x < w)){
-        if (lID < buf_w){
+        if (lID < buf_w){ // only work with buf_w threads
             xTemp = buf_corner_x + lID;
             xUse = xTemp;
-            if (xTemp < 0){
+            if (xTemp < 0){ // if pixel out of bounds, add compensation steps to find closest in bound pixel
                     xUse += 1;
-                }
+            }
             if (xTemp > w - 1){
                 xUse -= 1;
             }
@@ -55,14 +55,14 @@ median_3x3(__global __read_only float *in_values,
                 if (yTemp > h - 1){
                     yUse -= 1;
                 } 
-                buffer[row * buf_w + lID] = in_values[yUse*gSizeX + xUse];
+                buffer[row * buf_w + lID] = in_values[yUse*gSizeX + xUse]; // assign global memory of pixel or closest in bound pixel to buffer
             }
         }
     }
 
     barrier(CLK_LOCAL_MEM_FENCE);
     if ((y < h) && (x < w)){
-        out_values[gID] = median9(buffer[(buf_y-1)*buf_w + (buf_x-1)],
+        out_values[gID] = median9(buffer[(buf_y-1)*buf_w + (buf_x-1)], // take median of 8 neighbors and current pixel
                                   buffer[(buf_y-1)*buf_w + (buf_x)],
                                   buffer[(buf_y-1)*buf_w + (buf_x+1)],
                                   buffer[(buf_y)*buf_w + (buf_x-1)],
