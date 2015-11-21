@@ -1,0 +1,29 @@
+Results were as follows:
+
+Maze 1:
+Part1: Finished after 904 iterations, 418.91049 ms total, 0.46339656892 ms per iteration
+Found 2 regions
+Part2: Finished after 531 iterations, 241.37665 ms total, 0.45456996761 ms per iteration
+Found 2 regions
+Part 3: Finished after 10 iterations, 4.61896 ms total, 0.4618960467 ms per iteration
+Found 2 regions
+Part 4: Finished after 10 iterations, 13.07019 ms total, 1.30701931928 ms per iteration
+Found 2 regions
+
+Maze 2: 
+Part1: Finished after 523 iterations, 238.76491 ms total, 0.4565294731 ms per iteration
+Found 35 regions
+Part 2: Finished after 283 iterations, 128.76932 ms total, 0.45501526965 ms per iteration
+Found 35 regions
+Part 3: Finished after 9 iterations, 4.05541 ms total, 0.45060196899 ms per iteration
+Found 35 regions
+Part 4: Finished after 9 iterations, 11.66303 ms total, 1.2958923333 ms per iteration
+Found 35 regions
+
+My results for Part 4 were much slower than results for part 3 (to the magnitude of 3 to 4 times slower) which suggests that using a single thread is not a good choice. Note that there are the same number of iterations and only time per iteration increases. This is probably due to the fact that there exists a tradeoff between memory and compute - given the specific architecture of my machine, our computation in this case is compute-bound instead of memory-bound. It appears that the benefits of single-threading (which include avoiding redundantly checking global memory) is outweighed by the costs of having to perform computations serially and losing parallelism. Perhaps if the pixel labels were more similar or if my GPU were memory-bound, then using a single thread might be a good choice, but not in this case.
+
+Part 5: 
+
+On the correctness front, the atomic_min() operation ensures that the calculations and writing out of results is done in one atomic step, i.e. no other thread is able to intervene when our native thread is still under operation. Switching to using min() would mean that race conditions might occur in the sense that our old label is updated redundantly. The final result would still be correct.
+
+However, in terms of time, we run the risk of having extra redundant updates, which is could hurt our runtime and might cause our algorithm to run more slowly. Even though the min() operation is itself faster than the atomic_min() operation, the redundancies in operations might cause overall runtime to increase. 

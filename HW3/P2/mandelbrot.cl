@@ -14,6 +14,21 @@ mandelbrot(__global __read_only float *coords_real,
 
     if ((x < w) && (y < h)) {
         // YOUR CODE HERE
-        ;
+        z_real, z_imag = 0, 0;
+        c_real = coords_real[x + y*w];
+        c_imag = coords_imag[x + y*w];
+
+        // Perform mandelbrot computations
+        for (iter = 0; iter < max_iter; iter++) {
+            if ((z_real * z_real + z_imag * z_imag) > 4)
+                break;
+            // Update z_real and z_imag
+            z_real_old = z_real;
+            z_real = c_real + (z_real * z_real) - (z_imag * z_imag);
+            z_imag = c_imag + 2 * z_real_old * z_imag;
+        }
+
+        // Store iteration number into output counts
+        out_counts[x + y*w] = iter;
     }
 }
