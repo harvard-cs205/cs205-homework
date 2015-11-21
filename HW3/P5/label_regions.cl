@@ -84,34 +84,39 @@ propagate_labels(__global __read_write int *labels,
 
     // CODE FOR PART 2
 
-    if (old_label < w*h) {
-        buffer[ buf_y * buf_w + buf_x ] = labels[old_label];
-    }
+    // if (old_label < w*h) {
+        // buffer[ buf_y * buf_w + buf_x ] = labels[old_label];
+    // }
 
 
     // CODE FOR PART 4
 
+    barrier(CLK_LOCAL_MEM_FENCE);
     // when we have the first thread
-    //if ((lx == 0) && (ly == 0)) {
-//
-        //// loop over rows and columns
-        //for (int x_i = halo; x_i < buf_h - halo; x_i++) {
-            //for (int y_i = halo; y_i < buf_w - halo; y_i++) {
-//
-                //// obtain grand parent
-                //if (old_label < w*h) {
-                    //if (this_label != last_label) {
-                        //buffer[x_i + buf_w * y_i] = labels[buffer[x_i + buf_w * y_i]];
-                        //last_label = this_label;
-                    //}
-                    //else {
-                        //buffer[x_i + buf_w * y_i] = buffer[last_index];
-                    //}
-                    //last_index = x_i + buf_w * y_i;
-                //}
-            //}
-        //}
-    //}
+    if ((lx == 0) && (ly == 0)) {
+
+        // initialize variables to use
+        int last_label;
+        int my_label;
+
+        // loop over rows and columns of the buffer
+        for (int x_i = halo; x_i < buf_h - halo; x_i++) {
+            for (int y_i = halo; y_i < buf_w - halo; y_i++) {
+
+                my_label = buffer[x_i + buf_w * y_i];
+                // obtain grand parent
+                if (old_label < w*h) {
+                    // avoid having the same value as the previous one
+                    if (my_label != last_label) {
+                        // update the buffer
+                        buffer[x_i + buf_w * y_i] = labels[my_label];
+                        // update the last label
+                        last_label = my_label;
+                    }
+                }
+            }
+        }
+    }
        
     // stay in bounds
     if (((x < w) && (y < h)) && (old_label < w*h)) {
@@ -138,7 +143,7 @@ propagate_labels(__global __read_write int *labels,
             // multiple threads might write this.
             *(changed_flag) += 1;
             //labels[y * w + x] = new_label;
-            atomic_min(&labels[x + y * w], new_label);
+            atomic_min(&labels[y * w + x], new_label);
         }
     }
 }
