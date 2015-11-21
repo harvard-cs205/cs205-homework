@@ -60,7 +60,7 @@ if __name__ == '__main__':
     gpu_image_a = cl.Buffer(context, cl.mem_flags.READ_WRITE, host_image.size * 4)
     gpu_image_b = cl.Buffer(context, cl.mem_flags.READ_WRITE, host_image.size * 4)
 
-    local_size = (8, 8)  # 64 pixels per work group
+    local_size = (4, 4)  # 64 pixels per work group
     global_size = tuple([round_up(g, l) for g, l in zip(host_image.shape[::-1], local_size)])
     width = np.int32(host_image.shape[1])
     height = np.int32(host_image.shape[0])
