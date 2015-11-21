@@ -23,7 +23,11 @@ Part 4:
 Making 1 thread update the buffer regions with grandparent values is not as efficient on average 
 given the time per iteration is roughly twice as long as Part 3. Even though lots of adjacent pixels 
 may have equal buffer values after sufficient iterations, the reduced number of memory reads 
-does not outweight the loss of parallelism between threads. 
+does not outweight the loss of parallelism between threads. If more threads are used, for 
+example due to smaller context sizes, then even more memory calls to the labels array will occur.
+So using one thread to remember previous grandparent values may perform better than having
+each thread fetch a value from memory simultaneously (resulting in partial serialization since 
+more threads will have to wait for memory) as the number of threads gets even larger.
 
 Part 5:
 
