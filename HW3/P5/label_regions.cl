@@ -80,20 +80,52 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
-    
+
+
+    // Part 2
+    if ((x < w) && (y < h) && old_label < w*h) {
+        buffer[buf_y * buf_w + buf_x] = labels[buffer[buf_y * buf_w + buf_x]];
+    }
+
+    barrier(CLK_LOCAL_MEM_FENCE);
+
+    int left;
+    int right;
+    int up;
+    int down;
+
     // stay in bounds
     if ((x < w) && (y < h)) {
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
-        new_label = old_label;
+
+        // We get the values for the 4 neighbors
+        left = buffer[buf_y * buf_w + buf_x-1];
+        right = buffer[buf_y * buf_w + buf_x+1];
+        up = buffer[(buf_y-1) * buf_w + buf_x];
+        down = buffer[(buf_y+1) * buf_w + buf_x];
+
+        // If it's not a wall, we find the minimum value of its 4 neighboring pixels and itself 
+        if (old_label < w*h) {
+            new_label = min(left, right);
+            new_label = min(new_label, up);
+            new_label = min(new_label, down);
+            new_label = min(new_label, old_label);
+        }
+        else {
+            new_label = old_label;
+        }
 
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
             // indicate there was a change this iteration.
             // multiple threads might write this.
             *(changed_flag) += 1;
-            labels[y * w + x] = new_label;
+            atomic_min(&labels[old_label], labels[new_label]);
+            labels[y * w + x] = labels[old_label];
+            // labels[y * w + x] = new_label;
+
         }
     }
 }
