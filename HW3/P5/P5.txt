@@ -1,0 +1,46 @@
+Iteration counts and average kernel times after each change for Parts 1-4,
+an explanation for Part 4 as to why a single thread is a good (or bad) choice for this
+operation, and the explanation of Part 5.
+
+Was getting errors on part 1, but continued on anyways
+
+Some of Error Output:
+"/tmp/OCL8gbLMr.cl", line 31: error: a parameter cannot be allocated in a
+          named address space
+  propagate_labels(__global __read_write int *labels,
+                   ^
+
+"/tmp/OCL8gbLMr.cl", line 31: error: expected a ")"
+  propagate_labels(__global __read_write int *labels,
+                                         ^
+
+"/tmp/OCL8gbLMr.cl", line 36: warning: parsing restarts here after previous
+          syntax error
+                   const int halo)
+                                 ^
+
+"/tmp/OCL8gbLMr.cl", line 50: error: identifier "halo" is undefined
+      const int buf_corner_x = x - lx - halo;
+                                        ^
+
+"/tmp/OCL8gbLMr.cl", line 65: error: identifier "buf_w" is undefined
+      if (idx_1D < buf_w) {
+                   ^
+
+"/tmp/OCL8gbLMr.cl", line 66: error: identifier "buf_h" is undefined
+          for (int row = 0; row < buf_h; row++) {
+                                  ^
+
+
+
+Part 4 Explanation
+It seems valuable to use a single thread for a work group as it has its
+own memory and won't have to wastefully repeat calculations over same
+indices, which is what may be happening in part 2.
+
+
+Part 5 Explanation
+If we used min instead of atomic_min our answer might not be correct.
+Atomic_min serializes so it will get the true minimum, while min in
+parallel will cause values to be overwritten.  However, this serialization
+makes atomic_min slower.
