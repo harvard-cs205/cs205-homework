@@ -1,1 +1,11 @@
 # Your answers here
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Sep 13 23:33:57 2015
+
+@author: balthasar
+"""
+
+[A] The output of the program varies each time I run it. That happens because the parallel processes don't terminate perfectly simultaneously. I could see how that could lead to issues if, for example, several parallel processes are used to determine the value of the same variable. the value of the variable is then given by whichever process happens to finish last, and will thus vary almost perfectly randomly, or even worse: seemingly systematically, depending on what affects the slight differences in speed between different processors.
+
+[B] The results for my experiment are not particularly illuminating - for low times, serial operation takes longer. Presumably because it takes extra work to generate the several processes. The problem could be that my computer physically actually has only one processor (with two cores, it says? it's a mid 2011 macbook air that runs an i7 at 1.8GHz. It says that it has one processor but two cores, of which i can't really make meaning ) What's interesting is that the parallel process consistently outperforms the serial one by a factor of 3 at approximately the same length of wait time.
