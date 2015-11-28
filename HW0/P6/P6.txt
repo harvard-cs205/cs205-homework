@@ -1,1 +1,59 @@
-# Your answers here
+
+P6A:
+
+-Output:
+
+	Hi Job 0
+	Hi Job 1
+	Hi Job 2
+	Hi Job 3
+	Bye Job 1
+	Bye Job 0
+	Bye Job 2
+	Hi Job 4
+	Hi Job 5
+	Hi Job 6
+	Bye Job 3
+	Hi Job 7
+	Bye Job 5
+	Bye Job 4
+	Bye Job 6
+	Bye Job 7
+	Hi Job 8
+	Hi Job 9
+	Bye Job 9
+	Bye Job 8
+	[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+-If you run the above code a number of times, you may see some unexpected results. Explain these results.
+
+	The output of the function is out of order with respect to the numerical input range. For example, for the first four sleep executions, 0 through 3, which are processed in parallel, 0 is not neccessarily the first operation to be complete. This is an interresting outcome because the multiprocessing fucntion is executing multiple operations on parallel processors at one time, but they are not completed in any specfic order. 
+
+-How could this affect how we program in parallel?
+
+	This could definately have an affect on programs we execute in parallel, as we are not certain which specific processor will be complete with which process first. If a subsequent process has a dependency on a previous process completion the order of exectution and subsequent information is important. With this parallel method this order of output is not clear. When executing programs in serial this is always obvious. 
+
+-Describe a scenario where this would be important.
+
+	Any program where executions are dependent upon one another would break down in this method of parallel exection, as we are not certain in what order information will become available.
+
+
+P6B:
+
+-Try to explain the trend you observe. 
+
+	The trend that I observed is that as the sleep times increases above 10^(-4) seconds, the effifiency of the parallel program also increases. This is clear as the ratio between the serial time over the parallel time increases. This increase in the ratio and effficency diminshes however, as the number of processors is limits the efficency gains. 
+
+-Is it possible that a parallel program could take longer than it’s serial version? 
+ 
+	From the graph we can see that when the sleep time is below 10^(-4) seconds, then the serial process is faster that the parallel process. This is clear because the ratio is less than one at these points indicating that the parallel times are larger than the serial times. Please see the attached graph for visual representation.
+
+-Under what conditions?
+
+	The parallel process can take a longer amount of time when the actual execution time is very short (as is the case when the sleep time is less that 10^(-4) seconds). This is due to the overhead cost associated with running the instrutions associated with the parallel program and the times to communicate data between processors. Incases with fast process time, it maybe faster to execute serial programs. 
+
+
+
+
+
+
