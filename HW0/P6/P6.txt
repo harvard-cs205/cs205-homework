@@ -1,1 +1,34 @@
 # Your answers here
+
+P6A.py
+
+Below is the result
+
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 1
+Bye Job 2
+Bye Job 3
+Bye Job 0
+Hi Job 4
+Hi Job 5
+Hi Job 6
+Hi Job 7
+Bye Job 4
+Hi Job 8
+Bye Job 5
+Hi Job 9
+Bye Job 6
+Bye Job 7
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+As we can see, the jobs do not necessarily terminate in ascending order even though they start in the order beacuse time it takes to communicate with a processor is relatively random. If the order of the result does matter here, doing parallel programming in this way would be dangerous. For example, if we want to print out the start and end of the jobs in ascending order, this program would not work.
+
+P6B.py
+
+As we can see from the graph, serial execution does a better job in the 10^(-6) and 10^(-5) wait time parameters. parallel execution does better for the rest. This is because openning a processor takes time, just like handing an item in the last problem we discuss. If the job takes very small amount of time, we prefer serial execution since the run time compared with openning a processor and communicating is neglegible. However, if the run time is huge, we prefer parallel execution.
+
