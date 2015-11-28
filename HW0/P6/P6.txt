@@ -1,1 +1,36 @@
-# Your answers here
+6A
+
+Example output:
+
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 1
+Bye Job 3
+Bye Job 0
+Bye Job 2
+Hi Job 4
+Hi Job 5
+Hi Job 6
+Hi Job 7
+Bye Job 7
+Bye Job 4
+Bye Job 5
+Bye Job 6
+Hi Job 8
+Hi Job 9
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+Analysis:
+
+The output doesn't always list the "Bye" output values in sorted ascending order.  While .map() starts processes sequentially, there's no guarantee that they'll finish in the same order they began.  This isn't a problem as long as the individual components we're sending out to multiprocessing threads are unordered.  
+
+Consider, however, the case where we have an encrypted message, and each character in the message can be decoded with a certain function (eg. a Caesar cipher).  The message only makes sense if the characters are kept in their original order.  If we parallelized the decryption by sending each character, in parallel, to a number of decoder threads, under the current regime we'd have no way to ensure that the string returned is the original message, even though we know the letters are now correctly decoded.
+
+
+6B
+
+We can see that, for very short sleep times, the serial approach is actually faster than the parallel approach.  This is likely because there is a multiprocessing overhead associated with generating the separate threads and re-combining them.  For longer jobs, this overhead is less expensive than serial execution, but for very fast jobs, the overhead becomes the dominant time constraint.
