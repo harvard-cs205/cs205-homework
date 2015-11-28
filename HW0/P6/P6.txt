@@ -1,1 +1,84 @@
 # Your answers here
+
+COUNT TO TEN:
+
+Example output:
+
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 1
+Bye Job 2
+Hi Job 4
+Hi Job 5
+Bye Job 0
+Hi Job 6
+Bye Job 3
+Hi Job 7
+Bye Job 4
+Bye Job 6
+Hi Job 8
+Hi Job 9
+Bye Job 5
+Bye Job 7
+Bye Job 9
+Bye Job 8
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 0
+Hi Job 4
+Bye Job 2
+Bye Job 3
+Hi Job 5
+Hi Job 6
+Bye Job 1
+Hi Job 7
+Bye Job 7
+Bye Job 4
+Bye Job 5
+Hi Job 8
+Hi Job 9
+Bye Job 6
+Bye Job 9
+Bye Job 8
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 0
+Hi Job 4
+Bye Job 1
+Bye Job 2
+Hi Job 5
+Bye Job 3
+Hi Job 6
+Hi Job 7
+Bye Job 7
+Bye Job 6
+Bye Job 4
+Hi Job 8
+Hi Job 9
+Bye Job 5
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+
+
+If we run several times the program, we observe that the prints are in a different orders. Even though the result list at the end is always the same, the order of execution of the different threads changes.
+This means that we should programm in parallel only for independant tasks because we cannot predict which thread will be executed first in a multi processing. This is important in the case of the different processors have access to a shared memomy and need to interact with it. We cannot predict here in which order the processor will access this shared memory.
+
+
+HOW MUCH FASTER?
+
+The speed up curve is divided in two part: the second one above 5 * 10 ** (-3)s which is constant and the part before. Several execution of the program lead to the same second part but the first one may be different.
+
+The second part is what we expected as we run in parallel the same code on 4 processors, so it's 4 times faster than if we had runned it in serial.
+We can explain the first part of the curve if we consider the communication/coordination time needed when we run a programm in parallel between the different processors. This time is negligible in the second part of the curve but not in the first one as the sleeping time is really low and may be in the same order of magnitude. As a result, in this part the parallel time is closer to the serial time. And for really low sleeping time, it's worth keeping the programm in serial.
