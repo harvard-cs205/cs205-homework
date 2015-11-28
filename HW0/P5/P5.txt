@@ -1,1 +1,18 @@
-# Your answers here.
+# Student: Xingchi Dai
+
+Q1: (255 secs) For 256 bags, one calculator, it will take one person 255 seconds to count all pennies. 
+
+Q2: (34 secs) We have 8 people. Everyone takes 32 nags and in 31 seconds, all bags will be counted. Then it will take three seconds to add them up.
+
+Q3: (8 secs). If we have infinite people, let assume everyone takes two bags, then everyone takes two numbers to add up. It will take 8 seconds to finish counting. 
+
+Q4: For multiple persons, the trends would equals to log2(bags_numbers) while the single person equals to n-1
+
+Q5: (15 Seconds), in this case, if two people talk, we will add 1 sec. Therefore, 7 seconds will be added. 
+
+Q6: (272 s, 270s) If we gave bags to 256 people, it will take 256 s for handling, 8 secs to communicate each other and calculating. The total will be 272 secs. The same thing for two bags each person, it will take 270 s.
+
+New strategy: 
+The problem here is that if we gave everyone the same amount of bags, the first person would finish it first then wait for others(it will take some time for 'me' to hand out bags).In order to make sure everyone finish the at the same time, we would give the first person more bags.
+
+Thus, so let's say the first person has n bags, he/she would spend (n-1) seconds to finish. The second person would have n - 1 bags, but since the handling, it will still cost him (n-1) seconds. After all bags are counted, it will take 2 * Log2(Number of people) for them to communicating and calculating. In the case of 256 bags, the first person will have (n)(n+1)/n = 256, which n = 23. In this case, we will have a better solution. 
