@@ -1,1 +1,16 @@
-# Your answers here
+Because the processors are all running simultaneously and sending results back
+at almost exactly the same time, the program receives the results in an arbitrary
+order, thus creating unreliably sequenced responses. This could result in out of 
+order instructions and potentially disastrous results. A mild example of a pitfall 
+could be when trying to complete an arithmetic task, the worker doing the multiplication
+may take longer than the one tasked with addition, and if the multiplication is required 
+for a subsequent operation, it may miscalculate the final answer.
+
+
+P6B:
+
+What we observe here is that the increase in speed-up decreases as the time interval
+increases. This demonstrate that with longer tasks, parallel processes still have to
+wait for operations to complete. If the tasks were sufficiently small and relied on 
+large amounts of communication between worker nodes, the overhead costs of completing 
+a task in parallel would result in a shorter serial time. 
