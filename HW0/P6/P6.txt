@@ -1,1 +1,7 @@
 # Your answers here
+
+Count to Ten
+	As we run this in parellel multiple times, we see that the results are often returned in differing orders, a result of different workers finishing at different times. Because of this, we should not use parallel structures that are directly dependent on each other, or else one worker may be trying to run a certain function whose inputs have yet to be created because a different worker has yet to complete its work. We could use parallelism in instances when we are doing the same calculations on each element of a huge array, since each element is unaffected by other elements.
+
+How Much Faster?
+	According to the figure, the series operation is much faster while wait time << 1, but at t = 1, they are equal. It seems in all of these operations series is faster because the overhead as a result of parallel communications is on an order greater than 10^-6, for example. At wait time above one, parallelism is faster because the ratio of the time of communication to the time spent waiting decreases to negligible amounts, and the dominant determinant of time then becomes the cores, in which case the parallel case becomes faster than the series one.
