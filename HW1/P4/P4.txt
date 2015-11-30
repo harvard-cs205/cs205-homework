@@ -1,1 +1,13 @@
 # Your discussion here
+The graph representation that I use for solving the problem is a graph adjacency list which is in the following format,
+(Character1,[Character3 Character4 …])
+The adjacency graph reduces the size of the RDD and also ensures that the keys in the RDD remain unique since there is only one entry in the RDD corresponding to a character enabling faster filtering on keys.
+
+The no. of touched nodes are the following for the required searches:
+‘CAPTAIN AMERICA’ : 6408
+‘MISS THING/MARY’: 7
+‘ORWELL’: 9
+
+The graph diameter is required to ensure that searches are not carried beyond a given depth in the tree. But since the Marvel universe is very interconnected, the graph diameter for almost all search nodes does not exceed 10. Hence relaxing the graph diameter by including a condition ensures that the graph search stops when it can’t find any child nodes anymore. The graph has untouched nodes in each of the search mentioned and has certain nodes which are not connected to any other nodes.
+
+The bfs implementations used in this case have both the counter being used as well an implementation with the accumulator.
