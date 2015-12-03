@@ -1,0 +1,13 @@
+
+The best configuration for my machine is:
+
+configuration ('coalesced', 512, 128): 0.000331392 seconds
+
+The coalesced read is faster than the blocked read on average 
+for the same number of work groups and workers because more 
+threads can do work on the same block of fetched memory. In the
+blocked reads, once a thread fetchs its block to sum, more
+threads may have to wait to fetch their block of memory. However in the
+coalesced reads, more threads can sum elements simultaneously
+more often since a fetched block of memory will be more likely to 
+contain elements needed by more threads than in the blocked scheme.

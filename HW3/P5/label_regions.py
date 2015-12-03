@@ -2,7 +2,7 @@ from __future__ import division
 import sys
 import pyopencl as cl
 import numpy as np
-import pylab
+#import pylab
 
 def round_up(global_size, group_size):
     r = global_size % group_size
@@ -42,7 +42,7 @@ if __name__ == '__main__':
 
     program = cl.Program(context, open('label_regions.cl').read()).build(options='')
 
-    host_image = np.load('maze1.npy')
+    host_image = np.load('maze2.npy')
     host_labels = np.empty_like(host_image)
     host_done_flag = np.zeros(1).astype(np.int32)
 
@@ -75,9 +75,9 @@ if __name__ == '__main__':
 
     # Show the initial labels
     cl.enqueue_copy(queue, host_labels, gpu_labels, is_blocking=True)
-    pylab.imshow(host_labels)
-    pylab.title(itercount)
-    pylab.show()
+    #pylab.imshow(host_labels)
+    #pylab.title(itercount)
+    #pylab.show()
 
     show_progress = True
     total_time = 0
@@ -105,9 +105,9 @@ if __name__ == '__main__':
         print host_done_flag
         if itercount % 100 == 0 and show_progress:
             cl.enqueue_copy(queue, host_labels, gpu_labels, is_blocking=True)
-            pylab.imshow(host_labels)
-            pylab.title(itercount)
-            pylab.show()
+            #pylab.imshow(host_labels)
+            #pylab.title(itercount)
+            #pylab.show()
         if itercount % 10000 == 0:
             print 'Reached maximal number of iterations, aborting'
             sys.exit(0)
@@ -116,6 +116,6 @@ if __name__ == '__main__':
     # Show final result
     cl.enqueue_copy(queue, host_labels, gpu_labels, is_blocking=True)
     print 'Found {} regions'.format(len(np.unique(host_labels)) - 1)
-    pylab.imshow(host_labels)
-    pylab.title(itercount)
-    pylab.show()
+    #pylab.imshow(host_labels)
+    #pylab.title(itercount)
+    #pylab.show()

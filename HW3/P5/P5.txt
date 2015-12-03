@@ -1,0 +1,86 @@
+
+
+Explanation:
+
+Part 1: 
+
+This is the base code.
+
+Part 2: 
+
+This is optimized over the first part because the buffer values are updated with the
+grandparent values, which is guaranteed to be less than or equal to the current 
+buffer value.
+
+Part 3:
+
+This is optimized over the second part because a pixel's parent is updated to the pixel's 
+value if it is smaller than the pixel's parent using atomic min. However, the iteration
+time increases due to the atomic (min) operation.
+
+Part 4:
+
+Making 1 thread update the buffer regions with grandparent values is not as efficient on average 
+given the time per iteration is roughly twice as long as Part 3. Even though lots of adjacent pixels 
+may have equal buffer values after sufficient iterations, the reduced number of memory reads 
+does not outweight the loss of parallelism between threads. If more threads are used, for 
+example due to smaller context sizes, then even more memory calls to the labels array will occur.
+So using one thread to remember previous grandparent values may perform better than having
+each thread fetch a value from memory simultaneously (resulting in partial serialization since 
+more threads will have to wait for memory) as the number of threads gets even larger.
+
+Part 5:
+
+If a standard min operation were used instead of atomic min, the iteration time would decrease
+because the imposed serialized delays from atomic operation will not be applied. The final result
+will still be correct because even if a thread overwrites the pixel's parent's value with a greater value
+than another thread, the value will still be less than the original parent value. Thus the number of 
+iterations may increase. As stated, the value in label could increase, but that is during the same iteration.
+Between iterations, label values cannot increase because a pixel's previous iteration value is compared
+via the minimum operator with a new label. Thus after the current iteration finishs, each label's value
+will be less than or equal to that of the previous iteration.
+  
+
+Results:
+
+Maze 1
+
+Part1:
+
+Finished after 915 iterations, 36.084992 ms total, 0.0394371497268 ms per iteration
+Found 2 regions
+
+Part 2:
+
+Finished after 529 iterations, 20.321376 ms total, 0.0384146994329 ms per iteration
+Found 2 regions
+
+Part 3:
+
+Finished after 12 iterations, 0.611552 ms total, 0.0509626666667 ms per iteration
+Found 2 regions
+
+Part 4:
+
+Finished after 11 iterations, 1.224416 ms total, 0.111310545455 ms per iteration
+Found 2 regions
+
+Maze 2
+
+Part 1:
+Finished after 532 iterations, 20.138752 ms total, 0.0378547969925 ms per iteration
+Found 35 regions
+
+Part 2:
+Finished after 276 iterations, 10.62384 ms total, 0.038492173913 ms per iteration
+Found 35 regions
+
+Part 3:
+Finished after 11 iterations, 0.539008 ms total, 0.0490007272727 ms per iteration
+Found 35 regions
+
+Part 4:
+Finished after 10 iterations, 1.11216 ms total, 0.111216 ms per iteration
+Found 35 regions
+
+
