@@ -1,0 +1,87 @@
+Results
+
+********
+Part 1
+********
+
+--- Maze 1 ----
+
+Finished after 314 iterations, 153.46664 ms total, 0.488747261146 ms per iteration
+Found 77 regions
+
+--- Maze 2 ---
+
+Finished after 243 iterations, 106.70872 ms total, 0.439130534979 ms per iteration
+Found 113 regions
+
+********
+Part 2
+********
+
+--- Maze 1 ---
+
+
+Finished after 132 iterations, 65.11392 ms total, 0.493287272727 ms per iteration
+Found 77 regions
+
+--- Maze 2 ---
+
+Finished after 114 iterations, 55.83568 ms total, 0.489786666667 ms per iteration
+Found 113 regions
+
+********
+Part 3
+********
+
+--- Maze 1 ---
+
+Finished after 11 iterations, 5.42896 ms total, 0.493541818182 ms per iteration
+Found 60 regions
+
+
+--- Maze 2 ---
+
+Finished after 11 iterations, 5.3596 ms total, 0.487236363636 ms per iteration
+Found 106 regions
+
+********
+Part 4
+********
+
+--- Maze 1 ---
+
+Finished after 71 iterations, 96.0672 ms total, 1.35305915493 ms per iteration
+Found 66 regions
+
+--- Maze 2 ---
+
+Finished after 49 iterations, 66.29168 ms total, 1.35289142857 ms per iteration
+Found 106 regions
+
+Looks like using only one thread did not improve anything. Worse, I now have more iterations. I don't have time to find out what happened.
+While we have decreased the fetches into the global memory by serializing, the run time is bigger.
+
+
+********
+Part 5
+********
+
+Changing atomic_min() to a simple min() ?
+
+For now we have :
+
+atomic_min(&labels[old_label],new_label);
+atomic_min(&labels[y * w + x], new_label);
+
+and we are asking ourselves the questions what would happen with
+
+min(labels[old_label], new_label);
+min(labels[y * w + x], new_label); 
+
+The atomic operation ensure that only one thread assigns to labels[old_label] and  labels[y * w + x] the smallest label at a time. If multiple threads do this at the same time in parallel, there is no reason to believe that it will correctly assign the smallest value of the label anymore. 
+
+However, this operation will be faster per iteration because now done via multithreading. 
+
+Also we may expect more iterations because the minimum value stored at the end of one iteration may not be the minimum value for all the threads.
+
+

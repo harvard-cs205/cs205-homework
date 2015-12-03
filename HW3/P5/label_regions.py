@@ -42,7 +42,7 @@ if __name__ == '__main__':
 
     program = cl.Program(context, open('label_regions.cl').read()).build(options='')
 
-    host_image = np.load('maze1.npy')
+    host_image = np.load('maze2.npy')
     host_labels = np.empty_like(host_image)
     host_done_flag = np.zeros(1).astype(np.int32)
 
@@ -93,7 +93,7 @@ if __name__ == '__main__':
                                              width, height,
                                              buf_size[0], buf_size[1],
                                              halo)
-        prop_exec.wait()
+        prop_exec.wait( )
         elapsed = 1e-6 * (prop_exec.profile.end - prop_exec.profile.start)
         total_time += elapsed
         # read back done flag, block until it gets here

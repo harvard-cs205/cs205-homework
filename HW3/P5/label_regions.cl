@@ -21,7 +21,7 @@ int
 get_clamped_value(__global __read_only int *labels,
                   int w, int h,
                   int x, int y)
-{
+{   
     if ((x < 0) || (x >= w) || (y < 0) || (y >= h))
         return w * h;
     return labels[y * w + x];
@@ -80,20 +80,73 @@ propagate_labels(__global __read_write int *labels,
     old_label = buffer[buf_y * buf_w + buf_x];
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
-    
+
+
+    // CODE FOR PART 2
+
+    // if (old_label < w*h) {
+        // buffer[ buf_y * buf_w + buf_x ] = labels[old_label];
+    // }
+
+
+    // CODE FOR PART 4
+
+
+    // when we have the first thread
+    if ((lx == 0) && (ly == 0)) {
+
+        // initialize variables to use
+        int last_label = -1 ;
+        int my_label_new;
+
+        // get grandparent
+        if (old_label < w*h){
+            last_label = labels[old_label];
+        }
+
+        // loop over rows and columns of the buffer
+        for (int x_i = halo; x_i < get_local_size(0) + halo; x_i++) {
+            for (int y_i = halo; y_i < get_local_size(1) + halo; y_i++) {
+
+                my_label_new = buffer[(ly+x_i)*buf_w+(lx+y_i)];
+                
+                if (buffer[(ly+x_i)*buf_w+(lx+y_i)] < w*h) {
+                    // avoid having the same value as the previous one
+                    if (my_label_new != last_label) {
+                        // update the buffer
+                        buffer[(ly+x_i)*buf_w+(lx+y_i)] = labels[my_label_new];
+                    } 
+                }
+            }
+        }
+    }
+       
     // stay in bounds
-    if ((x < w) && (y < h)) {
+    if (((x < w) && (y < h)) && (old_label < w*h)) {
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
-        new_label = old_label;
+
+        // one pixel becomes the minimum of its 4 neighboring 
+        // pixels and itself
+        // get the locations in a similar fashion as P4
+        int left = buffer[ buf_y * buf_w + buf_x - 1];
+        int right = buffer[ buf_y * buf_w + 1];
+        int up = buffer[ (buf_y - 1) * buf_w + buf_x ];
+        int down = buffer[ (buf_y + 1) * buf_w + buf_x ];
+        // find the minimum
+        new_label = min(old_label, min( min( min(up,down) , right) , left));
+        
+
 
         if (new_label != old_label) {
+            atomic_min(&labels[old_label], new_label);
             // CODE FOR PART 3 HERE
             // indicate there was a change this iteration.
             // multiple threads might write this.
             *(changed_flag) += 1;
-            labels[y * w + x] = new_label;
+            //labels[y * w + x] = new_label;
+            atomic_min(&labels[y * w + x], new_label);
         }
     }
 }
