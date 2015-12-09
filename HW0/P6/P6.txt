@@ -1,1 +1,1 @@
-# Your answers here
+1. The numbers are not printed in any particular order and are disrupted by the text. The effect is that we don't have as much control over the order of our commands when we use multiprocessing. This is important for it means when the computer is doing tasks such as trying to follow many commands, it risks skipping some. This could result with issues such as when you try to download many items at once the computer may end up taking a very long time for different files randomly. 

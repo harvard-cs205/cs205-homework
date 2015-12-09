@@ -1,1 +1,6 @@
-# Your answers here.
+1. 256 seconds
+2. Yes, 31 seconds (log2)
+3. 8 seconds 
+5. The time will double minus the last person adding bags, so 15 seconds.
+6.It will take 143 seconds for 1 seconds and 79 seconds for 2 seconds 
+The better strategy, if they have to communicate would be to take several bags at once, and the pass them all off at the same time
