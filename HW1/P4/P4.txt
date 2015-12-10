@@ -1,1 +1,16 @@
-# Your discussion here
+“A description of your graph representation, and the number of touched nodes in each of the searches above. Also, discuss the two questions above (re. graph diameter, and untouched nodes).”
+
+The created graph has as keys all the possible nodes (superheroes). The value of each key is a list of characters that have appeared with this particular superhero in the same comic.
+
+“For the purposes of this problem, you may assume that the diameter of this graph is ten (10). What does this diameter imply about the maximum number of steps in which your search must be executed?”
+
+If the diameter of the graph is ten, it means that the maximum number of iterations that BFS can do is 10 since in each iteration we search for the nodes that are at “i” distance from the starting node.
+
+“Count the number of nodes touched in each of the above searches and place these counts in your writeup. What does it mean if a character does not have a defined distance during the search?”
+
+When applying the BFS code to the created graph, we obtain the following results. The number of nodes touched for:
+- Captain America is 6408
+- Orwell is 9
+- Miss thing/Mary is 7
+
+If a character does not have a defined distance during the search it means that is not connected to the starting node (or its children nodes).
