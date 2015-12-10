@@ -1,1 +1,35 @@
 # Your answers here
+
+A/
+
+
+I ran the code a couple of times. Here is one output 
+
+Hi Job  0
+Hi Job  1
+Hi Job  2
+Hi Job  3
+Bye Job 0Bye Job 3Bye Job 1
+
+
+Bye Job 2
+Hi Job  4
+Hi Job  5
+Hi Job  6
+Hi Job  7
+Bye Job 4Bye Job 6
+
+Bye Job 7Bye Job 5
+
+Hi Job  8
+Hi Job  9
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+
+We see that the jobs are launched in order. However the time it takes to complete the jobs varies. Therefore we have Bye Job 3 before Bye Job 2 etc.
+
+This can be an issue when one job needs the results from a previous one to run.
+
+B/ For a short wait time (short job within the function burntime) the serial version is faster than the parallel version (the ratio is lower than 1). It is because of the parallel overhead. It requires time to call the different processors. After, the parallel program is faster. Finally for large wait time the curve flattens. Around a wait time, the full capacity of the parallel program is reached. The overhead time becomes negligible. 
