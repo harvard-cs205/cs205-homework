@@ -1,1 +1,11 @@
 # Your discussion here
+[([u'camp', u'of', u'Enter', u'and', u'Sir,', u'the', u'Queen.', u'Please', u'you', u'read,', u'my', u'lord.', u'His', u'wits', u'begin', u"t'", u'unsettle.', u'Glou.', u'Canst', u'thou'], []), 
+([u'have', u"match'd", u'in', u'marriage;', u'The', u'sons', u'of', u'Rome,', u'And', u'bring', u'along', u'these', u'rascal', u'knaves', u'with', u'thee?', u'And', u'what', u'art', u'thou'], []), 
+([u'day,', u'So', u'fought,', u'so', u'followed,', u'and', u'so', u'good', u'a', u'man', u'haunts', u'the', u'forest', u'bear', u'doth', u'lick?', u'Not', u'his', u'that', u'finds'], []), 
+([u'jest.', u'can,', u'Petruchio,', u'help', u'thee', u'curse', u'the', u"Dauphin's", u'crest', u'thy', u'sword', u'and', u'cloak.', u'Falstaff,', u'good', u'night.', u'Come,', u'civil', u'night,', u'Thou'], []), 
+([u'kindly', u'in', u'your', u'foul', u'sin.', u'If', u'thou', u'dost', u'know', u'in', u'that', u'kind,', u'swears', u'you', u'do', u'me', u'no', u'more', u"man's", u'blood'], []), 
+([u'and', u'unjust', u'extent', u'Against', u'thy', u'deity.', u'Help,', u'Jupiter!', u'or', u'we', u'are', u'alone,', u'Wouldst', u'thou', u'betray', u'me?', u'do', u'beseech', u'thee,', u'Captain,'], []), 
+([u'which,', u'to', u'a', u'lightness,', u'and,', u'by', u'my', u'life', u'dies.', u'Cousin,', u'go', u'draw', u'our', u'puissance', u'together.', u'Exit', u'France,', u'am', u"burn'd", u'up'], []), 
+([u"expos'd", u'myself', u'From', u'certain', u'and', u'more', u'a', u'cat.', u'Mend', u'the', u'instance,', u'shepherd.', u'You', u'have', u'as', u'Could', u'put', u'into', u'contempt', u'the'], []), 
+([u'cur,', u'Ajax', u'prouder', u'than', u"garments'", u'costs,', u'Of', u'more', u'pre-eminence', u'than', u'fish', u'and', u'half', u'once', u'to', u'behold', u'our', u'works', u'And', u'call'], []), 
+([u'troop.', u'Hail,', u'all', u'the', u'peers', u'and', u'nobles', u'of', u'the', u'ladder,', u'or', u'the', u'mean,', u'if', u'on', u'earth', u'have', u'won', u'the', u'fleece.'], [])]
