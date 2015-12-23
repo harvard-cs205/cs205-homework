@@ -1,1 +1,121 @@
 # Your answers here
+
+Part P6A
+
+Example Output
+Output 1:
+
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 3
+Bye Job 1
+Bye Job 2
+Hi Job 4
+Hi Job 5
+Hi Job 6
+Bye Job 0
+Hi Job 7
+Bye Job 4
+Hi Job 8
+Bye Job 6
+Hi Job 9
+Bye Job 5
+Bye Job 7
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+
+Output 2:
+
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 2
+Bye Job 1
+Bye Job 3
+Hi Job 4
+Bye Job 0
+Hi Job 5
+Hi Job 6
+Hi Job 7
+Bye Job 4
+Bye Job 5
+Hi Job 8
+Hi Job 9
+Bye Job 7
+Bye Job 6
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+
+Output 3:
+
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 0
+Hi Job 4
+Bye Job 1
+Hi Job 5
+Bye Job 3
+Bye Job 2
+Hi Job 6
+Hi Job 7
+Bye Job 4
+Bye Job 5
+Bye Job 6
+Bye Job 7
+Hi Job 8
+Hi Job 9
+Bye Job 9
+Bye Job 8
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+
+The results are odd becuase the jobs don't all start and stop in a
+consistent or symmetrical manner.  These runs all start with jobs 0-3 but
+they don't finish in the same order every time. This shows a latency
+issue. Some jobs are postponed because other operations are running.
+
+This could affect how we program in parallel because there are three
+paths (more computers, multicore, GPU) with different strengths so we
+have to weigh the costs and benefits of each.  We might also want to
+set it up differently and change the process size depending on what we are
+trying to compute and if it needs to be synchronized processing. We would
+need it if one part running depended on the other parts running as well,
+in other words, if they were interdependent.
+
+
+
+Part 6B
+
+The trend that I observed is that when the wait time or sleep time is
+small, the ratio of serialTime/parallelTime is more variable.  I ran
+it multiple times. Once the sleep time gets larger, the ratio starts
+to level out at about 4.  The number stays more steady because the
+function takes up more time so it really carries more weight, bringing
+out the differences between the serial and parallel methods.  It
+specifically levels at the number 4 because that is the number of
+processes we chose. So our serial method runs the function for each
+wait time individually, working 4 times as hard as our parallel pool.map
+which runs 4 processes at a time. Using the number 5 example, it's like
+using one cashier (serial) versus four cashiers (parallel).
+
+
+It is possible for parallel to be slower than serial, which I saw in
+the graph for one of my runs.  This only happens when the wait time
+or function running time is small.  So it might be less efficient to
+use more workers to do a small job.  The function is too fast to
+outweigh the parallelization overhead.
+
+
+
+
+
+

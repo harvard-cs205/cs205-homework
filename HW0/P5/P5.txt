@@ -1,1 +1,143 @@
 # Your answers here.
+
+1)  A: 255 seconds
+
+2)  A: 34 seconds
+    now 8 cashiers, 256 bags
+    256/8 = 32 bags each
+
+    each takes 31 seconds to add their group
+    8 numbers left to add
+
+    4 cashiers add 2 numbers each in 1 second
+    4 numbers left to add
+
+    2 cashiers add 2 numbers each in 1 second
+    2 numbers left to add
+
+    1 cashier adds 2 numbers in 1 second
+    done
+
+    total of 31 + 1 + 1 + 1 seconds, or 34 seconds
+
+3)  A:  8 seconds
+
+        log(#bags) / log(2)
+        so for 256 bags, 8 seconds
+
+    General Equation:
+    from previous problem....
+
+    split bags amongst employees, each can add in bags per employee - 1
+    seconds
+    then you have employee numbers left to add
+    since you add 2 numbers each, you need half the employees and it
+    will take 1 second, you will also have half the employees numbers
+    left to add
+    so basically after the initial split it will take 1 second per
+    halving of number of employees
+    stop when you reach 1 employee
+
+    2^x = employees
+    x = log(employees) / log(2)
+
+
+
+    My Equation (1):
+            (bags/employees - 1) + log(employees) / log(2)
+
+
+
+    Note: this is when you can split the bags evenly amongst employees
+    and when the bags > employees
+
+
+    if you have an infinite amount of employees, you can assume more
+    employees than bags, so you just use 1 employee for every 2 bags
+    so it is like the second part of the equation.
+
+    My Equation (2):
+            log(bags) / log(2)
+
+
+    Note: this is for when bag < employees
+
+
+4)  A: log(N)/log(2)
+    Explanation from number 3
+    showed close up of graph so you can see the shape
+
+5)  A: 2 * (log(N) / log(2)) - 1
+    for 256 bags it takes 15 seconds
+
+    1 second to communicate number between employees
+    so initially N bags
+    N/2 employees handling
+    so when halving it takes 1 more seconds to communicate the numbers
+    so solve and communicate takes 2 seconds per turn except you don't
+    need to communicate on the last step
+    so 2 *(log(N) / log(2)) - 1
+
+    this assumes the infinite number of cashiers
+
+6)  A 1 bag: 272 seconds
+
+    so with N bags initially it takes N seconds to distribute 1 bags
+    to each cashier
+
+    you don't have to hand bags over anymore because you can just
+    communicate and calculate numbers
+
+    so then you take 1 second to communicate so N/2 employees get 2 bags
+    each.
+
+    then the problem is like number 5 again.
+
+    so N + 1 + 2 * (log(N)/log(2)) - 1
+    256 + 1 + 15 = 272
+
+
+
+    A 2 bags: 143 seconds
+
+    initially it will take N/2 seconds to distribute 2 bags to each
+    cashier. they can go straight to calculating and communicating again
+    so it is now like number 5
+
+    N/2 + 2 * (log(N)/log(2)) - 1
+    128 + 15 = 143
+
+
+
+    A better strategy?:
+
+    so handing over bags takes up the long time
+    so want to minimize that
+
+    N/bagsatatime initially
+
+    multiple bags means it will take them bagsatatime - 1 to calculate
+    how much they each have. so this takes up an even longer time.
+
+    after this they have 1 number each
+    they need 2 seconds to communicate and calculate for each halving,
+    like the usual problem
+
+
+    N/bagsatatime + (bagsatatime-1) + 2 * (log(N/bagsatatime)/log(2))
+
+            or more simply
+
+    N/b + (b-1) + 2(log(N/b)/log2)
+
+
+    N is fixed
+    The graph for this function for time vs bagsatatime looks something
+    like a checkmark
+
+
+    The main idea is that you want bags per person to be raised but not
+    too high because of the (b-1) part, which accounts for a single
+    person counting all the bags they were given.
+
+
