@@ -44,11 +44,11 @@ propagate_labels(__global __read_write int *labels,
     // Local position relative to (0, 0) in workgroup
     const int lx = get_local_id(0);
     const int ly = get_local_id(1);
-
     // coordinates of the upper left corner of the buffer in image
     // space, including halo
     const int buf_corner_x = x - lx - halo;
     const int buf_corner_y = y - ly - halo;
+
 
     // coordinates of our pixel in the local buffer
     const int buf_x = lx + halo;
@@ -81,15 +81,51 @@ propagate_labels(__global __read_write int *labels,
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
     
-    // stay in bounds
-    if ((x < w) && (y < h)) {
+    //if(buffer[buf_y * buf_w + buf_x]< w*h) buffer[buf_y * buf_w + buf_x] = labels[buffer[buf_y * buf_w + buf_x]];
+
+    // initialising the previous buffer and grand parents to be able to cjeck:
+    int prev_buff = -100;
+    int prev_gp = 0;
+
+    if ((lx==0) && (ly==0)){ //making sure we are only using one thread
+
+        for(int i = 0; i<buf_w*buf_h; ++i){ // iterating on the index of the buffer (like mentioned on a post in piazza)
+
+        	int current = buffer[i]; // s
+
+            if(current<w*h){ //checking current is not a wall or 
+
+            	if(current != prev_buff){// updating the new buffers and gp if different
+
+            		prev_buff = current;
+            		prev_gp = labels[current];
+            		buffer[i] = prev_gp;
+
+            	}
+
+            	else buffer[i] = prev_gp; //calling the same previous gp if they are equal
+                
+            }
+
+        }
+
+    }
+
+    barrier(CLK_LOCAL_MEM_FENCE);
+
+    
+    if ((x < w) && (y < h)) { // checking that we stayed in bounds
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
         new_label = old_label;
 
+        if(old_label<w*h) new_label = min(old_label,min(min(buffer[buf_y * buf_w + buf_x+1],buffer[buf_y * buf_w + buf_x-1]),
+                                    min(buffer[(buf_y-1) * buf_w + buf_x],buffer[(buf_y+1) * buf_w + buf_x])));
+
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
+            atomic_min(&labels[old_label],new_label);
             // indicate there was a change this iteration.
             // multiple threads might write this.
             *(changed_flag) += 1;
