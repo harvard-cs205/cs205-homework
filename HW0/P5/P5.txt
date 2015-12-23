@@ -1,1 +1,23 @@
-# Your answers here.
+Problem 5.
+
+Answers:
+1. 255 s
+2. 34 s
+3. 8 s
+4. ceiling(log2(N)) or N-1 (see attached)
+5. 15s
+6. a) 260 s b) 133 s c) Give 16 bags so as to balance out the gains from serial computations due to the lag in process distribution with the power of parallelization (35 s).
+
+Explanations:
+1. Addition is commutative and associative, and addition requires two "bags" to be processed at once. Therefore, the cashier must add 256 - 1 = 255 times to obtain the total.
+2. 8 workers together can process 16 bags per second. To process 256 bags, it will require 16 seconds; the 128 sums can be summed in 8 seconds, the resulting 64 sums can be processed in 4 seconds, and the following 32 sums in 2 seconds, yielding 16 sums requiring an additional 1 second to be further combined to 8 sums, in a binary tree fashion. However, further computations will be unable to take advantage of the available labor, as future computations require the present computations to complete first. Thus, each further summation will be an additional 1 second, halving the number of "sums" until the total sum remains (thus, 16 + 8 + 4 + 2 + 1 + 1 + 1 + 1 = 34 s)
+3. All 256 bags could be used by a maximum of 128 employees in the first "round" of computation, yielding 128 numbers to be added up. Then, in the second "round" of computation, 64 sums would be maximally obtained. In a binary tree fashion, we would see a halving of calculations needing to be done at each step. Thus, 8 rounds of computation would be required to analyze all 256 bags (2^8 = 256).
+4. With a countably "infinite" number of employees, the time required would be, in seconds, a ceiling of log base 2 of the number of bags, whereas a single employee would require N - 1 seconds.
+5. Going back to #3, neglecting communication delay, it requires 8 s to complete this task. Now, with communication delay, each round of computation requires a round of cross-talk between cashiers, which means that there is a 1 s delay between each of the 8 stages. Therefore, there is an additional 7 s delay on top of the 8 s = 15 s.
+6. It will take 256 s to distribute 1 bag to 1 cashier, so let's look at the terminating stages: once all 256 cashiers have received 1 bag, the last two need to (1) talk, (2) sum, (3) communicate with the rest of the "sum", and (4) sum for the final value. Hence, 256 + 4 s = 260 s.
+
+It will take 128 s to distribute 2 bags to each cashier. Each cashier would do a summation, then communicate with whatever cashier is "available" and sum the available numbers. At the end of the distribution, there will be a leftover sum at this point, so we need to communicate and then add the two values to give the total value, thus requiring 128 s + 5 s = 133 s.
+
+Consider the following cases, where I hand off 256 bags to one cashier -- I cut down significantly on the transfer time (1 s), but the serial processing is going to take time (255 s), for a total of 256 s. Given our answers to the cases of lower numbers, there is clearly at least one optimal value of bags for me to be able to hand off so as to minimize total processing time. 
+
+Ultimately, we need to balance serial computation with parallel distributions, so as to maximize our ability to compute with high efficiency. In this situation, giving 16 bags to each will maximize this efficiency, as the first summation will be complete when all the bags have been distributed (16 s), and parallel cross-talk can begin (15 s + 4 s from final serial "sum" to total value). Other values (e.g., 8 or 32) do not yield as low a computation time. 
