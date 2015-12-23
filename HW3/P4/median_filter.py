@@ -1,7 +1,7 @@
 from __future__ import division
 import pyopencl as cl
 import numpy as np
-import pylab
+#import matplotlib.plot as pylab
 import os.path
 
 def round_up(global_size, group_size):

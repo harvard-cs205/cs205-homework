@@ -1,0 +1,13 @@
+Best configuration:
+
+Running the python script multiple times, I never obtained the same configuration twice. For instance:
+
+- configuration ('coalesced', 512, 64): 0.00229512 seconds
+- configuration ('coalesced', 256, 128): 0.002206 seconds
+- configuration ('coalesced', 32, 128): 0.00222312 seconds
+- configuration ('coalesced', 64, 128): 0.00215992 seconds
+
+The two conclusions we can get out of these experiments are:
+
+1) Coalesced is always better than blocked
+2) The optimum time is around 0.0021-0.0023
