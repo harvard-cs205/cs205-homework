@@ -1,1 +1,62 @@
 # Your answers here
+
+Part A:
+
+Below	 are two iterations of the program when I run it:
+
+Iteration 1:
+
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 0Bye Job 2
+
+Bye Job 1
+Hi Job 4
+Hi Job 5
+Bye Job 3
+Hi Job 6
+Hi Job 7
+Bye Job 4Bye Job 6
+
+Bye Job 5
+Bye Job 7
+Hi Job 8
+Hi Job 9
+Bye Job 8
+Bye Job 9
+
+Iteration 2:
+
+Hi Job 0Hi Job 1
+
+Hi Job 2
+Hi Job 3
+Bye Job 2Bye Job 0
+
+Bye Job 1
+Hi Job 4
+Bye Job 3
+Hi Job 5
+Hi Job 6
+Hi Job 7
+Bye Job 4Bye Job 6
+
+Bye Job 7
+Bye Job 5
+Hi Job 8
+Hi Job 9
+Bye Job 8Bye Job 9
+
+From the above results, you'll notice that every time the code is run, the jobs do not necessarily finish in the original order that they were run in. For example, in the first iteration, Job 2 finished before Job 1, and Job 6 finishes before Job 5. In the second iteration, Job 2 finishes before Job 0 and 1. 
+
+However, this result is not surprising, since because the instructions are sent to different processors (which run independent of each other), we cannot determine the order in which they return the values. 
+
+This implies that when we program in parallel, our program should be indifferent to the order in which our processes complete. 
+
+This could affect the way we program because there may problems that rely on some sort of sequence (e.g. certain jobs are dependent on each other). A simple example that this program could fail in would be to (really, really) quickly print the alphabet in order. 
+
+Part B: How Much Faster?
+
+From the graph, it seems that the general trend is that as the wait time increases, the ratio of serial time to parallel time also increases. This signals that as wait times increase, the parallel approach is faster than the serial approach. However, it is possible that a parallel program takes longer than its serial version. This is due to the fact that there is a fixed amount of overhead that the multiprocessing requires. When the wait time is minimal, the time that parallel programming saves (via the computations) does not justify the overhead.

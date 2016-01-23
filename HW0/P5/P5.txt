@@ -1,1 +1,81 @@
 # Your answers here.
+
+Number 1. 
+255 seconds. 255 comparisons (and therefore additions) are needed.
+
+Number 2. 
+34 seconds. 
+
+With 8 people, every second, you can reduce the problem to 8 fewer bags. Therefore, in 31 seconds, you can reduce the problem to 8 bags. Once you get here though, you can no longer use all 8 people, so you use 1 second (4 people) to reduce the problem to 4 bags, 1 second (2 people) to reduce the problem to 2 bags, and the final second to reduce it to the last bag. 31 + 1 + 1 + 1 = 34.
+
+An alternative way to count the original 31 seconds it takes to get down to 8 bags would be notice that it takes 16 seconds to reduce the problem to 128 bags, or half the original 256. It takes another 8 seconds to reduce the problem to 64, and so on. 16 + 8 + 4 + 2 + 1 = 31.
+
+Number 3.
+8 seconds.
+
+Since we're assuming that any given employee can sum up at most 2 bags in a single second, then within in the 1st second, at most 128 comparisons (and thus 128 bags being "removed") can be made. In the 2nd second, at most 64 comparisons can be made, and so on. Each time, our problem gets halved. Therefore, our answer (for 256 bags) is log_2(256) = 8.
+
+Number 4.
+Ceil(log_2(N)) seconds.
+
+By the previous part, if N is a power of 2, then the answer is an integer: log_2(N). However, if N falls between some 2^x and 2^(x+1), then it must take at most x+1 seconds (because N < 2^(x+1)), and more than x seconds (because there would be bags leftover). Therefore, we take the ceiling.
+
+Please find the Python plot illustrating the findings in "P5.png". Note to ease readability, I have taken the log of the y scale.
+
+Number 5.
+15 seconds.
+
+We use the same approach as before, but now all the addition steps take 2 seconds instead of 1 (communication and adding as opposed to just adding), with the exception of the first step. This is because, to begin, if we have 128 cashiers with 2 bags each, we can bypass the first communication.
+
+Therefore, our final answer is 1 + 2*7 = 15.
+
+Number 6.
+PART A: 260 seconds.
+
+Second 1: C1 (Cashier 1) gets a bag.
+Second 2: C2 gets a bag.
+Second 3: C3 gets a bag, C1 communicates to C2.
+Second 4: C4 gets a bag, C1 and C2's bags are summed.
+Second 5: C5 gets a bag, C3 communicates to C4
+Second 6: C6 gets a bag, C3 and C4's bags are summed.
+Seconds 7-8: C7 and C8 get bags. C2 communicates and sums with C4, C5 communicates and sums with C6. 
+Seconds 9-10: C9 and C10 get bags. C4 communicates and sums with C6.
+Continue.
+
+Using this pattern, we construct a tree that looks like this:
+
+       ...
+     /\ ...
+    /\ \ ...
+   /\ \ \ ...
+  /\ \ \ \ ...
+ /\ \ \ \ \ ...
+/\/\/\/\/\/\ ...
+
+In the graph, each of the leaves represent the individual cashiers possessing a bag. Two branches intersecting at a higher level represents the communication and summation between two sets of bags.
+
+Examining the time taken, we find that the total time is N+4, or 260. 
+
+PART B: 133 seconds.
+
+For this, we can use a similar approach.
+
+Every time a cashier gets a bag, he will immediately spend an extra second summing it. This time, we only have 128 cashiers, since each is getting 2.
+
+Starting with C1 in Second 2, every second will have an additional cashier having finished summed his bags.
+
+In Seconds 4-5, C1 and C2 will communicate and sum their bags. In Seconds 7-8, C3 and C5 will communicate and sum their bags.
+
+From then on, whenever a cashier finishes summing the bags he just received, he will communicate and sum with one of the two sets of people who just finished summing their bags.
+
+For example, C1 and C2 finished summing after 5 seconds, which is when C4 finished summing the bags he just received, so they'll sum their bags. Then after 7 seconds, C6 will have just finished summing the bags he just received, so they'll communicate and sum with him. This trend continues with all the remaining even indexed cashiers.
+
+The same trend applies to odd indexed cashiers.
+
+At the end, we will have C128 finish summing his own at Second 129 and communicate and sum his bags in Seconds 130-131. Then the two groups of cashiers must sum their bags, which costs an additional 2 seconds, for a total of 133 seconds.
+
+PART C: 23 seconds.
+
+Assuming there are no limits on how many bags can be handed at a time, then you should give all 256 bags to C1. Each cashier should then recursively hand out half of his bags until each cashier has 2 bags each. This will take 8 seconds. Spend another second getting each of the 128 cashiers to sum up their bags. Now, we can use our result from Part 5 to communicate and sum up the rest of the bags in 2 * log_2(N) = 2 * log_2(128) = 14 seconds.
+
+The total time spent was 8 + 1 + 14 = 23 seconds.
