@@ -1,1 +1,41 @@
 # Your answers here.
+
+1) In order to add 256 bags a cashier needs to perform 255 additions.
+Each addition cost 1 second.
+So it will take 255 seconds.
+
+2) The integer division of 256 by 8 is 32.
+8 workers compute 32 bags in 31 seconds.
+Then each of the 8 workers have 1 bag.
+It takes 3 seconds to compute down to one bag.
+So it takes 34s altogether.
+
+3) If the addition are organized in a binary tree, the fastest computation
+take the logarithm base 2 of 256 which is 8seconds.
+
+4) For N bag.
+The lonely worker always takes N-1 seconds.
+The infinitely many workers take ceiling of log(N)s. 
+See P5.png for the plot.
+
+5) In the binary tree structure, we now add 1 second at each node for the
+communication. If you give 2 bags to 128 workers at the beginning, it will now
+take (1+1)*7+1=15s, 1+1 for communication+compute, and 1 for the compute of
+the first 128 workers with 2 bags.
+
+6) For one bag per worker, the situation once you finished distributing the
+bags is one bag in the 256 worker, one bag in the 255th worker and one bag in
+the 253rd worker (this latter bag is the sum of all the other bags). And it
+takes 4s to go from this situation to 1 bag with the whole sum.
+So it takes 260s to compute when giving one bag to each worker.
+
+For 2 bags per worker, once you are done distributing the bags, the situation
+is the following: 128th worker has 2 bags, the 127th worker has 1 bag and the
+124th worker has 2bags which sum is the sum of all the other workers. It then
+takes 5 second to go from this situation to one bag with the whole sum.
+So it takes 133s to compute giving one bag to each worker.
+
+We see that the time to compute those 256 bags is
+time(num_bag)=N/num_bag+(3+num_bag).
+By plotting this function with num_bag=1:256 we see a minimum at 35s when
+distributing 16bags per person.

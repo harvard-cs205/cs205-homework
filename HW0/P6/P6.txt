@@ -1,1 +1,47 @@
 # Your answers here
+
+
+1)
+A typical result I get when I run P6A.py is:
+Hi Job 0
+Hi Job 2
+Hi Job 3
+Hi Job 1
+Bye Job 0
+Hi Job 4
+Bye Job 3
+Hi Job 5
+Bye Job 2
+Bye Job 1
+Hi Job 6
+Hi Job 7
+Bye Job 4
+Hi Job 8
+Bye Job 5
+Hi Job 9
+Bye Job 7
+Bye Job 6
+Bye Job 8
+Bye Job 9
+
+We see that Jobs are not finished in the same order as they are started.
+We also see that jobs are not started in the right order.
+A possible explanation is that there are sometimes some lock in the
+communication.
+The fact that jobs don't start in the right order can be a problem if a
+job needs some information depending on a previous job.
+An example is for example is we apply the function x->(x+j)**2 to the input
+with j the number of the jobs. This being non linear, will not give the right
+answer if jobs are not computed in the right order.
+I found an interesting quote from "how to survive the multicore revolution"
+that explains the type of issue raised by multiprocessors named "race
+condition".
+"A race condition occurs when concurrent software tasks access a shared-memory
+location and at least one of the tasks stores a value into the location.
+Depending on the scheduling of the tasks, the software may behave differently."
+This better explains the point that I wanted to make.
+
+2)
+From the plot we can see that the ratio plateaus at 4.
+This is because there are only 4 processors in the pool.
+At small times, parallel performs poorly because communication costs.
