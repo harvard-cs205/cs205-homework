@@ -1,1 +1,21 @@
 # Your answers here
+The unexpected results are that the numbers of starting and ending ("hi" and "bye")
+can change position arbitrarily, so it is impossible to tell exactly which process will
+start or end first if both are sent at basically the same time. This can affect how we
+program in parallel by making us consider these race conditions and making sure that
+all of the pieces that we need are in place before continuing, not just one of the process
+results we expect is the last. 
+One scenario where this is important is in the stock exchange, where two people can submit
+requests to buy or sell at the same time, but given the nature of computation, one person can
+get one price and the next person can get a larger or smaller price if the market has changed in
+that split second. Also, if there is a shortage of buyers or sellers, one person can have all of 
+their stock bought or sold before the other, though both sent in their request at the same time.
+
+The trend is that serial computation is faster than parallel for very short
+wait times, 10^-5 seconds for my computer, and after that wait time, 
+parallel computing wins out steadily on a log scale until it becomes a consistent 4x faster
+(4 being the amount of processes). 
+Therefore, serial programming has some overhead that makes it slower when doing very quick and
+short computations, but if the computation \takes more than a marginal amount of time,
+parallelizing wins out in the end, up to a maximum of being faster by the factor of more
+processes.
