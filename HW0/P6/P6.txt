@@ -1,1 +1,50 @@
 # Your answers here
+
+6A: Example Output:
+
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 3
+Bye Job 0
+Bye Job 1
+Bye Job 2
+Hi Job 4
+Hi Job 5
+Hi Job 6
+Hi Job 7
+Bye Job 4
+Bye Job 7
+Bye Job 6
+Bye Job 5
+Hi Job 8
+Hi Job 9
+Bye Job 9
+Bye Job 8
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+6A: Explanation
+
+We see above that while inputs from each thread enter the function burnTime
+in the numerical order we might expect, when our process sleeps for 0.25 seconds,
+the order in which threads access stdout is unpredictable. Notably, although k=0...3
+enter the print command in the expected numerical order, we see that after the break of 0.25 
+seconds the new outputs of 3,0,1,2 are chosen seemingly randomly. This race condition highlights
+that when we write parallelized code we need to lock access to certain shared resources so 
+we don't get unexpected behavior with certain threads reaching the wrong area at the wrong time. 
+
+
+#6B:
+
+Yes, this is possible since we see that for very small values of t (wait time), the serial computation
+is actually faster than the parallel computation. Specifically we see this trend occur for 10e-06 and 10e-05
+seconds, and one possible reason that this may be the cast is that when the sleep time is actually very small,
+the time required to actually distribute and allocate the tasks to the various processors and then combine their
+outputs (what we referred to in part #5 as communication) can dominate the run-time of the overall process. Thus,
+we could see that very small amounts of sleep time do not have enough returns to their scale to justify using the
+heavier overhead of parallel processing. 
+
+
+
+

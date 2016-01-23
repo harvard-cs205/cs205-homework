@@ -13,3 +13,19 @@ if __name__ == '__main__':
     # Apply burnTime to this list of "job numbers" using the pool
     result = pool.map(burnTime, range(10))
     print(result)
+
+
+
+
+import numpy as np
+
+#A = np.matrix([[3, 5, 9], [2, 7, 4]])
+
+A = np.random.rand(5, 3)
+
+B = np.dot(A, A.T)
+C = np.dot(A.T, A)
+
+
+print np.linalg.eig(B)
+print np.linalg.eig(C)
