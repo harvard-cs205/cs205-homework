@@ -1,1 +1,11 @@
-# Your answers here.
+1. 255 seconds.
+
+2. Yes. They can verify the total sum in 34 seconds.
+
+3. The infinite number of employees can verify the sum in 8 seconds (log2(256)).
+
+4. It will take them ceil(log2(N)) seconds.
+
+5. With communication overhead (where communication can be done in parallel between independent parties), the best time for 256 bags changes to 15 seconds (log2(256) + log2(128)). We give each cashier 2 bags to begin with, in order to skip the initial layer of communication that would occur if we gave each cashier a single bag.
+
+6. We assume that each cashier can begin their computation when they get their bags. If each cashier takes 1 bag from me, then it will take 256 seconds for all the bags to be distributed, and 4 seconds of computation after distribution to finish (since most of the computation as done during distribution). In total it will take 260 seconds. If each cashier takes 2 bags, then it will take 128 seconds to distribute all the bags, and 5 seconds of computation to finish, for a total of 133 seconds. In general, if each cashier takes M bags each, then the total time will be ceil(256/M)+3+M seconds. The best strategy is when this time is minimized, which occurs at M = 16 bags per cashier. This gives a total compute time of 35 seconds.
