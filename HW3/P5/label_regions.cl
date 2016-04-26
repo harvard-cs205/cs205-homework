@@ -53,9 +53,15 @@ propagate_labels(__global __read_write int *labels,
     // coordinates of our pixel in the local buffer
     const int buf_x = lx + halo;
     const int buf_y = ly + halo;
+    
+    // Local_size... size of our work-group (For part 4)
+    const int wg_size_x = get_local_size(0);
+    const int wg_size_y = get_local_size(1);
 
     // 1D index of thread within our work-group
-    const int idx_1D = ly * get_local_size(0) + lx;
+    const int idx_1D = ly * wg_size_x + lx;
+    
+   
     
     int old_label;
     // Will store the output value
@@ -81,19 +87,49 @@ propagate_labels(__global __read_write int *labels,
 
     // CODE FOR PARTS 2 and 4 HERE (part 4 will replace part 2)
     
+//    if (old_label < w*h) {
+//        buffer[buf_y * buf_w + buf_x] = labels[old_label];
+//        }
+    
+    // Use single thread to update work group labels (part 4)
+    if ((lx == (wg_size_x-1)) && (ly == (wg_size_y - 1))) {
+        int wg_label, prior_label;
+        
+        for (int wgx_idx = halo; wgx_idx < (buf_h-halo); wgx_idx++) { // Scan through work group
+            for (int wgy_idx = halo; wgy_idx < (buf_w-halo); wgy_idx++) {
+            
+                wg_label = buffer[wgx_idx * buf_w + wgy_idx]; // Pull label and assume it is the label for the entire workgroup
+                if (wg_label < w*h) {
+                    if (wg_label == prior_label) { // Check to see if our current label is the same as the prior label, if so, reassign buffer to this label at the current index
+                    buffer[wgx_idx * buf_w + wgy_idx] = prior_label;
+                    } else { // reset prior_label to the current label for this workgroup.
+                        prior_label = wg_label;
+                        buffer[wgx_idx * buf_w + wgy_idx] = labels[wg_label];
+                    }
+                }
+            }
+        }
+    }
+    
+    barrier(CLK_LOCAL_MEM_FENCE);
+    
     // stay in bounds
-    if ((x < w) && (y < h)) {
+    if (((x < w) && (y < h)) && (old_label < w*h)) {
         // CODE FOR PART 1 HERE
         // We set new_label to the value of old_label, but you will need
         // to adjust this for correctness.
-        new_label = old_label;
+        new_label = min(old_label,
+                        min( min(buffer[buf_y * buf_w + buf_x + 1], buffer[buf_y * buf_w + buf_x - 1]), // min across rows
+                             min(buffer[(buf_y + 1) * buf_w + buf_x], buffer[(buf_y - 1) * buf_w + buf_x]) //min across columns
+                            ));
 
         if (new_label != old_label) {
             // CODE FOR PART 3 HERE
+            atomic_min(&labels[old_label],new_label);
             // indicate there was a change this iteration.
             // multiple threads might write this.
             *(changed_flag) += 1;
-            labels[y * w + x] = new_label;
+            atomic_min(&labels[y * w + x],new_label);
         }
     }
 }

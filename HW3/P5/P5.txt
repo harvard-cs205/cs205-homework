@@ -1,0 +1,60 @@
+Performance:
+
+Part 1: Implement updates from neighbors
+-----------------------------------------
+Maze 1:
+Finished after 915 iterations, 203.1936 ms total, 0.222069508197 ms per iteration
+Found 2 regions
+
+Maze 2:
+Finished after 532 iterations, 118.20936 ms total, 0.222198045113 ms per iteration
+Found 35 regions
+
+
+Part 2: Fetch Grandparents
+----------------------------------------
+Maze 1:
+Finished after 529 iterations, 113.90464 ms total, 0.215320680529 ms per iteration
+Found 2 regions
+
+Maze 2:
+Finished after 272 iterations, 58.57104 ms total, 0.215334705882 ms per iteration
+Found 35 regions
+
+
+Part 3: Merge Parent Regions
+-----------------------------------------
+Maze 1:
+Finished after 10 iterations, 3.08912 ms total, 0.308912 ms per iteration
+Found 2 regions
+
+Maze 2:
+Finished after 9 iterations, 2.65512 ms total, 0.295013333333 ms per iteration
+Found 35 regions
+
+Part 4: Efficient Grandparents
+-----------------------------------------
+Maze 1:
+Finished after 16 iterations, 11.91624 ms total, 0.744765 ms per iteration
+Found 2 regions
+
+Maze 2:
+Finished after 15 iterations, 11.31144 ms total, 0.754096 ms per iteration
+Found 35 regions
+
+                -----------------------COMMENTARY-----------------------
+From my empirical results of using a single thread to account for labelling its workgroup,  you can see that I got reduced performance. I expected this even though we skip a good number of memory reads because we have transformed this part of the code to a sequential scan through the work group. The time to complete iteration was more than doubled to do this scan. I am sure that if I were to find a better way to assign the entire workgroup a single label (by blocking or some other aggregate method) that this wouldn’t be as much of a limitation. For this reason, I think that it is reasonable in these memory-bound types of problems (the computational aspect of reading and writing information is negligible) to use a single thread to label an entire workgroup. If the task of labeling was more computationally intensive, we would surely want to harness the ability of GPUs to run multiple processes at once on individual threads.
+
+
+Part 5: No Atomic Operations
+-----------------------------------------
+Maze 1:
+N/A
+
+Maze 2:
+N/A
+                -----------------------COMMENTARY-----------------------
+As far as I understand the threading of GPUs, threads switch after each step or command call that is made. What makes atomic operations convenient is that they perform an operation and write the result in one step. That means, no other thread is able to intervene and increase a label before our native thread is finished performing the iteration. By changing from atomic_min() to min() we would provide opportunities for such interruptions to occur. I don’t think that the result could be expected to remain the same in a general sense. If there were multiple threads accessing and writing to a single location you may create some redundancies or gaps iteration by iteration depending on the algorithm, thereby altering the final results. The creation of these racing conditions could significantly decrease our performance as iterations could hang as other threads interrupt the task that iteration was assigned.  
+
+
+
