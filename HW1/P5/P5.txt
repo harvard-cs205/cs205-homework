@@ -1,1 +1,6 @@
-# Your discussion here
+From Kevin_Bacon to Harvard_University
+{0: 'Kevin_Bacon', 1: u'College_Bowl', 2: 'Harvard_University'}
+
+From Harvard_University to Kevin_Bacon
+{0: 'Harvard_University', 1: u'Cornell_University', 2: u'Edmund_Bacon', 3: 'Kevin_Bacon'}
+

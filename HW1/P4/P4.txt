@@ -1,1 +1,18 @@
-# Your discussion here
+1. Description:
+Firstly, I set up a RDD with the key of each comic issue, the value of the characters that appear in that comic issue. Through several transformations, I set up a final graph, which is a paired RDD, with the key of each character, and the value of all the characters who are in the same comic issue.
+
+2. Graph diameter:
+We start at distance 0 which can be seen as the center of the graph. Every time we move to the neighbours with distance of 1. Since the diameter is 10, meaning that we can move 5 times. Therefore, the maximum number of steps we can search is 5.
+
+3. The new nodes touched by three source verticles:
+"CAPTAIN AMERICA"- 6408 in all (itself included)
+each interation touches the number of new nodes of 1906,4463,38,0,0
+
+"MISS THING/MARY"- 7 in all (itself included)
+each interation touches the number of new nodes of 6,0,0,0,0
+
+"ORWELL"- 9 in all (itself included)
+each interation touches the number of new nodes of 8,0,0,0,0
+
+4. Untouched nodes:
+If a character does not have a defined distance during the search, which means this character is not in any circle of the start point (the source verticle that is at distance 0). When we use an edge to connect two nodes which have connections, the untouched nodes are the lonely points or their circles don't intersect with the circles of the start point.
