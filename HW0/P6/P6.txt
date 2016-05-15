@@ -1,1 +1,7 @@
 # Your answers here
+
+Count to Ten:
+The jobs have a different ordering at each run. This means that the batch of instructions get sent to different processors at each run, and there is no way to make sure that the processes will terminate in the original order. The processors effecticely run in a stateless manner. This means that when we program in parallel, a process should be agnostic to the order in which the other processes complete. In other words, a parallel program should be careful of when the results depend on a particular order of process termination. A scenario in which this would be important would be converting an MP3 file to a different format (MP4, WAV, etc.). Four processors can convert four equal parts of the songs, but can output them in a different order, causing the resulting file to sound completely different from the original.
+
+How Much Faster?:
+As it is depicted in the plot, as the wait times increase, the serial times to complete the N jobs increase and the parallel times decrease. However, when the wait time is relatively small, the serial process is faster than the parallel process. Thus, it is possible for a parallel program to take longer than the serial version. This is because each computation in the serial process is faster when the wait time is small. In this case, it is not better to take the parallel approach because the overhead of the running the multiple processes becomes the bottleneck. 
