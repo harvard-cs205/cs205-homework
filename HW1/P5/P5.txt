@@ -1,1 +1,30 @@
-# Your discussion here
+Finding Directed Paths
+We use a modified version of the BFS function developped in pbm4. Here we stop as soon as we find the node of arrival.
+Running the code we find that the distance Kevin_Baccon-->Harvard_University is 2. And the distance Harvard_University-->Kevin_Bacon is 3.
+(Please also see the detailed and commented code in P5.py and P5_bfs.py)
+
+Connected Components
+- For directed graphs, please see the very detailed and commented code in P5_connected_components.py
+We delete visited nodes in the RDD on the fly to reduce the amount of data to test. This comes to the cost of suppressing the visited node in the connexion listof each still existing nodes. But it proves much faster once a lot of nodes are already visited and that there are mostly small connected components remaining. The code is also designed to still give outputs when interupted.
+For the directed graph, the biggest connected component contains 3'708'081
+nodes. As I interrupted the code after 9h of calculation I only have a lower
+bound of the number of connected components which is 228.
+
+- For symmetrized graph.
+You will see in P5_connected_components.py part 2) after the function
+distance_cc how I transform the RDD intoa symmetric one.
+I used the symmetry properties to filter out all the connected components that
+are constituted of only one node. I. e. the node without connexion. There are
+3'630'864 of them! whereas there are 0 in the directed case. There are also
+558'027 with only one connexion whereas there are 3'064'395 of them in the
+directed graph case.
+After running the algorithm for 8h on AWS, I find that the biggest connected
+component has 1'979'400 nodes which expectedly smaller than the directed case.
+As I had to interrupt the code I also have the lower bound for the number of
+connected components of 3'631'443 whih is dramatically increased by all the
+nodes without connexion!
+
+
+I have not had the time to think about the implementation of the algorithm in
+O(log D) but I would be interested to see the implementation in the
+correction.
