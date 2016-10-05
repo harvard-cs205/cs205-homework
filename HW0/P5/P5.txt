@@ -1,1 +1,57 @@
 # Your answers here.
+1.  255 seconds (by whatever method - either by consecutively adding the next
+    bag to a running total, or pairwise, 128 + 64 + 32 + 16 + 8 + 4 + 2 + 1).
+
+2.  Yes - the 8 cashiers can split the bags evenly (so each has 32 bags, which
+    take 31 seconds to add), then four of them each add their total to the
+    total of one of the other four (1 additional second), then two of the
+    remaining four add the remaining two pairs (1 more second), then one
+    cashier adds these results (1 more second), for 34 seconds total.
+
+3.  8 seconds (in the first second, 128 cashiers each add a pair of bags;
+    the next second, 64 add pairs of those results; and so on, until one
+    remaining cashier adds the final total in the 8th second).
+
+4.  Log_2(N) seconds (because the number of sums is halved each second).
+
+5.  15 seconds (in the first second, 128 cashiers each add a pair of bags; the
+    next second, half of those 128 communicate their sum to the other half;
+    those 64 add their sums to the sums they were just told; and so on,
+    requiring one additional second of communication after each one-second
+    round of the instantaneous-communication version, except the final round).
+
+6.  If each cashier takes 1 bag, 260 seconds (the last bag is handed to a
+    cashier in the 256th second; prior to that, each bag handed out is
+    communicated to one of two cashiers, so one is always adding while the
+    other gets a number from the cashier that just received a bag. When the
+    last bag is handed out, one cashier has just added the 127th bag to their
+    total, while the other cashier has just been told their 128th number; in
+    the 257th second, the last bag's number is communicated to the former
+    cashier, and the latter cashier adds their 128th value to their running
+    total; in the 258th second, the former cashier adds the last number to
+    their total; in the 259th second, one communicates their total to the
+    other; and in the 260th second, they add their totals).
+
+    If each cashier takes 2 bags, 133 seconds (the last bags are handed to a
+    cashier in the 128th second; one second later, the last cashier to receive
+    a bag adds their two bags together; and from that point, as above, an
+    additional four seconds are necessary to reach the final total).
+
+    Using this same basic algorithm (give some number of bags to each cashier,
+    have them add up all those bags, then combine their total with one of two 
+    cashiers keeping a running total by alternately talking and adding), the 
+    best we can do is handing 16 bags to each cashier, which takes 35 seconds 
+    (the last set of bags is handed to a cashier in the 16th second; 15 
+    seconds later, the last cashier to receive their bags finishes totaling 
+    their bags; and four more seconds are required to reach the final totals).
+    Going to 32 bags doesn't decrease the time further, taking 43 seconds 
+    (only 8 to hand out the bags, but 31 for each cashier to do their sums, 
+    plus 4 to finish).
+
+    However, we can do even better (23 seconds) with a different approach:
+    in the first second, I hand all 256 bags to a cashier. In the next second,
+    the cashier hands 128 bags to another cashier. In the third second, each
+    cashier hands half their bags to another cashier. By the 8th second, 128
+    cashiers are each holding two bags, which is the scenario we started with
+    in question 5, so it takes 15 more seconds to perform the remaining
+    additions and communications.

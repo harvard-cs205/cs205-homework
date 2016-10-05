@@ -1,1 +1,51 @@
 # Your answers here
+PART A.
+    Example output:
+        Hi Job 0
+        Hi Job 1
+        Hi Job 2
+        Hi Job 3
+        Bye Job 0
+        Bye Job 1
+        Bye Job 3
+        Bye Job 2
+        Hi Job 4
+        Hi Job 5
+        Hi Job 6
+        Hi Job 7
+        Bye Job 4
+        Bye Job 6
+        Bye Job 7
+        Bye Job 5
+        Hi Job 8
+        Hi Job 9
+        Bye Job 9
+        Bye Job 8
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    
+    The jobs do not always complete in the order they were started (even though
+    they nominally sleep for the same amount of time). This means we can't rely
+    on processes running in parallel completing in any particular order. If two
+    processes modify the same resource, for example, and one relies on the
+    output of the other, unexpected behavior may result (e.g., if a bank is
+    processing many transactions in parallel and a user deposits their paycheck
+    and then pays a bill, the deposit may not have completed before the bill
+    payment is deducted from the user's account, resulting in overdraft fees).
+
+PART B.
+    The speedup of parallel relative to serial execution increases as the wait
+    time increases, finally plateauing at roughly the theoretical maximum of
+    4x speedup for wait times on the order of 10^-2 through 10^0 seconds.
+    There's some amount of overhead involved in splitting up the processes, so
+    for shorter wait times, this cuts into the speedup (for long wait times,
+    there's the same amount of overhead, but it's negligible relative to the
+    wait time itself).
+
+    For very short wait times (in this case, on the order of 10^-5 seconds),
+    the parallel version actually takes more time than the serial version
+    (i.e., speedup < 1), which is possible if the overhead to assign the
+    threads is a significant fraction of the total time it takes to run the
+    function serially. The hand-each-cashier-one-bag version of P5.6 shows one
+    theoretical example of this: it takes longer to verify the total in that 
+    case than in the one-cashier-working-alone case, because so much time is
+    spent handing one bag at a time to each cashier.
