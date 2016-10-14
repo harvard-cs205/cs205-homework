@@ -1,3 +1,10 @@
+###############################
+
+# CS 205 Fall 2015 Homework 0 Problem 6
+# Submitted by Kendrick Lo (Harvard ID: 70984997)
+# Github username: ppgmg
+
+import numpy as np
 import multiprocessing as mp
 import time
 import matplotlib.pyplot as plt
@@ -16,16 +23,25 @@ if __name__ == '__main__':
 
     # Use a variety of wait times
     ratio = []
-    wait_time = []
+    number_samples = 50
+    wait_time = np.logspace(-6, 0, number_samples)
 
     for t in wait_time:
-        # Compute jobs serially and in parallel
-        # Use time.time() to compute the elapsed time for each
-        serialTime = 1
-        parallelTime = 1
+
+        # Compute jobs serially
+        serial_time = time.time()  # initialize with current time
+        for i in range(N):
+            burnTime(t)    
+        serial_time = time.time() - serial_time
+
+        # Compute jobs in parallel
+        parallel_time = time.time()  # initialize with current time
+        # Call burnTime with argument t, N times using the pool
+        pool.map(burnTime, np.repeat(t,N))
+        parallel_time = time.time() - parallel_time
 
         # Compute the ratio of these times
-        # ratio.append(serialTime/parallelTime)
+        ratio.append(serial_time/parallel_time)
 
     # Plot the results
     plt.plot(wait_time, ratio, '-ob')

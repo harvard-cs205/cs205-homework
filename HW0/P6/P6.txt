@@ -1,1 +1,199 @@
-# Your answers here
+###############################
+
+# CS 205 Fall 2015 Homework 0 Problem 6
+# Submitted by Kendrick Lo (Harvard ID: 70984997)
+# Github username: ppgmg
+
+1. Running P6A.py
+
+We attach example output at the end of this text file.
+A few observations:
+
+- First, as a whole, the sequence of outputs are not the same from
+  run to run. This can cause problems if you are expecting the same
+  series of outputs merely because you ran the exact same program.
+
+- In runs (1, 2, 4) the 'Hi Job' statements are in order from 0 to 9,
+  but in run 3, 'Hi Job 1' appears out of order.
+
+- In runs (1, 2, 3) the 'Bye Job' statements are out of order; for
+  example, 'Bye Job 0' appears after three other 'Bye Job' statements
+  have already been output. On the other hand, all 'Bye Job' statements
+  appear in order from 0 to 9 in run 4.
+
+- There is no fixed pattern of "Hi Job" and "Bye Job" statements; e.g.
+  it is not always the case that we'll see alternating "Hi Job" and 
+  "Bye Job" statements after a fixed number of "Hi Job" statements.
+
+- Although the 'sleep' time between Hi and Bye jobs of the same number
+  appear fixed, each pair is not separated by the same number of
+  statements.
+
+In general, the statement you expect to be output first for each category
+may not output first; the statement you expect to be output last for each
+category may not output last. Additionally, the ordering of both 
+the outputs within and between each category cannot be predicted with
+certainty in these example runs.
+
+If the programmer is not careful, operations may be performed in an
+order that was not intended. This could result in spurious or incorrect
+output, and may even crash programs, depending on the nature of the
+operations.
+
+For example, suppose that each "Hi Job" operation represented an
+operation to assign a variable one value, whereas a "Bye Job" operation
+might retrieve values for one or more variables and perform some
+mathematical operation on them. If the assignment and retrieval
+operations are not performed in the expected order, problems could
+occur: e.g. we could be retrieving the value for a variable to which
+an assignment has not yet been made, we could retrieve an old value
+rather than what was expected to be the current value (and use the
+wrong one in our mathematical operation, further perpetuating the
+miscalculation), we could retrieve a value that is too new (the one
+that we wanted has already been overwritten), and so on.
+
+Therefore, if certain operations must be performed in a specific
+sequence relative to other operations in order to produce correct
+program behavior, we as parallel programmers need a mechanism to enforce
+the order for these particular operations and prevent them from being
+changed. In this regard, when multiple processes are involved, and
+when one process wants to access the same resource (e.g. memory) as
+another contemporaneously, we need a mechanism to control access to 
+those resources to prevent one process from intervening with another's
+access in unexpected and potentially harmful ways.
+
+Another example scenario involves the calculations we performed in
+Problem 4, for columns in matrix S as an example. Each set of values for
+a given column in s depended on values of the preceding column (which is
+associated with the previous time step); if we try to apply parallel
+programming techniques and do so in a way that changes the order of the
+columns for example, the resultant model will be different (and likely
+incorrect).
+
+2. Running P6B.py
+
+From the plot, in general there seems to be a trend that suggests the
+factor by which the serial version is slower than the parallel version
+increases as the wait time increases. There is a levelling off toward the
+ratio value of 4, which is the number of parallel processes in the pool.
+This makes sense since, in theory, if we have four processes performing
+the same set of tasks in parallel, then a process that must perform
+those tasks sequentially should be four times as slow.
+
+There are, however, a number of ratio values below one, when the
+wait times are very small. This may be due to the fact that there is
+overhead involved in setting up or with other tasks associated with
+managing and coordinating the multiple parallel processes. When the wait
+times are very short, the serial process may complete all tasks very
+quickly, and the overhead arising from the use of parallel processes may
+introduce a relatively lengthy delay. However, as the time to complete all
+tasks increases, the same overhead becomes relatively less significant,
+and the benefits of being able to expire the delays from burnTime in
+parallel become more apparent.
+
+We note that in this particular problem, very little coordination between
+the parallel processes seems required: the task of sleeping for multiple
+periods of time appears readily parallelizable. However, parallelism
+does not readily apply to all tasks. If the task requires a certain
+amount of coordination or exchange of information between processes,
+this additional overhead may temper any gains that one might have
+expected over a single-threaded program.
+
+---
+Example output for P6A
+
+Run 1:
+
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 0
+Hi Job 4
+Bye Job 1
+Hi Job 5
+Bye Job 3
+Hi Job 6
+Bye Job 2
+Hi Job 7
+Bye Job 5
+Hi Job 8
+Bye Job 4
+Hi Job 9
+Bye Job 7
+Bye Job 6
+Bye Job 9
+Bye Job 8
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+Run 2:
+
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 1
+Bye Job 0
+Bye Job 2
+Hi Job 4
+Hi Job 5
+Bye Job 3
+Hi Job 6
+Hi Job 7
+Bye Job 4
+Bye Job 5
+Hi Job 8
+Hi Job 9
+Bye Job 7
+Bye Job 6
+Bye Job 9
+Bye Job 8
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+Run 3:
+
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Hi Job 0
+Bye Job 2
+Hi Job 4
+Bye Job 3
+Hi Job 5
+Bye Job 1
+Hi Job 6
+Bye Job 0
+Hi Job 7
+Bye Job 4
+Hi Job 8
+Bye Job 5
+Hi Job 9
+Bye Job 6
+Bye Job 7
+Bye Job 9
+Bye Job 8
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+Run 4:
+
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 0
+Hi Job 4
+Bye Job 1
+Hi Job 5
+Bye Job 2
+Hi Job 6
+Bye Job 3
+Hi Job 7
+Bye Job 4
+Bye Job 5
+Hi Job 8
+Hi Job 9
+Bye Job 6
+Bye Job 7
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]

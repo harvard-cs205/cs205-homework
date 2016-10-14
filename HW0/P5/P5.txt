@@ -1,1 +1,327 @@
-# Your answers here.
+###############################
+
+# CS 205 Fall 2015 Homework 0 Problem 5
+# Submitted by Kendrick Lo (Harvard ID: 70984997)
+# Github username: ppgmg
+
+Summary
+-------
+
+1. 255 seconds
+2. 34 seconds
+3. 8 seconds
+4. log N seconds
+5. 15 seconds
+6. 272 seconds, 143 seconds
+   Wait-and-Combine (16 workers): 39 seconds
+   Front-Loading: 33 seconds
+
+Explanation
+-----------
+   
+1.  Let N be the number of bags.
+    One cashier can only add two bag counts at a time.
+    If t_add is the time it takes to add two bags, 
+        then t_add is required to add bags 1 and 2,
+        t_add*2 to add bags 1 to 3 (i.e. prior total plus bag 3),
+        t_add*3 to add bags 1 to 4 (i.e. prior total plus bag 4),
+        ...
+        t_add*(N-1) to add bags 1 to N.
+	
+    If t_add = 1s and N = 256, then adding all the bags takes
+        t_add*(N-1) = 1*(256-1) = 255 seconds. 
+
+2.  Let the number of workers on the counting project be P.
+    When we have P>1 workers, we divide and conquer: 
+        (1) split the N bags into P parts;
+        (2) each worker counts his N/P bags;
+        (3) add up all P counts.
+
+    Assuming P divides into N evenly, and that step (1) can be done
+    instantaneously, applying the result from question 1 to each
+    individual p, each worker can count his N/P bags in 
+        t_add*(N/P - 1) time. 
+    For t_add = 1s, N = 256, and P = 8, all workers can finish
+    their counts for step (2) in 1*(256/8 - 1) or 31s.
+
+    Note if P does not divide into N evenly, then at least one worker
+    will have to count ceil(N/P) bags; workers with fewer bags will,
+    at least in the worst-case scenario, need to wait until those with
+    more bags have completed their counts. So in the worst-case (which
+    assumes that workers with fewer bags do not start adding their own
+    totals among themselves), is more generally t_add*(ceil(N/P)-1).
+
+    Per (3), additional time is needed to add up the remaining P
+    counts. We can divide P counts into pairs, and add each pair at
+    the same time. We then repeat this until we have our total.
+        If P=2, this step takes t_add time;
+        if P=4, this step takes 2*t_add time;
+        if P=8, this step takes 3*t_add time, etc.
+
+    It seems that an added (log P) iterations are required. We can
+    show that in general, ceil(log P) iterations are required.
+
+    When t_add = 1s and P = 8, we need (log 8)*1 = 3 seconds more.
+
+    Combining this time with the total for (2), it will take
+        31 + 3 = 34 seconds 
+    for the 8 workers to complete the task.
+
+3.  First, if we can choose any number of P we want, it appears that
+    for our particular methodology in question 2, we do not get any
+    additional benefits from choosing P > N. If we distributed all N
+    bags to P workers, each worker will have a bag, and any additional
+    workers would not receive one and would be idle. Also, since each
+    iteration in (3) is done by at most half the workers simultaneously,
+    the additional workers will still be idle during (3). 
+
+    Put another way, it will take the same amount of time for P=N
+    workers to complete the task as for P>N workers. Therefore, we need
+    only consider completion times for P from 1 to N.
+
+    We noted from question 2 that it takes, in the worst case,
+        t_add*(ceil(N/P)-1)  time
+    for all P workers to count their own bags, and then
+        t_add*ceil(log P)  time 
+    to total those P counts.
+	
+    Thus, the total time is t_add*(ceil(N/P) + ceil(log P) - 1), and
+    we want to determine P where this function is at a minimum.
+    Without getting too formal, we tried a few scenarios:
+        when P = N = 2^k where k is an integer (k >= 0): 
+            total = t_add * (1 + log N - 1) = t_add * k
+        when P = N/2: 
+            total = t_add * (2 + log N/2 - 1) = t_add * k
+        when P = N/4: 
+            total = t_add * (4 + log N/4 - 1) = t_add * k + 1
+        when P = N/8:
+            total = t_add * (8 + log N/8 - 1) = t_add * k + 4
+        and we note the totals keep getting bigger.
+
+    It seems that the fastest we can complete the task is 
+        t_add * k = t_add * log N
+	
+    which can be achieved with any number of workers from N/2 to N
+    inclusive.
+
+    When t_add = 1s and N = 256, the total time to complete the task is 
+        1 * log 256 = 8 seconds. 
+
+4.  As we already generalized the results above, from question 3
+    the total time we can complete the described counting task in:
+        log N
+    for an integer N>=1, and when t_add = 1.
+
+    We plotted counting time versus bag count for infinite available
+    workers (in practice you just need P = N/2 -- which means you give
+    two bags to each worker until you run out), and plotted the case
+    using only one cashier, which the total time from question 1 is:
+        N - 1
+    also for an integer N>=1, and when t_add = 1.
+
+    See file P5/P5.png.
+
+5.  The additional overhead for communicating counts between workers
+    occurs in step (3) of the process mentioned in question 2 above.
+
+    Let t_share be the time it takes for worker A to communicate a
+    count to worker B, so that B can then proceed to perform an addition.
+
+    As in question 2, We can divide P counts into pairs (which we assume
+    takes no time or is accounted for in the time to share counts), and
+    then do all the shares simultaneously, then all additions
+    simultaneously:
+        If P=2, this step takes t_share + t_add time;
+        if P=4, this step takes 2*(t_share + t_add) time;
+        if P=8, this step takes 3*(t_share + t_add) time, etc.
+    
+    Observe in step (3), we can treat sharing/receiving the count and
+    performing the addition as one task, since any worker must receive
+    a count from another worker before he can perform the add.
+    
+    As above, it seems that (log P) more iterations are required.
+    In general, ceil(log P) iterations are required.
+    Thus, the time to perform step (3) is (t_share + t_add) * ceil(log p).
+
+    So, in the worst case, it takes 
+        t_add*(ceil(N/P)-1) time
+    for all P workers to count their own bags (no change), and now 
+        (t_share + t_add)*ceil(log P) time
+    to total those P counts.
+
+    In a manner similar to what we did for question 3:
+        when P = N = 2^k where k is an integer (k >= 0): 
+            total = (t_share + t_add)*k
+        when P = N/2: 
+            total = t_add*1 + (t_share + t_add)*(k-1)
+                  = (t_share + t_add)*k - t_share
+        when P = N/4: 
+            total = t_add*3 + (t_share + t_add)*(k-2)
+                  = (t_share + t_add)*k + t_add - 2*t_share 
+        when P = N/8:
+            total = t_add*7 + (t_share + t_add)*(k-3)
+                  = (t_share + t_add)*k + t_add*4 - 3*t_share, etc.
+
+    A few interesting things: 
+    (a) In contrast to question 3, we save t_share seconds by using
+    N/2 workers rather than N workers. This makes sense since if each
+    worker gets one bag, they will have to spend t_share time to 
+    communicate the total to the person performing the first addition;
+    however, if you give two bags to each worker at the outset, they
+    can perform the first addition without communicating with anyone.
+    (b) Although it is beyond the scope of this particular problem,
+    there may be a different P associated with the lowest count time
+    depending on the specific values of t_share and t_add 
+    (e.g. the time for a given worker to add up all bags for step (2) 
+    may be much greater or much less than the time to total up individual
+    counts for step (3), depending on the relative magnitudes of t_add
+    and t_share).
+
+    In our question, t_share = t_add = 1, so:
+        choosing P = N, total = 2k = 2*(log N)
+        choosing P = N/2, total = 2k-1 = 2*(log N) - 1
+        choosing P = N/4, total = 2k-1 = 2*(log N) - 1
+        choosing P = N/8, total = 2k+1 = 2*(log N) + 1
+        and the values will continue to get larger.
+
+    Therefore, for N = 256, we can complete the task 
+    (we could achieve this, for example, with N/4 = 64 workers), in
+        2*(log 256) - 1 = 15 seconds.
+
+6.  We are told that it takes time, lets say t_give, to hand a bag from
+    person to person. This essentially relates to step (1) in question 2,
+    which we have so far assumed to take zero time. 
+
+    We shall assume that bags need only exchange hands at the very
+    beginning; after that, workers need only communicate counts
+    (which takes t_share time). [In this particular example, the time
+    to communicate a count or to hand off a bag are the same so at
+    least for the case where a worker may have a choice to communicate a
+    count or pass off _one bag_ (after the initial handoff), it 
+    will not affect our conclusion anyway assuming they will either
+    verbally communicate a count or pass a bag, but not both.]
+
+    The problem also indicates that you cannot hand out bags to
+    more than one person at a time. This means it will take an extra
+        P * t_give 
+    time to complete the handing out of bags. 
+
+    This is also the absolute minimum time it will take to complete the 
+    entire counting task, which can only be practically achieved if
+    adding bags (i.e. t_add = 0) and communicating counts 
+    (i.e. t_share = 0) were to take no time. 
+
+    Wait-and-Combine Strategy
+
+    For this strategy, we first distribute all bags, one worker at a
+    time. Once all the bags are distributed to P workers, we can wait
+    until the last worker finishes his count (leaving others waiting,
+    idle) and then apply step (3) to combine counts as noted above.
+
+    (It may be possible for some workers who were given bags earlier
+    in the distribution to start consolidating counts within the
+    P * t_give interval it takes to hand out the bags, rather than
+    sitting idle waiting for everyone to get their bag. Such efficiencies,
+    and exactly how much time may be saved, will depend on the relative
+    magnitudes of t_give and t_add. For convenience we will investigate
+    an upper-bound for the time required; note, however the time can
+    never be less than P * t_give in any event.) 
+
+    By distributing all the bags to P workers, waiting for the last
+    worker to count their bags, and then applying step (3) of
+    consolidating P individual counts, the task can be completed 
+    in no more than:
+        (P*t_give)+(t_add*(ceil(N/P)-1))+(t_share+t_add)*ceil(log P)
+
+    For the particular case where t_give = t_add = t_share = 1, 
+    this reduces to:
+        P + ceil(N/P)-1 + 2*ceil(log P)   ( * )
+
+    (a) Therefore, in the worst case, if we have N=256 bags and only
+    give one bag to each worker, we will have P=256 workers, and the
+    time to complete the task is:  
+        256 + 2 * 8 = 272 seconds.
+
+    (b) In the worst case, if we give two bags to each worker, we will
+    have P=128 workers, and the time to complete the task is:
+        128 + 1 + 2 * 7 = 143 seconds.
+
+    (c) Clearly, the bottleneck in these two cases relates to the task
+    of handing out bags to P workers. We could lower P and give more
+    bags to each worker, thus minimizing (P * t_give), but if we choose
+    P too low, then workers spend too much time counting their own 
+    bags (i.e. N/P increases), which is also a sequential process. 
+    Therefore, there is a trade-off involved, and we need to balance
+    these two factors.
+
+    We can estimate a P where ( * ) is at a minimum. Ignoring the
+    ceiling functions for simplicity, we calculate the first derivative
+    of ( * ) with respect to P and set it to zero, then solve for P:
+
+        1 + -N/P^2 + 2/P = 0
+        P^2 + 2P - N = 0
+
+    This function has a positive root close to sqrt(N), which in
+    our question is sqrt(256)=16.
+
+    Therefore, applying the same wait-and-combine strategy, but
+    choosing only 16 workers (i.e. handing out 256/16 = 16 bags each),
+    the time to complete the task is:
+        16 + 15 + 2 * 4 = 39 seconds.
+  
+    This is a much better improvement, with judicious selection of P.
+    However, I think we can do even better.
+
+    Front-Loading Strategy
+
+    Once P workers have their counts ready to combine, the process of
+    consolidating counts according to (3) is already pretty quick,
+    O(log n). Where we might be able to find improvements is in the
+    process of giving out bags and the counting that is done prior to
+    counts being consolidated. 
+
+    One factor to consider is that we always have to wait for the last
+    person to get his bags, and to count them, before we can move on
+    to the quick consolidation process. Since we are not constrained to
+    giving each worker the same number of bags, we can give more bags
+    at the beginning and fewer bags at the end. Importantly, this 
+    means that while the last worker is waiting to be given his 
+    bag(s), the other workers can start counting their bags.
+
+    Further, if all workers complete their counting at the same time,
+    we can then start consolidating counts immediately after.
+
+    To demonstrate this strategy, we work backwards, assuming 
+    t_give = t_add = 1):
+        time for 1 worker to receive AND count 1 bag = 1 + 0 = 1
+        time for 1 worker to receive AND count 2 bags = 1 + 1 = 2
+        time for 1 worker to receive AND count 3 bags = 1 + 2 = 3
+        [...]
+        time for 1 worker to receive AND count m bags = m
+
+    Thus, if we give the first worker m bags, then the next worker (m-1),
+    then the next (m-2) and so on, AND each worker starts counting
+    right away -- i.e. no idling -- after m seconds everyone will have
+    completed counting their own bags! So we only have to determine m,
+    such that we give out 256 bags in total:
+
+        1 + 2 + 3 + ... + m = m(m+1)/2
+
+    Setting this equal to N = 256 and solving for m, we get m = 22.13,
+    which we round up to 23.
+
+       Strategy:
+
+       Give out 23 bags to the first worker, than 22 bags to the next,
+       then 21 bags to the next... and 7 bags to the 17th worker. The
+       P=18th worker gets the one remaining bag, for a total of 256
+       bags. All workers start counting their bags once they get them.
+
+    All 18 workers will finish counting their bags no later than
+    m = 23 seconds (the first 17 workers should finish simultaneously).
+
+    Then, we consolidate counts per step (3), which takes an additional
+       2 * ceil(log P) = 2 * 5 = 10 seconds.
+
+    Accordingly, with this front-loading strategy, we can complete
+    the task in 33 seconds.
