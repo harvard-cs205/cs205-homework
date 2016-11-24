@@ -1,1 +1,18 @@
 # Your answers here
+
+PART A:
+
+What we can first see is that the first 4 jobs are launched first but not necessarily picked up in the same order. Moreover before jobs 5-8 are launched, some of the first 4 might already been closed. This seems to indicate that the cores might perform any task available, no matter what the order is.
+
+A separation of 0.25s does not seem sufficient to ensure that the 8 first jobs are completed before being closed. This could be problematic if we need all the information in a first series of tasks to perform a second series of tasks.
+
+An example of that could be:
+
+Let's say we have 4 calculations to make at first, followed by a 5th calculation, which is the product of the 4 previous results. We must make sure to give sufficient amount of time to complete the first 4 because otherwise, the system will try to perform the 5th calculation with information missing from one of the 4 cores for instance.
+
+
+PART B:
+
+What the plot indicates is that the longer the tasks are, the more efficent parralel computing appears, in comparision with serial computing. Nevertheless, conducting the experiment multiple times shows that the efficiency reaches a limit around 16 form 10^-2 and onwards. 
+
+We can also notice that when the time needed to perform some actions is really small, serial computing can be as, if it is not more, efficient than parallel computing. This can be accounted for by the time needed to dispatch the actions and collect the information.
