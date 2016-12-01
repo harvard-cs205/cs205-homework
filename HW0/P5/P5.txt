@@ -1,1 +1,56 @@
-# Your answers here.
+5.1.For one cashier, there are a total of 255 additions to do, so it will
+    take 255 seconds.
+
+5.2.Yes, they will be able to verify the amount faster.
+    One of the methodologies the cashiers could adopt is as follows:
+        a.  all 8 cashiers start by adding totals concurrently, without
+            touching other cashiers' bags
+        b.  after Step (a) being repeated for 31 times, there are 8 bags
+            left. 4 of the 8 cashiers (randomly selected) then perform
+            the addition between 2 bags sequentially, resulting in 4 sums.
+        c.  Then 2 of the 8 cashiers perform the similar addition in
+            Step (b), resulting in 2 sums.
+        d.  The bright and optimistic cashier perform the final addition
+            between the two bags.
+    This will take 31+1+1+1=34 seconds, instead of 255 seconds, a 7.5x
+    improvement.
+
+5.3.It will take ceiling(log2(256))=8 seconds.
+    The methodology used in (2) and here is based on backward thinking-
+    before the final answer comes up, the last step must be 1 addition
+    from the remaining 2 sums; the second last step, if fully utilized,
+    would be 2 additions from the remaining 4 sums; so for the nth second
+    from the end, there are at most 2^n remaining sums to be added.
+    In that sense, for 256 (=2^8) bags, we want to start with 128 additions
+    (additional cashiers won't help in this case), and then 64, then 32...
+    This leads to my calculation of log2(256)=8 steps.
+
+5.4.Derived from the logic in (3), at the nth second from the end, there
+    can be at most 2^n bags remaining to be added. Hence:
+        2^t > N
+    t = ceiling(log2(N))
+    For a single cashier, N bags take N-1 seconds to count. Please see
+    graph attached.
+
+5.5.If an overhead of 1s is added, then before each additions when there are
+    less sums than cashiers, 1 second will be added to each additions. In the
+    case of 256 bags, it will take 8+7=15 seconds.
+
+5.6.If each cashier comes to me and takes 1 bag, then it will take 256 seconds
+    for me to hand out all the bags, plus 1 second during which half of the
+    cashiers hand their bags to other cashiers for the first sum. Then the total
+    time will be at most 256+1+15=272 seconds. However, the best time under this
+    scenario will be shorter, because cashiers could start summing/passing/telling
+    the coins while I am handing coins to new cashiers. It would take at least 258
+    seconds, to communicate and sum the last bag.
+    If each cashier takes 2 bags, then it will take 128 seconds for me to hand out
+    all bags. Similarly, it will take at most 128+15=143 seconds, and at least 131
+    seconds.
+
+    There exist better strategies because giving more bags at the same time. For
+    example, if I am handing out 16 bags at a time, then it takes me 16 seconds to
+    deliver all the bags; then each of the 16cashiers sums and add his/her 16 bags,
+    spending 15 seconds; then they start to communicate and sum, which for 16 sums
+    takes another 4*2=8 seconds. In this sense, a total of 16+15+8=39 seconds would
+    be needed. Of course, this time can still be reduced, because we can start summing
+    concurrently while I am still handing out bags.
