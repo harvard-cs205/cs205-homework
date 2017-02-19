@@ -3,7 +3,7 @@ import time
 
 def burnTime(k):
     print("Hi Job {}".format(k))
-    time.sleep(0.25)
+    time.sleep(.25)
     print("Bye Job {}".format(k))
     return k
 
