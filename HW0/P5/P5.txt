@@ -1,1 +1,49 @@
 # Your answers here.
+
+1) Need to do 255 summations - 255 seconds
+
+2) Yes, the 8 of them can split the bags evenly and find the sum of their respective 32 bags
+which would take 31 seconds. 4 of them then take the sums of the other 4 people and sum their
+numbers together (1 second), then 2 take the sum of the other 2 (1 second), then 1 person 
+takes the final sum (1 second). So in total 34 seconds + whatever time it takes to communicate
+the sums between employees.
+
+3) Using the same process of adding numbers, then taking half the employees to add the remaining numbers...
+	128 employees sum 2 numbers - 1 second
+	64 employees sum 2 numbers - 1 second
+	...
+	1 employee sums 2 numbers
+
+	For a total of 8 seconds
+
+4) ceil(log_2(N)) seconds.
+
+5) Add a second every time there's a sum between two numbers except in the first case - 15 seconds
+
+6) (hand 1 bag of 256 each second)
+   If only handing out x bags to each person, at the minimum it would take N/x seconds before 
+   handing out all the bags. There shouldn't be too many seconds after that to complete the 
+   summation though because as you're handing out bags the employees with bags already can 
+   start doing the computation.
+
+   **Attached script for calculating in submission folder P5_6.py
+
+   1 bag to each employee - 258 seconds
+   2 bags to each employee - 132 seconds
+
+   Try to parallelize the distribution of bags as much as possible:
+
+   For simplicity of writeup let's say you're Emp1
+   Emp1 gives 128 bags to Emp2 - 1 second
+   Emp1-2 gives 64 bags to Emp3-4 - 1 second
+   Emp1-4 gives 32 bags to Emp5-8 - 1 second
+   ...
+   Emp1-64 gives 2 bags to Emp65-128 - 1 second
+   Emp2-128 calculates sum emp1(you) gives bag to emp129 - 1 second
+   Emp2-64 communicate numbers to emp66-128 and emp129 sums - 1 second
+   Emp66-128 sum and emp129 communicates to emp65 - 1 second
+   ... summation process ...
+
+
+   Altogether distribution is 8 seconds + 16 seconds of calculation (1 more from the extra step 
+   it took for you to distribute the last 2) = 24 seconds
