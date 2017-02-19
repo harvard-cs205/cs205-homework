@@ -1,1 +1,23 @@
 # Your answers here.
+
+(1) In order to add the totals of 256 bags, the cashier will organize the bags into 128 pairs and add them up to create 128 sums, which will take 128 simulations. Following this logic, it will take 128+64+32+16+8+4+2+1 = 255 simulations, which will take 255 seconds.
+
+(2) Yes, they will verify the total sum faster than the original cashier by herself. We first divide the 256 bags into 8 piles with 32 bags per each pile. Each worker add up each pile, which will take 31 seconds, according to the logic in (1). Then take the sum of pairs of remaining 8 piles, which will require 4 workers, and it will take 1 second. Then again, we take the sum of pairs of remaining 4 piles, which will require 2 workers, and it will take 1 second. Finally, one worker will take the sum of remaining two piles, which will take an additional second. Therefore, in total, it takes 31 + 1 + 1 + 1 = 34 seconds.
+
+(3) With an infinite number of employees, the shortest time it will take them to verify the sum is log_2(256) = 8 seconds, first having 128 employees sum 128 pairs which takes a second, 64 employees sum resulting 64 pairs which takes a second… a employee sum two numbers. Therefore, it takes a total of 8 seconds. Another way to look at it is to think of it as a binary tree
+
+(4) It will take log_2(N) seconds
+
+(5) With an infinite number of employees, we have total of 8 rounds of summing, first round being with 128 employees, second round with 64 employees… Between rounds, there is now 1 second of delay for communication, except after the last round. Therefore, each round takes 2 seconds except for the last round, thus 2 * 7 + 1 = 15 seconds.
+
+(6) 
+- 1 bag
+
+The important thing here is to have the computations started as soon as the employee receive the bag to save more time. Even though the last bag will be given to the last cashier in the 256th second, you should make sure most of the computations are done by then. For example, the first 128 people will be done by 2 * 6 + 1 = 13, the next 64 people in 11, 32 people in 9, 16 people in 7, 8 people in 5, 4 people in 3. Therefore, all the calculations of the first 252 people will be done by the 255th person. Therefore, you then do the remaining summation of the 4 people which will take another 3 seconds, and add it up to the first 252 people, so it will take total of 256 + 3 + 1 seconds.
+
+- 2 bags
+
+Using the same logic, it will take at least 128 seconds to hand out all bags, and there will be 8 bags left to compute, so it will take 128 + 5 + 1 = 134 seconds. 
+
+
+The best strategy is to give all 256 bags to one cashier, and one second after, he gives the other half to the next, and so it goes. On the 8th second, they will each all have 2 bags in their hand, and according to our result in (5), it will take another 15 seconds after that, so in total, it will take 23 seconds. 
