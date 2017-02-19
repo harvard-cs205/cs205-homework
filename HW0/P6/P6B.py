@@ -14,18 +14,27 @@ if __name__ == '__main__':
     # A thread pool of P processes
     pool = mp.Pool(P)
 
-    # Use a variety of wait times
-    ratio = []
-    wait_time = []
-
+    # Initialize list for serial vs parallel ratios
+    ratio = []    
+    
+    # Range of wait times between 10^-6 and 10^0
+    wait_time = [y*10**x for x in range(-6,0) for y in range (1,10)] + [1]
+    
     for t in wait_time:
-        # Compute jobs serially and in parallel
-        # Use time.time() to compute the elapsed time for each
-        serialTime = 1
-        parallelTime = 1
+        
+        # Compute jobs serially
+        start = time.time()
+        for job in range(N):
+            burnTime(t)
+        serialTime = time.time() - start
+        
+        # Compute jobs in parallel
+        start = time.time()
+        pool.map(burnTime, [t for x in range(N)])
+        parallelTime = time.time() - start
 
         # Compute the ratio of these times
-        # ratio.append(serialTime/parallelTime)
+        ratio.append(serialTime/parallelTime)
 
     # Plot the results
     plt.plot(wait_time, ratio, '-ob')

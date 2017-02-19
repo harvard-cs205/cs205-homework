@@ -1,1 +1,41 @@
-# Your answers here
+###########################################################################################
+## Problem 6A
+###########################################################################################
+
+When running P6A.py, the 10 jobs did not always finish running in the same order that they started. For example, the code output below shows that the first batch of four jobs started in order 0, 1, 2, 3 but job 1 finished before job 0. Similarly, the second batch of four jobs started in order 4, 5, 6, 7 but job 7 finished before job 6.
+
+This appears to be 'normal' behavior rather than an outlier; in fact, the code had to be run 15 times before getting an output where all 10 jobs ended in the same order that they had started. This implies that it is difficult to guarantee consistent runtimes across individual jobs, even for very simple jobs like this one, and that it is likely to be even harder with larger jobs.
+
+To test this, I increased the sleep time from 0.25 to 1.0.  As expected, this resulted in the jobs being even more out of order with each other: in a few cases, the second or third batches of jobs started running before all the jobs in the previous batch had finished running, and in once instance even the first batch of jobs started out of order. In fact, out of 30 total runs, the jobs did not once end in the same order that they had started. These results indicate that smaller job sizes are necessary when attempting to maintain consistent run times across jobs and/or ordered jobs.
+
+One scenario where this type of behavior would be important is the case where subsequent jobs require inputs from earlier jobs. Such dependencies could result in bottlenecks, where processors are idle while waiting from other jobs to finish running. If not handled correctly, this situation could also result in later jobs using the wrong inputs (for example, if they are not able to detect that the earlier job has not finished running and use garbage values as input). This problem could be amplified in cases where larger jobs are unavoidable - for example, to minimize or offset the overall time associated with transferring a large dataset that is necessary for each job - as they could end up being run even more out of order.
+
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 1
+Bye Job 0
+Bye Job 3
+Bye Job 2
+Hi Job 4
+Hi Job 5
+Hi Job 6
+Hi Job 7
+Bye Job 4
+Bye Job 5
+Bye Job 7
+Bye Job 6
+Hi Job 8
+Hi Job 9
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+###########################################################################################
+## Problem 6B
+###########################################################################################
+
+The ratio of serial time to parallel time starts at approximately 0.1x for 10^-6 sleep times; it increases rapidly for sleep times up to about 10^-2 and then plateaus at approximately 4x for larger sleep times. The relationship shown on the graph represents the extent to which access to multiple processors is offset by the need to coordinate across them. For larger jobs, the ratio of serial time to parallel time is roughly equal to the increase in the number of processors, as each job takes long enough to run to make it worthwhile to distribute the effort across multiple processors. On the other hand, the low ratio of serial time to parallel time for very small jobs implies that the effort of coordination across multiple processors almost entirely offsets the gain in speed.
+
+The left-hand side of the plot implies that it could indeed be possible for a parallel program to take longer than its serial version, especially if the jobs are not set up efficiently. For example, the job in P6B.py only takes a single parameter t and runs a single line of code, but it is possible to envisage a scenario with a job that requires significantly more memory. In such a scenario, the gains from running in parallel would be entirely offset by the time lost due to latency and bandwidth limitations.
