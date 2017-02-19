@@ -1,1 +1,12 @@
 # Your answers here.
+1, 255 seconds
+2, 34 seconds. 8 people and each people takes 32 bags. It takes 31 seconds to finish the counting at the first stage. Furthremore, it takes log2(8) = 3 seconds to finish. So in total it is 31+3 = 34 seconds.
+3, 8 seconds
+4, done. Its log2(N)(round up to the nearest integer) seconds
+5, computing time = 8 seconds. However the communication time is 7 seconds, because at the first stage, the cashier would not need to communicate with himself. so in total it is 15 seconds.
+6, If each cashier comes and takes 1 bag. It takes 256 + 8 + 8 = 272 seconds.
+if each cashier comes and takes 2 bags. It takes 128 + 8 +7 to finish
+and yes, there is better strategies to shorten the time.
+
+For me the best way to is pick 23 to the first guy, and 22 to the second guy, etc.. 
+so we need 23 seconds to sum the numbers up, and its also the time required to finish the pick up precedures. And it needs 2*int(log2(23)) = 5*2 to calculate and communicate. So in total is 32 seconds.
