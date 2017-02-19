@@ -1,1 +1,19 @@
 # Your discussion here
+
+My graph representation is having a key-value pair where the key is each superhero with at least 1 neighbor, and the value is a list of neighbors of that superhero. I chose this representation over having both a node graph and a vertices graph because I can represent the graph in a single rdd in a much more concise manner.   
+
+
+
+1. The assumption that the diameter of the graph is 10 meant that we only need to do a maximum of 10 iterations for the BFS, because every pair of nodes in the graph is at most 10 vertices apart.  
+
+
+CAPTAIN AMERICA Data:
+[(0, 1), (1, 1906), (2, 4463), (3, 38), (-1, 18)]  
+
+MISS THING/MARY Data:
+[(0, 1), (1, 6), (-1, 6419)]    
+
+ORWELL Data:
+[(0, 1), (1, 8), (-1, 6417)]   
+
+If a character has an undefined distance during the search, it means that the character is not connected to the source via any path. In another words, there are no set of vertices that connects the character to the source
