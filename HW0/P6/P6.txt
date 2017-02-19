@@ -1,1 +1,55 @@
 # Your answers here
+
+Example output:
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 1
+Hi Job 4
+Bye Job 3
+Bye Job 0
+Hi Job 5
+Bye Job 2
+Hi Job 6
+Hi Job 7
+Bye Job 4
+Hi Job 8
+Bye Job 5
+Hi Job 9
+Bye Job 6
+Bye Job 7
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 1
+Bye Job 2
+Hi Job 4
+Hi Job 5
+Bye Job 0
+Hi Job 6
+Bye Job 3
+Hi Job 7
+Bye Job 6
+Bye Job 5
+Hi Job 8
+Bye Job 4
+Hi Job 9
+Bye Job 7
+Bye Job 9
+Bye Job 8
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+We see that jobs don't all start and finish in order, some job might start before another job but finish after it. This is because there are many factors that influence how processes are scheduled and how processors will run a process at any given time. For our purposes, we can't hope to understand all of these factors and predict the ordering in which execution will happen so we can consider this almost random. 
+This affects the way that we program in that we can't assume any ordering of executing so if we want to enforce some ordering, we will have to use mutex locks, semaphores etc.
+A scenario where this is important is when we'd like a process to depend on the changes to a shared resource that another process we'd like to finish before it will make. If the previous process is not done yet, then we might access the shared resource with inaccurate content.
+
+
+We observe a roughly monotonically increasing trend. For small sleep times, order 10-4 and lower, multiprocessing is actually slower than serial, but for larger sleep times it's faster, up to 4x speed at most. This is because there's a substantial amount of overhead required for multiprocessing such that for small sleep times, that overhead time is comparable to the task time, and the benefits of multi-processing are mitigated/lost. But for larger sleep times, the overhead is insignificant when compared to the task time, and we observe that the benefit has a limit of 4x, like we would expect when running with 4 processors instead of 1. 
+So yes, a parallel program can take longer than its serial version if the task that each process executes is very small and does not warrant the overhead cost associates with multiprocessing (involving scheduling the processes, communicating between them etc.).  
+
