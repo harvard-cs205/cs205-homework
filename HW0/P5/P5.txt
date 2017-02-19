@@ -1,1 +1,41 @@
 # Your answers here.
+Frustrated with the rising cost of textbooks, you have decided to enact revenge on the campus bookstore; you will pay for your textbooks with a suitcase full of small bags of pennies. Although each bag is correctly labeled with the number of pennies inside it, there are quite a few bags, and the cashiers must sum their totals to verify you are providing the correct amount of money. Armed with their calculators, it takes them 1 second to add two numbers (assume one person can only add two numbers at a time).
+
+1. If one cashier were to add the totals of 256 bags, how long would it take?
+
+If the one enthusiastic cashier were to count the labeled bags alone, it would take 255 seconds. I arrived at this answer using the classic trial and error method. Starting with a smaller number of bags, say 8 bags (each bag contains 1 penny) and if the employee can add two numbers in one second, then it would take:
+* 1+1=2 (1 second)
+* 2+1=3 (2 secs)
+* 3+1=4 (3 secs)
+* 4+1=5 (4 secs)
+* 5+1=6 (5 secs)
+* 6+1=7 (6 secs)
+* 7+1=8 (7 secs in total)
+Expanding this logic to the total number of bags gives the following algorithm: Total Count Time = # of bags - 1
+
+2. Seven of the cashier’s coworkers approach to see this ridiculous sight. The bright (and perhaps a bit opportunistic) cashier recruits them to help count. By working together, can they verify the total sum faster than the original cashier by herself? If so, how fast can they do this?
+
+Yes, of course they can! 2 heads are better than one, and in this case, 8 heads are way better. The employees can now exploit parallelism's finest property, optimized work flow and ultimately, less time working! Using the same trial and error method employed in problem 1, I tried small counting exercises in order to derive the following algorthim: First, let B = number of bags, and E = number of employees. After working the problem for 2 bags, 4 bags, and 6 bags, I found that there was a pattern of Bags/Employee that was common across all amounts of bags. I then added the number of employees in the same manner, 2-8 employees and discovered that there was a constant that grew logarithmically with the amount of employees or log_2(E). Finally, I combined the two equations led to the following algorithm:
+((B/E)−1) + log_2(E)
+and plugging in the parameters for this problem, the answer is:
+(256/8−1) + log2(8) = 34 seconds
+
+3. Imagine the store is big. . . very big. As a matter of fact, the store has an infinite number of employees. How fast can the employees verify the sum?
+The store is very lucky to have an unlimited amount of employees. However, for the purpose of our problem, we will only need 256/2=128 employees in order to keep them all productive (as employees can only had 2 numbers at a time). So given that we have the maximum number of employees counting bags at the same rate of 2 bags per second, then we would arrive at the following:
+(256/128−1) + log_2(128) = 8 seconds
+
+4. If you were feeling especially frustrated, perhaps you may use more than 256 bags. Instead, assume there are N bags. How long will it take the infinite number of employees to count the total? Using Python, plot the result with bag count on the horizontal and counting time on the vertical. On the same graph, plot the time it would take the lone cashier to do this by herself.
+
+See P4.png
+
+5. We’ve been neglecting any overhead associated with people communicating. How does the answer for 256 bags change, if it takes one second to communicate a number between two employees?
+
+In order to account for the communication between employees we must re-examine the counting process. Communication will only need to take place when employees have added all of their coin bags and need to sum with the employee next to them. This means that our original algorithm still holds true (B/E)-1 but now we must account for the employees communicating. This can once again be modeled with the logarithm, log_2(E). So to communicate and add between employees, the algorithm is now log_2(E) + log_2(E) or 2 * log_2(E). Putting it all together, I have the following: (B/E)-1 + 2 * log_2(E) and in our problem this equates to 256/8 - 1 + 2 * log_2(8) = 32-1+2*3 = 37 seconds. In the case of having infinite employees or our maximum needed of 128 we arrive at 256/128 -1 + 2*log_2(7) = 2-1+2*7 = 15 seconds. So the communication between employees adds some additional time but it doesn't seem like a huge bottleneck for this amount of bags. If they had to count 1 million bags, this communication time could start to add quite a bit of additional time.
+
+6. Also assume it takes one second to hand a bag (or any number of bags) between two people (including from you to a cashier). How long will it take to verify 256 bags worth of coins if each cashier comes to you and takes 1 bag? What about 2 bags? Is there a better strategy? Assume you can’t be handing bags to more than one person at a time.
+
+In order to verify the 256 bags worth coins, given that it takes exactly 1 second to hand a bag of coins to a cashier we need to examine how long it takes to hand all of the bags to the employees. In the case of 8 employees working, it will take exactly 8 seconds to hand over the first round of bags, then an additional 8 seconds to hand of the next round and so on and so forth. The trick here is that one employee can start summing their bags as you hand of bags to the next employee. So to hand over 2 rounds of bags, and to allow time for all employees to add their bags, it will take 8+8+1=17 seconds. If we apply this logic to all bags, it takes 17 seconds for 2 rounds or 16 bags, it will take 16 rounds of 16 bags to complete the task or 16*16+1 = 257. Now for the communication costs (log_2(E)) and the additional time needed to add (log_2(E)) we add the 2 * log_2(E) factor and arrive at 257 + 2 * log_2(8) = 256+(2*3) = 263.
+
+Now we can assume that it takes the same amount of time to hand of 2 bags as it does to hand off 1 bag. This means that employees can start summing their bags as I start to hand of bags to the next cashier which should result in reduced verification time. If we once again have 8 employees and 256 bags, I will hand 2 bags to the first employee and while I hand over the next 2 bags, the first employee will start summing. Now it will take B/2 time for each employee to count his or her bag. So for 256/2 = 128 seconds for each employee to count and since the employees are counting in a cascading manner, we must add 1 additional second to account for the time that the last employee needs to complete counting. Adding in our communication and employee constant of 2*log_2(E) arriving at the final answer of (256/2) + 1 + 2 * log2(8) = 128 + 2 + 2*3 = 135 seconds.
+
+In order to implement the best counting strategy, I started by splitting the number of bags evenly amongst the employees, or B/P = 256/8 = 32 bags per employee. Now the employees will have to count quite a bit of bags but once again this can happen in the parallel cascading manner that I previously discribed. This method minimizes the communication overhead and after some more T&E calculations, I arrived at the following algorithm: (B/E) - 1 + E which leads to 256/8 - 1 + 8  = 32 - 1 + 8 = 39 seconds.

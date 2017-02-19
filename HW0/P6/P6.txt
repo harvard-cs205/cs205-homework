@@ -1,1 +1,38 @@
+Problem 6A
+If you run the above code a number of times, you may see some unexpected results. Explain these results. How could this affect how we program in parallel? Describe a scenario where this would be important.
+
 # Your answers here
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 1
+Bye Job 2
+Bye Job 0
+Hi Job 4
+Hi Job 5
+Bye Job 3
+Hi Job 6
+Hi Job 7
+Bye Job 4
+Bye Job 5
+Hi Job 8
+Hi Job 9
+Bye Job 6
+Bye Job 7
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+The output from our program shows that when running tasks in parallel, our computer doesn't necessarily complete the tasks in the order that we would expect. One would expect for the program to wake 4 processes, then sleep those 4 processes before starting the next batch of processes. What happens in practice is that the program actually wakes new processes before closing the previous ones. This is worrisome when programming in parallel  as we must be concerned about data dependancies. Any process that is waiting on another process to complete can be potentially overwritten or completed out of order
+
+Imagine if we are trying to correctly sum the bags from P4 and determine which cashier combinations give the fastest results. If this is broken up amongst multiple processors and completed out of order, we could lose count and confuse our cashiers!
+
+
+Problem 6B
+Try to explain the trend you observe. Is it possible that a parallel program could take longer than it’s serial version? Under what conditions?
+
+In the Speedup versus function time plot, I see that the ratio significantly increases around 10^-4. This seems to be the sweet spot when the program really starts to take advantage of parallelism. After this quick increase in the rain there is a plateau around 10^-1. 
+
+Yes, it is possible as the ratio is smaller than one around 10^-5.5. It shows that parallel is not always better! I can imagine a scenario where there is a lot of data to move between processors and the computation is fairly simple. This would mean that it takes more time to move the data than to complete the compute task.
+
