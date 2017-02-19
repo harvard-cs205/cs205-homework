@@ -1,1 +1,133 @@
 # Your answers here.
+
+1. It will take (N-1) addition operations to sum the totals of N bags.
+Each addition operation takes t_add = 1s, so the time required is
+
+t_required = (N-1)t_add = 255 seconds
+
+2. Yes, they definitely can verify the total sum faster. If there are
+zeta employees, the minimum time to add the total of N bags is
+
+t_minimum = [(N/zeta - 1) + Log2(zeta)]t_add
+
+The first step corresponds to giving N/zeta bags to each employee and
+each employee sums all of the bags given to them. The second step
+(the Log2 one) corresponds to employees summing their totals down a
+binary tree, i.e. reading the below figure from top to bottom,
+
+x x x x x x x x
+ |   |   |   |
+ x   x   x   x
+   |       |
+   x       x
+       |
+       x
+
+where the number of x's in the first row are the number of employees. I
+believe this is the fastest way for them to pool their totals.
+
+The minimum time for this step is, plugging in N=256, zeta=8 (original cashier
+plus seven friends), is
+
+t=34 seconds
+
+3. The minimum number of bags that employees can initially have and
+help add the totals is 1. Therefore, the maximum number of employees
+that can meaningfully help out is zeta=N. Plugging in zeta=N into
+the equation above gives an intuitive result; in the infinite case,
+ employees just have to sum down the tree. Therefore,
+
+ t_infinite = Log2[N]t_add
+
+ Plugging in numbers yields
+
+ t_infinite = 8 seconds
+
+ 4. So again, if there are N bags and zeta employees, the general
+ formula is given by
+
+ t_minimum = [(N/zeta - 1) + Log2(zeta)]t_add
+
+
+The two limits we are interested in yield
+
+t_one = (N - 1)t_add
+t_infinite = Log2[N]t_add
+
+See P5_part4.py for the python program to produce the plot. See P5.png
+for the plot.
+
+5. We are supposed to assume we can still utilize an infinite number of
+employees. The fastest way employees can total, even with the
+communication barrier, is via summing down the binary tree. Per level
+of the tree, it will now take
+
+t_per_level = t_add + t_communicate
+
+Giving us, in the case of an infinite number of employees,
+
+t_infinite = Log2[N](t_add + t_communicate)
+
+Since t_add=t_communicate=1s, t_infinite will be doubled, giving us
+(when we plug in numbers)
+
+t_infinite = 16 seconds
+
+6. This last piece is a little more tricky.
+
+a) If it takes 1 second to hand a bag to an employee and we only add one
+bag at a time, it does not matter how many employees are working;
+there is a huge bottleneck! The employee will *at least* have to wait
+
+t_wait = N*t_hand
+
+before having all of the bags to total. After receiving the
+final bag, the employee will have to add that one. Therefore,
+
+t_one_bag_at_a_time = t_wait + 1 = N t_hand + 1
+t_one_bag_at_a_time = 257 seconds
+
+b) If each cashier takes two bags, things will become much better.
+In general, if you hand q bags out at a time, then
+
+t_wait = (N t_hand)/q
+
+At the end of t_wait, N/q employees will have summed their bags. They
+can then sum down the binary tree to obtain their totals. But,
+only N/q employees will have bags at the top of the tree. Therefore,
+
+t_q_bags_at_a_time = t_wait + t_sum_down_tree
+t_q_bags_at_a_time = (N t_hand)/q + Log2[N/q](t_add + t_communicate)
+
+Plugging in N=256, q=2, we find
+
+t_total = 142 seconds
+
+c) The most efficient strategy is to distribute bags as fast as
+possible. It only takes t_hand to hand *any number of bags* to an employee.
+Therefore, we should employee another binary tree method to hand bags
+out to employees as fast as possible. Sketching the idea,
+
+      N
+    |   |
+   N/2 N/2
+|    |   |   |
+N/4 N/4 N/4 N/4
+
+etc. You start with N bags and hand half to the next employee.
+That employee hands half to another employee, and this repeats until
+each employee has 1 bag. At this point, employees sum down the binary
+tree via communicating with each other. The solution will then scale as
+Log2[N] which is quite fast. We thus find
+
+t_minimum = Log2[N] t_hand + Log2[N](t_add + t_communicate)
+
+Simplifying,
+
+t_minimum = Log2[N](t_hand + t_add + t_communicate)
+
+Evidently, the fastest handing strategy results in 3 times the original
+infinite solution (without communication lag). Plugging in numbers,
+we find
+
+t_minimum = 24 seconds

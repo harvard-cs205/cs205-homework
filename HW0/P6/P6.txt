@@ -1,1 +1,46 @@
-# Your answers here
+#####################################################################
+A) We see behavior that I did not expect when running the script.
+We initiate a pool of four processes and expect that the jobs
+1-10 should complete in order. Instead what we see is something like:
+
+Hi Job 0
+Hi Job 2
+Hi Job 3
+Hi Job 1
+Bye Job 0
+Hi Job 4
+Bye Job 3
+Bye Job 2
+
+Somehow, Job 2 is launched *before* job 3 and job 1! Then, even though
+job 2 was launched before job 3, it finishes after job 3. I expected processes to
+launch and finish in order. Evidently it is not possible to control precisely
+when each process executes and finishes!
+
+The inability to control exactly when threads execute and finish has
+large implications for parallel computing. If threads need to communicate with
+each other, we must code a scheduler of some sort that controls the appropriate time
+when they communicate (i.e. you have to wait for the other thread to finish). Based on
+our readings, I believe this is the main challenge of parallel programming!
+Furthermore, if several processes are running and competing for resources and a
+less important process manages to run first (i.e. job 2 runs before job 1),
+it may hog computational resources and prevent more important processes from running.
+It may be hard to parallelize some code due to these issues.
+
+One scenario where process timing would be important is having multiple
+threads reading from a set of data that another thread is producing.
+If timing is not carefully controlled, the data-analyzing
+threads may try to read a dataset that does not yet exist, causing problems!
+Furthermore, if the data-analyzing threads somehow hogged the computational resources,
+the data-producing thread may be unable to function, rendering the data-analysis
+threads useless. This problem could deadlock the entire program!
+
+###############################################################################
+B) Naively, we expect that the serial time divided by the parallel time
+should always be greater than one. Instead, at times less than roughly
+$10^{-4}$, serial execution is *faster* than parallel execution! This is
+likely because the overhead associated with setting up parallel pools and
+keeping track of threads is greater than the time of running the burnTime program in this regime.
+Evidently, it does not pay to run code in parallel if each job executes extremely quickly,
+as the overhead associated with running a parallel program can ultimately result in a longer
+execution time!
