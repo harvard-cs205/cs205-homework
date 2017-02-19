@@ -1,1 +1,41 @@
-# Your answers here
+6.  Running the code several times, I see that in the first iteration, the first four Hi statements come out in order.  Then each process waits for a quarter second, and then puts out a Bye statement and the Hi statement for the subsequent job.  The Hi statements all come out in order, however the Bye statements often come out not in order.  What is happening is that the processes are happening at almost the exact same instant, so they do not synchronize.  As soon as one process puts out its Bye statement, it instantly snaps up the next available Hi statement, so the Hi statements stay in order, but the Bye statements are all trying to come out at once, and the order gets messed up.  
+
+For example:
+
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3    # The first four Hi statements always come out in order
+---------At this point, all four processes are sleeping for 0.25 seconds
+Bye Job 1   # The first bye statment came out out of order because it was working simultaneously
+Hi Job 4    #     with the other three.  This process then snatched up Hi 4, which was the next one.  
+Bye Job 0
+Hi Job 5    # The subsequent Hi statements (4,5,6,7) always come out in order
+Bye Job 2
+Hi Job 6
+Bye Job 3  # Bye 0, 1, 2, and 3 always come out in this step, but not always in order
+Hi Job 7
+---------All four processes are sleeping at the same time again
+Bye Job 5
+Hi Job 8   # The four processes each execute a Bye, and the first two snatch up the last 2 Hi's
+Bye Job 6
+Hi Job 9
+Bye Job 7  
+Bye Job 4
+---------The first two processes to execute sleep again before executing the last 2 Byes
+Bye Job 9
+Bye Job 8
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+
+This could require us to burn time to synchronize the outputs to make sure that the outputs all come out in order.  
+
+For example, if we were processing time-series data, it would be important for all of the outputs to come out in order.  
+
+
+How Much Faster?
+
+The plot P6.png shows that the ratio becomes more favorable for the Parallel process the longer the wait time is.  There is a point of diminishing returns, however, with a ratio of approximately 4, that becomes nearly flat for wait times any longer than 1/10 of a second.   The ratio of 4 for time-consuming tasks reflects that the tasks are completed 4 times as quickly by the 4 processes.  For quicker tasks, however, other considerations (communication between the processes, for instance), become more relevant and the advantage of parallel processing diminishes.  Somewhere between 10E-4 and 10E-5 seconds, the ratio crosses 1 (the point where the time for parallel and serial are equal), and for very quick tasks the serial approach is actually quicker than the parallel approach.  For these tasks in the 10E-6 to 10E-5 seconds range, the serial approach is faster because it does not incur the costs of communication between the processes and such.  
+
+### Acknowledgements: I overheard Taylor Killian mention using the np.logspace() function to create the range of time arguments for this problem, which was helpful.  
+
