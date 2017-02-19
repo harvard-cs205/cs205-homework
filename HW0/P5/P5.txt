@@ -1,1 +1,37 @@
-# Your answers here.
+#Your answers here.
+1) 255 seconds
+	Reason:2 bags takes 1 second
+	3 bags takes 2 seconds
+	...
+	x bags takes x-1 seconds
+
+2)34 seconds
+	For 16 bags, it takes 8 workers(2 bags per worker) 1 sec to get 8 numbers
+	8 numbers only takes 4 workers 1 sec to get 4 numbers. Note, 8 workers would
+	be redundant in this case.
+	4 numbers takes 2 workers 1 sec to get 2 numbers
+	2 numbers takes 1 worker 1 sec to calculate.
+	Thus 16 bags takes 4 secs total.
+
+	Using similar logic, 32 bags takes 8 workers 2 secs to get 16 numbers. 
+	64 bags - 4 secs to get 32 bags
+	128 bags - 8 secs to get 64 bags
+	256 bags - 16 secs to get 128 bags
+	
+	Thus total time = 16 + 8 + 4 + 2 + 4 = 34 secs
+
+3)8 secs
+	Starting at 256 bags, we only need 128 workers working 1 sec to get 128 numbers
+	Similarly, 128 numbers only takes 64 workers 1 sec to get 64 numbers.
+	Using steps above we get total time= 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 = 8secs
+	Or we can use log2(256)=8
+
+4)See PNG file
+
+5)15 secs
+	For 256 bags, we have 128 workers with no need for communication
+	When left with 128 numbers, 64 workers hold onto their numbers while the other 64 
+	tell their number to one of the 64 workers holding their number. This is a 1 sec delay        . Similarly, When 128 numbers becomes 64 numbers, 32 of those workers tell their numbers to the other 32 workers. Another 1 sec delay. This adds a total of 7 sec delay. Add this to the 8 sec solved for previously to get 15.   
+
+6)I think the best strategy to use here is pipelining. I hand 2 bags to cashier1. Then while I hand 2 bags to 
+cashier2, cashier1 is calculating. Then when I hand 2 bags to cashier3, cashier2 is calculating, cashier1 is idle. As I hand 2 bags to cashier4, cashier3 is calculating, cashier1 is communicating to cashier2. Continue like this for the entire process.	
