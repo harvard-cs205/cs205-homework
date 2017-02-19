@@ -1,1 +1,4 @@
 # Your answers here
+The job (run burnTime 10 times) is distributed to the 4 cores. And since they run in parallel, there is no guarantee which one runs first, except that the first 4 runs before 5-8. It might cause problem if for example, the next result depends on the previous output, aka serial problems.
+
+For very fast function run speed (10E-6s), serial outperforms parallel, because it takes significant time for the processors to distribute tasks. In slow function run speed (eg. >10E-3s), parallel computing significantly outperforms serial computing. And the trend approaches about 4 (4 processors). In this case, the time needed to distribute the task is marginal compared to the time processors need to run the tasks.
