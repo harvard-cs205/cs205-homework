@@ -1,1 +1,16 @@
 # Your answers here
+Part A: 
+
+Everytime we run this code, we get that the threads take slightly different times. 
+This is true because we expect that all 4 threads finish at the same time, so then 
+4 new items will be executed. However, we see that some of these 4 threads, even 
+though they all should take 0.25 seconds, finish just a tad faster than others. This 
+means that we should not use waiting times to try to make code synchronous. For example, 
+if we tried to run processes A1, A2, A3 and B1, B2, B3, where all the A's run before the
+B's. We should not just put them into a list in that order because we should make no 
+time guarantees that all the A's will finish before any B's will. 
+
+Part B: 
+Yes, it is possible because there is a fixed overhead of using the multiprocessing 
+library. As we can see from the graph, it seems like at 10^-5 seconds, we get the same 
+speed from series and parallel. 
