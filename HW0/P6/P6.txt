@@ -1,1 +1,28 @@
-# Your answers here
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 1
+Bye Job 2
+Bye Job 0
+Hi Job 4
+Bye Job 3
+Hi Job 5
+Hi Job 6
+Hi Job 7
+Bye Job 7
+Bye Job 4
+Bye Job 6
+Hi Job 8
+Bye Job 5
+Hi Job 9
+Bye Job 9
+Bye Job 8
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+Above is an example of output. We notice that sometimes early works are finished even later than later works. It may be due to different efficiency of processors in processing.
+This becomes important when communication is needed between processors. An example for this would be like, processor I and processor II both open and close a file. If we do not consider that effect, errors will be raised.
+
+----
+
+The t_serial / t_parallel trend is shown as in the plot. When each job takes long time, parallel programs are much more efficient than serial ones. However when each job takes not that long, parallel programs sometimes are less efficient than serial programs, which may be due to a long communication or data transition among processors.
