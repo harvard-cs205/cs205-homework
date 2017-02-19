@@ -1,1 +1,15 @@
 # Your discussion here
+The collect-free program runs approximately 2.5 minutes. Key processes: text rdd -> consecutive word triplets rdd -> word doublets and predictions with frequency rdd -> takeSample -> generate Markov text of 20 words.
+
+
+Output:
+{(u'know', u'so'): u"know so must you speak with you. My lord, you are a gentleman of the world, And world's exile is",
+ (u'joyfully', u"return'd."): u"joyfully return'd. King. Thou still hast served Tell thee, Macduff was from thence that is not so much as to", 
+ (u'finished', u'indeed'): u'finished indeed his mortal body, His soul thou canst not then be yielded to this place. barren detested vale you', 
+ (u'bled,', u'Or'): u"bled, Or foil'd some debile wretch, which without profit suck The soil's fertility from wholesome flowers. Why should he be", 
+ (u'Droop', u'not;'): u'Droop not; adieu. Farewell, my lord. Ham. am glad to see the writing. do beseech you, sir, to my lord', 
+ (u'unknown,', u'And,'): u'unknown, And, were these women to men of Angiers, ring your bells: King John, your son, with mere conceit and', 
+ (u'so', u'her'): u'so her torture may be said to be a man. But yet you would have been a man of his', 
+ (u'Pisanio,', u'her'): u'Pisanio, her old servant, have not seen the day of marriage, and you shall find me in the world is', 
+ (u'God,', u'knew'): u'God, knew not what to say. First, the gods to witness will choose it. will be a man. But yet', 
+ (u'constant', u'friend'): u"constant friend And turns the sun with one of the world, And world's exile is not so much as to"}

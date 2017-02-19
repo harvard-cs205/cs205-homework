@@ -1,1 +1,5 @@
 # Your discussion here
+
+In part a, I used equal partitioning of the plotting area into 10 by 10 partitions. The resulting plot ('plot.png') shows the Mandelbrot set, which apparently suggests unbalanced intensity distribution: some pixels are black with very few iterations while others are really bright with way more iterations. Obviously the partition should be adjusted to create a more balanced plot. In part b, I first shuffle the lists of i and j. And this way the bright pixels and dark pixels are more uniformly distributed. Partitioning this shuffled lists, I get more balanced workload for each partition. This is seen on the histogram plot ('hist.png'): a normal like ditribution of number of partitions with certain iteration bin.
+
+(Part b discussed with Kevin Qi.)

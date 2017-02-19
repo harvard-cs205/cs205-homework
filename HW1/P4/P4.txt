@@ -1,1 +1,12 @@
 # Your discussion here
+
+In this problem, general processes: read (character, book) rdd -> convert it (character, [neighbors]) rdd -> breadth search all reached nodes of a character. While getting the (character, [neighbors]) graph rdd, I used two different methods: 1. reverse to (book, character) and then generate all possible (character, neighbor character) tuples and group by key. 2. Cartesian all characters and check if they have intersection. This one is better when character size is small.
+
+Results:
+	['CAPTAIN AMERICA', 6408]
+	['MISS THING/MARY', 7, ['MISS THING/MARY', u'STERLING', u'PANTHER CUB/', u'SWORDSMAN IV/', u'AMAZO-MAXI-WOMAN/', u'DARLEGUNG, GEN.', u'MANT/ERNEST']]
+	['ORWELL', 9, ['ORWELL', u'LUDLUM, ROSS', u'HOFFMAN', u'ASHER, CARL', u'ASHER, DONNA', u'FAGIN', u'OSWALD', u'ASHER, MICHAEL', u'NILES, SEN. CATHERIN']]
+
+Discussion:
+	1. What is the diameter of a search tree?
+	Diameter of a search graph is the maximum distance from one node to another. Setting the diameter to be 10 implies the maximum number of steps this search can cost is O(N^10), where N is the all the nodes in the graph.
