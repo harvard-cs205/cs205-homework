@@ -1,1 +1,27 @@
 # Your answers here.
+
+# Your answers here.
+
+1. It would take 255 seconds for the cashier to count the total sum
+
+2. By working together, they would be able to verify the sum quicker than if the original cashier was by herself. Indeed, the number of bags would be divided between the employees and would hence reduce each of their counting time. On the other hand, the sums would have to be combined again betweeen the 8 employees:
+256/8=32 bags per person. Hence, it would take each person 31 seconds to count the sum of the bag of pennies they were given, and then again 1 second for each 2 employees out of the 8 (4 couples) to combine their numbers, and again one second for each 2 couples to combine the sums and again 1 second for the last two sums to become one number, leading to a total of 31+3=34 seconds to count the total sum.
+It must be noted that the recombination time is equal to the number of employees (8 in this case), divided by 2 (as two sums are combined) and substracting 1.
+
+3. When the number of employees increases to reach infinity, the most efficient way would be to have 256 employees recombining the sums together (number of employees equal to the number of bags):
+From 256 to 128 to 64 and so on, which would take 8 seconds.  (2ˆ8=256)  
+
+NB: It is important to note for the rest of the exercice that when having 8 employees: 2ˆ3=8,  leading to a recombination time of 8 seconds and 2ˆ8=256 employees leading to a recombination time of 8 seconds.
+
+4. Similarly, if you have N bags, it will take the infinite number of employees (which should be N) to recombine the sums from N/2 to N/4 to N/8 and so on, which each recombiantion of sum equal to 1 second.
+Hence, the time needed is x with x being equal to 2ˆx = N if N is exactly a power of 2 , or the closest rounded up number that can be a power of 2.
+This gives x*ln(2)=ln(N) hence x=ln(N)/ln(2) if N=2ˆx or x=round up(ln(N)/ln(2)) otherwise.
+
+5. By assuming one second for communication between two people, the time needed as calculated in question 2 increases. Indeed, instead of adding 1 second to recombine the sums, 2 seconds need to be added, leading to a total of 31+2*3= 37 seconds.
+
+Having 256 employees, and adding 1 second of communication, the total time becomes 8*2=16 seconds
+
+When adding communication, the 256 employees might not be the most efficient way: In that case, having 128 employees seems more efficient.
+One second for each employee to sum up both of its bags, and 7*2 to communicate and recombine the sums, leading to a total time of 15 seconds.
+
+The same logic could be applied when the number of employee is infinite.
