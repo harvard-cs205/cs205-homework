@@ -1,1 +1,11 @@
 # Your answers here
+In each parallel run, the order to run the four function in parallel is random. For example, the order of 0,1,2,3 can be random, it could be 1,2,3,0
+For example, we have multiple steps to finish a calculation, and we also have several sub-steps in each steps. If the steps need to be finished step by step, and the sub-steps is independent of other sub-steps in each step. Then we can run sub-steps in parallel, while we mustr run steps in series but not in parallel.
+Otherwise, we would get total wrong results if we run steps in parallel.
+
+For P6B
+When the sleep time is very small compared to communicating time, then the total time depends on the communicating time. Serial computing is even faster than parallel computing, that might due to parallel computing spend lots of time on communicating since it has 4 processes, while serial computing does not. 
+
+But when sleep time is large compared with communicating time, then multi-processes will greatly reduce the total time by a factor of 4 since it has 4 processes. That is, the ratio will eventually reach a plateau of 4. But there is a transition from communicating dominant to sleep time dominant.
+
+
