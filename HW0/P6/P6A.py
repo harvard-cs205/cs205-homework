@@ -2,9 +2,9 @@ import multiprocessing as mp
 import time
 
 def burnTime(k):
-    print("Hi Job {}".format(k))
+    print "Hi Job %d" % k
     time.sleep(0.25)
-    print("Bye Job {}".format(k))
+    print "Bye Job %d" % k
     return k
 
 if __name__ == '__main__':
