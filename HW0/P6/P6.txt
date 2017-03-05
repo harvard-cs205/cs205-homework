@@ -1,1 +1,56 @@
-# Your answers here
+# Qing Zhao's Answer for Problem 6
+
+Section 1: Count to Ten
+
+1) Example Output:
+
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 0Bye Job 2
+
+Bye Job 3Bye Job 1
+
+Hi Job 4
+Hi Job 5
+Hi Job 6
+Hi Job 7
+Bye Job 4
+Bye Job 6
+Bye Job 7
+Bye Job 5
+Hi Job 8
+Hi Job 9
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+2) Unexpected Results & explainations:
+
+a. Jobs which starts early may not ends early;
+b. Jobs use the same stdout so they may output at the same time
+ which makes output messages mixed up.
+
+3) Consequence:
+
+When using multiprocessing module, each process will compete to get
+the same kind of resources, e.g. stdin, stdout. So programming in parallel
+requires programmers paying attention to the shared resources (e.g. creating
+an event monitor).
+
+4) Important scenario:
+
+In some cases when each process is waiting for an event
+that only another process in the set can cause, they will be deadlocked.
+
+Section 2: How Much Faster?
+
+1) Trend
+a. On the whole, ratio of serial to parallel execution grows with wait time;
+b. When waiting time is very short(< 1e-05), retio's trend is comparatively unclear;
+c. As wait time grows close to 1s, retio moves toward 4, and tends to be unimproved.
+
+2) As shown in P6.png, when wait time < 3e-05s, most of times retio < 1, which means parallel
+program takes longer than it’s serial version. This could be explained by considering system
+I/O time, etc.
