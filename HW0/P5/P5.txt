@@ -1,1 +1,51 @@
 # Your answers here.
+1. 255 seconds
+
+2. Yes. First, split the bags into 8 groups of 32 for each cashier. The 8 cashiers will take 31 seconds to add the total sum of each group. Now, to add the 8 numbers together, it takes 1 second to add 4 pairs of numbers, then 1 second to add the remaining 2 pairs of numbers, and finally 1 second to add the last pair of numbers (i.e. it is a binary tree). Hence, it will take 34 seconds to add up the sum.
+
+3. 8 seconds. log(256)/log(2). Essentially, it is a binary tree.
+
+4. It will take log(N)/log(2)
+
+5. 16 seconds. The binary tree has a depth of 9, hence there are 8 seconds to communicate between levels.  
+
+6. If each cashier takes one bag, it will take 256 seconds to hand out the bags, followed by another 16 seconds (from part 5) to count the total sum. Hence this way will take 272 seconds.
+
+If each cashier takes 2 bags, it will take 128 seconds to hand out the bags. 
+Once you handed out the bags, the cashiers can start counting. I will write the first few seconds in detail and extrapolate:
+1st second: hand 2 bags to cashier 1
+2nd second: hand 2 bags to cashier 2, cashier 1 adds his 2 bags --> call this A
+3rd second: hand 2 bags to cashier 3, cashier 2 adds his 2 bags (B)
+4th second: hand 2 bags to cashier 4, cashier 3 adds his 2 bags (C), cashier 2 tells cashier 1 the value of B
+5th second: hand 2 bags to cashier 5, cashier 4 adds his 2 bags (D), cashier 1 adds A and B
+6th second: hand 2 bags to cashier 6, cashier 5 adds his 2 bags (E), cashier 4 tells cashier 3 the value of D
+7th second: hand 2 bags to cashier 7, cashier 6 adds his 2 bags (F), cashier 3 adds C and D
+8th second: hand 2 bags to cashier 8, cashier 7 adds his 2 bags (G), cashier 6 tells cashier 5 the value of F, cashier 3 tells cashier 1 the value of C+D
+9th second: hand 2 bags to cashier 9, cashier 8 adds his 2 bags (H), cashier 5 adds F and G. Cashier 1 adds A+B+C+D
+...
+128th second: hand 2 bags to cashier 128, cashier 127 adds his 2 bags, cashier 126 tells cashier 125 the value of his 2 bag (call this a bag-pair). cashier 123 tells cashier 1 the value of bag-pairs 122+124 
+129th second: cashier 128 add his 2 bags, cashier 125 adds bag 125 and bag 126. cashier 1 add up sum of values from bag-pair 1 to bag-pair 124
+130th second: cashier 128 tells cashier 127 the value of his bag-pair (....similar as above....)
+131st second: cashier 127 adds bag 127 + 128, cashier 1 adds bag-pairs 1 to bag-pair 126
+132nd second: cashier 127 tells cashier 1 the value of his bag-pairs 127+128
+133rd second: cashier 1 adds up the bag pair 1 to 128
+
+Therefore, It should take 133 seconds 
+
+
+It is clear that the bottleneck is in giving out bags. Hence, a better strategy will be to give more bags to the cashiers in the front of the queue, so that they can count bags while you give decreasing number of bags to cashier at the back of the queue. A faster (I am not sure if it is optimal) strategy goes as follows:
+
+1st second: 22 bags to cashier 1
+2nd second: 21 bags to cashier 2, cashier 1 starts counting (it will take him 21 seconds)
+3rd second: 20 bags to cashier 3, cashier 2 starts counting (it will take him 20 seconds)
+...
+21st second: 2 bags to cashier 21, cashier 20 starts counting (it will take him 2 seconds). Note: there are 4 bags left at this point
+22nd second: 4 bags to cashier 22. cashier 21 starts counting (it will takes 1 second)
+23rd second: cashier 22 starts counting. All the other cashiers finish counting their bags
+24th second: cashier 1 to 21 communicate to sum up the values. There will be 10 pairs with 1 lone cashier
+25th second: The cashiers adds up their pair of values
+26th second: the cashier communicate again to sum up the values, there will be 5 pairs with 1 lone cashier. At this point, cashier 22 finished counting. Therefore, there are 6 pairs to sum up. this will take another ceil(log(6)/log(2))*2 = 6 seconds
+
+Therefore, it will take a total of 32 seconds. 
+
+

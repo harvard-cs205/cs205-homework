@@ -1,1 +1,5 @@
 # Your answers here
+
+1. the order of jobs ending is different every time. Some jobs may even take a long time to complete, as other jobs grab the lock first. A scenario where this is important is when we want certain jobs to finish in a particular order, for example: A program that process and output strings of text from a document sentence-by-sentence, such as a translator (Prcoess and Output are 2 different jobs). The processing part can be done in parallel, but the string output has to be in sequential order for the final output to make sense.
+
+2. The serial version is faster than the parallel version for short sleep time. This is because there is overhead involved in switching between threads. When the job is finished very quickly, the overhead becomes significant, which makes the parallel version slower. 
