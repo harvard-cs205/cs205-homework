@@ -1,1 +1,38 @@
-# Your answers here
+Count to Ten
+----------------
+
+Sample Output:
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 3
+Bye Job 1
+Bye Job 0
+Bye Job 2
+Hi Job 4
+Hi Job 5
+Hi Job 6
+Hi Job 7
+Bye Job 4
+Hi Job 8
+Bye Job 5
+Hi Job 9
+Bye Job 6
+Bye Job 7
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+
+The jobs do not always finish in the order in which they start. This is presumably because threads that should, in theory, take the same amount of time to finish, don’t always take the same amount of time. These discrepancies probably occur because of the internal complexities of one program starting four jobs which then all have to return their results to that same program (something like the communication overhead we explored in Problem 5). This could easily occur anytime we run jobs in parallel that finish in roughly the same amount of time, since otherwise unnoticeable delays could cause one job to overtake the other.
+
+This could cause a problem if, for example, two processes are both interacting with one file. Perhaps process 1 finishes and then writes the first half of the file, and process 2 finishes and then writes the second half of the file. If process 2 finished ahead of process 1, the resulting file would be out of order.
+
+
+How Much Faster?
+----------------
+
+It seems that the parallel burnTime perform much worse than the serial burnTime for shorter wait times (10^-3 seconds and smaller) but for wait times closer to 1 second, the parallel and serial processes are about equally fast. One possible explanation is the existence of some constant overhead from communication between processes. In Problem 5, we looked at how communication overhead can cause significant slowdown. Suppose running four parallel processes results in some constant amount of time, c seconds, lost to communication. This overhead would cause huge performance losses relative to serialized code for jobs that take c seconds or less, but for jobs that take much longer than c seconds, the overhead would not be noticeable.
+
+Thus, a parallel program could take longer than its serial version unless the time lost to parallelization overhead is not much less than the time taken by the task.
