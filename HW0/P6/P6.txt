@@ -1,1 +1,66 @@
-# Your answers here
+P6A
+
+Run #1
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 2
+Hi Job 4
+Bye Job 0
+Hi Job 5
+Bye Job 1
+Hi Job 6
+Bye Job 3
+Hi Job 7
+Bye Job 5
+Hi Job 8
+Bye Job 4
+Hi Job 9
+Bye Job 6
+Bye Job 7
+Bye Job 9
+Bye Job 8
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+Run #2
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 0
+Hi Job 4
+Bye Job 1
+Hi Job 5
+Bye Job 2
+Hi Job 6
+Bye Job 3
+Hi Job 7
+Bye Job 4
+Hi Job 8
+Bye Job 5
+Bye Job 7
+Hi Job 9
+Bye Job 6
+Bye Job 9
+Bye Job 8
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+When I ran the program several times, I found:
+1. the printouts won't follow the "Hi--Bye" order.
+2. the printouts order differs every time I run.
+3. the result is always 0-9 ordered sequence.
+
+For the first observation, I think it's because the pool.map function sends items in the sequence seperately to the 4 processes, and each process completes the print in different time, some are faster, some are slower, so the final printing won't necessarily be "Hi" first and "Bye" second in a certain order.
+
+For the second observation, I think the reason is that every time you run the program, the 4 processes would complete the task in different time from last time the program was run, so the print order are always changing.
+
+For the third observation, I think it's because the map function would lock the main program until the process is finished to guarantee the burnTime function returns in right order. So the final result(not the printouts) is always in the same order.
+
+We should be careful and be aware that the time for each process to finish a task are different. So if you want these processes to interact(e.g. send msg/data from one to another), it will affect the total efficiency, especially if you create many processes and want them to interact intensively.
+
+P6B
+
+I observed that the ratio flutuates but as a whole goes up from 0 to about 4, and then it stops growing and keep around 4. I think it's reasonable because there're only 4 processes and doing it in parallel would speed up 4 times at most. 
+As for the ratio growth, I think it's because at first the sleep period is so short that the advantage of parallelism is reduced by the time spent on system operations on processes, and as the sleep time grows, the advantage gets more and more obvious.
+I think it's possible that a parallel program can take longer than its serial version. For example, when the program is not big, running it in serial won't cost much time, but by creating and managing too many processes, running in parallel may cost more time for system's operations on processes.

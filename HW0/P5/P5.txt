@@ -1,1 +1,25 @@
-# Your answers here.
+#1 
+It would take totally 255 seconds.
+
+#2 
+Yes they can do it faster. The fastest way to do this is to divide all the bags equally for the 8 people to count, and now there will be 256/8=32 bags for each person, so it will take 31 seconds to count individually, plus the time to sum them up, to sum up, it should follow a binary tree style, which is 3 seconds, so the fastest way to do this costs 34 seconds.
+
+#3 
+The shortest time it costs for the employees to count in a binary tree style, which first add 256/2 pairs of numbers, and then 256/4 pairs of numbers, and so on. So the time will be log_2(256)=8 seconds.
+
+#4 
+(P5.py) 
+When infinite employees, the calculation is just like question #3. So the shortest time to count should be ceil(log_2(N)), which means round up.
+When a lone employee count all the bags, the time will be linear to the #bags, which is obvious.
+
+#5 
+The shortest time it costs for the employees to count should now add the communication time which is 1 second for a level in the "binary tree" except for the highest level.
+So for 8 employees, it will now take 37 seconds.
+For infinite employees, it will now take 16 seconds for fastest counting.
+
+#6
+Assume that the employees starts to count and communicate the next second I give them the bags, and they just communicate in serial, not parallel.
+If each employee takes 1 bag from me, that will be 256 seconds for taking the bag, and for 256 employees to sum up all the bags, it will take 2*255 seconds(communications and add numbers), but they can start to count when I give out bags, and the overlap time will be 256-3+1 because the overlap begins at the time I give bag to the 3rd person. So the total time it costs will be 512 seconds.
+If each employee taks 2 bags from me, similarly, there will be 128 seconds for taking bags, and 1+3*127 seconds for counting, and an overlap of 127 seconds, so the total time will be 383 seconds.
+It would be much faster if I give them number of bags in a decreasing order so that when I finish giving bags, all the employees have already counted the bags in their hands and can start to communicate in parallel. For example, I give the 1st employee 22 bags, and give the second 21 bags, and so on. When I give out the last bag, all 22 employees should be ready to communicate their numbers, so this step would cost 22 seconds. And then the communication time would be ceil(log_2(22)) because there are 22 employees. And the calculation time between these communications would also be ceil(log_2(22)), so the total time will be about 32 seconds.
+
