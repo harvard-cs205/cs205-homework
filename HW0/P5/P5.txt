@@ -1,1 +1,36 @@
 # Your answers here.
+
+1. 255 seconds required to sum total 256 bags.
+2. The process of counting would be faster. The time required to calculate the sum total of all the bags would be 34 seconds.
+3. If the store has infinite number of employees, the problems becomes a binomial tree where each level takes 1 second to be solved. Hence the employees can verify the sum in log(N) to the base 2 time where N is the next largest value in 2^n series. Hence the time required for 256 bags will be log(256) to base 2 which is 8 seconds.
+4. int(Log2(N)) time since the problem will be a binary tree if we have infinite employees. N will be the next largest value in the 2^n series.
+5. Considering the one second required to communicate between the levels, each level in the Binary tree takes 2 seconds to communicate the result to the next level except for the highest level where the sum is directly calculated and hence has no communication cost. The time required for 256 bags will be 2*Log2(N) - 1 which equals 15 seconds.
+6. Approaching the problem by considering that employees are not allowed to pass the bags and only communicate with each other, lets take employees = 8 and each employee gets 32 bags. For this case, the time required for execution is 43 seconds. Similarly for number of employees  = 16 and each employee getting 16 bags, the time is  35 seconds. And for number of employees = 4 and each employee getting 64 bags, the time is 71 seconds. Using mathematical induction, we figure that if the number of employees is n, then the time taken is (256/n) + n +3 seconds. Using the above formula for 1 bag per employee, we get a time of 260 seconds. For 2 bags per employee, we get 133 seconds.
+
+A better approach will be to give 128 bags to each employee who further pass it down the chain in the binary tree. Including the lag in the second set of bags, the total time for the bags to reach the end of the chain is 8 seconds. Adding this time to the time we previously calculated in 5.5 which is required to communicate results up the chain we get an answer of 23 seconds.
+
+
+Code for the graph
+
+import matplotlib.pyplot as plt
+import numpy as np
+import math
+
+#Main
+if __name__ == "__main__":
+    num_bags = range(1,1000,10);
+    time_person = [];
+    time_inf_person = [];
+
+    for bag in num_bags:
+        time_person.append(bag-1)
+        time_inf_person.append(math.ceil(float(np.log2(bag))))
+    
+    plt.yscale('log')
+    one_person, = plt.plot(num_bags,time_person,'-ob')
+    inf_person, = plt.plot(num_bags,time_inf_person,'-ok')
+    plt.xlabel('Number of bags')
+    plt.ylabel('Time taken for execution(in log scale)')
+    plt.legend([one_person, inf_person],['Single cashier',\
+     'Infinite cashiers'])
+    plt.show()

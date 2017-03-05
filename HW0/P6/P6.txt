@@ -1,1 +1,27 @@
 # Your answers here
+1. The general observation is that the order of computation of jobs varies.
+ 
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 2
+Bye Job 0
+Bye Job 1
+Hi Job 4
+Hi Job 5
+Hi Job 6
+Bye Job 3
+Hi Job 7
+Bye Job 6
+Bye Job 5
+Bye Job 4
+Hi Job 8
+Hi Job 9
+Bye Job 7
+Bye Job 8
+Bye Job 9
+
+It might be so that job 5 may get completed before job 4. A problem where this might actually matter is where the parallel processing job is trying to modify shared data. Any program requiring serialized data where the past data affects the future operations might be affected by this behaviour.A fitting example would be high-frequency trading where there are multiple transactions ordered at the same instant of time. And incase a job where assets might be sold to recoup money to buy in assets be slower to process than the later job, this might cause insufficient balances.
+
+2.The trend that we observe in the graph is that with increasing wait times the serialised execution takes more time than the parallel execution. Initially the serial execution is faster since parallel execution has a certain overhead to the entire process which leads to slower results. With increasing timings, the overhead slowly becomes negligible and as the graph shows, the parallel execution becomes nearly 4 times faster than the serial execution. And as mentioned, the problem uses 4 threads which means that the longer the delay, the more the parallel program achieves better results since the overhead becomes negligible.
