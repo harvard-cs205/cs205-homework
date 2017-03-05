@@ -1,1 +1,33 @@
 # Your answers here.
+1. 255 s
+   2^7 + 2^6 + ... + 2^0
+
+2. Yes, faster. 34 s
+   2^7/(2^3) + 2^6/(2^3) + ...+ 2^3/(2^3) 
+   + 2^2/(2^3)[==1] + 2^1/(2^3)[==1] + 2^0/(2^3)[==1]
+
+3. 8 s
+   2^7/(inf)[==1] + 2^6/(inf)[==1] + ...+ 2^3/(inf)[==1] 
+   + 2^2/(inf)[==1] + 2^1/(inf)[==1] + 2^0/(inf)[==1]
+
+4. log2(N)
+
+5. 15 s
+   7(communication) + 8(counting)
+
+6. 1 bag case: 272s
+   256(handing) + 1(coummunication) + 7(communication) + 8(counting)
+
+   2 bag case: 143s
+   128(handing) + 0(coummunication) + 7(communication) + 8(counting)
+   
+
+   There is a better strategy. 
+   More employees means more handing&communication time but less counting time.
+   So the problem is a trade-off.
+
+   A better strategy can be like:
+   1) 16 employees each take 16 bags. (16 s)
+   2) Each of 16 employees counts their own 16 bags simultaneously. (15 s)
+   3) After getting 16 numbers, they work together to get the final number. (4s + 4s)
+   The total time is 39 s.
