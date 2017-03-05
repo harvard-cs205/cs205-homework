@@ -1,1 +1,103 @@
 # Your answers here
+1) The output of the programs is non-deterministic (program output for four runs are available below). This is due to different processors taking slightly different times to complete their work. I would expect the pool to use one of either a random, round-robin or fully load balanced approach to distribute work among the various processors. The processors are also doing other work for the computer and so this isnt strictly controlled. Under these conditions, it is understandable that they need different running times for the same task.
+
+This means that programmers should ensure they are not dependent on a deterministic ordering of results for the functioning of their application. If there are implicit dependencies between parallely distributed components, then race conditions like this could cause a lot of bugs in the application or output. Ensuring any dependencies are handled explicitly is one approach but that can also get quickly complicated. Writing code that is functional/immutable is another approach to getting around this.
+
+First run:
+Vinays-MacBook-Pro:P6 vinaysubbiah$ python P6A.py
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 0
+Hi Job 4
+Bye Job 1
+Bye Job 2
+Bye Job 3
+Hi Job 5
+Hi Job 6
+Hi Job 7
+Bye Job 4
+Hi Job 8
+Bye Job 5
+Bye Job 6
+Hi Job 9
+Bye Job 7
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+Second run:
+Vinays-MacBook-Pro:P6 vinaysubbiah$ python P6A.py
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 0
+Bye Job 1
+Hi Job 4
+Bye Job 2
+Hi Job 5
+Bye Job 3
+Hi Job 6
+Hi Job 7
+Bye Job 4
+Bye Job 6
+Bye Job 5
+Bye Job 7
+Hi Job 8
+Hi Job 9
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+Third run:
+Vinays-MacBook-Pro:P6 vinaysubbiah$ python P6A.py
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 2
+Bye Job 0
+Bye Job 1
+Hi Job 4
+Hi Job 5
+Hi Job 6
+Bye Job 3
+Hi Job 7
+Bye Job 4
+Bye Job 5
+Bye Job 6
+Hi Job 8
+Hi Job 9
+Bye Job 7
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+Fourth run:
+Vinays-MacBook-Pro:P6 vinaysubbiah$ python P6A.py
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 1
+Bye Job 2
+Bye Job 0
+Bye Job 3
+Hi Job 4
+Hi Job 5
+Hi Job 6
+Hi Job 7
+Bye Job 6
+Bye Job 5
+Bye Job 4
+Bye Job 7
+Hi Job 8
+Hi Job 9
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+2) Initially, when the burn time is very low, the serial processing beats the pool. Then we see significant speed up provided by the pool, eventually converging asymptotically at a speed-up that reflects the number of extra processors available - in this case a 4x speed up given that there are 4 times as many processors.
+A parallel program could take longer if the overhead involved in distributing the work is greater than the actual processing that needs to be done - this was observed at very low burn times. It could also potentially be observed if there was a lot of data transfer etc. contributing to the overhead. This is not demonstrated in our current example as there is no such need.
