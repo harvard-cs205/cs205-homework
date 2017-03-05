@@ -1,1 +1,6 @@
 # Your answers here.
+#1. It would take the cashier 255 seconds, because it takes 255 times to sum up all the 256 numbers if add two numbers at a time, and it takes one second to add two numbers.
+
+#2. They can verify the total sum faster than the original cashier. They can do in 38 seconds.
+The fastest way is for each cashier to verify the same number of bags: 256/8 = 32, it takes all of them 31 seconds. Then it takes 7 seconds to add the 7 numbers. In total, it is 38 seconds.
+
