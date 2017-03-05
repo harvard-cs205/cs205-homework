@@ -1,1 +1,79 @@
 # Your answers here.
+
+1. Answer: 255. Since there are 256 bags, it would take 1 cashier 255 seconds to add the counts. The logic follows inductively since it takes 1 second to count 2 bags and assuming it takes X seconds to count N bags, it will take X+1 seconds to take N+1 bags where N >= 2. 
+
+2. Answer: Yes, in 36 seconds. If 8 people work together, then each can add 256/8 = 32 bags in 31 seconds simultaneously. Then they split into 16 pairs and one person in each pair adds the 2 numbers to yield 8 numbers. Thus we progress from 8 to 4 to 2 to 1 in 31 + 3 = 34 seconds.
+
+3. Answer: 8 seconds. Give 128 people 2 bags each. After 1 second each person will add their 2 bags to get 1 number. Then divide the 128 people into 64 pairs and have one person in each pair add the 2 numers to yield 64 numbers. Thus we progress from 128 to 64 to 32 to 16 to 8 to 4 to 2 to 1 in 8 seconds.
+
+4. Answer: Ceiling(log2(N)). If N is a power of 2, it will take log2(N) seconds to count the bags by similar logic as stated in problem 3. If N is not a power of 2, then it will take floor(log2(N)) seconds to count 2**floor(log2(N)) bags and at most floor(log2(N)) seconds to count the remaining N - 2**floor(log2(N)) bags. After floor(log2(N)) seconds we get 2 numbers and after another second we get 1 number, thus taking floor(log2(N)) + 1 = ceil(log2(N)) seconds.
+
+5. Answer: 15 seconds. Assuming infinite number of employees and we gave 128 people 2 bags each, after 1 second each person will add their bags to get 1 number. Then divide the 128 people into 64 pairs and have 1 person in each pair communicate his/her number to the other employee. Then the employee with 2 numbers in each pair adds the numbers to yield 64 numbers. This took 2 seconds. Thus we go from 128 numbers to 64 to 32 to 16 to 8 to 4 to 2 to 1 in 1 + 2 + 2 + 2 + 2 + 2 + 2 + 2 = 15 seconds.
+
+6. a. Answer: 262 seconds. If we give 1 bag to 1 employee at a time, then a lower bound on the count time is 256 seconds since it takes 256 seconds to give out the bags. While the person is giving out the bags, the employees who have received a bag can communicate or add simultaneously.  
+
+Lemma: It takes 2*log2(N) seconds to count N bags (where N is power of 2) after the N bags are passed out to the employees.
+Proof: After the N bags are passed out to the employees, it takes log2(N) seconds to add the bag numbers by part 4 and an additional log2(N) seconds to communicate/pass the numbers on the bags between employees before the numbers are added. 
+
+The strategy is as follows. First pass out 128 bags to 128 employees. Then pass out 64 bags to 64 different employees. While we are passing out the 64 bags, it takes 14 seconds for the 128 people to count their coins by the above lemma, yielding 64 + 1 = 65 bag counts after the 64 bags are passed out. Then pass out 32 bags to 32 employees and have the 64 employees count their coins in 12 seconds. Continuing in this way, I list the number of bags handed out, the number of seconds that went by, and the number of bag counts below:
+
+Number of Seconds       Number of Bags Handed Out        Number of bag counts
+
+128                              128                           128
+192                              192                           65
+224                              224                           34
+240                              240                           18
+248                              248			       10
+252                              252                           5
+254                              254                           4
+256                              256                           5
+262                              256                           1 
+
+b. Answer: 136 seconds. If we give 2 bags to 1 employee at a time, then a lower bound on the count time is 128 seconds since it takes 128 seconds to give out the bags. While the person is giving out the bags, the employees who have received a bag can communicate or add simulataneously.
+
+Lemma: It takes 2*log2(N) + 1 seconds to count N bags (where N is a power of 2) after the N bags are passed out to the employees.
+Proof: Same as the previous lemma except we wait an additional second before communicating for all the last employee to add up his/her 2 numbers.
+
+The strategy is as follows. First pass out 128 bags to 64 employees. The procedure is similar to 6a.
+
+Number of Seconds       Number of Bags Handed Out        Number of bag counts
+
+65                              130                           64
+97                              194                           33
+113                             226                           18
+121                             242                           9
+125                             250			      6
+127                             254                           3
+129                             256                           5
+136                             256                           1  
+
+c. Answer: Yes, 73 seconds. Give 4 bags to 1 employee at a time instead. Then it takes at most 2*log2(N) + 3 seconds to count N bags (where N is a power of 2) after the N bags are passed out to employees. This is because we can wait 3 seconds for the last employee to count his/her 4 bags then take 2*log2(N) seconds for the N employees to count their coins. See table below:
+
+Number of Seconds       Number of Bags Handed Out        Number of bag counts
+
+35                              140                           32
+51                              204                           17
+59                              236                           9
+63                              252                           6
+67                              256                           6
+73                              256                           1
+
+
+
+
+
+
+
+
+                        
+
+
+
+
+
+
+
+ 
+
+
+
