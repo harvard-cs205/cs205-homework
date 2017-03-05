@@ -1,1 +1,31 @@
 # Your answers here.
+
+1.
+It would take (n-1) seconds to sum up . It would take 255 seconds to add up all the bags.
+
+2.
+With 8 cashiers, they can work in parallel and process 256/8 bags in 256/8 - 1  = 31 seconds. Then it would take an additional 3 seconds to add up 8 numbers. Therefore, in total it would take 31+3 = 34 seconds to process 256 bags with 8 cashiers.
+
+3.
+With an infinite number of cashiers, we will be limited by the number of bags. 256 cashiers can count 1 bag each so the total time is for the 256 cashiers to add up all the bags. Therefore, total time = log2(256) = 8 seconds.
+
+4.
+Lone cashier function: N - 1. Infinite cashier function ceil(log2(N)). Plot is shown in P5.png.
+
+5.
+Assuming that we have infinite cashiers and that communications between the cashiers take 1 second. We can see that when we have 4 sums/bags left, having 1 cashier or 2 cashiers to count both take 3 seconds. Therefore, the last 4 sums take 3 seconds instead of 4 seconds. So it is easy to see that since communications double for every stage of log2 except for the very last stage where it takes -1 seconds. We can see that the total time to count 256 bags would be 8*2 - 1 = 15 seconds.
+
+6. 
+If we assume that I as the bag owner can distribute N bags to cashiers to help me distribute the bags.
+The entire process will take 2 steps:
+1) Distribution of bags will take ceil(log2(N + 1)) where each cashier will give N/2 bags to another new cashier until each cashier ends up with the required amount of bags (1, 2, or optimal).
+2) Summing up of the bags with communication and adding costs much like q5
+
+a) 1 bag: This means 256 cashiers will need to be holding 1 bag before they start summing everything up which will take ceil(log2(256 + 1)) = 9 seconds. You will give 128 bags to cashier A and B and in turn, each of them will distribute half of what they have, 64, to another cashier. To sum everything up will take log2(256)*2 for communicating and adding. Total = 9 + 16 = 25 seconds.
+
+If on the other hand, all 256 cashiers have to come to me to get the bags, then it will take N + 1 seconds to add up all the bags. This is because while I am handing out the bags, 2 cashiers  will take 2 seconds to communicate and add up the bags. Total time = 256+2 = 258 seconds.
+
+b) 2 bags: This means 128 cashiers will need to be holding 2 bags before they start summing everything up which will take ceil(log2(128 + 1)) = 8 seconds. To sum everything up will take 1 + log2(128)*2 for communicating and adding (+1 at the start to sum up the 2 bags so we will have 128 numbers). Total = 8 + 15 = 23 seconds.
+
+c) Better way: A better way would be to take advantage of the fact of what we found in part 5 where it takes the same time for 1 cashier to sum up 4 bags as 2 cashiers to sum up 4 bags.
+This means 64 cashiers will hold 4 bags before they start summing up ceil(log2(64 + 1)) = 7 seconds. To sum up everyything wiwll take 3 + log2(64)*2 = 15 seconds (+3 at the start to sum up 4 bags so we have 64 numbers). Total = 7 + 15 = 22 seconds.
