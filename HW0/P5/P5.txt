@@ -1,1 +1,16 @@
 # Your answers here.
+1) 255 seconds. 255 comparisons need to be made.
+
+2) 34 seconds. In 16 seconds, with 8 people, you can reduce this to a problem with 128 bags to sum. Then it will take 8 seconds to half the problem again, and so on. The sum if 16+8+4+2+1 = 31. Now, this leaves 8 numbers, which would take 3 more seconds.
+
+3) Since a single person can add the sum of at most 2 bags in a time step, that means that in the first time step, the most comparisons that can be made 128. Likewise, in the second, it will be 64, and so on. So, the number of seconds it will take is log_2(256) which is 8.
+
+4) It would be the ceil(log_2(N)). You can see the png file illustrating this in P5.png. Note that the y-axis in that chart has a logarithmic scale.
+
+5) Basically, we get the same approach as before, except that all steps after the first one take two seconds instead of just one, just we now have to communicate. Since it previously took 8 steps, now 7 of those will take an extra second. Note that this works since you would still split the work until there are only 2 bags per cashier, because if there were 4 bags, it would take 3 seconds for one person to calculate it, but only 2 seconds for two people. So, we would still maintain the same distribution of 128 cashiers in time step 1, 64 in step 2, etc. So the total is 8 + 7 = 15 seconds.
+
+6)a) First, let's assume that we need to distribute the bags before any calculations happen. In this case, it takes 256 seconds to distribute bags to 256 unique cashiers, and another second for half of them to give their bags to a second person so that he can combine them. At this point, we have reduced it to problem (5), and it will take 15 more sceonds. Thus, the total time is 272 (which is 256 + 1 +  15). Now, if you relax that assumption, then you can do most of the additions while you are still handing out bags. In this case, all but the last 4 bags can be summed before handing them out, for a total of 260 seconds. To expand on this a little bit, the way that this approach would work is that after passing out 128 bags, the employees would begin counting them. Then, when you pass our 64 more, they would start counting them. Then after 32 more, they would start counting, and so on. This would make it so that by the time you reach the end, almost all of the bags would have been counted (except for the last 4), which would need to be added to the running sum, making it take a total of 260 seconds.
+
+b) If you can pass out 2 bags at a time, then the first step will take 128 seconds, and then there will be 15 additional seconds after that just like before, for a total of 143. Again, if you relax the assumption that you need to hand out all of the bags before combining, then you can do most of the computation before all of the bags are handed out. This time, all but the last 8 bags can be counted before reaching the end. So, it will take 128 + 8 = 136 seconds by that strategy.
+
+c) If there are no limits on how many at a time, you should first give all of your bags to one cashier, who will then recurisvely pass half of his bags to another cashier. This process will take 8 seconds to reach 2 bags per cashier. Then, it will take 15 seconds to sum from there, for a total of 23 seconds.
