@@ -1,1 +1,146 @@
 # Your answers here.
+
+Part 1. (Answer)
+Suppose we have N bags. 
+It takes 1 second to add up the first two bags (so there are N-2 bags left);
+thereafter it takes 1 second to add one more bag to the running sum. 
+So it takes N-1 seconds for one person to add up all the bags.
+
+*********************************
+In this case, it takes 255 seconds for 256 bags.
+*********************************
+
+Part 2. (Answer)
+Assuming one person can only add two numbers per second. 
+Assume that for any given sum, computation of the two summands are independent
+tasks (that is, knowing one summand of the sum doesn't speed up the computation
+of the other and that computing one summand doesn't require the knowledge of the 
+other).
+
+The person who computed the total, at time t_f, could have added up only two 
+subtotals; so, given our assumption, the best case scenario is that both subtotals 
+were produced optimally and simultaneously (so t_f - 1 is the min of the optimal 
+compute times of both subtotals).
+
+For M number of subtotal computed at time t > 0, the same rationale applies, that is, 
+we want to have optimally and simultaneously computed the 2M summands by time t-1. Thus, 
+at time 1 we want to calculate floor(N/2) number of subtotals; at time t we want to 
+calculate floor(N/2^t) number of subtotals.
+
+If we had an employee ready to perform a calculation whenever one was needed, 
+the fastest we can compute the total is ceil(log_2(N)).
+
+In our case, at best, we can compute the total for 256 bags in 8 seconds.
+
+Note that at each time t, we need floor(N/2^t) number of employees to do simultaneous
+calculations. Since the number of calculations (hence employees) is monotone decreasing
+with respect to time, the bottle neck is the number of employees needed at time t = 1.
+So, if the number of employees, M, is less than floor(N/2). Then at each time t, we can 
+reduce the number of subtotals that remain to be summed by at most M. Let x be the least 
+natural number such that M - xN >= 2M. Then the fastest we can compute the total will be 
+x + ceil(log_2(M-xN)).
+
+*********************************
+In our case, we can compute the total for 256 bags in (30 + 4) seconds with 8 employees.
+*********************************
+
+Part 3. (Answer)
+[See answer to Part 2]
+
+Part 4. (Answer)
+[See answer to Part 2]
+
+Part 5. (Answer)
+Assume there's no time cost to distributing the initial pile of bags to the employees 
+(i.e. grabbing a bag doesn't count as communication). Assume it takes 1 second to communicate 
+a number between two employees and that an employee cannot simultaneously communicate with
+two people. Then, at time t, each of the subtotals being simultaneously computed will take 
+three seconds (one for receiving each summand and one for adding). Thus, the computation 
+time for our scheme (in Part 2) will take 3*ceil(log_2(N))-2 seconds with an infinite
+number of employees. This is still faster than computing the total with one employee (linear
+time). 
+
+*********************************
+In our case, it takes 22 seconds to total 256 bags. 
+*********************************
+
+Part 6. (Answer)
+
+(One Bag Case) Assume, initially, that each employee can only grab one bag, that this transaction 
+takes one second and that I can only interact with one person at a time. Then it will take 256
+seconds to distribute the bags from me to 256 employees.
+
+*********************************
+In this case, distributing the bags to be added (using whatever method) is slower than adding
+them with one person. 
+*********************************
+
+(Two Bags Case) If each employee can grab two bags, then it takes 128 seconds to distribute the 
+bags. Assuming adding doesn't commence until the bags are distributed, thereafter it will take
+3*ceil(log_2(N)) - 2 seconds to total the bags. So, together it will take 
+ceil(N/2) + 3*ceil(log_2(N)) - 2 
+number of seconds to total N number of bags. This is still faster than computing the total with 
+one employee. 
+
+Suppose adding starts when the first two bags are distributed (and that, in case N is odd, the last
+employee receives just one bag). Then the pairs of summands for the first set of subtotals will be 
+available at time t=1, t=2, ..., t=ceil(N/2) respectively (i.e. the nth pair of bags is distributed, 
+and become available for summing, at t=n). We'd like to calculate a set of subtotal from our pairs 
+of bags as soon as possible. We can verify that this means having each employee sum up the pair of 
+bags each receives. So, the soonest by which the first set of subtotals can be available is t=2, 
+t=3, ..., t=ceil(N/2)+1 (the subtotal for the nth pair of bags we hand out will be computed by time 
+t=n+1) respectively.  
+
+Now, suppose the k-th set of subtotals are optimally computed. The fastest way to compute (k+1)-th 
+set of subtotals is to sum up pairs of summands with the earliest available time. That is, we sort
+the list of k-th subtotals by availability time, and pairs of consecutive items in the list become
+the summands for the (k+1)-th subtotals. So, each (k+1)-th subtotal is computed by time 
+t = max{t_s1, t_s2} + 2, where t_s1, t_s2 are the times at which summand 1 and summand 2 become 
+available, respectively. The rationale is: assuming t_s2 > t_s1, and that it takes one second to
+receive each summand, summand 1 will already have been received when summand 2 become available.
+Then, it will take one additional second to receive summand 2 and one more second to add them.
+
+Note that, in this scheme, the last (k+1)-th subtotal is computed by time max_k+1 = max_k + 1, 
+where max_k is the time by which the last k-th subtotal become available. Since the last pair of 
+bags is distributed by time t=ceil(N/2), it follows that we can total N bags in, at worst, 
+ceil(N/2) + 2*ceil(log_2(N)) - 1 seconds. 
+
+*********************************
+In this case, it takes 143 seconds to total 256 bags using our scheme.
+*********************************
+
+(Multiple Bags Case: naive approach) Assume that I can hand out multiple bags in each interaction 
+and that employees can distribute bags to other employees (under the same set of restrictions for 
+each interaction). Reversing the scheme we described for computing the total gives us a scheme for
+distributing the bags. That is, at time t=0, I distribute ceil(N/2) and N - ceil(N/2)
+number of bags respectively to two employees (this costs 2 seconds). At time t, each of the 
+K number of employees will distribute their bags respectively to the next 2K number of 
+bagless employees. Here, for simplicity, we assume that the K number of employees will
+begin distributing their bags at the same time (i.e. employees who receive their bags earlier
+will not distribute them earlier). Thus, the time it takes to distribute all the bags (so that
+each employee is holding one or two bags) is 2*(ceil(log_2(N))-1). Assuming that no addition is 
+taking place when the bags are being distributed, the total time for summing up the bags is 
+2*(ceil(log_2(N))-1) + 3*ceil(log_2(N)). 
+
+This is faster than computing the total with one employee as well as for the case where I 
+distribute two bags at a time, for large enough N. In the case of 256 bags, it takes 38
+seconds to total them using the above scheme.
+
+(Multiple Bags Case: slightly faster) Assume that I can hand out multiple bags in each interaction,
+while always handing out the odd numbered half first, and that employees can distribute bags to 
+other employees (under the same set of restrictions for each interaction). If we allow each employee 
+to compute subtotals and propagate information as soon as they are able, then each stage of the 
+distribution will be completed, at worst, 2 seconds, after the last process in the previous stage 
+(as before). But now, each stage of the subtotal calculation will be completed, at worst, 2 seconds 
+after the previous stage (unlike before) - this is because if the propagation of the summands needed 
+at stage K are staggered, then for each subtotal, we can generally say that one of the summands is 
+ready at time t-k while the other is ready at time t, hence both summand will be received at t+1. 
+Hence, the time to total N number of bags will be, at worst, 
+2*(ceil(log_2(N))-1) + 2*ceil(log_2(N)) - 1.
+
+*********************************
+In this case, it takes 29 seconds to total 256 bags using our scheme.
+*********************************
+
+
+
