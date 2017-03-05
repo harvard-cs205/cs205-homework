@@ -1,1 +1,46 @@
-# Your answers here
+ # Your answers here
+ # --- P6A ---
+ 
+ # Unexpected result
+ Hi Job 0
+ Hi Job 1
+ Hi Job 2
+ Hi Job 3
+ Bye Job 0
+ Bye Job 2
+ Bye Job 3
+ Bye Job 1
+ Hi Job 4
+ Hi Job 5
+ Hi Job 6
+ Hi Job 7
+ Bye Job 5
+ Bye Job 4
+ Bye Job 7
+ Bye Job 6
+ Hi Job 8
+ Hi Job 9
+ Bye Job 8
+ Bye Job 9
+ [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+We can see that, while Job 0 to 3 started in numerically ascending order, they did not terminate in this order. This is because all these four processes' execution were interleaved and how many instructions one process would execute was completely independent from that of another process.
+
+Possible time plot:
+
+Process A               Process B
+    |                       |
+  Start                     |
+    |                     Start
+    |                       |
+   \\\                      |
+                            |
+                           End
+   \\\
+    |
+   End
+
+This affect the parallel programming in that processes are not synchronized well. Synchronization is important in any situation where multiple processes are going to write to the same memory area. Also, some scenarios would require a process to be "atomic" in that processes cannot be interleaved.
+# --- P6B ---
+
+From P6B.png we can see that, as the sleeping interval increases, the ratio goes from nearly 0 to approximately 4. This is because there may be some overhead that is invisible to user when starting a new process. This overhead is negligible when the process itself will take much more time to run. However, as the execution time of the process is of the same scale, or smaller than that of the overhead time, then this overhead must be considered as thus, running the same amount of processes in parallel can actually be slower than running in serial. Suppose that the overhead takes 10^(-3)s, when a process takes 1 s to execute. It will take a total of 4 * (1 + 10^(-3)) ~ 4s to execute in parallel and 16s in serial. However, if it takes 10^(-6)s to run a process, then the total time will approximately be 4*10^(-3)s and 1.6 * 10^(-5)s, under which condition execution in parallel is actually slower.
