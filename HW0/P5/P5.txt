@@ -1,1 +1,29 @@
-# Your answers here.
+Problem 5
+
+1.) 255 seconds
+2.) 
+      - Each of the eight cashiers adds up 32 bags. It takes a total of 31 seconds.
+      - There are now 8 bags. Four cashiers add up 2 bags each. I takes another 1 second.
+      - There are no 4 bags. Two cashiers add up 2 bags each. I takes  another 1 second.
+      - There are now 2 bags. One cashier adds up the 2 bags. It takes another 1 second.
+      - Task is completed in 34 seconds.
+3.) 
+      - Each of 128 cashiers gets 2 bags and adds them up. It takes 1 second.
+      - There are now 64 bags. 31 cashiers add 2 bags each. It takes another 1 second.
+                                       .
+                                       .
+                                       .
+                                2^x = 256 
+                                    x = 8
+                          It takes 8 seconds.
+
+4.) I takes logN seconds for >= N/2 cashiers to add up N bags. It takes N - 1 seconds for one cashier to add up N bags. See plot. 
+
+5.) Each step when two cashiers add up their bags takes 2 seconds instead of 1 second. For 256 it takes 2*8 = 15 seconds (for >= N/2 cashiers).
+
+6.) First 256 bags are handled over to 256 cashiers. This takes 256 seconds. The next 8 consecutive steps require 1, 2, 4, 8, 16, 32, 64 and 128 additional seconds for handing over the bags. This adds up to 511 additional seconds (+ 16 seconds for counting and communication).
+
+If 2 bags are handled to each cashier at the beginning the handling takes 510 seconds (+ 15 seconds for counting and communication), since the first step (128 cashiers give one bag each to 128 other cashiers = 1 second) no longer happens.
+
+If handing bags from person to person takes so much time it is best to move the bags to one cashier and let him count all of them. This takes only a total of 511 seconds (255 seconds for counting and 256 seconds for bag handling) and saves resources (cashiers).
+
