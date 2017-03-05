@@ -1,1 +1,11 @@
 # Your answers here
+
+1. Jobs are not opened and closed sequentially, but some jobs are closed before some other jobs were even started.
+    This means we cannot just assume that processes that were started earlier have returned. A scenario in which this
+    would be important is when the output of a process that has not retrurned yet is needed for the start of the
+    execution of a new function, which them may crash or not crash depending on whether the previous task has returned.
+
+2. The parallel execution seems to be faster mostly for relatively long wait times.
+    Around 10E-5  execution times do not seem to differ much For heigher wait times it is easy for the parallel program
+    to split over multiple processes without incurring too much overhead from the splitting. At lower values the wait
+    time may actually be shorter that the time involved in starting multiple processes and dividing the work.
