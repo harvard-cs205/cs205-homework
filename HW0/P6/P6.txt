@@ -1,1 +1,29 @@
 # Your answers here
+Example output from P6A.py:
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 1
+Bye Job 0
+Bye Job 2
+Bye Job 3
+Hi Job 4
+Hi Job 5
+Hi Job 6
+Hi Job 7
+Bye Job 4
+Bye Job 5
+Hi Job 8
+Bye Job 6
+Hi Job 9
+Bye Job 7
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+When executing 10 jobs using 4 processes, we might imagine starting 4 jobs, then ending those 4 jobs, then starting 4 additional jobs, then ending 4 additional jobs, then starting 2 jobs, and then ending 2 additional jobs. Practically, however, jobs aren't dispatched in batches, and we see that jobs don't necessarily finish in the order of request; some jobs may take longer. These unexpected results affect our considerations of parallel programming when a strict order is required: for example, if these jobs were arithmetic, and the subsequent batches of jobs depended upon the result of the previous jobs.
+If we were writing a sum to memory shared between jobs, this could be an issue. As for shared memory, we can avoid this circumstance, or we can use a semaphore/mutex. Separately, if order is relevant but memory is not necessarily shared, then we can pair jobs with IDs, which we can then use to reorder the resultant data. 
+
+
+For P6B.py, we see that generally as the wait time is increased, the speedup increases. Between the wait times of 10^-6 and 10^-4, the ratio of parralel time/serial time is less than 1, meaning the serial computation is faster in these instances. The speedup then reaches an asymptote of around 4x speedup around 10^-2 wait time. This asymptotic speedup of 4x makes intuitive sense, as we have 16 jobs, and if we run 4 at a time, we expect 16/4 times speedup (plus the overhead required to batch and deploy the processes). When the wait time is very small, the overhead or the time to batch and deploy the processes exceeds the time spent running the computation in parallel. When the overhead of setting up a pool of parallel processes exceeds the job compute time, serial computation can be faster than parallel computation. 
