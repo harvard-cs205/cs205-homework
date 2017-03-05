@@ -1,1 +1,34 @@
 # Your answers here.
+1) It would take 255 seconds to one cashier to add the totals of 256 bags.
+   To calculate this we decompose the operation in the successive number of sums that must be done:
+   total_time = 128/1 + 64/1 + 32/1 + 16/1 + 8/1 + 4/1 + 2/1 + 1/1
+
+2) Yes, they can verify the total sum faster than the original cashier by herself. 
+   It would take them 34 seconds:
+   total_time = 128/8 + 64/8 + 32/8 + 16/8 + 8/8 + maximum(4/8,1) + maximum(2/8,1) + maximum(1/8,1)
+
+3) If there are infinite employees then the result corresponds to the binary logarithm of N (where N=number of bags).
+   total_time = log(N)/log(2)
+   In this case N = 256, so total_time = 8 seconds.
+
+4) If there are infinite employees and N bags then the total time is:
+   total_time = log(N)/log(2) 
+   See P5.png for the plot.
+
+5) If it takes one second to communicate a number between two employees, then we need to add one second to each batch of sums and remove one for the last one since no communication happens at that stage.
+   total_time = 8*2 -1 = 15 seconds 
+
+6) If it also takes one second to hand a bag (or any number of bags) between two people we will need 256 seconds to hand every bag and 4 more seconds to compensate the idle times (2 seconds at the beggining because you cannot start adding before the two first cashiers have their bags, and two seconds at the end to communicate and sum the last bags).  
+   total_time = 256 + 4 = 260 seconds.
+
+   If instead of one bag, I can hand 2 bags to the cashier then it would take take half of the time to hand all the bags plus the same 4 seconds that we added in the previous case.
+   total_time = 256/2 + 4 = 132 seconds.
+
+   We can notice that the equation for this problem is (for n>1): 
+   total_time = (n-1) + n + N/n + 2
+   Where n correspond to the number of bags I can give to each cachier (it takes n-1 seconds for one cashier to count the n bags I handed him. Also I can only hand bags to one person at a time so the second cashier finishes counting the bags I handed him at n-1+1 = n seconds.) 
+   Thus, to find the best strategy we just need to minimize the following function:
+  
+   total_time(n) = 2n + 1 + 256/n
+
+   The minimum total time is 46 seconds with n = 12 bags.

@@ -1,3 +1,4 @@
+import numpy as np
 import multiprocessing as mp
 import time
 import matplotlib.pyplot as plt
@@ -8,7 +9,7 @@ def burnTime(t):
 
 # Main
 if __name__ == '__main__':
-    N = 16  # The number of jobs
+    N = 16 # The number of jobs
     P = 4   # The number of processes
 
     # A thread pool of P processes
@@ -16,16 +17,25 @@ if __name__ == '__main__':
 
     # Use a variety of wait times
     ratio = []
-    wait_time = []
+    wait_time = np.logspace(-6,0,10)
 
     for t in wait_time:
         # Compute jobs serially and in parallel
+        t0 = time.time()
+        pool.map(burnTime, t*np.ones(N))
+        parallelTime = time.time() - t0
+        
+        t0 = time.time()
+        for i in range(N):
+            burnTime(t)
+        serialTime = time.time() - t0
+
         # Use time.time() to compute the elapsed time for each
-        serialTime = 1
-        parallelTime = 1
+#         serialTime = 1
+#         parallelTime = 1
 
         # Compute the ratio of these times
-        # ratio.append(serialTime/parallelTime)
+        ratio.append(serialTime/parallelTime)
 
     # Plot the results
     plt.plot(wait_time, ratio, '-ob')
@@ -33,4 +43,5 @@ if __name__ == '__main__':
     plt.xlabel('Wait Time (sec)')
     plt.ylabel('Serial Time (sec) / Parallel Time (sec)')
     plt.title('Speedup versus function time')
-    plt.show()
+    plt.show()   
+    #plt.savefig('P6.png', bbox_inches='tight')
