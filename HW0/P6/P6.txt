@@ -1,1 +1,49 @@
 # Your answers here
+6A. Example outputs:
+1) 
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 1Bye Job 0
+
+Bye Job 2
+Bye Job 3
+Hi Job 4
+Hi Job 5
+Hi Job 6
+Hi Job 7
+Bye Job 6Bye Job 4Bye Job 7Bye Job 5
+
+
+
+Hi Job 8
+Hi Job 9
+Bye Job 9Bye Job 8
+
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+2)
+Hi Job 0
+Hi Job 1
+Hi Job 2
+Hi Job 3
+Bye Job 0Bye Job 1
+Bye Job 3
+Bye Job 2
+
+Hi Job 4
+Hi Job 5
+Hi Job 6
+Hi Job 7
+Bye Job 4
+Bye Job 6
+Hi Job 8
+Bye Job 7
+Hi Job 9
+Bye Job 5
+Bye Job 8
+Bye Job 9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+Explanation: We have created 4 processs in the pool. When we call burnTime and all the processes are busy, the task will be queued and executed once a process becomes free. Also, some processes might start while others are in progress, so we might see "bye job 5" after "hi job 9" etc. This causes different outputs. So when we program in parallel, we need to consider if the sequence within each process would interfere with each other. This could be a problem if a process could start only when the previous ones are finished.

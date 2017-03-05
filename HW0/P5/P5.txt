@@ -1,1 +1,17 @@
 # Your answers here.
+1. It takes 255 seconds.
+
+2. Yes, working together makes the verification faster. 
+Each cashier counts the sum of 32 bags using 31 seconds and adding the subtotals up takes 3 seconds, so it takes 34 seconds in total.
+
+3. 2^8 = 256. It takes 8 seconds.
+
+4. See plot. Since the time need to be an integer in seconds, it is [ln(N)/ln(2)]+1, where [] refers to the integer part.
+
+5. If it takes a second to communicate, then it takes an addtional second to enter the next round of counting. So it takes 8s (counting time) + 7s (communication time)=15s.
+
+6. 1) If each cashier takes 1 bag, the distribution time will be 256s, communication time will be 8s (8 rounds of communication) and counting time 8s (8 rounds). The total is 272s.
+
+2) If each cashier takes 2 bag, the distribution time will be 128s, plus what we calculated in the previous question, the total time will be 128s+15s=143s.
+
+A better strategy would be to distribute bags from top down, i.e., we distribute 128 bags to the first two cashiers and they each distribute bags evenly to two cashiers and so on. In this case, the total distribution time will be 8 seconds. As we calculated in Q5, the communication + counting time is 15 seconds. So the total time is 23 seconds.
