@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt 
 import matplotlib.cm as cm
 
+#Below is the mandelbrot function
+
 def mandelbrot(x, y):
     z = c = complex(x, y)
     iteration = 0

@@ -1,1 +1,9 @@
 # Your discussion here
+
+
+We note that due to the nature of the mandelbrot function, computation is
+focused on certain parts (which we can tell from color intensity of the image it produces)
+much more than others. Thus, when we allocate the partitions sequentially, we see a disproportionate
+amount of work applied across them as a majority of the function evaluation work is done by a minority of partitions. However, in the next part we choose to select them randomly, and the work becomes much more evenly spread giving us a bell-shaped curve when we look at the total compute the partitions are requiring, alibiet this result comes with an overhead shuffle cost that does not seem to be too bad in this particular secenario.
+
+If we were really looking for a more optimal partiiton, perhaps we could iterate through the pixels and then use the mandelbrot function (or an approximation of it) to determine the amount of relative work we would need to do for that fixed point, and then partition accordingly. However, this would be a lot more work from an implementation standpoint, and unless there's a quick approxmation we could do, probably is still relatively inefficient. 
