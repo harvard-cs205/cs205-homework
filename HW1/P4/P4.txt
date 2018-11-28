@@ -1,1 +1,27 @@
 # Your discussion here
+For this question, I collaborated with Reinier Maat and Taylor Killian. 
+
+I initially created a Graph in the form of an adjacency matrix where the matrix was of the form:
+
+(Superhero1, [list of all neighbors])
+(Superhero2, [list of all neighbors])
+
+However, i found this type of graph structure (one that is short and wide) to not be ideal for BFS. Specifically, I instead decided to use a graph structure in the form of just an edge list where the matrix is of the form:
+
+(Superhero1, Neighbor 1)
+(Superhero1, Neighbor 2)
+(Superhero1, Neighbor 3)
+(Superhero2, Neighbor 1)
+
+This new graph is tall and skinny, which is much easier to manipulate in spark. I called the distinct() method to ensure no one is linked to themselves (this assumes every character has at least one neighbor otherwise if they are solo then they will never be found as they are omitted from this edge list).
+
+My BFS algorithm works as follows: it first inputs an origin node and sets that origin to 0, i then join that origin node with my graph to find all of my origin’s neighbors. those neighbors are assigned to a distance of 1 and saved in a new node RDD. I then join that RDD with the original graph to get the neighbors of the distance-1 neighbors. This process repeats until my accumulator no longer updates. The accumulator stops updating when there are no more neighbors to search. Specifically, during each iteration, to avoid duplicative calculations, I have included a line of code that a checks to see if a superhero has already been searched by looking at which characters were already included in my finall_rdd. I also took advantage of .cache() to reduce wasted time recalculating RDDs during each iteration. 
+ 
+
+ORWELL - 9
+MISS THING/MARY - 7
+CAPTAIN AMERICA - 6408
+
+If a character does not have a defined distance, then that means that character is disconnected from my source node. With respect to this problem, that would mean that that character does not share a comic with the source node nor does any of his/her neighbors. there is no connection between that character and my source node. 
+
+The diameter of the graph denotes the maximum number of iterations in which my search must be executed for a single connected component. If my understanding of diameter is correct, it is the diameter of a graph of connected components. I could have another separate connected component within the graph that has its own diameter. If this is not the case, then i suppose the diameter could represent the theoretical maximum number of steps needed but i may not be able to run all of those steps starting from some arbitrary source node if i have separate ‘islands’ of connected components.
