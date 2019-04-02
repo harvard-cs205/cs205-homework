@@ -1,1 +1,22 @@
-# Your discussion here
+For the BFS algorithm, every search we find the characters at a distance +1 and create a RDD with these characters as keys. Then substract the keys of this RDD until it does not change. So we have both the distance and the nodes that are not connected to node 0.
+
+For BFS -- CAPTAIN AMERICA
+Distance is 3
+Number of connected characters is 6408
+
+For BFS -- ORWELL
+Distance is 1
+Number of connected characters is 9
+
+For BFS -- MISS THING/MARY
+Distance is 1
+Number of connected characters is 7
+
+What does this diameter imply about the maximum number of steps in which your search must be executed?
+
+The maximum number of steps is 10, which means that the considered character is not connected to all the other characters connected to node 0.
+
+
+What does it mean if a character does not have a defined distance during the search?
+
+The maximum number of steps is equal to the diameter of the graph when nodes are been traversed beyond the diameter, which means the character is not connected the root character with other characters.

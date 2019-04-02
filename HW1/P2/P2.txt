@@ -1,1 +1,9 @@
 # Your discussion here
+
+P2a.py: 
+
+In this problem, we used default partitioning. Just partition all the data into 100 partitions within fixed order, which is fast with the partition time. However, it does not balance the work, since some pixels are concentrated in some certain partitions, such as the light pixels are located in certain partitions, which cause the processing time for those partitions very slow.
+
+P2b.py:
+
+In this problem, we used randomization partitioning. In this method, we called a function random.shuffle(), which shuffle costs. It balances the work because we reorder the pixels into different partitions, such as light pixels are relocated into different partitions, this will lead the processing time for all partitions to be balanced and fast.
