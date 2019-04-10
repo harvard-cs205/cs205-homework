@@ -1,1 +1,5 @@
-# Your discussion here
+The results are showed as below:
+
+(u'aerst', (11, [u'arets', u'aster', u'rates', u'reast', u'resat', u'stare', u'stear', u'strae', u'tares', u'tears', u'teras']))
+(u'aelst', (11, [u'least', u'leats', u'salet', u'slate', u'stale', u'steal', u'stela', u'taels', u'tales', u'teals', u'tesla']))
+(u'aeprs', (11, [u'asper', u'pares', u'parse', u'pears', u'prase', u'presa', u'rapes', u'reaps', u'spaer', u'spare', u'spear']))

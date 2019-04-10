@@ -1,1 +1,17 @@
 # Your discussion here
+
+The output are showed as below:
+
+- Number of nodes touched 
+CAPTAIN AMERICA： 6408         
+MISS THING/MARRY： 7           
+ORWELL： 9             
+
+- Diameter
+CAPTAIN AMERICA： 3         
+MISS THING/MARRY： 1           
+ORWELL： 1  
+
+In this question, I created a graph in the form of an list of (hero_i, neighbor_j). And then I use the distinct() function to remove those pairs whose neighbors are themselves. In the bfs() function, I start from the origin node (dist=0) and search for all its neighbors (dist=1). And then I iteratively search for the neighbors of all these new found nodes (dist +=1) until there is no longer new neighbor. 
+
+The graph diameters are also showed above. The diameter of a graph means the maximum number of iterations required for an inquired node. And a character that does not have a defined distance implies it is not connected with the source character.
